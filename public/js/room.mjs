@@ -1,18 +1,15 @@
 import { io } from 'https://cdn.socket.io/4.7.5/socket.io.esm.min.js';
 
 const socket = io();  // Uses served socket.io from script tag
-let currentRoomId = null;
 
-// DOM elements (only room page elements)
 const roomIdSpan = document.getElementById('roomId');
 const userCountSpan = document.getElementById('userCount');
 const messages = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 
-// Initialize room
 function init() {
   // Extract room ID from URL
-  const roomId = window.location.pathname.slice(1); // Remove leading slash
+  const roomId = window.location.pathname.slice(1); // Remove leading <slash></slash>
 
   if (!roomId) {
     // No room ID in URL, redirect to landing
@@ -24,22 +21,18 @@ function init() {
   setupEventListeners();
 }
 
-// set up event listeners
 function setupEventListeners() {
-  // global functions for HTML onclick handlers
   window.sendMessage = sendMessage;
   window.handleEnter = handleEnter;
 }
 
 function joinRoom(roomId) {
-  currentRoomId = roomId;
-  roomIdSpan.textContent = roomId;
   socket.emit('join-room', roomId);
 }
 
 function sendMessage() {
   const text = messageInput.value.trim();
-  if (text && currentRoomId) {
+  if (text && socket.roomId) {
     socket.emit('message', { text });
     messageInput.value = '';
   }
@@ -51,12 +44,14 @@ function handleEnter(event) {
   }
 }
 
-socket.on('joined-room', (data) => {
-  console.log('✅ Joined room:', data.roomId);
-  userCountSpan.textContent = data.userCount;
+socket.on('room-join-success', (data) => {
+  console.log('✅ You joined room:', data.roomId);
+  socket.roomId = data.roomId;
+  roomIdSpan.textContent = data.roomId;
 });
 
-socket.on('user-count', (count) => {
+
+socket.on('room-usercount-update', (count) => {
   userCountSpan.textContent = count;
 });
 
