@@ -2,7 +2,8 @@ import './RoomPage.css';
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import { io } from 'socket.io-client';
-import type { TypedSocket, Message, RoomId } from '../../../shared/types';
+import Messages from './Messages';
+import type { TypedSocket, Message, RoomId } from '../../../../shared/types';
 
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -30,7 +31,6 @@ export default function RoomPage() {
     });
 
     newSocket.on('message', (message: Message) => {
-      console.log('Message arrived from', message.userId, message.text);
       setMessages(messages => [...messages, message]);
     });
     return () => {
@@ -54,20 +54,11 @@ export default function RoomPage() {
     <>
       <h1>📞 Voice Chat Room</h1>
 
-      <div id="chat">
-        <h3>Room: <span id="roomId"></span></h3>
-        <p>Users connected: <span id="userCount">{roomUserCount}</span></p>
+      <div>
+        <h3>Room: <span></span></h3>
+        <p>Users connected: <span>{roomUserCount}</span></p>
 
-        <div id="messages">
-          {messages.map((msg, index) => (
-            <div key={index} className="message">
-              <strong>{msg.userId}:</strong> {msg.text}
-              <div className="timestamp">
-                {new Date(msg.timestamp).toLocaleTimeString()}
-              </div>
-            </div>
-          ))}
-        </div>
+        <Messages messages={messages} />
 
         <div>
           <input type="text"

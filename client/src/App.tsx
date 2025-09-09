@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router';
 import LandingPage from './pages/LandingPage';
-import RoomPage from './pages/RoomPage';
+import RoomPage from './pages/room/RoomPage';
 import './App.css'
 
 export default function App() {

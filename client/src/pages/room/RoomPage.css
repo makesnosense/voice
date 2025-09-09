@@ -16,7 +16,7 @@
       display: none;
     }
 
-    #messages {
+    .messages {
       border: 1px solid #ccc;
       height: 300px;
       overflow-y: scroll;
