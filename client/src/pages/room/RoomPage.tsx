@@ -14,6 +14,9 @@ export default function RoomPage() {
   const [messageInput, setMessageInput] = useState('');
 
   useEffect(() => {
+
+    document.title = `Room ${roomId}`;
+
     const newSocket: TypedSocket = io();
     socketRef.current = newSocket;
 

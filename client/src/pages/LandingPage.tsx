@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 import type { CreateRoomResponse } from '../../../shared/types';
@@ -7,6 +7,12 @@ import './LandingPage.css';
 export default function LandingPage() {
   const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = 'Voice Chat - Landing';
+  }, []);
+
+
 
   const handleCreateRoom = async () => {
     if (isCreating) return;
@@ -25,7 +31,6 @@ export default function LandingPage() {
 
   return (
     <>
-      <title>Landing</title>
       <h1>📞 Minimal Voice Chat</h1>
 
       <div id="lobby">
