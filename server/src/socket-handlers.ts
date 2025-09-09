@@ -2,7 +2,9 @@ import type {
   Room,
   RoomId,
   TypedServer,
-  ExtendedSocket
+  ExtendedSocket,
+  Message,
+  SocketId
 } from '../../shared/types';
 
 export default function createConnectionHandler(io: TypedServer, rooms: Map<RoomId, Room>) {
@@ -38,11 +40,13 @@ const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text:
   if (socket.roomId) {
     console.log(`💬 Message in ${socket.roomId}: ${data.text}`);
 
-    io.to(socket.roomId).emit('message', {
+    const message: Message = {
       text: data.text,
-      userId: socket.id.slice(0, 8), // Show first 8 chars of socket ID
+      userId: socket.id as SocketId,
       timestamp: Date.now()
-    });
+    };
+
+    io.to(socket.roomId).emit('message', message);
   }
 }
 
