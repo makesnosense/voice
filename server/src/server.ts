@@ -21,7 +21,7 @@ const rooms = new Map<RoomId, Room>();
 
 app.use(express.json());
 
-app.post('/create-room', (req, res) => {
+app.post('/api/create-room', (req, res) => {
   const roomId: RoomId = generateRoomId();
   rooms.set(roomId, {
     created: Date.now(),
