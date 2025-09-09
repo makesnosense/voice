@@ -5,6 +5,8 @@ import { io } from 'socket.io-client';
 import Messages from './Messages';
 import type { TypedSocket, Message, RoomId } from '../../../../shared/types';
 
+
+
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
 
@@ -37,6 +39,7 @@ export default function RoomPage() {
       setMessages(messages => [...messages, message]);
     });
     return () => {
+      newSocket.off();
       newSocket.disconnect();
     };
 
@@ -51,6 +54,14 @@ export default function RoomPage() {
       setMessageInput('');
     }
   };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
 
 
   return (
@@ -67,6 +78,7 @@ export default function RoomPage() {
           <input type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
+            onKeyDown={handleKeyPress}
             placeholder="Type message..." />
           <button
             onClick={sendMessage}
@@ -76,6 +88,6 @@ export default function RoomPage() {
       </div>
     </>
   );
-
-
 }
+
+
