@@ -20,7 +20,7 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
   socket: ExtendedSocket, roomId: RoomId): void => {
   const room = rooms.get(roomId);
   if (!room) {
-    socket.emit('error', 'Room not found');
+    socket.emit('room-not-found', 'Room not found');
     return;
   }
 

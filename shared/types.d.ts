@@ -3,6 +3,8 @@ import type { Server, Socket } from 'socket.io';
 export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
 
+type ConnectionStatus = 'connecting' | 'joined' | 'error';
+
 export interface Room {
   created: number;
   users: Set<SocketId>;
