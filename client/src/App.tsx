@@ -8,8 +8,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LandingPage />}></Route>
       <Route path="/:roomId" element={<RoomPage />}></Route>
-      {/* <Route path="/tracking/:orderId/:productId" element={<TrackingPage cart={cart} />}></Route> */}
-      {/* <Route path="*" element={<NotFound cart={cart} />}></Route> */}
     </Routes>
   )
 }
