@@ -1,4 +1,5 @@
-import styles from './Header.module.css';
+import baseStyles from './BaseCard.module.css';
+import voiceStyles from './Header.module.css';
 
 type VoiceState = 'active' | 'silent' | 'muted';
 
@@ -10,15 +11,16 @@ interface HeaderProps {
 
 export default function Header({
   title = 'Voice',
-  voiceState = 'silent',
+  voiceState = 'active',
   className = ''
 }: HeaderProps) {
-  const getStateClass = () => {
+
+  const getVoiceStateClass = () => {
     switch (voiceState) {
       case 'silent':
-        return styles.silent;
+        return voiceStyles.silent;
       case 'muted':
-        return styles.muted;
+        return voiceStyles.muted;
       case 'active':
       default:
         return '';
@@ -26,17 +28,17 @@ export default function Header({
   };
 
   return (
-    <header className={`${styles.voiceHeader} ${getStateClass()} ${className}`}>
-      <div className={styles.voiceIcon}>
-        <div className={styles.voiceWaves}>
-          <div className={styles.wave}></div>
-          <div className={styles.wave}></div>
-          <div className={styles.wave}></div>
-          <div className={styles.wave}></div>
-          <div className={styles.wave}></div>
+    <header className={`${baseStyles.card} ${getVoiceStateClass()} ${className}`}>
+      <div className={voiceStyles.voiceIcon}>
+        <div className={voiceStyles.voiceWaves}>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
         </div>
       </div>
-      <h1 className={styles.voiceTitle}>{title}</h1>
+      <h1 className={baseStyles.title}>{title}</h1>
     </header>
   );
 }

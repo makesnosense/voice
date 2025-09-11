@@ -1,22 +1,3 @@
-.voiceHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
-  width: fit-content;
-}
-
-.voiceHeader:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
 .voiceIcon {
   width: 28px;
   height: 28px;
@@ -105,13 +86,4 @@
   animation: none;
   opacity: 0.2;
   background: #e2e8f0;
-}
-
-.voiceTitle {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1e293b;
-  letter-spacing: -0.025em;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
