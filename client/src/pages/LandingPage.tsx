@@ -36,11 +36,10 @@ export default function LandingPage() {
       <div id="lobby">
         <button onClick={handleCreateRoom}
           disabled={isCreating}
-          className="create-room-btn">
-          Create Call</button>
-        <p>Or enter room URL to join existing call</p>
-      </div>
-    </>
+          className={`${buttonStyles.button} ${buttonStyles.lightGreen}`}>
+          <Phone size={20} className={buttonStyles.icon} />
+          Create Call
+        </button>
   );
 
 
