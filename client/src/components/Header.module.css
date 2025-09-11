@@ -37,6 +37,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 2px;
   animation: voice-wave 1.5s ease-in-out infinite;
+  transition: all 0.3s ease;
 }
 
 .wave:nth-child(1) {
@@ -78,6 +79,34 @@
   }
 }
 
+/* Enhanced silent state */
+.silent .wave {
+  animation: none;
+  opacity: 0.3;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  height: 4px !important;
+  /* All waves same minimal height */
+}
+
+/* Alternative: keep some visual hierarchy in silent state */
+.static .wave {
+  animation: none;
+  opacity: 0.4;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+}
+
+.static .wave:nth-child(2),
+.static .wave:nth-child(4) {
+  opacity: 0.6;
+}
+
+/* For completely muted appearance */
+.muted .wave {
+  animation: none;
+  opacity: 0.2;
+  background: #e2e8f0;
+}
+
 .voiceTitle {
   font-size: 20px;
   font-weight: 600;
@@ -85,15 +114,4 @@
   letter-spacing: -0.025em;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-/* Static version modifier */
-.static .wave {
-  animation: none;
-  opacity: 0.7;
-}
-
-.static .wave:nth-child(2),
-.static .wave:nth-child(4) {
-  opacity: 1;
 }
