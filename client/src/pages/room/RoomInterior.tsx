@@ -1,3 +1,6 @@
+// import buttonStyles from '../../components/Buttons.module.css';
+import CopyCard from '../../components/CopyCard';
+
 import Messages from './Messages';
 import { useState } from 'react';
 import type { RoomId, Message, TypedSocket } from "../../../../shared/types";
@@ -46,7 +49,9 @@ export default function RoomInterior({
   };
   return (
     <>
-      <span><button onClick={copyRoomUrl}>📋 Copy Room URL</button></span>
+      <span>
+        <CopyCard />
+      </span>
 
       <div>
         <h3>Room: <span>{roomId}</span></h3>
