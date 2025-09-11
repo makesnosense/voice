@@ -1,0 +1,29 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.content {
+  flex: 1;
+  padding-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Variant for room pages that need full content area */
+.contentFull {
+  flex: 1;
+  padding-top: 2rem;
+}

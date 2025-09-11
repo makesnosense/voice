@@ -1,3 +1,6 @@
+import buttonStyles from '../components/Buttons.module.css';
+import layoutStyles from '../styles/Layout.module.css';
+import { Phone } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
@@ -29,17 +32,21 @@ export default function LandingPage() {
   };
 
   return (
-    <>
-      <Header />
-      {/* <h1>📞 Minimal Voice Chat</h1> */}
+    <div className={layoutStyles.page}>
+      <div className={layoutStyles.header}>
+        <Header />
+      </div>
 
-      <div id="lobby">
+
+      <main className={layoutStyles.content}>
         <button onClick={handleCreateRoom}
           disabled={isCreating}
           className={`${buttonStyles.button} ${buttonStyles.lightGreen}`}>
           <Phone size={20} className={buttonStyles.icon} />
           Create Call
         </button>
+      </main>
+    </div >
   );
 
 
