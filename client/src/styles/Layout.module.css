@@ -22,8 +22,57 @@
   align-items: flex-start;
 }
 
-/* Variant for room pages that need full content area */
-.contentFull {
+/* Room-specific layouts */
+.roomContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.roomHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.roomInfo {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.messagesArea {
   flex: 1;
-  padding-top: 2rem;
+  min-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.messageInput {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.messageInput input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
+
+.messageInput button {
+  padding: 0.5rem 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }

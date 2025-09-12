@@ -1,5 +1,5 @@
-// import buttonStyles from '../../components/Buttons.module.css';
 import CopyCard from '../../components/CopyCard';
+import layoutStyles from '../../styles/layout.module.css'
 
 import Messages from './Messages';
 import { useState } from 'react';
@@ -20,7 +20,6 @@ export default function RoomInterior({
   socketRef
 }: RoomInteriorProps) {
 
-
   const [messageInput, setMessageInput] = useState('');
 
   const sendMessage = () => {
@@ -38,40 +37,34 @@ export default function RoomInterior({
     }
   };
 
-  const copyRoomUrl = async () => {
-    const url = window.location.href;
-    try {
-      await navigator.clipboard.writeText(url);
-      console.log('Room URL copied!');
-    } catch (err) {
-      console.error('Failed to copy URL:', err);
-    }
-  };
   return (
-    <>
+    <div className={layoutStyles.roomContainer}>
       <span>
         <CopyCard />
       </span>
 
-      <div>
+
+      <div className={layoutStyles.roomInfo}>
         <h3>Room: <span>{roomId}</span></h3>
         <p>Users connected: <span>{roomUserCount}</span></p>
-
-        <Messages messages={messages} />
-
-        <div>
-          <input type="text"
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Type message..." />
-          <button
-            onClick={sendMessage}
-            className="send-button"
-          >Send</button>
-        </div>
       </div>
-    </>
+
+      <div className={layoutStyles.messagesArea}>
+        <Messages messages={messages} />
+      </div>
+      <div className={layoutStyles.messageInput}>
+        <input type="text"
+          value={messageInput}
+          onChange={(e) => setMessageInput(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Type message..." />
+        <button
+          onClick={sendMessage}
+          className="send-button"
+        >Send</button>
+      </div>
+
+    </div>
   );
 
 
