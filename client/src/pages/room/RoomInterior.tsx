@@ -1,6 +1,7 @@
 import CopyCard from '../../components/CopyCard';
 import layoutStyles from '../../styles/layout.module.css'
-
+import { Mic, MicOff, MicVocal, VolumeX } from 'lucide-react';
+import buttonStyles from '../../components/Buttons.module.css';
 import Messages from './Messages';
 import { useState } from 'react';
 import type { RoomId, Message, TypedSocket } from "../../../../shared/types";
@@ -12,6 +13,8 @@ interface RoomInteriorProps {
   socketRef: React.RefObject<TypedSocket | null>;
   isMicActive: boolean;
   audioLevel: number;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 
@@ -21,7 +24,9 @@ export default function RoomInterior({
   messages,
   socketRef,
   isMicActive,
-  audioLevel
+  audioLevel,
+  isMuted,
+  toggleMute
 }: RoomInteriorProps) {
 
   const [messageInput, setMessageInput] = useState('');
@@ -66,8 +71,15 @@ export default function RoomInterior({
           transition: 'transform 0.1s',
           opacity: isMicActive ? 1 : 0.3
         }} />
-        <small>{isMicActive ? '🎤 Active' : '🔇 Inactive'}</small>
+        <small>{isMicActive ? <MicVocal size={20} /> : <VolumeX size={20} />} microphone {isMicActive ? ' connected' : 'not connected'}</small>
 
+        <button
+          onClick={toggleMute}
+          className={`${buttonStyles.button} ${buttonStyles.iconButton}`}
+        >
+          {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+          {isMuted ? 'Unmute' : 'Mute'}
+        </button>
       </div>
 
       <div className={layoutStyles.messagesArea}>

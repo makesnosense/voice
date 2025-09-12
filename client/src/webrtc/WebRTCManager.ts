@@ -76,12 +76,32 @@ export class WebRTCManager {
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
 
-    // Simple average
-    const sum = dataArray.reduce((a, b) => a + b, 0);
-    return Math.min(100, (sum / dataArray.length) / 255 * 100);
+    let sum = 0;
+    let count = 0;
+
+    for (let i = 0; i < dataArray.length; i++) {
+
+      if (dataArray[i] > 10) {
+        sum += dataArray[i];
+        count++;
+      }
+    }
+
+
+    if (count === 0) return 0;
+
+    const average = sum / count;
+
+    return Math.min(100, (average / 255) * 400);
   }
 
-
+  toggleMute() {
+    if (this.localStream) {
+      this.localStream.getAudioTracks().forEach(track => {
+        track.enabled = !track.enabled;
+      });
+    }
+  }
 
 
   // // Step 2: Create a peer connection for a specific user

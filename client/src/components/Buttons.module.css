@@ -39,3 +39,10 @@
 .lightGreen .icon {
   color: #22c55e;
 }
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+}
