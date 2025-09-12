@@ -1,0 +1,33 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.message {
+  /* No card styling - just clean text */
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
+}
+
+.messageHeader strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: normal;
+}
+
+.messageText {
+  color: #111827;
+  line-height: 1.4;
+  margin-left: 0;
+}
