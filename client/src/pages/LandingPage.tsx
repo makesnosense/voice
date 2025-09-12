@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router';
 import axios from 'axios';
 import type { CreateRoomResponse } from '../../../shared/types';
 import Header from '../components/Header';
-import './LandingPage.css';
 
 export default function LandingPage() {
   const [isCreating, setIsCreating] = useState(false);
