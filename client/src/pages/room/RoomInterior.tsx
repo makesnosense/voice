@@ -10,6 +10,8 @@ interface RoomInteriorProps {
   roomUserCount: number;
   messages: Message[];
   socketRef: React.RefObject<TypedSocket | null>;
+  isMicActive: boolean;
+  audioLevel: number;
 }
 
 
@@ -17,10 +19,13 @@ export default function RoomInterior({
   roomId,
   roomUserCount,
   messages,
-  socketRef
+  socketRef,
+  isMicActive,
+  audioLevel
 }: RoomInteriorProps) {
 
   const [messageInput, setMessageInput] = useState('');
+
 
   const sendMessage = () => {
     const text = messageInput.trim();
@@ -47,6 +52,22 @@ export default function RoomInterior({
       <div className={layoutStyles.roomInfo}>
         <h3>Room: <span>{roomId}</span></h3>
         <p>Users connected: <span>{roomUserCount}</span></p>
+
+
+
+        {/* Minimal audio indicator */}
+        <div style={{
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          margin: '10px auto',
+          backgroundColor: isMicActive ? '#22c55e' : '#ccc',
+          transform: `scale(${1 + audioLevel / 100})`,
+          transition: 'transform 0.1s',
+          opacity: isMicActive ? 1 : 0.3
+        }} />
+        <small>{isMicActive ? '🎤 Active' : '🔇 Inactive'}</small>
+
       </div>
 
       <div className={layoutStyles.messagesArea}>

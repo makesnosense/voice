@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef, } from 'react';
 import { io } from 'socket.io-client';
 import type { RoomId, TypedSocket, Message, ConnectionStatus } from '../../../../shared/types';
+import useWebRTC from '../../webrtc/useWebRTC';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
   const [roomUserCount, setRoomUserCount] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [shouldInitWebRTC, setShouldInitWebRTC] = useState(false);
+
   const socketRef = useRef<TypedSocket | null>(null);
+
+  // WebRTC hook - only activates when shouldInitWebRTC is true
+  const { isMicActive, audioLevel } = useWebRTC(socketRef.current, shouldInitWebRTC);
 
 
 
@@ -33,10 +39,13 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       console.error('❌ Room error:', error);
     });
 
-    newSocket.on('room-join-success', (data: { roomId: RoomId, userCount: number }) => {
+    newSocket.on('room-join-success', async (data: { roomId: RoomId, userCount: number }) => {
       console.log('✅ Successfully joined room:', data.roomId);
       setConnectionStatus('joined');
       setRoomUserCount(data.userCount);
+
+      // Here we trigger WebRTC initialization
+      setShouldInitWebRTC(true);
     });
 
     newSocket.on('message', (message: Message) => {
@@ -54,6 +63,8 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     connectionStatus,
     roomUserCount,
     messages,
-    socketRef
+    socketRef,
+    isMicActive,
+    audioLevel
   };
 }

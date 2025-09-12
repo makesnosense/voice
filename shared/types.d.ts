@@ -26,11 +26,22 @@ export interface ServerToClientEvents {
   'room-join-success': ({ roomId: RoomId, userCount: number }) => void;
   'message': (message: Message) => void;
   'error': (error: string) => void;
+  // WebRTC events
+  'webrtc-offer': (data: { offer: WebRTCOffer; fromUserId: SocketId }) => void;
+  'webrtc-answer': (data: { answer: WebRTCAnswer; fromUserId: SocketId }) => void;
+  'webrtc-ice-candidate': (data: { candidate: IceCandidate; fromUserId: SocketId }) => void;
+  'user-joined': (userId: SocketId) => void;
+  'user-left': (userId: SocketId) => void;
 }
 
 export interface ClientToServerEvents {
   'join-room': (roomId: RoomId) => void;
   'message': (data: { text: string }) => void;
+
+  // WebRTC events
+  'webrtc-offer': (data: { offer: WebRTCOffer; toUserId: SocketId }) => void;
+  'webrtc-answer': (data: { answer: WebRTCAnswer; toUserId: SocketId }) => void;
+  'webrtc-ice-candidate': (data: { candidate: IceCandidate; toUserId: SocketId }) => void;
 }
 
 export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
@@ -39,3 +50,20 @@ export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 export type ExtendedSocket = TypedSocket & {
   roomId?: RoomId;
 };
+
+export interface WebRTCOffer {
+  sdp: string;
+  type: 'offer';
+}
+
+export interface WebRTCAnswer {
+  sdp: string;
+  type: 'answer';
+}
+
+export interface IceCandidate {
+  candidate: string;
+  sdpMLineIndex: number | null;
+  sdpMid: string | null;
+}
+
