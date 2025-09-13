@@ -1,6 +1,6 @@
 import CopyCard from '../../components/CopyCard';
 import layoutStyles from '../../styles/layout.module.css'
-import { Mic, MicOff, MicVocal, VolumeX } from 'lucide-react';
+import { Mic, MicOff, MicVocal, Unplug } from 'lucide-react';
 import buttonStyles from '../../components/Buttons.module.css';
 import Messages from './Messages';
 import { useState } from 'react';
@@ -71,7 +71,7 @@ export default function RoomInterior({
           transition: 'transform 0.1s',
           opacity: isMicActive ? 1 : 0.3
         }} />
-        <small>{isMicActive ? <MicVocal size={20} /> : <VolumeX size={20} />} microphone {isMicActive ? ' connected' : 'not connected'}</small>
+        <small>{isMicActive ? <MicVocal size={20} /> : <Unplug size={20} />} microphone {isMicActive ? ' connected' : 'not connected'}</small>
 
         <button
           onClick={toggleMute}
