@@ -71,28 +71,39 @@ export class WebRTCManager {
   }
 
   getAudioLevel(): number {
-    if (!this.analyser) return 0;
+    if (!this.analyser || !this.localStream) return 0;
+
+    const audioTracks = this.localStream.getAudioTracks();
+    const isAudioEnabled = audioTracks.some(track => track.enabled);
+
+    if (!isAudioEnabled) return 0;
 
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
 
+    // focus on voice frequency range (roughly 300Hz - 3000Hz)
+    const sampleRate = this.audioContext?.sampleRate || 48000;
+    const binSize = sampleRate / (this.analyser.fftSize * 2);
+
+    const startBin = Math.floor(300 / binSize);  // ~300Hz
+    const endBin = Math.floor(3000 / binSize);   // ~3000Hz
+
+    const noiseThreshold = 25;
     let sum = 0;
     let count = 0;
 
-    for (let i = 0; i < dataArray.length; i++) {
-
-      if (dataArray[i] > 10) {
-        sum += dataArray[i];
+    // only analyze voice frequency range
+    for (let i = startBin; i < Math.min(endBin, dataArray.length); i++) {
+      if (dataArray[i] > noiseThreshold) {
+        sum += Math.pow(dataArray[i] - noiseThreshold, 1.5); // Exponential scaling
         count++;
       }
     }
 
-
     if (count === 0) return 0;
 
     const average = sum / count;
-
-    return Math.min(100, (average / 255) * 400);
+    return Math.min(100, Math.sqrt(average) * 3); // Square root for more natural scaling
   }
 
   toggleMute() {

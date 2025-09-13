@@ -67,7 +67,8 @@ export default function RoomInterior({
           borderRadius: '50%',
           margin: '10px auto',
           backgroundColor: isMicActive ? '#22c55e' : '#ccc',
-          transform: `scale(${1 + audioLevel / 100})`,
+          // Better scale calculation: starts small (0.3) and grows to max 1.8
+          transform: `scale(${0.3 + (audioLevel / 100) * 1.5})`,
           transition: 'transform 0.1s',
           opacity: isMicActive ? 1 : 0.3
         }} />
