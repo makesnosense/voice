@@ -24,6 +24,9 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
     return;
   }
 
+
+  const usersBeforeAddingNew = Array.from(room.users);
+
   room.users.add(socket.id);
 
   socket.join(roomId);
@@ -31,9 +34,22 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
 
   console.log(`🚪 ${socket.id} joined room ${roomId} (${room.users.size} users)`);
 
-  io.to(roomId).emit('room-usercount-update', room.users.size);
+  // io.to(roomId).emit('room-usercount-update', room.users.size);
+  // send current users list to everyone in the room
+  const allUsers = Array.from(room.users);
+  io.to(roomId).emit('room-users-update', allUsers);
 
-  socket.emit('room-join-success', { roomId, userCount: room.users.size });
+
+  // send success to the joining user
+  socket.emit('room-join-success', { roomId });
+
+  // if new user is not the first one to join room, notify other users new user joining (triggers WebRTC)
+  if (usersBeforeAddingNew.length === 1) {
+    console.log(`📞 Second user ${socket.id} joined - initiating WebRTC call`);
+    usersBeforeAddingNew.forEach(existingUserId => {
+      io.to(existingUserId).emit('second-user-joined-initiate-webrtc-call', socket.id as SocketId);
+    });
+  }
 }
 
 const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
@@ -62,10 +78,11 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
 
   room.users.delete(socket.id);
 
-  io.to(socket.roomId).emit('room-usercount-update', room.users.size);
+  const roomUsersWithoutDisconnected = Array.from(room.users);
+  io.to(socket.roomId).emit('room-users-update', roomUsersWithoutDisconnected);
 
   if (room.users.size === 0) {
-    rooms.delete(socket.roomId);
+    // rooms.delete(socket.roomId);
     console.log(`🗑️ Deleted empty room: ${socket.roomId}`);
   }
 

@@ -22,15 +22,16 @@ export interface CreateRoomResponse {
 
 // Socket.IO event types
 export interface ServerToClientEvents {
-  'room-usercount-update': (count: number) => void;
-  'room-join-success': ({ roomId: RoomId, userCount: number }) => void;
+  'room-users-update': (users: SocketId[]) => void;
+  'room-join-success': (data: { roomId: RoomId }) => void;
   'message': (message: Message) => void;
-  'error': (error: string) => void;
+  'room-not-found': (error: string) => void;
+
   // WebRTC events
+  'second-user-joined-initiate-webrtc-call': (newUserId: SocketId) => void;
   'webrtc-offer': (data: { offer: WebRTCOffer; fromUserId: SocketId }) => void;
   'webrtc-answer': (data: { answer: WebRTCAnswer; fromUserId: SocketId }) => void;
   'webrtc-ice-candidate': (data: { candidate: IceCandidate; fromUserId: SocketId }) => void;
-  'user-joined': (userId: SocketId) => void;
   'user-left': (userId: SocketId) => void;
 }
 

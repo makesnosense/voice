@@ -1,14 +1,13 @@
 import CopyCard from '../../components/CopyCard';
+import Users from './Users';
 import layoutStyles from '../../styles/layout.module.css'
-import { Mic, MicOff, MicVocal, Unplug } from 'lucide-react';
-import buttonStyles from '../../components/Buttons.module.css';
 import Messages from './Messages';
 import { useState } from 'react';
-import type { RoomId, Message, TypedSocket } from "../../../../shared/types";
+import type { RoomId, Message, TypedSocket, SocketId } from "../../../../shared/types";
 
 interface RoomInteriorProps {
   roomId: RoomId;
-  roomUserCount: number;
+  roomUsers: SocketId[];
   messages: Message[];
   socketRef: React.RefObject<TypedSocket | null>;
   isMicActive: boolean;
@@ -19,8 +18,7 @@ interface RoomInteriorProps {
 
 
 export default function RoomInterior({
-  roomId,
-  roomUserCount,
+  roomUsers,
   messages,
   socketRef,
   isMicActive,
@@ -55,33 +53,28 @@ export default function RoomInterior({
 
 
       <div className={layoutStyles.roomInfo}>
-        <h3>Room: <span>{roomId}</span></h3>
-        <p>Users connected: <span>{roomUserCount}</span></p>
-
-
-
-        {/* Minimal audio indicator */}
-        <div style={{
-          width: '20px',
-          height: '20px',
-          borderRadius: '50%',
-          margin: '10px auto',
-          backgroundColor: isMicActive ? '#22c55e' : '#ccc',
-          // Better scale calculation: starts small (0.3) and grows to max 1.8
-          transform: `scale(${0.3 + (audioLevel / 100) * 1.5})`,
-          transition: 'transform 0.1s',
-          opacity: isMicActive ? 1 : 0.3
-        }} />
-        <small>{isMicActive ? <MicVocal size={20} /> : <Unplug size={20} />} microphone {isMicActive ? ' connected' : 'not connected'}</small>
-
-        <button
-          onClick={toggleMute}
-          className={`${buttonStyles.button} ${buttonStyles.iconButton}`}
-        >
-          {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
-          {isMuted ? 'Unmute' : 'Mute'}
-        </button>
+        <div>
+          Current users:
+          {roomUsers.map(userId => (
+            <span key={userId}>
+              {userId === socketRef.current?.id ? 'You ' : `User ${userId.slice(-4)}`}
+            </span>
+          ))}
+        </div>
       </div>
+
+      <div style={{ padding: '1rem 0' }}>
+        <Users
+          roomUsers={roomUsers}
+          currentUserId={socketRef.current?.id as SocketId}
+          isMicActive={isMicActive}
+          audioLevel={audioLevel}
+          isMuted={isMuted}
+          onToggleMute={toggleMute}
+        />
+      </div>
+
+
 
       <div className={layoutStyles.messagesArea}>
         <Messages messages={messages} />
