@@ -182,6 +182,12 @@ export class WebRTCManager {
       this.localStream = null;
     }
 
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
+      this.analyser = null;
+    }
+
     // Close all peer connections
     // this.peerConnections.forEach((pc, userId) => {
     //   this.closePeerConnection(userId);

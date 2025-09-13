@@ -63,6 +63,7 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
         webrtcRef.current = null;
       }
       setIsMicActive(false);
+      setAudioLevel(0);
     };
   }, [socket, shouldInitWebRTC]);
 
