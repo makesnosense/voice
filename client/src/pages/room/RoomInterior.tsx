@@ -1,4 +1,5 @@
 import CopyCard from '../../components/CopyCard';
+import RemoteAudio from './RemoteAudio';
 import Users from './Users';
 import layoutStyles from '../../styles/layout.module.css'
 import Messages from './Messages';
@@ -14,6 +15,7 @@ interface RoomInteriorProps {
   audioLevel: number;
   isMuted: boolean;
   toggleMute: () => void;
+  remoteStreams: Map<SocketId, MediaStream>;
 }
 
 
@@ -24,7 +26,8 @@ export default function RoomInterior({
   isMicActive,
   audioLevel,
   isMuted,
-  toggleMute
+  toggleMute,
+  remoteStreams
 }: RoomInteriorProps) {
 
   const [messageInput, setMessageInput] = useState('');
@@ -50,6 +53,11 @@ export default function RoomInterior({
       <span>
         <CopyCard />
       </span>
+
+
+      {Array.from(remoteStreams.entries()).map(([userId, stream]) => (
+        <RemoteAudio key={userId} userId={userId} stream={stream} />
+      ))}
 
 
       <div className={layoutStyles.roomInfo}>

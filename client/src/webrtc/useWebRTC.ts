@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { WebRTCManager } from './WebRTCManager';
-import type { TypedSocket } from '../../../shared/types';
+import type { TypedSocket, SocketId } from '../../../shared/types';
 
 export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: boolean) {
   const [isMicActive, setIsMicActive] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [remoteStreams, setRemoteStreams] = useState<Map<SocketId, MediaStream>>(new Map());
+
   const webrtcRef = useRef<WebRTCManager | null>(null);
   const animationRef = useRef<number>(0);
+
 
   const toggleMute = () => {
     if (webrtcRef.current) {
@@ -16,9 +19,23 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
     }
   };
 
+  const handleStreamAdded = (remoteUserId: SocketId, stream: MediaStream) => {
+    console.log('🎵 Adding remote stream for user:', remoteUserId);
+    setRemoteStreams(prev => new Map(prev).set(remoteUserId, stream));
+  };
+
+  const handleStreamRemoved = (remoteUserId: SocketId) => {
+    console.log('🔇 Removing remote stream for user:', remoteUserId);
+    setRemoteStreams(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(remoteUserId);
+      return newMap;
+    });
+  };
+
 
   useEffect(() => {
-    // Only init when we have socket AND should init (after room join)
+    // only init when we have socket AND should init (after room join)
     if (!socket || !shouldInitWebRTC) return;
 
 
@@ -27,7 +44,7 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
 
       try {
         console.log('🎬 Starting WebRTC initialization...');
-        const manager = new WebRTCManager(socket, () => { }, () => { });
+        const manager = new WebRTCManager(socket, handleStreamAdded, handleStreamRemoved);
 
         webrtcRef.current = manager;
 
@@ -67,5 +84,5 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
     };
   }, [socket, shouldInitWebRTC]);
 
-  return { isMicActive, audioLevel, isMuted, toggleMute };
+  return { isMicActive, audioLevel, isMuted, toggleMute, remoteStreams };
 }

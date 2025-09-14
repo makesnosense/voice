@@ -12,7 +12,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   const socketRef = useRef<TypedSocket | null>(null);
 
   // WebRTC hook - only activates when shouldInitWebRTC is true
-  const { isMicActive, audioLevel, isMuted, toggleMute } = useWebRTC(socketRef.current, shouldInitWebRTC);
+  const { isMicActive, audioLevel, isMuted, toggleMute, remoteStreams } = useWebRTC(socketRef.current, shouldInitWebRTC);
 
 
 
@@ -72,6 +72,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     isMicActive,
     audioLevel,
     isMuted,
-    toggleMute
+    toggleMute,
+    remoteStreams
   };
 }
