@@ -4,7 +4,10 @@ import type {
   TypedServer,
   ExtendedSocket,
   Message,
-  SocketId
+  SocketId,
+  WebRTCOffer,
+  WebRTCAnswer,
+  IceCandidate
 } from '../../shared/types';
 
 export default function createConnectionHandler(io: TypedServer, rooms: Map<RoomId, Room>) {
@@ -12,6 +15,11 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
     socket.on('join-room', (roomId: RoomId) => handleRoomJoin(io, rooms, socket, roomId));
     socket.on('message', (data: { text: string }) => handleNewMessage(io, socket, data));
     socket.on('disconnect', () => handleDisconnect(io, rooms, socket));
+
+    // WebRTC signaling events
+    socket.on('webrtc-offer', (data) => handleWebRTCOffer(io, socket, data));
+    socket.on('webrtc-answer', (data) => handleWebRTCAnswer(io, socket, data));
+    socket.on('webrtc-ice-candidate', (data) => handleWebRTCIceCandidate(io, socket, data));
   }
   return handleConnection;
 }
@@ -88,3 +96,33 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
 
 }
 
+// WebRTC signaling handlers
+const handleWebRTCOffer = (io: TypedServer, socket: ExtendedSocket,
+  data: { offer: WebRTCOffer; toUserId: SocketId }) => {
+  console.log(`📞 Relaying offer from ${socket.id} to ${data.toUserId}`);
+
+  io.to(data.toUserId).emit('webrtc-offer', {
+    offer: data.offer,
+    fromUserId: socket.id as SocketId
+  });
+}
+
+const handleWebRTCAnswer = (io: TypedServer, socket: ExtendedSocket,
+  data: { answer: WebRTCAnswer; toUserId: SocketId }) => {
+  console.log(`✅ Relaying answer from ${socket.id} to ${data.toUserId}`);
+
+  io.to(data.toUserId).emit('webrtc-answer', {
+    answer: data.answer,
+    fromUserId: socket.id as SocketId
+  });
+}
+
+const handleWebRTCIceCandidate = (io: TypedServer, socket: ExtendedSocket,
+  data: { candidate: IceCandidate; toUserId: SocketId }) => {
+  console.log(`🧊 Relaying ICE candidate from ${socket.id} to ${data.toUserId}`);
+
+  io.to(data.toUserId).emit('webrtc-ice-candidate', {
+    candidate: data.candidate,
+    fromUserId: socket.id as SocketId
+  });
+}
