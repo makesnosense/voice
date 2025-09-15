@@ -7,13 +7,38 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
   const [roomUsers, setRoomUsers] = useState<SocketId[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [shouldInitWebRTC, setShouldInitWebRTC] = useState(false);
+  const [audioSetupComplete, setAudioSetupComplete] = useState(false);
 
   const socketRef = useRef<TypedSocket | null>(null);
+
+  const shouldInitWebRTC = connectionStatus === 'joined' && audioSetupComplete;
+
 
   // WebRTC hook - only activates when shouldInitWebRTC is true
   const { isMicActive, audioLevel, isMuted, toggleMute, remoteStreams } = useWebRTC(socketRef.current, shouldInitWebRTC);
 
+  useEffect(() => {
+    const checkMicrophonePermission = async () => {
+      try {
+        // Try to get media stream - this is the most reliable check
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('🎤 Microphone already available, skipping overlay');
+
+        // Stop tracks immediately
+        stream.getTracks().forEach(track => track.stop());
+
+        // Skip overlay entirely
+        setAudioSetupComplete(true);
+
+      } catch (error) {
+        console.log('🎤 Microphone not available, will show overlay');
+        console.error(error);
+        // audioSetupComplete stays false, overlay will show
+      }
+    };
+
+    checkMicrophonePermission();
+  }, []);
 
 
   useEffect(() => {
@@ -43,8 +68,8 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       console.log('✅ Successfully joined room:', data.roomId);
       setConnectionStatus('joined');
 
-      // Here we trigger WebRTC initialization
-      setShouldInitWebRTC(true);
+      // // Here we trigger WebRTC initialization
+      // setShouldInitWebRTC(true);
     });
 
 
@@ -73,6 +98,8 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     audioLevel,
     isMuted,
     toggleMute,
-    remoteStreams
+    remoteStreams,
+    audioSetupComplete,
+    setAudioSetupComplete
   };
 }

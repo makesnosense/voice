@@ -2,6 +2,7 @@ import CopyCard from '../../components/CopyCard';
 import RemoteAudio from './RemoteAudio';
 import Users from './Users';
 import layoutStyles from '../../styles/layout.module.css'
+import AudioSetupOverlay from './AudioSetupOverlay';
 import Messages from './Messages';
 import { useState } from 'react';
 import type { RoomId, Message, TypedSocket, SocketId } from "../../../../shared/types";
@@ -16,6 +17,8 @@ interface RoomInteriorProps {
   isMuted: boolean;
   toggleMute: () => void;
   remoteStreams: Map<SocketId, MediaStream>;
+  audioSetupComplete: boolean;
+  setAudioSetupComplete: (value: boolean) => void;
 }
 
 
@@ -27,7 +30,9 @@ export default function RoomInterior({
   audioLevel,
   isMuted,
   toggleMute,
-  remoteStreams
+  remoteStreams,
+  audioSetupComplete,
+  setAudioSetupComplete
 }: RoomInteriorProps) {
 
   const [messageInput, setMessageInput] = useState('');
@@ -47,6 +52,25 @@ export default function RoomInterior({
       sendMessage();
     }
   };
+
+  if (!audioSetupComplete) {
+    return (
+      <div className={layoutStyles.roomContainer}>
+        <CopyCard />
+        <Users
+          roomUsers={roomUsers}
+          currentUserId={socketRef.current?.id as SocketId}
+          isMicActive={false}
+          audioLevel={0}
+          isMuted={false}
+          onToggleMute={() => { }}
+        />
+
+        <AudioSetupOverlay onSetupComplete={() => setAudioSetupComplete(true)} />
+      </div>
+    );
+  }
+
 
   return (
     <div className={layoutStyles.roomContainer}>
