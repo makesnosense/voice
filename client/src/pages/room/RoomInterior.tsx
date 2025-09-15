@@ -18,7 +18,7 @@ interface RoomInteriorProps {
   toggleMute: () => void;
   remoteStreams: Map<SocketId, MediaStream>;
   audioSetupComplete: boolean;
-  setAudioSetupComplete: (value: boolean) => void;
+  handleAudioSetupComplete: () => void;
 }
 
 
@@ -32,7 +32,7 @@ export default function RoomInterior({
   toggleMute,
   remoteStreams,
   audioSetupComplete,
-  setAudioSetupComplete
+  handleAudioSetupComplete
 }: RoomInteriorProps) {
 
   const [messageInput, setMessageInput] = useState('');
@@ -66,7 +66,7 @@ export default function RoomInterior({
           onToggleMute={() => { }}
         />
 
-        <AudioSetupOverlay onSetupComplete={() => setAudioSetupComplete(true)} />
+        <AudioSetupOverlay onSetupComplete={handleAudioSetupComplete} />
       </div>
     );
   }

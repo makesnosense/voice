@@ -24,8 +24,7 @@ app.use(express.json());
 app.post('/api/create-room', (req, res) => {
   const roomId: RoomId = generateRoomId();
   rooms.set(roomId, {
-    created: Date.now(),
-    users: new Set()
+    users: new Map()
   });
 
   console.log(`📱 Created room: ${roomId}`);

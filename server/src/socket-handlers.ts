@@ -14,12 +14,13 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
   const handleConnection = (socket: ExtendedSocket) => {
     socket.on('join-room', (roomId: RoomId) => handleRoomJoin(io, rooms, socket, roomId));
     socket.on('message', (data: { text: string }) => handleNewMessage(io, socket, data));
+    socket.on('audio-ready', () => handleAudioReady(io, rooms, socket));
     socket.on('disconnect', () => handleDisconnect(io, rooms, socket));
 
     // WebRTC signaling events
-    socket.on('webrtc-offer', (data) => handleWebRTCOffer(io, socket, data));
-    socket.on('webrtc-answer', (data) => handleWebRTCAnswer(io, socket, data));
-    socket.on('webrtc-ice-candidate', (data) => handleWebRTCIceCandidate(io, socket, data));
+    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => handleWebRTCOffer(io, socket, data));
+    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toUserId: SocketId; }) => handleWebRTCAnswer(io, socket, data));
+    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toUserId: SocketId; }) => handleWebRTCIceCandidate(io, socket, data));
   }
   return handleConnection;
 }
@@ -33,9 +34,9 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
   }
 
 
-  const usersBeforeAddingNew = Array.from(room.users);
+  // const usersBeforeAddingNew = Array.from(room.users);
 
-  room.users.add(socket.id);
+  room.users.set(socket.id, { audioReady: false });
 
   socket.join(roomId);
   socket.roomId = roomId;
@@ -44,20 +45,21 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
 
   // io.to(roomId).emit('room-usercount-update', room.users.size);
   // send current users list to everyone in the room
-  const allUsers = Array.from(room.users);
+
+  const allUsers = Array.from(room.users.keys());
   io.to(roomId).emit('room-users-update', allUsers);
 
 
   // send success to the joining user
   socket.emit('room-join-success', { roomId });
 
-  // if new user is not the first one to join room, notify other users new user joining (triggers WebRTC)
-  if (usersBeforeAddingNew.length === 1) {
-    console.log(`📞 Second user ${socket.id} joined - initiating WebRTC call`);
-    usersBeforeAddingNew.forEach(existingUserId => {
-      io.to(existingUserId).emit('second-user-joined-initiate-webrtc-call', socket.id as SocketId);
-    });
-  }
+  // // if new user is not the first one to join room, notify other users new user joining (triggers WebRTC)
+  // if (usersBeforeAddingNew.length === 1) {
+  //   console.log(`📞 Second user ${socket.id} joined - initiating WebRTC call`);
+  //   usersBeforeAddingNew.forEach(existingUserId => {
+  //     io.to(existingUserId).emit('second-user-joined-initiate-webrtc-call', socket.id as SocketId);
+  //   });
+  // }
 }
 
 const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
@@ -86,14 +88,35 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
 
   room.users.delete(socket.id);
 
-  const roomUsersWithoutDisconnected = Array.from(room.users);
+  const roomUsersWithoutDisconnected = Array.from(room.users.keys());
   io.to(socket.roomId).emit('room-users-update', roomUsersWithoutDisconnected);
 
   if (room.users.size === 0) {
     // rooms.delete(socket.roomId);
     console.log(`🗑️ Deleted empty room: ${socket.roomId}`);
   }
+}
 
+const handleAudioReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
+  if (!socket.roomId) return;
+
+  const room = rooms.get(socket.roomId);
+  if (!room) return;
+
+  const userData = room.users.get(socket.id);
+  if (userData) {
+    room.users.set(socket.id, { audioReady: true });
+    console.log(`🎤 ${socket.id} is audio ready`);
+
+    // Check if all users are audio ready
+    const allReady = Array.from(room.users.values()).every(user => user.audioReady);
+
+    if (allReady && room.users.size === 2) {
+      const firstUser = Array.from(room.users.keys())[0];
+      console.log(`🎬 All users ready, telling ${firstUser} to initiate WebRTC`);
+      io.to(firstUser).emit('initiate-webrtc');
+    }
+  }
 }
 
 // WebRTC signaling handlers

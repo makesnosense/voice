@@ -8,10 +8,10 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   const [roomUsers, setRoomUsers] = useState<SocketId[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [audioSetupComplete, setAudioSetupComplete] = useState(false);
+  const [shouldInitWebRTC, setShouldInitWebRTC] = useState(false);
 
   const socketRef = useRef<TypedSocket | null>(null);
 
-  const shouldInitWebRTC = connectionStatus === 'joined' && audioSetupComplete;
 
 
   // WebRTC hook - only activates when shouldInitWebRTC is true
@@ -20,14 +20,11 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   useEffect(() => {
     const checkMicrophonePermission = async () => {
       try {
-        // Try to get media stream - this is the most reliable check
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         console.log('🎤 Microphone already available, skipping overlay');
 
-        // Stop tracks immediately
         stream.getTracks().forEach(track => track.stop());
 
-        // Skip overlay entirely
         setAudioSetupComplete(true);
 
       } catch (error) {
@@ -67,11 +64,14 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     newSocket.on('room-join-success', async (data: { roomId: RoomId }) => {
       console.log('✅ Successfully joined room:', data.roomId);
       setConnectionStatus('joined');
-
-      // // Here we trigger WebRTC initialization
-      // setShouldInitWebRTC(true);
     });
 
+
+
+    newSocket.on('initiate-webrtc', () => {
+      console.log('🎬 Server says initiate WebRTC');
+      setShouldInitWebRTC(true);
+    });
 
     newSocket.on('room-users-update', (users: SocketId[]) => {
       console.log('👥 Room users updated:', users);
@@ -88,6 +88,16 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
   }, [roomId, initialStatus]);
 
+  const handleAudioSetupComplete = () => {
+    setAudioSetupComplete(true);
+    if (socketRef.current) {
+      console.log('🎤 Emitting audio-ready to server');
+      socketRef.current.emit('audio-ready');
+    }
+  };
+
+
+
   return {
     roomId: roomId as RoomId,
     connectionStatus,
@@ -100,6 +110,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     toggleMute,
     remoteStreams,
     audioSetupComplete,
-    setAudioSetupComplete
+    handleAudioSetupComplete
   };
 }
