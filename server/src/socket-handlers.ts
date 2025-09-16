@@ -14,7 +14,7 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
   const handleConnection = (socket: ExtendedSocket) => {
     socket.on('join-room', (roomId: RoomId) => handleRoomJoin(io, rooms, socket, roomId));
     socket.on('message', (data: { text: string }) => handleNewMessage(io, socket, data));
-    socket.on('audio-ready', () => handleAudioReady(io, rooms, socket));
+    socket.on('webrtc-ready', () => handleWebRTCReady(io, rooms, socket));
     socket.on('disconnect', () => handleDisconnect(io, rooms, socket));
 
     // WebRTC signaling events
@@ -36,7 +36,7 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
 
   // const usersBeforeAddingNew = Array.from(room.users);
 
-  room.users.set(socket.id, { audioReady: false });
+  room.users.set(socket.id, { webRTCReady: false });
 
   socket.join(roomId);
   socket.roomId = roomId;
@@ -97,7 +97,7 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
   }
 }
 
-const handleAudioReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
+const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
   if (!socket.roomId) return;
 
   const room = rooms.get(socket.roomId);
@@ -105,16 +105,19 @@ const handleAudioReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
 
   const userData = room.users.get(socket.id);
   if (userData) {
-    room.users.set(socket.id, { audioReady: true });
-    console.log(`🎤 ${socket.id} is audio ready`);
+    room.users.set(socket.id, { webRTCReady: true });
+    console.log(`🎤 ${socket.id} is WebRTC ready`);
 
     // Check if all users are audio ready
-    const allReady = Array.from(room.users.values()).every(user => user.audioReady);
+    const allReady = Array.from(room.users.values()).every(user => user.webRTCReady);
+
+
 
     if (allReady && room.users.size === 2) {
-      const firstUser = Array.from(room.users.keys())[0];
+      const users = Array.from(room.users.keys());
+      const [firstUser, secondUser] = users;
       console.log(`🎬 All users ready, telling ${firstUser} to initiate WebRTC`);
-      io.to(firstUser).emit('initiate-webrtc');
+      io.to(firstUser).emit('initiate-webrtc-call', secondUser as SocketId);
     }
   }
 }

@@ -66,7 +66,7 @@ export default function RoomInterior({
           onToggleMute={() => { }}
         />
 
-        <AudioSetupOverlay onSetupComplete={handleAudioSetupComplete} />
+        <AudioSetupOverlay onAudioSetupComplete={handleAudioSetupComplete} />
       </div>
     );
   }

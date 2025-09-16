@@ -34,7 +34,7 @@ export class WebRTCManager {
 
   async initializeUserMedia(): Promise<void> {
     try {
-      console.log('🎤 Requesting microphone access...');
+      console.log('🎤 Getting microphone access (permission already granted)...');
 
       // request only audio for now (we can add video later)
       this.localStream = await navigator.mediaDevices.getUserMedia({
@@ -54,7 +54,7 @@ export class WebRTCManager {
       source.connect(this.analyser);
       this.analyser.fftSize = 256;
 
-      console.log('✅ Microphone access granted');
+      console.log('✅ Microphone stream ready for WebRTC');
       // log audio track settings
       const audioTrack = this.localStream.getAudioTracks()[0];
       if (audioTrack) {
@@ -115,26 +115,26 @@ export class WebRTCManager {
 
   private setupSocketListeners() {
     // the most important one
-    // when second user joins, we'll initiate the call
-    this.socket.on('second-user-joined-initiate-webrtc-call', async (newUserId: SocketId) => {
-      console.log(`👋 Second user ${newUserId} joined - I'm initiating the call...`);
-      await this.initiateCall(newUserId);
+    // when second user joins and is webrtc-ready
+    this.socket.on('initiate-webrtc-call', async (remoteUserId: SocketId) => {
+      console.log(`👋 Second user ${remoteUserId} joined - I'm initiating the call...`);
+      await this.initiateCall(remoteUserId);
     });
 
     // if we are that second user that joined the room, we receive the offer
-    this.socket.on('webrtc-offer', async (data) => {
+    this.socket.on('webrtc-offer', async (data: { fromUserId: SocketId; offer: WebRTCOffer; }) => {
       console.log(`📞 Received call offer from ${data.fromUserId}`);
       await this.handleOffer(data.fromUserId, data.offer);
     });
 
     // we are the user that initiated the call and we handle the answer to our offer
-    this.socket.on('webrtc-answer', async (data) => {
+    this.socket.on('webrtc-answer', async (data: { fromUserId: SocketId; answer: WebRTCAnswer; }) => {
       console.log(`✅ Received call answer from ${data.fromUserId}`);
       await this.handleAnswer(data.fromUserId, data.answer);
     });
 
-    // asyncronously handle incoming ice candidates
-    this.socket.on('webrtc-ice-candidate', async (data) => {
+    // asynchronously handle incoming ice candidates
+    this.socket.on('webrtc-ice-candidate', async (data: { fromUserId: SocketId; candidate: IceCandidate; }) => {
       console.log(`🧊 Received ICE candidate from ${data.fromUserId}`);
       await this.handleIceCandidate(data.fromUserId, data.candidate);
     });
@@ -147,19 +147,19 @@ export class WebRTCManager {
 
   // we are first user and initiate the call when second user joins
   // offer is created here
-  private async initiateCall(userId: SocketId) {
+  private async initiateCall(remoteUserId: SocketId) {
     try {
-      const peerConnection = this.createPeerConnection(userId);
+      const peerConnection = this.createPeerConnection(remoteUserId);
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
 
-      console.log(`📤 Sending offer to ${userId}`);
+      console.log(`📤 Sending offer to ${remoteUserId}`);
       this.socket.emit('webrtc-offer', {
         offer: {
           sdp: offer.sdp!,
           type: offer.type as 'offer'
         },
-        toUserId: userId
+        toUserId: remoteUserId
       });
     } catch (error) {
       console.error('❌ Failed to initiate call:', error);

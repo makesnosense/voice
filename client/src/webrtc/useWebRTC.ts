@@ -63,6 +63,11 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
 
         checkAudio();
 
+        // WebRTC is ready - emit directly to server
+        console.log('✅ WebRTC ready, emitting audio-ready to server');
+        socket.emit('webrtc-ready');
+
+
       } catch (error) {
         console.error('WebRTC init failed:', error);
         setIsMicActive(false);

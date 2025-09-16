@@ -6,7 +6,7 @@ export type SocketId = string & { readonly __brand: 'SocketId' };
 type ConnectionStatus = 'connecting' | 'joined' | 'error';
 
 export interface Room {
-  users: Map<SocketId, { audioReady: boolean }>;
+  users: Map<SocketId, { webRTCReady: boolean }>;
 }
 
 export interface Message {
@@ -26,7 +26,7 @@ export interface ServerToClientEvents {
   'message': (message: Message) => void;
   'room-not-found': (error: string) => void;
 
-  'initiate-webrtc': () => void;
+  'initiate-webrtc-call': (targetUserId: SocketId) => void;
 
   // WebRTC events
   'webrtc-offer': (data: { offer: WebRTCOffer; fromUserId: SocketId }) => void;
@@ -38,7 +38,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   'join-room': (roomId: RoomId) => void;
   'message': (data: { text: string }) => void;
-  'audio-ready': () => void;
+  'webrtc-ready': () => void;
 
   // WebRTC events
   'webrtc-offer': (data: { offer: WebRTCOffer; toUserId: SocketId }) => void;

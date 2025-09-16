@@ -7,35 +7,21 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
   const [roomUsers, setRoomUsers] = useState<SocketId[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+
   const [audioSetupComplete, setAudioSetupComplete] = useState(false);
   const [shouldInitWebRTC, setShouldInitWebRTC] = useState(false);
 
   const socketRef = useRef<TypedSocket | null>(null);
 
-
-
   // WebRTC hook - only activates when shouldInitWebRTC is true
   const { isMicActive, audioLevel, isMuted, toggleMute, remoteStreams } = useWebRTC(socketRef.current, shouldInitWebRTC);
 
   useEffect(() => {
-    const checkMicrophonePermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log('🎤 Microphone already available, skipping overlay');
-
-        stream.getTracks().forEach(track => track.stop());
-
-        setAudioSetupComplete(true);
-
-      } catch (error) {
-        console.log('🎤 Microphone not available, will show overlay');
-        console.error(error);
-        // audioSetupComplete stays false, overlay will show
-      }
-    };
-
-    checkMicrophonePermission();
-  }, []);
+    if (audioSetupComplete && connectionStatus === 'joined') {
+      console.log('🎬 Audio permission granted and room joined, starting WebRTC initialization');
+      setShouldInitWebRTC(true);
+    }
+  }, [audioSetupComplete, connectionStatus]);
 
 
   useEffect(() => {
@@ -66,12 +52,10 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       setConnectionStatus('joined');
     });
 
-
-
-    newSocket.on('initiate-webrtc', () => {
-      console.log('🎬 Server says initiate WebRTC');
-      setShouldInitWebRTC(true);
-    });
+    // newSocket.on('initiate-webrtc-call', () => {
+    //   console.log('🎬 Server says initiate WebRTC');
+    //   setShouldInitWebRTC(true);
+    // });
 
     newSocket.on('room-users-update', (users: SocketId[]) => {
       console.log('👥 Room users updated:', users);

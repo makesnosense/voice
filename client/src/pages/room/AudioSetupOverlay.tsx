@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 
 interface AudioSetupOverlayProps {
-  onSetupComplete: () => void;
+  onAudioSetupComplete: () => void;
 }
 
-export default function AudioSetupOverlay({ onSetupComplete }: AudioSetupOverlayProps) {
+export default function AudioSetupOverlay({ onAudioSetupComplete }: AudioSetupOverlayProps) {
   const [micPermission, setMicPermission] = useState<'pending' | 'granted' | 'denied'>('pending');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export default function AudioSetupOverlay({ onSetupComplete }: AudioSetupOverlay
 
         // auto-proceed after short delay
         setTimeout(() => {
-          onSetupComplete();
+          onAudioSetupComplete();
         }, 500);
 
       } catch (error) {
@@ -33,7 +33,7 @@ export default function AudioSetupOverlay({ onSetupComplete }: AudioSetupOverlay
     };
 
     requestMicrophone();
-  }, [onSetupComplete]);
+  }, [onAudioSetupComplete]);
 
   return (
     <div style={{
