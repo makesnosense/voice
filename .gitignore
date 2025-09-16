@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+installHook.js.map
+
+certs/
+*.pem
+*.key
+*.crt
+*.p12
+ssl/
