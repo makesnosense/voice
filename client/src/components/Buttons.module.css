@@ -29,16 +29,50 @@
   box-shadow: 0 4px 12px -2px rgba(34, 197, 94, 0.2);
 }
 
+.neutral {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+}
+
+.neutral:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+}
+
+.lightRed {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.lightRed:hover {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.2);
+}
+
 .icon {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-
 .lightGreen .icon {
   color: #22c55e;
 }
+
+.lightRed .icon {
+  color: #ef4444;
+}
+
+.neutral .icon {
+  color: #1e293b;
+}
+
 
 .iconButton {
   display: flex;

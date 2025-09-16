@@ -27,7 +27,7 @@ export default function UserCard({
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.textOnly}`}>
-      <User size={20} />
+      {/* <User size={20} /> */}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
         <span className={baseStyles.title} style={{ fontSize: '16px' }}>
@@ -47,32 +47,30 @@ export default function UserCard({
               opacity: isMicActive ? 1 : 0.3
             }} />
 
-            {/* Mic status text */}
-            <small style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              color: isMicActive ? '#22c55e' : '#6b7280'
-            }}>
-              {isMicActive ? <MicVocal size={16} /> : <MicOff size={16} />}
-              {isMicActive ? 'Connected' : 'Not connected'}
-            </small>
+
 
             {/* Mute/Unmute button */}
             {isMicActive && (
               <button
                 onClick={onToggleMute}
-                className={`${buttonStyles.button} ${buttonStyles.iconButton} ${buttonStyles.lightGreen}`}
-                style={{
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  opacity: isMuted ? 0.7 : 1
-                }}
+                className={` ${buttonStyles.iconButton} ${buttonStyles.button} 
+                ${isMuted ? buttonStyles.lightRed : buttonStyles.neutral}
+                `}
               >
                 {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
-                {isMuted ? 'Unmute' : 'Mute'}
               </button>
             )}
+
+            {/* Mic status text */}
+            <small style={{
+              fontSize: "10px",
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}>
+              {isMicActive ? <MicVocal size={14} /> : <MicOff size={14} />}
+              {isMicActive ? 'connected' : 'not connected'}
+            </small>
           </>
         )}
       </div>

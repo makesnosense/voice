@@ -84,7 +84,7 @@ export default function RoomInterior({
       ))}
 
 
-      <div className={layoutStyles.roomInfo}>
+      {/* <div className={layoutStyles.roomInfo}>
         <div>
           Current users:
           {roomUsers.map(userId => (
@@ -93,7 +93,7 @@ export default function RoomInterior({
             </span>
           ))}
         </div>
-      </div>
+      </div> */}
 
       <div style={{ padding: '1rem 0' }}>
         <Users
