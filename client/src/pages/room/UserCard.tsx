@@ -1,5 +1,5 @@
 // client/src/components/UserCard.tsx
-import { User, Mic, MicOff, MicVocal } from 'lucide-react';
+import { Mic, MicOff, MicVocal } from 'lucide-react';
 import baseStyles from '../../components/BaseCard.module.css';
 import buttonStyles from '../../components/Buttons.module.css';
 import type { SocketId } from '../../../../shared/types';
@@ -48,8 +48,19 @@ export default function UserCard({
             }} />
 
 
+            {/* Mic status text */}
+            {(isMicActive === false) && (
+              <small style={{
+                fontSize: "10px",
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}> <MicOff size={14} /> not connected
 
+              </small>)
+            }
             {/* Mute/Unmute button */}
+
             {isMicActive && (
               <button
                 onClick={onToggleMute}
@@ -61,16 +72,7 @@ export default function UserCard({
               </button>
             )}
 
-            {/* Mic status text */}
-            <small style={{
-              fontSize: "10px",
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}>
-              {isMicActive ? <MicVocal size={14} /> : <MicOff size={14} />}
-              {isMicActive ? 'connected' : 'not connected'}
-            </small>
+
           </>
         )}
       </div>
