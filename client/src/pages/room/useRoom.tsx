@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, } from 'react';
 import { io } from 'socket.io-client';
 import type { RoomId, TypedSocket, Message, ConnectionStatus, SocketId } from '../../../../shared/types';
-import useWebRTC from '../../webrtc/useWebRTC';
+import useWebRTC from './webrtc/useWebRTC';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
@@ -74,10 +74,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
   const handleAudioSetupComplete = () => {
     setAudioSetupComplete(true);
-    if (socketRef.current) {
-      console.log('🎤 Emitting audio-ready to server');
-      socketRef.current.emit('audio-ready');
-    }
   };
 
 

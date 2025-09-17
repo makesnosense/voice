@@ -1,4 +1,4 @@
-import type { TypedSocket, SocketId, IceCandidate, WebRTCOffer, WebRTCAnswer, AudioFrequencyData } from '../../../shared/types';
+import type { TypedSocket, SocketId, IceCandidate, WebRTCOffer, WebRTCAnswer, AudioFrequencyData } from '../../../../../shared/types';
 
 
 

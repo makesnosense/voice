@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { WebRTCManager } from './WebRTCManager';
-import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/types';
+import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../../../shared/types';
 
 export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: boolean) {
   const [isMicActive, setIsMicActive] = useState(false);
