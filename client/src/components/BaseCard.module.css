@@ -1,6 +1,6 @@
 .card {
-  display: flex;
   align-items: center;
+  display: flex;
   gap: 12px;
   padding: 16px 24px;
   background: rgba(255, 255, 255, 0.9);
@@ -10,6 +10,11 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   width: fit-content;
+  box-sizing: border-box;
+}
+
+.card.messagesCard {
+  align-items: flex-start;
 }
 
 .card:hover {
@@ -32,7 +37,6 @@
 /* new variants */
 .fullWidth {
   width: 100%;
-  align-self: stretch;
 }
 
 .column {
