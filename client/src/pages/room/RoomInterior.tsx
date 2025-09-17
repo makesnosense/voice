@@ -5,6 +5,7 @@ import layoutStyles from '../../styles/layout.module.css'
 import AudioSetupOverlay from './AudioSetupOverlay';
 import Messages from './Messages';
 import { useState } from 'react';
+import baseStyles from '../../components/BaseCard.module.css'
 import type { RoomId, Message, TypedSocket, SocketId, AudioFrequencyData } from "../../../../shared/types";
 
 interface RoomInteriorProps {
@@ -74,9 +75,9 @@ export default function RoomInterior({
 
   return (
     <div className={layoutStyles.roomContainer}>
-      <span>
-        <CopyCard />
-      </span>
+
+      <CopyCard />
+
 
 
       {Array.from(remoteStreams.entries()).map(([userId, stream]) => (
@@ -84,18 +85,7 @@ export default function RoomInterior({
       ))}
 
 
-      {/* <div className={layoutStyles.roomInfo}>
-        <div>
-          Current users:
-          {roomUsers.map(userId => (
-            <span key={userId}>
-              {userId === socketRef.current?.id ? 'You ' : `User ${userId.slice(-4)}`}
-            </span>
-          ))}
-        </div>
-      </div> */}
-
-      <div style={{ padding: '1rem 0' }}>
+      <div>
         <Users
           roomUsers={roomUsers}
           currentUserId={socketRef.current?.id as SocketId}
@@ -106,26 +96,24 @@ export default function RoomInterior({
         />
       </div>
 
-
-
-      <div className={layoutStyles.messagesArea}>
+      <div className={`${baseStyles.card} ${baseStyles.fullWidth} ${baseStyles.messagesCard}`}>
         <Messages messages={messages} />
       </div>
-      <div className={layoutStyles.messageInput}>
-        <input type="text"
+
+      <div className={`${baseStyles.fullWidth} ${layoutStyles.messageInputArea} `}>
+        <input
+          type="text"
           value={messageInput}
           onChange={(e) => setMessageInput(e.target.value)}
           onKeyDown={handleKeyPress}
-          placeholder="Type message..." />
-        <button
-          onClick={sendMessage}
-          className="send-button"
-        >Send</button>
+          placeholder="Type message..."
+        />
+        <button onClick={sendMessage}>
+          Send
+        </button>
       </div>
-
     </div>
+
   );
-
-
 }
 

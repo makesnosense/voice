@@ -25,7 +25,25 @@
   margin: 0;
 }
 
-/* Modifier for text-only cards (no icon gap needed) */
 .textOnly {
   gap: 0;
+}
+
+/* new variants */
+.fullWidth {
+  width: 100%;
+  align-self: stretch;
+}
+
+.column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+/* messages area specific */
+.messagesCard {
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
 }
