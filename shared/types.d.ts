@@ -69,3 +69,7 @@ export interface IceCandidate {
   sdpMid: string | null;
 }
 
+export interface AudioFrequencyData {
+  bands: number[]; // array of frequency band levels
+  overallLevel: number; // keep the existing single level for compatibility
+}

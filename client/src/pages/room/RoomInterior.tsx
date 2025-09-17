@@ -5,7 +5,7 @@ import layoutStyles from '../../styles/layout.module.css'
 import AudioSetupOverlay from './AudioSetupOverlay';
 import Messages from './Messages';
 import { useState } from 'react';
-import type { RoomId, Message, TypedSocket, SocketId } from "../../../../shared/types";
+import type { RoomId, Message, TypedSocket, SocketId, AudioFrequencyData } from "../../../../shared/types";
 
 interface RoomInteriorProps {
   roomId: RoomId;
@@ -13,7 +13,7 @@ interface RoomInteriorProps {
   messages: Message[];
   socketRef: React.RefObject<TypedSocket | null>;
   isMicActive: boolean;
-  audioLevel: number;
+  audioFrequencyData: AudioFrequencyData;
   isMuted: boolean;
   toggleMute: () => void;
   remoteStreams: Map<SocketId, MediaStream>;
@@ -27,7 +27,7 @@ export default function RoomInterior({
   messages,
   socketRef,
   isMicActive,
-  audioLevel,
+  audioFrequencyData,
   isMuted,
   toggleMute,
   remoteStreams,
@@ -61,7 +61,7 @@ export default function RoomInterior({
           roomUsers={roomUsers}
           currentUserId={socketRef.current?.id as SocketId}
           isMicActive={false}
-          audioLevel={0}
+          audioFrequencyData={audioFrequencyData}
           isMuted={false}
           onToggleMute={() => { }}
         />
@@ -100,7 +100,7 @@ export default function RoomInterior({
           roomUsers={roomUsers}
           currentUserId={socketRef.current?.id as SocketId}
           isMicActive={isMicActive}
-          audioLevel={audioLevel}
+          audioFrequencyData={audioFrequencyData}
           isMuted={isMuted}
           onToggleMute={toggleMute}
         />

@@ -1,4 +1,5 @@
-import type { TypedSocket, SocketId, IceCandidate, WebRTCOffer, WebRTCAnswer } from '../../../shared/types';
+import type { TypedSocket, SocketId, IceCandidate, WebRTCOffer, WebRTCAnswer, AudioFrequencyData } from '../../../shared/types';
+
 
 
 const ICE_SERVERS: RTCConfiguration = {
@@ -213,41 +214,68 @@ export class WebRTCManager {
     }
   }
 
-
-  getAudioLevel(): number {
-    if (!this.analyser || !this.localStream) return 0;
+  getAudioFrequencyData(): AudioFrequencyData {
+    if (!this.analyser || !this.localStream) {
+      return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
+    }
 
     const audioTracks = this.localStream.getAudioTracks();
     const isAudioEnabled = audioTracks.some(track => track.enabled);
 
-    if (!isAudioEnabled) return 0;
+    if (!isAudioEnabled) {
+      return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
+    }
 
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
 
-    // focus on voice frequency range (roughly 300Hz - 3000Hz)
     const sampleRate = this.audioContext?.sampleRate || 48000;
     const binSize = sampleRate / (this.analyser.fftSize * 2);
 
-    const startBin = Math.floor(300 / binSize);  // ~300Hz
-    const endBin = Math.floor(3000 / binSize);   // ~3000Hz
+    // define 5 frequency ranges for human voice
+    const frequencyRanges = [
+      { min: 80, max: 250 },    // low fundamentals
+      { min: 250, max: 500 },   // vocal fry, low voice
+      { min: 500, max: 1000 },  // main vocal range
+      { min: 1000, max: 2000 }, // clarity, consonants
+      { min: 2000, max: 4000 }  // presence, sibilance
+    ];
+
+    const bands: number[] = [];
+    let totalEnergy = 0;
+    let totalSamples = 0;
 
     const noiseThreshold = 25;
-    let sum = 0;
-    let count = 0;
 
-    // only analyze voice frequency range
-    for (let i = startBin; i < Math.min(endBin, dataArray.length); i++) {
-      if (dataArray[i] > noiseThreshold) {
-        sum += Math.pow(dataArray[i] - noiseThreshold, 1.5); // Exponential scaling
-        count++;
+    for (const range of frequencyRanges) {
+      const startBin = Math.floor(range.min / binSize);
+      const endBin = Math.floor(range.max / binSize);
+
+      let sum = 0;
+      let count = 0;
+
+      for (let i = startBin; i < Math.min(endBin, dataArray.length); i++) {
+        if (dataArray[i] > noiseThreshold) {
+          const adjustedValue = Math.pow(dataArray[i] - noiseThreshold, 1.5);
+          sum += adjustedValue;
+          count++;
+          totalEnergy += adjustedValue;
+          totalSamples++;
+        }
       }
+
+      const bandLevel = count > 0 ? Math.min(100, Math.sqrt(sum / count) * 3) : 0;
+      bands.push(bandLevel);
     }
 
-    if (count === 0) return 0;
+    const overallLevel = totalSamples > 0 ?
+      Math.min(100, Math.sqrt(totalEnergy / totalSamples) * 3) : 0;
 
-    const average = sum / count;
-    return Math.min(100, Math.sqrt(average) * 3); // Square root for more natural scaling
+    return { bands, overallLevel };
+  }
+
+  getAudioLevel(): number {
+    return this.getAudioFrequencyData().overallLevel;
   }
 
   toggleMute() {

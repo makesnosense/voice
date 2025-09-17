@@ -12,7 +12,7 @@ export default function CopyCard() {
     try {
       await navigator.clipboard.writeText(currentUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopied(false), 2000); // reset after 2 seconds
     } catch (err) {
       console.error('Failed to copy:', err);
     }

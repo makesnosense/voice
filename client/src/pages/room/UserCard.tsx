@@ -1,15 +1,15 @@
-// client/src/components/UserCard.tsx
-import { Mic, MicOff, MicVocal } from 'lucide-react';
+import { Mic, MicOff } from 'lucide-react';
+import AudioWaves from '../../components/AudioWaves';
 import baseStyles from '../../components/BaseCard.module.css';
 import buttonStyles from '../../components/Buttons.module.css';
-import type { SocketId } from '../../../../shared/types';
+import type { SocketId, AudioFrequencyData } from '../../../../shared/types';
 
 interface UserCardProps {
   userId: SocketId;
   isCurrentUser: boolean;
   // Props only for current user
   isMicActive?: boolean;
-  audioLevel?: number;
+  audioFrequencyData?: AudioFrequencyData; // changed from audioLevel
   isMuted?: boolean;
   onToggleMute?: () => void;
 }
@@ -18,7 +18,7 @@ export default function UserCard({
   userId,
   isCurrentUser,
   isMicActive = false,
-  audioLevel = 0,
+  audioFrequencyData = { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
   isMuted = false,
   onToggleMute
 }: UserCardProps) {
@@ -36,17 +36,11 @@ export default function UserCard({
 
         {isCurrentUser && (
           <>
-            {/* Audio level indicator */}
-            <div style={{
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              backgroundColor: isMicActive ? '#22c55e' : '#ccc',
-              transform: `scale(${1 + audioLevel / 200})`,
-              transition: 'transform 0.1s, background-color 0.3s',
-              opacity: isMicActive ? 1 : 0.3
-            }} />
-
+            <AudioWaves
+              audioData={audioFrequencyData}
+              isActive={isMicActive && !isMuted}
+              size="small"
+            />
 
             {/* Mic status text */}
             {(isMicActive === false) && (

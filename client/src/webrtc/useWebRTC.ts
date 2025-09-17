@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { WebRTCManager } from './WebRTCManager';
-import type { TypedSocket, SocketId } from '../../../shared/types';
+import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/types';
 
 export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: boolean) {
   const [isMicActive, setIsMicActive] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [audioFrequencyData, setAudioFrequencyData] = useState<AudioFrequencyData>({
+    bands: [0, 0, 0, 0, 0],
+    overallLevel: 0
+  });
   const [remoteStreams, setRemoteStreams] = useState<Map<SocketId, MediaStream>>(new Map());
 
   const webrtcRef = useRef<WebRTCManager | null>(null);
@@ -56,8 +60,9 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
 
         // Simple audio level monitoring
         const checkAudio = () => {
-          const level = manager.getAudioLevel();
-          setAudioLevel(level);
+          const frequencyData = manager.getAudioFrequencyData();
+          setAudioFrequencyData(frequencyData);
+          setAudioLevel(frequencyData.overallLevel); // keep for compatibility
           animationRef.current = requestAnimationFrame(checkAudio);
         };
 
@@ -86,8 +91,16 @@ export default function useWebRTC(socket: TypedSocket | null, shouldInitWebRTC: 
       }
       setIsMicActive(false);
       setAudioLevel(0);
+      setAudioFrequencyData({ bands: [0, 0, 0, 0, 0], overallLevel: 0 });
     };
   }, [socket, shouldInitWebRTC]);
 
-  return { isMicActive, audioLevel, isMuted, toggleMute, remoteStreams };
+  return {
+    isMicActive,
+    audioLevel,
+    audioFrequencyData,
+    isMuted,
+    toggleMute,
+    remoteStreams
+  };
 }

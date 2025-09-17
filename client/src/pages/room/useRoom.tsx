@@ -14,7 +14,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   const socketRef = useRef<TypedSocket | null>(null);
 
   // WebRTC hook - only activates when shouldInitWebRTC is true
-  const { isMicActive, audioLevel, isMuted, toggleMute, remoteStreams } = useWebRTC(socketRef.current, shouldInitWebRTC);
+  const { isMicActive, audioFrequencyData, isMuted, toggleMute, remoteStreams } = useWebRTC(socketRef.current, shouldInitWebRTC);
 
   useEffect(() => {
     if (audioSetupComplete && connectionStatus === 'joined') {
@@ -89,7 +89,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     messages,
     socketRef,
     isMicActive,
-    audioLevel,
+    audioFrequencyData,
     isMuted,
     toggleMute,
     remoteStreams,

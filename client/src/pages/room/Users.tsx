@@ -1,5 +1,5 @@
 import UserCard from './UserCard';
-import type { SocketId } from '../../../../shared/types';
+import type { SocketId, AudioFrequencyData } from '../../../../shared/types';
 
 
 interface UsersListProps {
@@ -7,7 +7,7 @@ interface UsersListProps {
   currentUserId: SocketId | undefined;
   // current user's mic properties
   isMicActive: boolean;
-  audioLevel: number;
+  audioFrequencyData: AudioFrequencyData;
   isMuted: boolean;
   onToggleMute: () => void;
 }
@@ -16,7 +16,7 @@ export default function Users({
   roomUsers,
   currentUserId,
   isMicActive,
-  audioLevel,
+  audioFrequencyData,
   isMuted,
   onToggleMute
 }: UsersListProps) {
@@ -39,7 +39,7 @@ export default function Users({
             isCurrentUser={isCurrentUser}
             // only pass mic props for current user
             isMicActive={isCurrentUser ? isMicActive : undefined}
-            audioLevel={isCurrentUser ? audioLevel : undefined}
+            audioFrequencyData={isCurrentUser ? audioFrequencyData : undefined}
             isMuted={isCurrentUser ? isMuted : undefined}
             onToggleMute={isCurrentUser ? onToggleMute : undefined}
           />
