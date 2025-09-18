@@ -4,6 +4,7 @@ export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
 
 type ConnectionStatus = 'connecting' | 'joined' | 'error';
+type MicPermissionStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'not-supported';
 
 export interface Room {
   users: Map<SocketId, { webRTCReady: boolean }>;

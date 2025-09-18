@@ -10,7 +10,7 @@ const ICE_SERVERS: RTCConfiguration = {
 };
 
 export class WebRTCManager {
-  private localStream: MediaStream | null = null;
+  private localStream: MediaStream;
   private peerConnections: Map<SocketId, RTCPeerConnection> = new Map();
   private socket: TypedSocket;
 
@@ -24,9 +24,11 @@ export class WebRTCManager {
 
   constructor(
     socket: TypedSocket,
+    passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: (userId: SocketId) => void) {
     this.socket = socket;
+    this.localStream = passedMicStream;
     this.onStreamAdded = onStreamAdded;
     this.onStreamRemoved = onStreamRemoved;
 
@@ -35,18 +37,7 @@ export class WebRTCManager {
 
   async initializeUserMedia(): Promise<void> {
     try {
-      console.log('🎤 Getting microphone access (permission already granted)...');
-
-      // request only audio for now (we can add video later)
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        // {
-        //   echoCancellation: true,
-        //   noiseSuppression: true,
-        //   autoGainControl: true
-        // }
-        video: false
-      });
+      console.log('✅ Using existing microphone stream for WebRTC');
 
       // setup analyser for audio levels
       this.audioContext = new AudioContext();
@@ -306,7 +297,7 @@ export class WebRTCManager {
         track.stop()
         console.log('🛑 Stopped track:', track.kind);
       });
-      this.localStream = null;
+      // this.localStream = null;
     }
 
     if (this.audioContext) {
