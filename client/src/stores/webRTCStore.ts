@@ -35,7 +35,6 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       (userId) => get().removeRemoteStream(userId)
     );
 
-    await newManager.initializeUserMedia();
     set({ manager: newManager, isMicActive: true });
 
     // start audio monitoring

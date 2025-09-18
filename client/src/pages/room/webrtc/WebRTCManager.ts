@@ -13,50 +13,48 @@ export class WebRTCManager {
   private localStream: MediaStream;
   private peerConnections: Map<SocketId, RTCPeerConnection> = new Map();
   private socket: TypedSocket;
-
   // these are for audio analysis
-  private audioContext: AudioContext | null = null;
-  private analyser: AnalyserNode | null = null;
+  private audioContext: AudioContext;
+  private localAnalyser: AnalyserNode;
+
+  // audio analysis for remote streams
+  // private remoteAnalyser: AnalyserNode | null = null;
+
 
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
   private onStreamRemoved: (userId: SocketId) => void;
+  // private onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void;
 
   constructor(
     socket: TypedSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
-    onStreamRemoved: (userId: SocketId) => void) {
+    onStreamRemoved: (userId: SocketId) => void,
+    // onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void,
+
+  ) {
     this.socket = socket;
     this.localStream = passedMicStream;
     this.onStreamAdded = onStreamAdded;
     this.onStreamRemoved = onStreamRemoved;
+    // this.onRemoteAudioData = onRemoteAudioData;
+
+    // initialize audio analysis
+    this.audioContext = new AudioContext();
+    this.localAnalyser = this.createAnalyser(this.localStream);
 
     this.setupSocketListeners();
+
+
   }
 
-  async initializeUserMedia(): Promise<void> {
-    try {
-      console.log('✅ Using existing microphone stream for WebRTC');
-
-      // setup analyser for audio levels
-      this.audioContext = new AudioContext();
-      this.analyser = this.audioContext.createAnalyser();
-      const source = this.audioContext.createMediaStreamSource(this.localStream);
-      source.connect(this.analyser);
-      this.analyser.fftSize = 256;
-
-      console.log('✅ Microphone stream ready for WebRTC');
-      // log audio track settings
-      const audioTrack = this.localStream.getAudioTracks()[0];
-      if (audioTrack) {
-        console.log('🔊 Audio track enabled:', audioTrack.enabled);
-        console.log('🎚️ Audio track settings:', audioTrack.getSettings());
-      }
-    } catch (error) {
-      console.error('❌ Failed to get user media:', error);
-      throw error;
-    }
+  private createAnalyser(stream: MediaStream): AnalyserNode {
+    const analyser = this.audioContext.createAnalyser();
+    const source = this.audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    analyser.fftSize = 256;
+    return analyser;
   }
 
   private createPeerConnection(remoteUserId: SocketId): RTCPeerConnection {
@@ -206,7 +204,7 @@ export class WebRTCManager {
   }
 
   getAudioFrequencyData(): AudioFrequencyData {
-    if (!this.analyser || !this.localStream) {
+    if (!this.localAnalyser || !this.localStream) {
       return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
@@ -217,11 +215,11 @@ export class WebRTCManager {
       return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
-    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-    this.analyser.getByteFrequencyData(dataArray);
+    const dataArray = new Uint8Array(this.localAnalyser.frequencyBinCount);
+    this.localAnalyser.getByteFrequencyData(dataArray);
 
     const sampleRate = this.audioContext?.sampleRate || 48000;
-    const binSize = sampleRate / (this.analyser.fftSize * 2);
+    const binSize = sampleRate / (this.localAnalyser.fftSize * 2);
 
     // define 5 frequency ranges for human voice
     const frequencyRanges = [
@@ -302,11 +300,9 @@ export class WebRTCManager {
 
     if (this.audioContext) {
       this.audioContext.close();
-      this.audioContext = null;
-      this.analyser = null;
     }
 
-    this.peerConnections.forEach((peerConnection, userId) => {
+    this.peerConnections.forEach((_peerConnection, userId) => {
       this.closePeerConnection(userId);
     });
   }
