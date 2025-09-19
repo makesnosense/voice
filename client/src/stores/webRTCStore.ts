@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { WebRTCManager } from '../pages/room/webrtc/WebRTCManager';
+import { WebRTCManager } from '../pages/room/WebRTCManager';
 import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/types';
 
 interface WebRTCStore {

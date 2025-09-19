@@ -1,7 +1,7 @@
 import type {
   TypedSocket, SocketId, IceCandidate,
   WebRTCOffer, WebRTCAnswer, AudioFrequencyData
-} from '../../../../../shared/types';
+} from '../../../../shared/types';
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
