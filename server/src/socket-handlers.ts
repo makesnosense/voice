@@ -33,8 +33,11 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
     return;
   }
 
-
-  // const usersBeforeAddingNew = Array.from(room.users);
+  // check room capacity - max 2 people
+  if (room.users.size >= 2) {
+    socket.emit('room-full', 'Room is full (max 2 people)');
+    return;
+  }
 
   room.users.set(socket.id, { webRTCReady: false });
 
@@ -43,23 +46,12 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
 
   console.log(`🚪 ${socket.id} joined room ${roomId} (${room.users.size} users)`);
 
-  // io.to(roomId).emit('room-usercount-update', room.users.size);
-  // send current users list to everyone in the room
-
   const allUsers = Array.from(room.users.keys());
   io.to(roomId).emit('room-users-update', allUsers);
-
 
   // send success to the joining user
   socket.emit('room-join-success', { roomId });
 
-  // // if new user is not the first one to join room, notify other users new user joining (triggers WebRTC)
-  // if (usersBeforeAddingNew.length === 1) {
-  //   console.log(`📞 Second user ${socket.id} joined - initiating WebRTC call`);
-  //   usersBeforeAddingNew.forEach(existingUserId => {
-  //     io.to(existingUserId).emit('second-user-joined-initiate-webrtc-call', socket.id as SocketId);
-  //   });
-  // }
 }
 
 const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
@@ -88,11 +80,13 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
 
   room.users.delete(socket.id);
 
-  const roomUsersWithoutDisconnected = Array.from(room.users.keys());
-  io.to(socket.roomId).emit('room-users-update', roomUsersWithoutDisconnected);
+  // notify other user about disconnect
+  const remainingUsers = Array.from(room.users.keys());
+  io.to(socket.roomId).emit('room-users-update', remainingUsers);
+  io.to(socket.roomId).emit('user-left', socket.id as SocketId);
 
   if (room.users.size === 0) {
-    // rooms.delete(socket.roomId);
+    // rooms.delete(socket.roomId); // temporarily commented out for easier debug
     console.log(`🗑️ Deleted empty room: ${socket.roomId}`);
   }
 }
@@ -116,7 +110,7 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
     if (allReady && room.users.size === 2) {
       const users = Array.from(room.users.keys());
       const [firstUser, secondUser] = users;
-      console.log(`🎬 All users ready, telling ${firstUser} to initiate WebRTC`);
+      console.log(`🎬 Both users ready, telling ${firstUser} to initiate WebRTC`);
       io.to(firstUser).emit('initiate-webrtc-call', secondUser as SocketId);
     }
   }

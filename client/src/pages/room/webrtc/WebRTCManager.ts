@@ -1,6 +1,7 @@
-import type { TypedSocket, SocketId, IceCandidate, WebRTCOffer, WebRTCAnswer, AudioFrequencyData } from '../../../../../shared/types';
-
-
+import type {
+  TypedSocket, SocketId, IceCandidate,
+  WebRTCOffer, WebRTCAnswer, AudioFrequencyData
+} from '../../../../../shared/types';
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
@@ -11,7 +12,7 @@ const ICE_SERVERS: RTCConfiguration = {
 
 export class WebRTCManager {
   private localStream: MediaStream;
-  private peerConnections: Map<SocketId, RTCPeerConnection> = new Map();
+  private peerConnection: RTCPeerConnection | null = null;
   private socket: TypedSocket;
   // these are for audio analysis
   private audioContext: AudioContext;
@@ -23,14 +24,14 @@ export class WebRTCManager {
 
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
-  private onStreamRemoved: (userId: SocketId) => void;
+  private onStreamRemoved: () => void;
   // private onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void;
 
   constructor(
     socket: TypedSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
-    onStreamRemoved: (userId: SocketId) => void,
+    onStreamRemoved: () => void,
     // onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void,
 
   ) {
@@ -84,11 +85,12 @@ export class WebRTCManager {
       }
     };
 
+
     peerConnection.onconnectionstatechange = () => {
       console.log(`📶 Connection state with ${remoteUserId}: ${peerConnection.connectionState}`);
 
       if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'disconnected') {
-        this.handlePeerDisconnect(remoteUserId);
+        this.handlePeerDisconnect();
       }
     };
 
@@ -99,7 +101,7 @@ export class WebRTCManager {
       this.onStreamAdded(remoteUserId, remoteStream);
     };
 
-    this.peerConnections.set(remoteUserId, peerConnection);
+    this.peerConnection = peerConnection;
     return peerConnection;
   }
 
@@ -126,12 +128,12 @@ export class WebRTCManager {
     // asynchronously handle incoming ice candidates
     this.socket.on('webrtc-ice-candidate', async (data: { fromUserId: SocketId; candidate: IceCandidate; }) => {
       console.log(`🧊 Received ICE candidate from ${data.fromUserId}`);
-      await this.handleIceCandidate(data.fromUserId, data.candidate);
+      await this.handleIceCandidate(data.candidate);
     });
 
     this.socket.on('user-left', (userId: SocketId) => {
       console.log(`👋 User ${userId} left`);
-      this.handlePeerDisconnect(userId);
+      this.handlePeerDisconnect();
     });
   }
 
@@ -181,9 +183,8 @@ export class WebRTCManager {
   // we are the user that initiated the call and we handle the answer to our offer
   private async handleAnswer(fromUserId: SocketId, answer: WebRTCAnswer) {
     try {
-      const peerConnection = this.peerConnections.get(fromUserId);
-      if (peerConnection) {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      if (this.peerConnection) {
+        await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
         console.log(`✅ Call established with ${fromUserId}`);
       }
     } catch (error) {
@@ -192,11 +193,10 @@ export class WebRTCManager {
   }
 
   // asynchronously handling ice candidates
-  private async handleIceCandidate(fromUserId: SocketId, candidate: IceCandidate) {
+  private async handleIceCandidate(candidate: IceCandidate) {
     try {
-      const peerConnection = this.peerConnections.get(fromUserId);
-      if (peerConnection) {
-        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      if (this.peerConnection) {
+        await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       }
     } catch (error) {
       console.error('❌ Failed to handle ICE candidate:', error);
@@ -275,17 +275,17 @@ export class WebRTCManager {
     }
   }
 
-  private handlePeerDisconnect(userId: SocketId) {
-    console.log(`👋 Peer ${userId} disconnected`);
-    this.closePeerConnection(userId);
+  private handlePeerDisconnect() {
+    console.log(`👋 Peer disconnected`);
+    this.closePeerConnection();
   }
 
-  private closePeerConnection(userId: SocketId) {
-    const peerConnection = this.peerConnections.get(userId);
-    if (peerConnection) {
-      peerConnection.close();
-      this.peerConnections.delete(userId);
-      this.onStreamRemoved(userId);
+
+  private closePeerConnection() {
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+      this.onStreamRemoved();
     }
   }
 
@@ -295,16 +295,13 @@ export class WebRTCManager {
         track.stop()
         console.log('🛑 Stopped track:', track.kind);
       });
-      // this.localStream = null;
     }
 
     if (this.audioContext) {
       this.audioContext.close();
     }
 
-    this.peerConnections.forEach((_peerConnection, userId) => {
-      this.closePeerConnection(userId);
-    });
+    this.closePeerConnection();
   }
 
 }

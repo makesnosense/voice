@@ -16,7 +16,8 @@ export default function RoomPage() {
       </div>
 
       <div className={layoutStyles.content}>
-        {(roomState.connectionStatus === 'error') && <RoomError />}
+        {(roomState.connectionStatus === 'error') && <RoomError errorType="not-found" />}
+        {(roomState.connectionStatus === 'room-full') && <RoomError errorType="room-full" />}
         {(roomState.connectionStatus === 'joined') && (
           <RoomInterior {...roomState} />
         )}
@@ -29,4 +30,3 @@ export default function RoomPage() {
     </div>
   )
 }
-

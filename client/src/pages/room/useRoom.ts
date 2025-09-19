@@ -27,14 +27,11 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     audioFrequencyData,
     isMuted,
     toggleMute,
-    remoteStreams,
+    remoteStream,
+    remoteUserId,
     cleanup: cleanupWebRTC
   } = useWebRTCStore();
 
-  // console.log(micPermissionStatus);
-  // console.log(connectionStatus);
-  // console.log(localStream);
-  // console.log(socketRef);
   useEffect(() => {
     requestMicrophone();
   }, [requestMicrophone]);
@@ -75,6 +72,12 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       console.error('❌ Room error:', error);
     });
 
+    // handle room full error
+    newSocket.on('room-full', (error: string) => {
+      setConnectionStatus('room-full');
+      console.error('🚫 Room full:', error);
+    });
+
     newSocket.on('room-join-success', async (data: { roomId: RoomId }) => {
       console.log('✅ Successfully joined room:', data.roomId);
       setConnectionStatus('joined');
@@ -112,7 +115,8 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     audioFrequencyData,
     isMuted,
     toggleMute,
-    remoteStreams,
+    remoteStream,
+    remoteUserId,
     micPermissionStatus
   };
 }

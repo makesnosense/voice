@@ -4,7 +4,8 @@ import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/
 
 interface WebRTCStore {
   manager: WebRTCManager | null;
-  remoteStreams: Map<SocketId, MediaStream>;
+  remoteStream: MediaStream | null;
+  remoteUserId: SocketId | null;
   isMicActive: boolean;
   isMuted: boolean;
   audioFrequencyData: AudioFrequencyData;
@@ -13,13 +14,14 @@ interface WebRTCStore {
   toggleMute: () => void;
   cleanup: () => void;
   updateAudioData: (data: AudioFrequencyData) => void;
-  addRemoteStream: (userId: SocketId, stream: MediaStream) => void;
-  removeRemoteStream: (userId: SocketId) => void;
+  setRemoteStream: (userId: SocketId, stream: MediaStream) => void;
+  clearRemoteStream: () => void;
 }
 
 export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   manager: null,
-  remoteStreams: new Map(),
+  remoteStream: null,
+  remoteUserId: null,
   isMicActive: false,
   isMuted: false,
   audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
@@ -31,8 +33,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const newManager = new WebRTCManager(
       socket,
       localStream,
-      (userId, stream) => get().addRemoteStream(userId, stream),
-      (userId) => get().removeRemoteStream(userId)
+      (userId, stream) => get().setRemoteStream(userId, stream),
+      () => get().clearRemoteStream()
     );
 
     set({ manager: newManager, isMicActive: true });
@@ -63,18 +65,12 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({ audioFrequencyData: data });
   },
 
-  addRemoteStream: (userId, stream) => {
-    set(state => ({
-      remoteStreams: new Map(state.remoteStreams).set(userId, stream)
-    }));
+  setRemoteStream: (userId, stream) => {
+    set({ remoteStream: stream, remoteUserId: userId });
   },
 
-  removeRemoteStream: (userId) => {
-    set(state => {
-      const newStreams = new Map(state.remoteStreams);
-      newStreams.delete(userId);
-      return { remoteStreams: newStreams };
-    });
+  clearRemoteStream: () => {
+    set({ remoteStream: null, remoteUserId: null });
   },
 
   cleanup: () => {
@@ -84,7 +80,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     }
     set({
       manager: null,
-      remoteStreams: new Map(),
+      remoteStream: null,
+      remoteUserId: null,
       isMicActive: false,
       audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 }
     });

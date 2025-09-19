@@ -5,7 +5,7 @@ import type { Socket } from '../client/node_modules/socket.io';
 export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
 
-type ConnectionStatus = 'connecting' | 'joined' | 'error';
+type ConnectionStatus = 'connecting' | 'joined' | 'error' | 'room-full';
 type MicPermissionStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'not-supported';
 
 export interface Room {
@@ -26,6 +26,7 @@ export interface CreateRoomResponse {
 export interface ServerToClientEvents {
   'room-users-update': (users: SocketId[]) => void;
   'room-join-success': (data: { roomId: RoomId }) => void;
+  'room-full': (error: string) => void;
   'message': (message: Message) => void;
   'room-not-found': (error: string) => void;
 

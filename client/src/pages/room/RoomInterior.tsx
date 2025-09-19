@@ -6,7 +6,10 @@ import layoutStyles from '../../styles/layout.module.css'
 import Messages from './Messages';
 import { useState } from 'react';
 import baseStyles from '../../components/BaseCard.module.css'
-import type { RoomId, Message, TypedSocket, SocketId, AudioFrequencyData, MicPermissionStatus } from "../../../../shared/types";
+import type {
+  RoomId, Message, TypedSocket, SocketId,
+  AudioFrequencyData, MicPermissionStatus
+} from "../../../../shared/types";
 
 interface RoomInteriorProps {
   roomId: RoomId;
@@ -17,7 +20,8 @@ interface RoomInteriorProps {
   audioFrequencyData: AudioFrequencyData;
   isMuted: boolean;
   toggleMute: () => void;
-  remoteStreams: Map<SocketId, MediaStream>;
+  remoteStream: MediaStream | null;
+  remoteUserId: SocketId | null;
   micPermissionStatus: MicPermissionStatus;
 }
 
@@ -30,7 +34,8 @@ export default function RoomInterior({
   audioFrequencyData,
   isMuted,
   toggleMute,
-  remoteStreams,
+  remoteStream,
+  remoteUserId,
   micPermissionStatus
 }: RoomInteriorProps) {
 
@@ -55,9 +60,10 @@ export default function RoomInterior({
     <div className={layoutStyles.roomContainer}>
       <CopyCard />
 
-      {Array.from(remoteStreams.entries()).map(([userId, stream]) => (
-        <RemoteAudio key={userId} userId={userId} stream={stream} />
-      ))}
+      {/* single remote audio component */}
+      {remoteStream && remoteUserId && (
+        <RemoteAudio userId={remoteUserId} stream={remoteStream} />
+      )}
 
       <div>
         <Users
