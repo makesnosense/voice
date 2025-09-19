@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { SocketId } from '../../../../shared/types';
+import type { SocketId } from '../../../../../shared/types';
 
 interface RemoteAudioProps {
   userId: SocketId;

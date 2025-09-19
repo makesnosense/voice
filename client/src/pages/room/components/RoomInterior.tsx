@@ -1,15 +1,15 @@
-import CopyCard from '../../components/CopyCard';
+import CopyCard from './copycard/CopyCard';
 import RemoteAudio from './RemoteAudio';
 import Users from './Users';
-import layoutStyles from '../../styles/layout.module.css'
+import layoutStyles from '../../../styles/layout.module.css'
 // import AudioSetupOverlay from './AudioSetupOverlay';
-import Messages from './Messages';
+import Messages from './messages/Messages';
 import { useState } from 'react';
-import baseStyles from '../../components/BaseCard.module.css'
+import baseStyles from '../../../styles/BaseCard.module.css'
 import type {
   RoomId, Message, TypedSocket, SocketId,
   AudioFrequencyData, MicPermissionStatus
-} from "../../../../shared/types";
+} from "../../../../../shared/types";
 
 interface RoomInteriorProps {
   roomId: RoomId;

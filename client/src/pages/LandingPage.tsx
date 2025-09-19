@@ -1,4 +1,4 @@
-import buttonStyles from '../components/Buttons.module.css';
+import buttonStyles from '../styles/Buttons.module.css';
 import layoutStyles from '../styles/Layout.module.css';
 import { Phone } from 'lucide-react';
 import { useState, useEffect } from 'react';

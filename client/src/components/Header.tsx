@@ -1,4 +1,4 @@
-import baseStyles from './BaseCard.module.css';
+import baseStyles from '../styles/BaseCard.module.css';
 import voiceStyles from './Header.module.css';
 
 type VoiceState = 'active' | 'silent' | 'muted';

@@ -1,5 +1,5 @@
 import UserCard from './UserCard';
-import type { SocketId, AudioFrequencyData } from '../../../../shared/types';
+import type { SocketId, AudioFrequencyData } from '../../../../../shared/types';
 
 
 interface UsersListProps {

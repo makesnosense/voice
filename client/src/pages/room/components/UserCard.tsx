@@ -1,8 +1,8 @@
 import { Mic, MicOff } from 'lucide-react';
-import AudioWaves from '../../components/AudioWaves';
-import baseStyles from '../../components/BaseCard.module.css';
-import buttonStyles from '../../components/Buttons.module.css';
-import type { SocketId, AudioFrequencyData } from '../../../../shared/types';
+import AudioWaves from './audiowaves/AudioWaves';
+import baseStyles from '../../../styles/BaseCard.module.css';
+import buttonStyles from '../../../styles/Buttons.module.css';
+import type { SocketId, AudioFrequencyData } from '../../../../../shared/types';
 
 interface UserCardProps {
   userId: SocketId;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { AudioFrequencyData } from '../../../shared/types';
+import type { AudioFrequencyData } from '../../../../../../shared/types';
 import audioWavesStyles from './AudioWaves.module.css';
 
 interface AudioWavesProps {

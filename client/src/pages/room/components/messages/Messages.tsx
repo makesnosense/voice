@@ -1,4 +1,4 @@
-import type { Message } from '../../../../shared/types';
+import type { Message } from '../../../../../../shared/types';
 import messagesStyles from './Messages.module.css';
 
 interface MessagesProps {

@@ -2,8 +2,8 @@ import layoutStyles from '../../styles/layout.module.css'
 import useRoomIdValidation from './useRoomIdValidation';
 import useRoom from './useRoom';
 import Header from '../../components/Header';
-import RoomError from './RoomError';
-import RoomInterior from './RoomInterior';
+import RoomError from './components/RoomError';
+import RoomInterior from './components/RoomInterior';
 
 export default function RoomPage() {
   const validationResult = useRoomIdValidation();
