@@ -1,4 +1,6 @@
-import type { Server, Socket } from 'socket.io';
+import type { Server } from '../server/node_modules/socket.io';
+import type { Socket } from '../client/node_modules/socket.io';
+
 
 export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
@@ -48,7 +50,7 @@ export interface ClientToServerEvents {
 }
 
 export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
-export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+export type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export type ExtendedSocket = TypedSocket & {
   roomId?: RoomId;
