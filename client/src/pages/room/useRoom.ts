@@ -29,6 +29,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     toggleMute,
     remoteStream,
     remoteUserId,
+    remoteAudioFrequencyData,
     cleanup: cleanupWebRTC
   } = useWebRTCStore();
 
@@ -117,6 +118,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     toggleMute,
     remoteStream,
     remoteUserId,
+    remoteAudioFrequencyData,
     micPermissionStatus
   };
 }

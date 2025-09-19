@@ -22,6 +22,7 @@ interface RoomInteriorProps {
   toggleMute: () => void;
   remoteStream: MediaStream | null;
   remoteUserId: SocketId | null;
+  remoteAudioFrequencyData: AudioFrequencyData;
   micPermissionStatus: MicPermissionStatus;
 }
 
@@ -36,6 +37,7 @@ export default function RoomInterior({
   toggleMute,
   remoteStream,
   remoteUserId,
+  remoteAudioFrequencyData,
   micPermissionStatus
 }: RoomInteriorProps) {
 
@@ -73,6 +75,9 @@ export default function RoomInterior({
           audioFrequencyData={audioFrequencyData}
           isMuted={isMuted}
           onToggleMute={toggleMute}
+          remoteAudioFrequencyData={remoteAudioFrequencyData}
+          remoteUserId={remoteUserId}
+          hasRemoteStream={!!remoteStream}
         />
 
         {/* show mic permission status if there's an issue */}

@@ -7,66 +7,73 @@ import type { SocketId, AudioFrequencyData } from '../../../../../shared/types';
 interface UserCardProps {
   userId: SocketId;
   isCurrentUser: boolean;
-  // Props only for current user
-  isMicActive?: boolean;
-  audioFrequencyData?: AudioFrequencyData; // changed from audioLevel
+
+  // audio visualization (for any user)
+  audioData?: AudioFrequencyData;
+  isAudioActive?: boolean;
+
+  // controls (only for current user)
   isMuted?: boolean;
   onToggleMute?: () => void;
+
+  // status (only for current user)
+  isMicConnected?: boolean;
 }
 
 export default function UserCard({
   userId,
   isCurrentUser,
-  isMicActive = false,
-  audioFrequencyData = { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
+  audioData,
+  isAudioActive = false,
   isMuted = false,
-  onToggleMute
+  onToggleMute,
+  isMicConnected = false
 }: UserCardProps) {
 
   const displayName = isCurrentUser ? 'You' : `User ${userId.slice(-4)}`;
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.textOnly}`}>
-      {/* <User size={20} /> */}
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
         <span className={baseStyles.title} style={{ fontSize: '16px' }}>
           {displayName}
         </span>
 
+        {/* show audio waves when audio data is available */}
+        {audioData && (
+          <AudioWaves
+            audioData={audioData}
+            isActive={isAudioActive}
+            size="small"
+          />
+        )}
+
+        {/* current user controls and status */}
         {isCurrentUser && (
           <>
-            <AudioWaves
-              audioData={audioFrequencyData}
-              isActive={isMicActive && !isMuted}
-              size="small"
-            />
-
-            {/* Mic status text */}
-            {(isMicActive === false) && (
+            {/* mic not connected status */}
+            {!isMicConnected && (
               <small style={{
                 fontSize: "10px",
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-              }}> <MicOff size={14} /> not connected
+              }}>
+                <MicOff size={14} /> not connected
+              </small>
+            )}
 
-              </small>)
-            }
-            {/* Mute/Unmute button */}
-
-            {isMicActive && (
+            {/* mute/unmute button */}
+            {isMicConnected && onToggleMute && (
               <button
                 onClick={onToggleMute}
-                className={` ${buttonStyles.iconButton} ${buttonStyles.button} 
-                ${isMuted ? buttonStyles.lightRed : buttonStyles.neutral}
+                className={`${buttonStyles.iconButton} ${buttonStyles.button} 
+                  ${isMuted ? buttonStyles.lightRed : buttonStyles.neutral}
                 `}
               >
                 {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
               </button>
             )}
-
-
           </>
         )}
       </div>

@@ -9,11 +9,13 @@ interface WebRTCStore {
   isMicActive: boolean;
   isMuted: boolean;
   audioFrequencyData: AudioFrequencyData;
+  remoteAudioFrequencyData: AudioFrequencyData;
 
   initializeWebRTC: (socket: TypedSocket, localStream: MediaStream) => Promise<void>;
   toggleMute: () => void;
   cleanup: () => void;
   updateAudioData: (data: AudioFrequencyData) => void;
+  updateRemoteAudioData: (data: AudioFrequencyData) => void;
   setRemoteStream: (userId: SocketId, stream: MediaStream) => void;
   clearRemoteStream: () => void;
 }
@@ -25,6 +27,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   isMicActive: false,
   isMuted: false,
   audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
+  remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
 
   initializeWebRTC: async (socket, localStream) => {
     const { manager } = get();
@@ -34,17 +37,24 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       socket,
       localStream,
       (userId, stream) => get().setRemoteStream(userId, stream),
-      () => get().clearRemoteStream()
+      () => get().clearRemoteStream(),
+      (_userId, data) => get().updateRemoteAudioData(data)
     );
 
     set({ manager: newManager, isMicActive: true });
 
-    // start audio monitoring
+    // start audio monitoring for both local and remote
     const checkAudio = () => {
       const currentManager = get().manager;
       if (currentManager) {
-        const data = currentManager.getAudioFrequencyData();
-        get().updateAudioData(data);
+        // local audio
+        const localData = currentManager.getAudioFrequencyData();
+        get().updateAudioData(localData);
+
+        // remote audio
+        const remoteData = currentManager.getRemoteAudioFrequencyData();
+        get().updateRemoteAudioData(remoteData);
+
         requestAnimationFrame(checkAudio);
       }
     };
@@ -65,12 +75,20 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({ audioFrequencyData: data });
   },
 
+  updateRemoteAudioData: (data) => { // new
+    set({ remoteAudioFrequencyData: data });
+  },
+
   setRemoteStream: (userId, stream) => {
     set({ remoteStream: stream, remoteUserId: userId });
   },
 
   clearRemoteStream: () => {
-    set({ remoteStream: null, remoteUserId: null });
+    set({
+      remoteStream: null,
+      remoteUserId: null,
+      remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 } // reset remote audio data
+    });
   },
 
   cleanup: () => {
@@ -83,7 +101,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       remoteStream: null,
       remoteUserId: null,
       isMicActive: false,
-      audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 }
+      audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
+      remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 }
     });
   }
 }));

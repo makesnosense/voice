@@ -1,3 +1,4 @@
+import AudioAnalyser from './AudioAnalyser';
 import type {
   TypedSocket, SocketId, IceCandidate,
   WebRTCOffer, WebRTCAnswer, AudioFrequencyData
@@ -16,46 +17,35 @@ export class WebRTCManager {
   private socket: TypedSocket;
   // these are for audio analysis
   private audioContext: AudioContext;
-  private localAnalyser: AnalyserNode;
-
-  // audio analysis for remote streams
-  // private remoteAnalyser: AnalyserNode | null = null;
-
+  private localAnalyser: AudioAnalyser;
+  private remoteAnalyser: AudioAnalyser | null = null;
 
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
   private onStreamRemoved: () => void;
-  // private onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void;
+  private onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void;
 
   constructor(
     socket: TypedSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: () => void,
-    // onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void,
+    onRemoteAudioData?: (userId: SocketId, data: AudioFrequencyData) => void,
 
   ) {
     this.socket = socket;
     this.localStream = passedMicStream;
     this.onStreamAdded = onStreamAdded;
     this.onStreamRemoved = onStreamRemoved;
-    // this.onRemoteAudioData = onRemoteAudioData;
+    this.onRemoteAudioData = onRemoteAudioData;
 
     // initialize audio analysis
     this.audioContext = new AudioContext();
-    this.localAnalyser = this.createAnalyser(this.localStream);
+    this.localAnalyser = new AudioAnalyser(this.audioContext, this.localStream);
 
     this.setupSocketListeners();
 
 
-  }
-
-  private createAnalyser(stream: MediaStream): AnalyserNode {
-    const analyser = this.audioContext.createAnalyser();
-    const source = this.audioContext.createMediaStreamSource(stream);
-    source.connect(analyser);
-    analyser.fftSize = 256;
-    return analyser;
   }
 
   private createPeerConnection(remoteUserId: SocketId): RTCPeerConnection {
@@ -98,6 +88,10 @@ export class WebRTCManager {
     peerConnection.ontrack = (event) => {
       console.log(`🎵 Received remote stream from ${remoteUserId}`);
       const [remoteStream] = event.streams;
+
+      this.remoteAnalyser = new AudioAnalyser(this.audioContext, remoteStream);
+      console.log(`🎤 Set up remote audio analysis for ${remoteUserId}`);
+
       this.onStreamAdded(remoteUserId, remoteStream);
     };
 
@@ -215,63 +209,30 @@ export class WebRTCManager {
       return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
-    const dataArray = new Uint8Array(this.localAnalyser.frequencyBinCount);
-    this.localAnalyser.getByteFrequencyData(dataArray);
+    return this.localAnalyser.getFrequencyData();
+  }
 
-    const sampleRate = this.audioContext?.sampleRate || 48000;
-    const binSize = sampleRate / (this.localAnalyser.fftSize * 2);
-
-    // define 5 frequency ranges for human voice
-    const frequencyRanges = [
-      { min: 80, max: 250 },    // low fundamentals
-      { min: 250, max: 500 },   // vocal fry, low voice
-      { min: 500, max: 1000 },  // main vocal range
-      { min: 1000, max: 2000 }, // clarity, consonants
-      { min: 2000, max: 4000 }  // presence, sibilance
-    ];
-
-    const bands: number[] = [];
-    let totalEnergy = 0;
-    let totalSamples = 0;
-
-    const noiseThreshold = 25;
-
-    for (const range of frequencyRanges) {
-      const startBin = Math.floor(range.min / binSize);
-      const endBin = Math.floor(range.max / binSize);
-
-      let sum = 0;
-      let count = 0;
-
-      for (let i = startBin; i < Math.min(endBin, dataArray.length); i++) {
-        if (dataArray[i] > noiseThreshold) {
-          const adjustedValue = Math.pow(dataArray[i] - noiseThreshold, 1.5);
-          sum += adjustedValue;
-          count++;
-          totalEnergy += adjustedValue;
-          totalSamples++;
-        }
-      }
-
-      const bandLevel = count > 0 ? Math.min(100, Math.sqrt(sum / count) * 3) : 0;
-      bands.push(bandLevel);
+  getRemoteAudioFrequencyData(): AudioFrequencyData {
+    if (!this.remoteAnalyser) {
+      return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
-    const overallLevel = totalSamples > 0 ?
-      Math.min(100, Math.sqrt(totalEnergy / totalSamples) * 3) : 0;
-
-    return { bands, overallLevel };
+    return this.remoteAnalyser.getFrequencyData();
   }
+
 
   getAudioLevel(): number {
     return this.getAudioFrequencyData().overallLevel;
   }
+
 
   toggleMute() {
     if (this.localStream) {
       this.localStream.getAudioTracks().forEach(track => {
         track.enabled = !track.enabled;
       });
+      const isEnabled = this.localStream.getAudioTracks().some(track => track.enabled);
+      this.localAnalyser.setActive(isEnabled);
     }
   }
 
@@ -287,18 +248,28 @@ export class WebRTCManager {
       this.peerConnection = null;
       this.onStreamRemoved();
     }
+
+    // cleanup remote audio analysis
+    if (this.remoteAnalyser) {
+      this.remoteAnalyser.cleanup();
+      this.remoteAnalyser = null;
+    }
   }
 
   cleanup() {
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => {
-        track.stop()
+        track.stop();
         console.log('🛑 Stopped track:', track.kind);
       });
     }
 
     if (this.audioContext) {
       this.audioContext.close();
+    }
+
+    if (this.localAnalyser) {
+      this.localAnalyser.cleanup();
     }
 
     this.closePeerConnection();
