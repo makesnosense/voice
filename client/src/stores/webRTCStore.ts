@@ -38,7 +38,6 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       localStream,
       (userId, stream) => get().setRemoteStream(userId, stream),
       () => get().clearRemoteStream(),
-      (_userId, data) => get().updateRemoteAudioData(data)
     );
 
     set({ manager: newManager, isMicActive: true });
@@ -55,7 +54,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         const remoteData = currentManager.getRemoteAudioFrequencyData();
         get().updateRemoteAudioData(remoteData);
 
-        requestAnimationFrame(checkAudio);
+        requestAnimationFrame(checkAudio); // the magic that sets continuous checkAudio calling
       }
     };
     checkAudio();

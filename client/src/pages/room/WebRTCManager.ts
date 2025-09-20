@@ -23,21 +23,16 @@ export class WebRTCManager {
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
   private onStreamRemoved: () => void;
-  private onRemoteAudioData: (userId: SocketId, data: AudioFrequencyData) => void;
-
   constructor(
     socket: TypedSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: () => void,
-    onRemoteAudioData?: (userId: SocketId, data: AudioFrequencyData) => void,
-
   ) {
     this.socket = socket;
     this.localStream = passedMicStream;
     this.onStreamAdded = onStreamAdded;
     this.onStreamRemoved = onStreamRemoved;
-    this.onRemoteAudioData = onRemoteAudioData;
 
     // initialize audio analysis
     this.audioContext = new AudioContext();
