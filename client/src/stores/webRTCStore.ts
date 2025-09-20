@@ -7,7 +7,7 @@ interface WebRTCStore {
   remoteStream: MediaStream | null;
   remoteUserId: SocketId | null;
   isMicActive: boolean;
-  isMuted: boolean;
+  isMutedLocal: boolean;
   audioFrequencyData: AudioFrequencyData;
   remoteAudioFrequencyData: AudioFrequencyData;
 
@@ -25,7 +25,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   remoteStream: null,
   remoteUserId: null,
   isMicActive: false,
-  isMuted: false,
+  isMutedLocal: false,
   audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
   remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
 
@@ -63,10 +63,10 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   toggleMute: () => {
-    const { manager, isMuted } = get();
+    const { manager, isMutedLocal } = get();
     if (manager) {
       manager.toggleMute();
-      set({ isMuted: !isMuted });
+      set({ isMutedLocal: !isMutedLocal });
     }
   },
 

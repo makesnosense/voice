@@ -8,7 +8,7 @@ interface UsersListProps {
   // current user's mic properties
   isMicActive: boolean;
   audioFrequencyData: AudioFrequencyData;
-  isMuted: boolean;
+  isMutedLocal: boolean;
   onToggleMute: () => void;
   // remote user's properties
   remoteAudioFrequencyData: AudioFrequencyData;
@@ -21,7 +21,7 @@ export default function Users({
   currentUserId,
   isMicActive,
   audioFrequencyData,
-  isMuted,
+  isMutedLocal,
   onToggleMute,
   remoteAudioFrequencyData,
   remoteUserId
@@ -45,7 +45,7 @@ export default function Users({
 
         if (isCurrentUser && isMicActive) {
           userAudioData = audioFrequencyData;
-          isUserAudioActive = !isMuted;
+          isUserAudioActive = !isMutedLocal;
         } else if (isRemoteUser) {
           userAudioData = remoteAudioFrequencyData;
           isUserAudioActive = true; // remote audio is always "active" when present
@@ -59,7 +59,7 @@ export default function Users({
             audioData={userAudioData}
             isAudioActive={isUserAudioActive}
             // current user specific props
-            isMuted={isCurrentUser ? isMuted : undefined}
+            isMutedLocal={isCurrentUser ? isMutedLocal : undefined}
             onToggleMute={isCurrentUser ? onToggleMute : undefined}
             isMicConnected={isCurrentUser ? isMicActive : undefined}
           />

@@ -13,7 +13,7 @@ interface UserCardProps {
   isAudioActive?: boolean;
 
   // controls (only for current user)
-  isMuted?: boolean;
+  isMutedLocal?: boolean;
   onToggleMute?: () => void;
 
   // status (only for current user)
@@ -25,7 +25,7 @@ export default function UserCard({
   isCurrentUser,
   audioData,
   isAudioActive = false,
-  isMuted = false,
+  isMutedLocal = false,
   onToggleMute,
   isMicConnected = false
 }: UserCardProps) {
@@ -68,10 +68,10 @@ export default function UserCard({
               <button
                 onClick={onToggleMute}
                 className={`${buttonStyles.iconButton} ${buttonStyles.button} 
-                  ${isMuted ? buttonStyles.lightRed : buttonStyles.neutral}
+                  ${isMutedLocal ? buttonStyles.lightRed : buttonStyles.neutral}
                 `}
               >
-                {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
+                {isMutedLocal ? <MicOff size={16} /> : <Mic size={16} />}
               </button>
             )}
           </>

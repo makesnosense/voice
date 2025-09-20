@@ -18,7 +18,7 @@ interface RoomInteriorProps {
   socketRef: React.RefObject<TypedSocket | null>;
   isMicActive: boolean;
   audioFrequencyData: AudioFrequencyData;
-  isMuted: boolean;
+  isMutedLocal: boolean;
   toggleMute: () => void;
   remoteStream: MediaStream | null;
   remoteUserId: SocketId | null;
@@ -33,7 +33,7 @@ export default function RoomInterior({
   socketRef,
   isMicActive,
   audioFrequencyData,
-  isMuted,
+  isMutedLocal,
   toggleMute,
   remoteStream,
   remoteUserId,
@@ -73,7 +73,7 @@ export default function RoomInterior({
           currentUserId={socketRef.current?.id as SocketId}
           isMicActive={isMicActive}
           audioFrequencyData={audioFrequencyData}
-          isMuted={isMuted}
+          isMutedLocal={isMutedLocal}
           onToggleMute={toggleMute}
           remoteAudioFrequencyData={remoteAudioFrequencyData}
           remoteUserId={remoteUserId}
