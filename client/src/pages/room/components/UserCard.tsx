@@ -39,18 +39,18 @@ export default function UserCard({
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.textOnly} ${baseStyles.userCard}`}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
         <span className={baseStyles.title} style={{ fontSize: '16px' }}>
           {displayName}
         </span>
 
         <div style={{
-          height: "16px"
+          height: "1.5rem"
         }}>
           {isMutedRemoteUser && (
             <MicOff
               className={`${buttonStyles.lightRed} ${buttonStyles.noBorder}`}
-              size={14} />
+              size={16} />
           )}
 
           {/* show audio waves when audio data is available */}
@@ -58,7 +58,7 @@ export default function UserCard({
             <AudioWaves
               audioData={audioData}
               isActive={isAudioActive}
-              size="small"
+              size="medium"
             />
           )}
 
