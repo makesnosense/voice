@@ -24,7 +24,6 @@ interface UserCardProps {
 }
 
 export default function UserCard({
-  userId,
   isCurrentUser,
   audioData,
   isAudioActive = false,
@@ -34,7 +33,7 @@ export default function UserCard({
   isRemoteUserMuted = false
 }: UserCardProps) {
 
-  const displayName = isCurrentUser ? 'You' : `User ${userId.slice(-4)}`;
+  const displayName = isCurrentUser ? 'You' : 'Other';
 
   const isMutedRemoteUser = !isCurrentUser && isRemoteUserMuted;
 
