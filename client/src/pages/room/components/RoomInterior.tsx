@@ -8,12 +8,12 @@ import { useState } from 'react';
 import baseStyles from '../../../styles/BaseCard.module.css'
 import type {
   RoomId, Message, TypedSocket, SocketId,
-  AudioFrequencyData, MicPermissionStatus
+  AudioFrequencyData, MicPermissionStatus, UserDataClientSide
 } from "../../../../../shared/types";
 
 interface RoomInteriorProps {
   roomId: RoomId;
-  roomUsers: SocketId[];
+  roomUsers: UserDataClientSide[];
   messages: Message[];
   socketRef: React.RefObject<TypedSocket | null>;
   isMicActive: boolean;
@@ -25,7 +25,6 @@ interface RoomInteriorProps {
   remoteAudioFrequencyData: AudioFrequencyData;
   micPermissionStatus: MicPermissionStatus;
 }
-
 
 export default function RoomInterior({
   roomUsers,

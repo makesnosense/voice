@@ -7,7 +7,8 @@ import type {
   SocketId,
   WebRTCOffer,
   WebRTCAnswer,
-  IceCandidate
+  IceCandidate,
+  UserDataClientSide
 } from '../../shared/types';
 
 export default function createConnectionHandler(io: TypedServer, rooms: Map<RoomId, Room>) {
@@ -15,6 +16,7 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
     socket.on('join-room', (roomId: RoomId) => handleRoomJoin(io, rooms, socket, roomId));
     socket.on('message', (data: { text: string }) => handleNewMessage(io, socket, data));
     socket.on('webrtc-ready', () => handleWebRTCReady(io, rooms, socket));
+    socket.on('mute-status-changed', (data: { isMuted: boolean }) => handleMuteStatusChanged(io, rooms, socket, data)); // new handler
     socket.on('disconnect', () => handleDisconnect(io, rooms, socket));
 
     // WebRTC signaling events
@@ -24,6 +26,15 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
   }
   return handleConnection;
 }
+
+// helper function to convert server user data to client user data
+const getUsersForClient = (room: Room): UserDataClientSide[] => {
+  return Array.from(room.users.entries()).map(([userId, userData]) => ({
+    userId,
+    isMuted: userData.isMuted
+  }));
+};
+
 
 const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
   socket: ExtendedSocket, roomId: RoomId): void => {
@@ -39,15 +50,15 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
     return;
   }
 
-  room.users.set(socket.id, { webRTCReady: false });
+  room.users.set(socket.id, { webRTCReady: false, isMuted: false });
 
   socket.join(roomId);
   socket.roomId = roomId;
 
   console.log(`🚪 ${socket.id} joined room ${roomId} (${room.users.size} users)`);
 
-  const allUsers = Array.from(room.users.keys());
-  io.to(roomId).emit('room-users-update', allUsers);
+  const usersForClient = getUsersForClient(room);
+  io.to(roomId).emit('room-users-update', usersForClient);
 
   // send success to the joining user
   socket.emit('room-join-success', { roomId });
@@ -80,9 +91,9 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
 
   room.users.delete(socket.id);
 
-  // notify other user about disconnect
-  const remainingUsers = Array.from(room.users.keys());
-  io.to(socket.roomId).emit('room-users-update', remainingUsers);
+  // notify other users about disconnect with updated user list
+  const usersForClient = getUsersForClient(room);
+  io.to(socket.roomId).emit('room-users-update', usersForClient);
   io.to(socket.roomId).emit('user-left', socket.id as SocketId);
 
   if (room.users.size === 0) {
@@ -99,7 +110,7 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
 
   const userData = room.users.get(socket.id);
   if (userData) {
-    room.users.set(socket.id, { webRTCReady: true });
+    room.users.set(socket.id, { ...userData, webRTCReady: true });
     console.log(`🎤 ${socket.id} is WebRTC ready`);
 
     // Check if all users are audio ready
@@ -113,6 +124,25 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
       console.log(`🎬 Both users ready, telling ${firstUser} to initiate WebRTC`);
       io.to(firstUser).emit('initiate-webrtc-call', secondUser as SocketId);
     }
+  }
+}
+
+const handleMuteStatusChanged = (io: TypedServer, rooms: Map<RoomId, Room>,
+  socket: ExtendedSocket, data: { isMuted: boolean }) => {
+  if (!socket.roomId) return;
+
+  const room = rooms.get(socket.roomId);
+  if (!room) return;
+
+  const userData = room.users.get(socket.id);
+  if (userData) {
+    // update mute status while preserving webRTCReady status
+    room.users.set(socket.id, { ...userData, isMuted: data.isMuted });
+    console.log(`🔇 ${socket.id} mute status changed to: ${data.isMuted ? 'muted' : 'unmuted'}`);
+
+    // broadcast updated user list to all users in room
+    const usersForClient = getUsersForClient(room);
+    io.to(socket.roomId).emit('room-users-update', usersForClient);
   }
 }
 

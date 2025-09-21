@@ -18,6 +18,9 @@ interface UserCardProps {
 
   // status (only for current user)
   isMicConnected?: boolean;
+
+  // remote user mute status
+  isRemoteUserMuted?: boolean;
 }
 
 export default function UserCard({
@@ -27,7 +30,8 @@ export default function UserCard({
   isAudioActive = false,
   isMutedLocal = false,
   onToggleMute,
-  isMicConnected = false
+  isMicConnected = false,
+  isRemoteUserMuted = false
 }: UserCardProps) {
 
   const displayName = isCurrentUser ? 'You' : `User ${userId.slice(-4)}`;
@@ -75,6 +79,19 @@ export default function UserCard({
               </button>
             )}
           </>
+        )}
+
+        {/* remote user mute status display */}
+        {!isCurrentUser && isRemoteUserMuted && (
+          <small style={{
+            fontSize: "10px",
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            color: '#ef4444'
+          }}>
+            <MicOff size={14} /> muted
+          </small>
         )}
       </div>
     </div>

@@ -39,7 +39,7 @@ export const useMicrophoneStore = create<MicrophoneStore>()(
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true
-          }
+          },
         });
 
         console.log('✅ Microphone stream obtained');

@@ -8,9 +8,20 @@ export type SocketId = string & { readonly __brand: 'SocketId' };
 type ConnectionStatus = 'connecting' | 'joined' | 'error' | 'room-full';
 type MicPermissionStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'not-supported';
 
-export interface Room {
-  users: Map<SocketId, { webRTCReady: boolean }>;
+export interface UserDataServerSide {
+  webRTCReady: boolean;
+  isMuted: boolean;
 }
+
+export interface UserDataClientSide {
+  userId: SocketId;
+  isMuted: boolean;
+}
+
+export interface Room {
+  users: Map<SocketId, UserDataServerSide>;
+}
+
 
 export interface Message {
   text: string;
@@ -24,7 +35,7 @@ export interface CreateRoomResponse {
 
 // Socket.IO event types
 export interface ServerToClientEvents {
-  'room-users-update': (users: SocketId[]) => void;
+  'room-users-update': (users: UserDataClientSide[]) => void;
   'room-join-success': (data: { roomId: RoomId }) => void;
   'room-full': (error: string) => void;
   'message': (message: Message) => void;
@@ -43,6 +54,7 @@ export interface ClientToServerEvents {
   'join-room': (roomId: RoomId) => void;
   'message': (data: { text: string }) => void;
   'webrtc-ready': () => void;
+  'mute-status-changed': (data: { isMuted: boolean }) => void;
 
   // WebRTC events
   'webrtc-offer': (data: { offer: WebRTCOffer; toUserId: SocketId }) => void;

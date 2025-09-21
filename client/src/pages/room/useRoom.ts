@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef, } from 'react';
 import { io } from 'socket.io-client';
-import type { RoomId, TypedSocket, Message, ConnectionStatus, SocketId } from '../../../../shared/types';
+import type { RoomId, TypedSocket, Message, ConnectionStatus, UserDataClientSide } from '../../../../shared/types';
 import { useMicrophoneStore } from '../../stores/microphoneStore';
 import { useWebRTCStore } from '../../stores/webRTCStore';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
-  const [roomUsers, setRoomUsers] = useState<SocketId[]>([]);
+  const [roomUsers, setRoomUsers] = useState<UserDataClientSide[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
 
-
   const socketRef = useRef<TypedSocket | null>(null);
-
 
   const {
     stream: localStream,
@@ -19,7 +17,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     requestMicrophone,
     cleanup: cleanupMicrophone
   } = useMicrophoneStore();
-
 
   const {
     initializeWebRTC,
@@ -37,8 +34,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     requestMicrophone();
   }, [requestMicrophone]);
 
-
-
   // initialize WebRTC when conditions are met
   useEffect(() => {
     if (micPermissionStatus === 'granted' && connectionStatus === 'joined' && localStream && socketRef.current) {
@@ -46,9 +41,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       initializeWebRTC(socketRef.current, localStream);
     }
   }, [micPermissionStatus, connectionStatus, localStream, initializeWebRTC]);
-
-
-
 
   useEffect(() => {
     if (!roomId || initialStatus === 'error') {
@@ -89,7 +81,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     //   setShouldInitWebRTC(true);
     // });
 
-    newSocket.on('room-users-update', (users: SocketId[]) => {
+    newSocket.on('room-users-update', (users: UserDataClientSide[]) => {
       console.log('👥 Room users updated:', users);
       setRoomUsers(users);
     });

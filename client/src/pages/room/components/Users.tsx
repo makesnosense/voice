@@ -1,9 +1,9 @@
 import UserCard from './UserCard';
-import type { SocketId, AudioFrequencyData } from '../../../../../shared/types';
+import type { SocketId, AudioFrequencyData, UserDataClientSide } from '../../../../../shared/types';
 
 
 interface UsersListProps {
-  roomUsers: SocketId[];
+  roomUsers: UserDataClientSide[];
   currentUserId: SocketId | undefined;
   // current user's mic properties
   isMicActive: boolean;
@@ -35,9 +35,9 @@ export default function Users({
       justifyContent: 'center',
       alignItems: 'flex-start'
     }}>
-      {roomUsers.map(userId => {
-        const isCurrentUser = userId === currentUserId;
-        const isRemoteUser = userId === remoteUserId;
+      {roomUsers.map(user => {
+        const isCurrentUser = user.userId === currentUserId;
+        const isRemoteUser = user.userId === remoteUserId;
 
         // determine audio data and activity for this user
         let userAudioData: AudioFrequencyData | undefined;
@@ -48,13 +48,13 @@ export default function Users({
           isUserAudioActive = !isMutedLocal;
         } else if (isRemoteUser) {
           userAudioData = remoteAudioFrequencyData;
-          isUserAudioActive = true; // remote audio is always "active" when present
+          isUserAudioActive = !user.isMuted; // server-provided!
         }
 
         return (
           <UserCard
-            key={userId}
-            userId={userId}
+            key={user.userId}
+            userId={user.userId}
             isCurrentUser={isCurrentUser}
             audioData={userAudioData}
             isAudioActive={isUserAudioActive}
@@ -62,6 +62,8 @@ export default function Users({
             isMutedLocal={isCurrentUser ? isMutedLocal : undefined}
             onToggleMute={isCurrentUser ? onToggleMute : undefined}
             isMicConnected={isCurrentUser ? isMicActive : undefined}
+            // remote user mute status
+            isRemoteUserMuted={!isCurrentUser ? user.isMuted : undefined}
           />
         );
       })}

@@ -15,14 +15,17 @@ export class WebRTCManager {
   private localStream: MediaStream;
   private peerConnection: RTCPeerConnection | null = null;
   private socket: TypedSocket;
+
   // these are for audio analysis
   private audioContext: AudioContext;
   private localAnalyser: AudioAnalyser;
   private remoteAnalyser: AudioAnalyser | null = null;
 
+
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
   private onStreamRemoved: () => void;
+
   constructor(
     socket: TypedSocket,
     passedMicStream: MediaStream,
@@ -39,8 +42,6 @@ export class WebRTCManager {
     this.localAnalyser = new AudioAnalyser(this.audioContext, this.localStream);
 
     this.setupSocketListeners();
-
-
   }
 
   private createPeerConnection(remoteUserId: SocketId): RTCPeerConnection {
@@ -192,15 +193,22 @@ export class WebRTCManager {
     }
   }
 
+  private get inputAudioEnabled(): boolean {
+    if (!this.localStream) return false;
+    return this.localStream.getAudioTracks().some(track => track.enabled);
+  }
+
+  get isMuted(): boolean {
+    return !this.inputAudioEnabled;
+  }
+
+
   getAudioFrequencyData(): AudioFrequencyData {
     if (!this.localAnalyser || !this.localStream) {
       return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
-    const audioTracks = this.localStream.getAudioTracks();
-    const isAudioEnabled = audioTracks.some(track => track.enabled);
-
-    if (!isAudioEnabled) {
+    if (!this.inputAudioEnabled) {
       return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
@@ -226,8 +234,12 @@ export class WebRTCManager {
       this.localStream.getAudioTracks().forEach(track => {
         track.enabled = !track.enabled;
       });
-      const isEnabled = this.localStream.getAudioTracks().some(track => track.enabled);
-      this.localAnalyser.setActive(isEnabled);
+
+      this.localAnalyser.setActive(this.inputAudioEnabled);
+
+      // emit mute status change to server
+      console.log(`🔇 Emitting mute status change: ${this.isMuted ? 'muted' : 'unmuted'}`);
+      this.socket.emit('mute-status-changed', { isMuted: this.isMuted });
     }
   }
 

@@ -40,7 +40,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       () => get().clearRemoteStream(),
     );
 
-    set({ manager: newManager, isMicActive: true });
+    set({
+      manager: newManager,
+      isMicActive: true,
+      isMutedLocal: newManager.isMuted // sync initial state
+    });
 
     // start audio monitoring for both local and remote
     const checkAudio = () => {
@@ -63,10 +67,12 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   toggleMute: () => {
-    const { manager, isMutedLocal } = get();
+    const { manager } = get();
     if (manager) {
       manager.toggleMute();
-      set({ isMutedLocal: !isMutedLocal });
+
+      const actualMutedState = manager.isMuted;
+      set({ isMutedLocal: actualMutedState });
     }
   },
 
