@@ -51,3 +51,8 @@
   max-height: 400px;
   overflow-y: auto;
 }
+
+.userCard {
+  width: 6rem;
+  justify-content: center;
+}
