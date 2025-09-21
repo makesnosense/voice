@@ -36,6 +36,8 @@ export default function UserCard({
 
   const displayName = isCurrentUser ? 'You' : `User ${userId.slice(-4)}`;
 
+  const isMutedRemoteUser = !isCurrentUser && isRemoteUserMuted;
+
   return (
     <div className={`${baseStyles.card} ${baseStyles.textOnly}`}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
@@ -43,14 +45,21 @@ export default function UserCard({
           {displayName}
         </span>
 
+        {isMutedRemoteUser && (
+          <MicOff
+            className={`${buttonStyles.lightRed} ${buttonStyles.noBorder}`}
+            size={14} />
+        )}
+
         {/* show audio waves when audio data is available */}
-        {audioData && (
+        {audioData && !isMutedRemoteUser && (
           <AudioWaves
             audioData={audioData}
             isActive={isAudioActive}
             size="small"
           />
         )}
+
 
         {/* current user controls and status */}
         {isCurrentUser && (
@@ -81,18 +90,6 @@ export default function UserCard({
           </>
         )}
 
-        {/* remote user mute status display */}
-        {!isCurrentUser && isRemoteUserMuted && (
-          <small style={{
-            fontSize: "10px",
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            color: '#ef4444'
-          }}>
-            <MicOff size={14} /> muted
-          </small>
-        )}
       </div>
     </div>
   );

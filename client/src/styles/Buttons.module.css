@@ -55,6 +55,14 @@
   box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.2);
 }
 
+.lightRed.noBorder {
+  border: none;
+}
+
+.lightRed.noBorder:hover {
+  transform: none;
+}
+
 .icon {
   display: flex;
   align-items: center;
