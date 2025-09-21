@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import baseStyles from '../../../styles/BaseCard.module.css';
+import buttonStyles from '../../../styles/Buttons.module.css';
 
 interface RoomErrorProps {
   errorType?: 'not-found' | 'room-full';
@@ -43,13 +45,36 @@ export default function RoomError({ errorType = 'not-found' }: RoomErrorProps) {
   const { icon, title, description } = getErrorMessage();
 
   return (
-    <>
-      <h1>{icon} {title}</h1>
-      <div className="error">
-        <p>{description}</p>
-        <p>Redirecting to home page in {countdown} second{countdown !== 1 ? 's' : ''}...</p>
-        <button onClick={() => navigate('/')}>Go Home Now</button>
+    <div style={{
+      width: '100%',
+      textAlign: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '1.5rem'
+    }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ fontSize: '2rem' }}>
+          {icon}
+        </div>
+        <h1 className={baseStyles.title}>{title}</h1>
       </div>
-    </>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <p style={{ color: '#64748b', margin: 0 }}>
+          {description}
+        </p>
+        <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>
+          Redirecting to home page in {countdown} second{countdown !== 1 ? 's' : ''}...
+        </p>
+      </div>
+
+      <button
+        onClick={() => navigate('/')}
+        className={`${buttonStyles.button} ${buttonStyles.neutral}`}
+      >
+        Go Home Now
+      </button>
+    </div>
   );
 }
