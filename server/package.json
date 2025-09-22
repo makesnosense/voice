@@ -2,9 +2,9 @@
   "name": "voice-server",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "dev": "bun --watch --env-file=./.env.development src/server.ts",
+    "build": "bun build src/server.ts --target node --outfile dist/server.js",
+    "start": "bun --env-file=./.env.production ./dist/server.js"
   },
   "dependencies": {
     "express": "^4.21.2",

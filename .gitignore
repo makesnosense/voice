@@ -30,3 +30,6 @@ certs/
 *.crt
 *.p12
 ssl/
+
+.env.development
+.env.production
