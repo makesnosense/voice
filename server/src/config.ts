@@ -1,24 +1,45 @@
+const getRequiredEnv = (key: string): string => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+  return value;
+};
+
+
+const nodeEnv = getRequiredEnv('NODE_ENVIRONMENT');
+const port = parseInt(getRequiredEnv('PORT'), 10);
+const host = getRequiredEnv('HOST');
+const corsOrigins = getRequiredEnv('CORS_ORIGINS')
+  .split(',')
+  .map(origin => origin.trim());
+
+const isProduction = nodeEnv === 'production';
+
+
 const config = {
-  nodeEnvironment: process.env.NODE_ENVIRONMENT,
-  port: parseInt(process.env.PORT ?? '3001', 10),
-  host: process.env.HOST ?? 'localhost',
+  nodeEnvironment: nodeEnv,
+  port,
+  host,
+  corsOrigins,
+  isProduction,
   ssl: {
-    keyPath: process.env.SSL_KEY_PATH ?? '../certs/key.pem',
-    certPath: process.env.SSL_CERT_PATH ?? '../certs/cert.pem'
-  },
-  cors: {
-    origins: process.env.CORS_ORIGINS?.split(',').map(origin => origin.trim())
-      ?? ['https://localhost:5173']
+    keyPath: isProduction ? '' : getRequiredEnv('SSL_KEY_PATH'),
+    certPath: isProduction ? '' : getRequiredEnv('SSL_CERT_PATH')
   }
 };
 
+
+// logging
 console.log('🔧 Server configuration:');
 console.log(`   Environment: ${config.nodeEnvironment}`);
 console.log(`   Host: ${config.host}`);
 console.log(`   Port: ${config.port}`);
-console.log(`   SSL Key: ${config.ssl.keyPath}`);
-console.log(`   SSL Cert: ${config.ssl.certPath}`);
-console.log(`   CORS Origins: ${config.cors.origins.join(', ')}`);
+if (!config.isProduction && config.ssl) {
+  console.log(`   SSL Key: ${config.ssl.keyPath}`);
+  console.log(`   SSL Cert: ${config.ssl.certPath}`);
+}
+console.log(`   CORS Origins: ${config.corsOrigins.join(', ')}`);
 
 
 export default config;

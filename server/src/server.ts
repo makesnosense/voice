@@ -1,5 +1,6 @@
 import express from 'express';
-import { createServer } from 'https';
+import { createServer as createHttpServer } from 'http';
+import { createServer as createHttpsServer } from 'https';
 import { Server } from 'socket.io';
 import { generateRoomId } from './utils/generators';
 import createConnectionHandler from './socket-handlers';
@@ -7,18 +8,18 @@ import config from './config';
 import type { Room, RoomId } from '../../shared/types'
 import fs from 'node:fs'
 
-
-
 const app = express();
 
-const server = createServer({
-  key: fs.readFileSync(config.ssl.keyPath),
-  cert: fs.readFileSync(config.ssl.certPath),
-}, app);
+const server = config.isProduction
+  ? createHttpServer(app)
+  : createHttpsServer({
+    key: fs.readFileSync(config.ssl.keyPath),
+    cert: fs.readFileSync(config.ssl.certPath),
+  }, app);
 
 const io = new Server(server, {
   cors: {
-    origin: config.cors.origins,
+    origin: config.corsOrigins,
     methods: ["GET", "POST"]
   }
 });
