@@ -1,0 +1,15 @@
+networks:
+  web:
+    external: true
+
+services:
+  voice-server:
+    build:
+      context: .                    # build from voice/ root
+      dockerfile: server/Dockerfile # but use server/Dockerfile
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    networks:
+      - web
+    container_name: voice-server
