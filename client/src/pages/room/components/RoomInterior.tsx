@@ -1,7 +1,7 @@
 import CopyCard from './copycard/CopyCard';
 import RemoteAudio from './RemoteAudio';
 import Users from './Users';
-import layoutStyles from '../../../styles/layout.module.css'
+import layoutStyles from '../../../styles/Layout.module.css'
 // import AudioSetupOverlay from './AudioSetupOverlay';
 import Messages from './messages/Messages';
 import { useState } from 'react';
