@@ -41,8 +41,11 @@ app.post('/api/create-room', (req, res) => {
 const handleConnection = createConnectionHandler(io, rooms);
 io.on('connection', handleConnection);
 
+const isHttps = 'cert' in server && 'key' in server;
+const protocol = isHttps ? 'https' : 'http';
+
 
 server.listen(config.port, config.host, () => {
-  console.log(`🚀 Server running on https://${config.host}:${config.port}`);
+  console.log(`🚀 Server running on ${protocol}://${config.host}:${config.port}`);
   console.log(`🌍 Environment: ${config.nodeEnvironment}`);
 });

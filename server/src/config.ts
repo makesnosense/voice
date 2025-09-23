@@ -8,14 +8,13 @@ const getRequiredEnv = (key: string): string => {
 
 
 const nodeEnv = getRequiredEnv('NODE_ENVIRONMENT');
-const port = parseInt(getRequiredEnv('PORT'), 10);
-const host = getRequiredEnv('HOST');
+const port = parseInt(getRequiredEnv('SERVER_PORT'), 10);
+const host = getRequiredEnv('SERVER_HOST');
 const corsOrigins = getRequiredEnv('CORS_ORIGINS')
   .split(',')
   .map(origin => origin.trim());
 
 const isProduction = nodeEnv === 'production';
-
 
 const config = {
   nodeEnvironment: nodeEnv,
