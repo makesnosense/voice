@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, } from 'react';
 import { io } from 'socket.io-client';
 import type { RoomId, TypedSocket, Message, ConnectionStatus, UserDataClientSide } from '../../../../shared/types';
-import { useMicrophoneStore } from '../../stores/microphoneStore';
-import { useWebRTCStore } from '../../stores/webRTCStore';
+import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
+import { useWebRTCStore } from '../../stores/useWebRTCStore';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
