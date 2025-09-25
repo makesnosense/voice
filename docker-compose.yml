@@ -13,3 +13,11 @@ services:
     networks:
       - web
     container_name: voice-server
+
+  coturn:
+    build: ./coturn
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    network_mode: host
+    container_name: voice-coturn

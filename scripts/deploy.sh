@@ -10,7 +10,7 @@ cd "$(dirname "$0")/.."
 
 # copy to nginx (relative to voice directory)
 echo "📋 Copying static files to nginx..."
-sudo cp -r client/dist/* ../vps-nginx-config/www/voice/
+sudo cp -r client/dist/* ../nginx-on-vps/www/voice/
 
 # restart voice app first (this directory)
 echo "🔄 Restarting voice app..."
@@ -19,7 +19,7 @@ docker compose up -d --build
 
 # reload nginx config (don't restart nginx, just reload)
 echo "🔄 Reloading nginx..."
-cd ../vps-nginx-config
-docker compose exec nginx nginx -s reload
+cd ../nginx-on-vps
+docker exec nginx-proxy nginx -s reload
 
 echo "🚀 Deployment complete!"

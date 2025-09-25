@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer as createHttpServer } from 'http';
 import { createServer as createHttpsServer } from 'https';
 import { Server } from 'socket.io';
-import { generateRoomId } from './utils/generators';
+import { generateRoomId, generateTurnCredentials } from './utils/generators';
 import createConnectionHandler from './socket-handlers';
 import config from './config';
 import type { Room, RoomId } from '../../shared/types'
@@ -36,6 +36,17 @@ app.post('/api/create-room', (req, res) => {
 
   console.log(`📱 Created room: ${roomId}`);
   res.json({ roomId });
+});
+
+app.get('/api/turn-credentials', (req, res) => {
+  if (!config.turnSecret) {
+    return res.status(500).json({ error: 'TURN server not configured' });
+  };
+  const credentials = generateTurnCredentials(config.turnSecret);
+  res.json({
+    username: credentials.username,
+    credential: credentials.credential
+  });
 });
 
 const handleConnection = createConnectionHandler(io, rooms);

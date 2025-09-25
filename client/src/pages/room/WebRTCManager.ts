@@ -4,12 +4,11 @@ import type {
   WebRTCOffer, WebRTCAnswer, AudioFrequencyData
 } from '../../../../shared/types';
 
-const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' }, // Google's public STUN server
-    { urls: 'stun:stun1.l.google.com:19302' }
-  ]
-};
+const BASE_ICE_SERVERS: RTCIceServer[] = [
+  // { urls: 'stun:stun.l.google.com:19302' },
+  // { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}` }
+];
 
 export class WebRTCManager {
   private localStream: MediaStream;
@@ -20,7 +19,6 @@ export class WebRTCManager {
   private audioContext: AudioContext;
   private localAnalyser: AudioAnalyser;
   private remoteAnalyser: AudioAnalyser | null = null;
-
 
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
@@ -44,10 +42,11 @@ export class WebRTCManager {
     this.setupSocketListeners();
   }
 
-  private createPeerConnection(remoteUserId: SocketId): RTCPeerConnection {
+  private async createPeerConnection(remoteUserId: SocketId): Promise<RTCPeerConnection> {
     console.log(`🔗 Creating peer connection to ${remoteUserId}`);
 
-    const peerConnection = new RTCPeerConnection(ICE_SERVERS);
+    const iceServers = await this.getIceServers();
+    const peerConnection = new RTCPeerConnection({ iceServers });
 
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => {
@@ -95,6 +94,27 @@ export class WebRTCManager {
     return peerConnection;
   }
 
+  private async getIceServers(): Promise<RTCIceServer[]> {
+    const iceServers = [...BASE_ICE_SERVERS];
+
+    try {
+      const response = await fetch('/api/turn-credentials');
+      const turn_credentials = await response.json();
+
+      iceServers.push({
+        urls: `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}`,
+        username: turn_credentials.username,
+        credential: turn_credentials.credential
+      });
+
+      console.log('✅ TURN credentials obtained');
+    } catch (error) {
+      console.log('⚠️ TURN credentials unavailable, using STUN only');
+    }
+
+    return iceServers;
+  }
+
   private setupSocketListeners() {
     // the most important one
     // when second user joins and is webrtc-ready
@@ -131,7 +151,7 @@ export class WebRTCManager {
   // offer is created here
   private async initiateCall(remoteUserId: SocketId) {
     try {
-      const peerConnection = this.createPeerConnection(remoteUserId);
+      const peerConnection = await this.createPeerConnection(remoteUserId);
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
 
@@ -151,7 +171,7 @@ export class WebRTCManager {
   // by creating answer
   private async handleOffer(fromUserId: SocketId, offer: WebRTCOffer) {
     try {
-      const peerConnection = this.createPeerConnection(fromUserId);
+      const peerConnection = await this.createPeerConnection(fromUserId);
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
       const answer = await peerConnection.createAnswer();
