@@ -5,9 +5,9 @@ import type {
 } from '../../../../shared/types';
 
 const BASE_ICE_SERVERS: RTCIceServer[] = [
-  // { urls: 'stun:stun.l.google.com:19302' },
-  // { urls: 'stun:stun1.l.google.com:19302' },
-  // { urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}` }
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}` }
 ];
 
 export class WebRTCManager {
@@ -109,6 +109,7 @@ export class WebRTCManager {
 
       console.log('✅ TURN credentials obtained');
     } catch (error) {
+      console.error(error);
       console.log('⚠️ TURN credentials unavailable, using STUN only');
     }
 
