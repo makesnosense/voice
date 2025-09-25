@@ -86,6 +86,38 @@ const getUsersForClient = (room: Room): UserDataClientSide[] => {
   }));
 };
 
+const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number => {
+  let removedCount = 0;
+
+  for (const [userId, userData] of room.users.entries()) {
+    const socket = io.sockets.sockets.get(userId);
+
+    // kick if socket is dead or disconnected
+    if (!socket || !socket.connected) {
+      console.log(`💀 Force cleanup: removing dead socket ${userId}`);
+      room.users.delete(userId);
+      io.to(roomId).emit('user-left', userId as SocketId);
+      removedCount++;
+      continue;
+    }
+
+    // kick if not webrtc ready (stuck in some broken state)
+    if (!userData.webRTCReady) {
+      console.log(`🚫 Force cleanup: removing non-webRTC-ready socket ${userId}`);
+      room.users.delete(userId);
+
+      socket.disconnect(true);
+
+      io.to(roomId).emit('user-left', userId as SocketId);
+      removedCount++;
+    }
+  }
+
+  return removedCount;
+};
+
+
+
 const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
   socket: ExtendedSocket, roomId: RoomId): void => {
   const room = rooms.get(roomId);
@@ -94,7 +126,15 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
     return;
   }
 
-  // check room capacity - max 2 people
+  // aggressively clean up problematic connections
+  if (room.users.size >= 2) {
+    const removedCount = forceCleanupRoom(io, room, roomId);
+    if (removedCount > 0) {
+      console.log(`🧹 Force cleaned up ${removedCount} problematic connections from room ${roomId}`);
+    }
+  }
+
+  // check room capacity after cleanup
   if (room.users.size >= 2) {
     socket.emit('room-full', 'Room is full (max 2 people)');
     return;

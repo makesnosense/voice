@@ -27,7 +27,11 @@ const io = new Server(server, {
   cors: {
     origin: config.corsOrigins,
     methods: ["GET", "POST"]
-  }
+  },
+  pingTimeout: 10000,
+  pingInterval: 5000,
+  upgradeTimeout: 5000,
+  allowEIO3: false,
 });
 
 const rooms = new Map<RoomId, Room>();
