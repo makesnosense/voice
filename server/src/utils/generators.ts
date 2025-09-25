@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import type { RoomId } from '../../../shared/types'
 
 export function generateRoomId(): RoomId {
@@ -25,6 +26,20 @@ export function generateUserName() {
   const animal = animals[Math.floor(Math.random() * animals.length)];
 
   return `${adjective}${animal}`;
+}
+
+export function generateTurnCredentials(secret: string): { username: string; credential: string } {
+  // username format: timestamp:random
+  const timestamp = Math.floor(Date.now() / 1000) + 86400; // valid for 24 hours
+  const username = `${timestamp}:voiceuser`;
+
+  // credential is HMAC of username using shared secret
+  const credential = crypto
+    .createHmac('sha1', secret)
+    .update(username)
+    .digest('base64');
+
+  return { username, credential };
 }
 
 

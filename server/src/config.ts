@@ -25,7 +25,8 @@ const config = {
   ssl: {
     keyPath: isProduction ? '' : getRequiredEnv('SSL_KEY_PATH'),
     certPath: isProduction ? '' : getRequiredEnv('SSL_CERT_PATH')
-  }
+  },
+  turnSecret: getRequiredEnv('COTURN_SECRET')
 };
 
 
