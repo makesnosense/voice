@@ -4,8 +4,7 @@ import Users from './Users';
 import layoutStyles from '../../../styles/Layout.module.css'
 // import AudioSetupOverlay from './AudioSetupOverlay';
 import Messages from './messages/Messages';
-import { useState } from 'react';
-import baseStyles from '../../../styles/BaseCard.module.css'
+
 import type {
   RoomId, Message, TypedSocket, SocketId,
   AudioFrequencyData, MicPermissionStatus, UserDataClientSide
@@ -40,23 +39,6 @@ export default function RoomInterior({
   micPermissionStatus
 }: RoomInteriorProps) {
 
-  const [messageInput, setMessageInput] = useState('');
-
-
-  const sendMessage = () => {
-    const text = messageInput.trim();
-    if (text && socketRef.current) {
-      console.log(messageInput);
-      socketRef.current.emit('message', { text });
-      setMessageInput('');
-    }
-  };
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
   return (
     <div className={layoutStyles.roomContainer}>
       <CopyCard />
@@ -109,22 +91,11 @@ export default function RoomInterior({
         )}
       </div>
 
-      <div className={`${baseStyles.card} ${baseStyles.fullWidth} ${baseStyles.messagesCard}`}>
-        <Messages messages={messages} />
-      </div>
 
-      <div className={`${baseStyles.fullWidth} ${layoutStyles.messageInputArea}`}>
-        <input
-          type="text"
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Type message..."
-        />
-        <button onClick={sendMessage}>
-          Send
-        </button>
-      </div>
+      <Messages
+        messages={messages}
+        socketRef={socketRef} />
+
     </div>
   );
 }

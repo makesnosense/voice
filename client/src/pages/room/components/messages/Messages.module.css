@@ -1,34 +1,142 @@
+.messagesCard {
+  width: fit-content;
+  max-width: min(90vw, 500px);
+  min-width: 280px;
+  gap: 0px;
+  padding: 16px 16px;
+  padding-bottom: 10px;
+}
+
+.messagesContent {
+  flex: 1;
+  min-height: 80px;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* firefox */
+  -ms-overflow-style: none;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #0000003c;
+  font-size: 12px;
+}
+
 .messages {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
+
 }
 
 .messageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.25rem;
+  margin-bottom: 2px;
+  gap: 8px;
 }
 
-.messageHeader strong {
+.username {
   color: #374151;
   font-weight: 600;
+  font-size: 11px;
+  flex-shrink: 0;
 }
 
-
 .timestamp {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 9px;
+  color: #9ca3af;
   font-weight: 500;
-  /* slightly bolder */
-  padding: 2px 8px;
-
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .messageText {
   color: #111827;
-  line-height: 1.4;
-  margin-left: 0;
+  line-height: 1.3;
+  font-size: 12px;
+  word-wrap: break-word;
+}
+
+.messageInput {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  /* base card column gap handles the spacing from content above */
+}
+
+.messageInput input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.messageInput input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.messageInput input::placeholder {
+  color: #9ca3af;
+}
+
+.sendButton {
+  background: transparent;
+  color: #667eea;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: translateY(-1px);
+}
+
+.sendButton:hover:not(:disabled) {
+  color: #5a67d8;
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #9ca3af;
+}
+
+
+/* mobile adjustments */
+@media (max-width: 480px) {
+  .messagesCard {
+    min-width: 240px;
+    max-width: 95vw;
+  }
+
+  .username {
+    font-size: 10px;
+  }
+
+  .timestamp {
+    font-size: 8px;
+  }
+
+  .messageText {
+    font-size: 11px;
+  }
+
+  .messageInput button {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
 }

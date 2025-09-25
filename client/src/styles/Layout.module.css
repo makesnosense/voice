@@ -15,14 +15,6 @@
     padding: 16px 12px;
     max-width: 100%;
   }
-
-  .header {
-    /* margin-bottom: 1.5rem; */
-  }
-
-  .content {
-    /* padding-top: 1.5rem; */
-  }
 }
 
 /* For very small screens */
@@ -86,42 +78,4 @@
   .roomContainer {
     gap: 0.75rem;
   }
-}
-
-.messageInputArea {
-  display: flex;
-  gap: 0.5rem;
-  width: 100%;
-  align-self: stretch;
-}
-
-.messageInputArea input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  outline: none;
-  font-size: 16px;
-  background: white;
-}
-
-.messageInputArea input:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
-}
-
-.messageInputArea button {
-  padding: 0.75rem 1.5rem;
-  background: #10b981;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 16px;
-  transition: background 0.2s ease;
-}
-
-.messageInputArea button:hover {
-  background: #059669;
 }
