@@ -26,7 +26,12 @@ const config = {
     keyPath: isProduction ? '' : getRequiredEnv('SSL_KEY_PATH'),
     certPath: isProduction ? '' : getRequiredEnv('SSL_CERT_PATH')
   },
-  turnSecret: getRequiredEnv('COTURN_SECRET')
+  turnSecret: getRequiredEnv('COTURN_SECRET'),
+  // rate limiting configuration
+  rateLimiting: {
+    enabled: true, // you can disable for development if needed
+    trustProxy: isProduction, // trust proxy headers in production
+  }
 };
 
 
@@ -40,6 +45,6 @@ if (!config.isProduction && config.ssl) {
   console.log(`   SSL Cert: ${config.ssl.certPath}`);
 }
 console.log(`   CORS Origins: ${config.corsOrigins.join(', ')}`);
-
+console.log(`   Rate Limiting: ${config.rateLimiting.enabled ? 'enabled' : 'disabled'}`);
 
 export default config;

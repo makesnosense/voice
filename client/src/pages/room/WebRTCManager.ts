@@ -7,7 +7,7 @@ import type {
 const BASE_ICE_SERVERS: RTCIceServer[] = [
   // { urls: 'stun:stun.l.google.com:19302' },
   // { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}` }
+  // { urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}` }
 ];
 
 export class WebRTCManager {

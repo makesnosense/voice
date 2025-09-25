@@ -1,3 +1,4 @@
+import { socketRateLimiter, SOCKET_RATE_LIMITS } from './utils/socket-rate-limiter';
 import type {
   Room,
   RoomId,
@@ -13,19 +14,69 @@ import type {
 
 export default function createConnectionHandler(io: TypedServer, rooms: Map<RoomId, Room>) {
   const handleConnection = (socket: ExtendedSocket) => {
-    socket.on('join-room', (roomId: RoomId) => handleRoomJoin(io, rooms, socket, roomId));
-    socket.on('message', (data: { text: string }) => handleNewMessage(io, socket, data));
-    socket.on('webrtc-ready', () => handleWebRTCReady(io, rooms, socket));
-    socket.on('mute-status-changed', (data: { isMuted: boolean }) => handleMuteStatusChanged(io, rooms, socket, data)); // new handler
+    console.log(`🔌 New connection: ${socket.id}`);
+
+    socket.on('join-room', (roomId: RoomId) => {
+      if (!checkRateLimit(socket, 'join-room')) return;
+      handleRoomJoin(io, rooms, socket, roomId);
+    });
+
+    socket.on('message', (data: { text: string }) => {
+      if (!checkRateLimit(socket, 'message')) return;
+      handleNewMessage(io, socket, data);
+    });
+
+    socket.on('webrtc-ready', () => {
+      if (!checkRateLimit(socket, 'webrtc-ready')) return;
+      handleWebRTCReady(io, rooms, socket);
+    });
+
+    socket.on('mute-status-changed', (data: { isMuted: boolean }) => {
+      if (!checkRateLimit(socket, 'mute-status-changed')) return;
+      handleMuteStatusChanged(io, rooms, socket, data);
+    });
+
     socket.on('disconnect', () => handleDisconnect(io, rooms, socket));
 
-    // WebRTC signaling events
-    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => handleWebRTCOffer(io, socket, data));
-    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toUserId: SocketId; }) => handleWebRTCAnswer(io, socket, data));
-    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toUserId: SocketId; }) => handleWebRTCIceCandidate(io, socket, data));
-  }
+    // WebRTC signaling events with rate limiting
+    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => {
+      if (!checkRateLimit(socket, 'webrtc-offer')) return;
+      handleWebRTCOffer(io, socket, data);
+    });
+
+    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toUserId: SocketId; }) => {
+      if (!checkRateLimit(socket, 'webrtc-answer')) return;
+      handleWebRTCAnswer(io, socket, data);
+    });
+
+    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toUserId: SocketId; }) => {
+      if (!checkRateLimit(socket, 'webrtc-ice-candidate')) return;
+      handleWebRTCIceCandidate(io, socket, data);
+    });
+  };
+
   return handleConnection;
 }
+
+// helper to check rate limits for socket events
+const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_LIMITS): boolean => {
+  const limit = SOCKET_RATE_LIMITS[event];
+  const allowed = socketRateLimiter.checkLimit(
+    socket.id as SocketId,
+    event,
+    limit.max,
+    limit.windowMs
+  );
+
+  if (!allowed) {
+    console.warn(`🚫 Rate limit exceeded for ${socket.id} on event ${event}`);
+    socket.emit('error' as any, {
+      message: `Rate limit exceeded for ${event}. Please slow down.`
+    });
+  }
+
+  return allowed;
+};
 
 // helper function to convert server user data to client user data
 const getUsersForClient = (room: Room): UserDataClientSide[] => {
@@ -34,7 +85,6 @@ const getUsersForClient = (room: Room): UserDataClientSide[] => {
     isMuted: userData.isMuted
   }));
 };
-
 
 const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
   socket: ExtendedSocket, roomId: RoomId): void => {
@@ -67,6 +117,11 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
 
 const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
   if (socket.roomId) {
+
+    if (!data.text || data.text.length > 1000) {
+      socket.emit('error' as any, { message: 'Invalid message content' });
+      return;
+    }
     console.log(`💬 Message in ${socket.roomId}: ${data.text}`);
 
     const message: Message = {

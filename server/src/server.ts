@@ -3,12 +3,18 @@ import { createServer as createHttpServer } from 'http';
 import { createServer as createHttpsServer } from 'https';
 import { Server } from 'socket.io';
 import { generateRoomId, generateTurnCredentials } from './utils/generators';
+import { generalApiLimiter, createRoomLimiter, turnCredentialsLimiter } from './utils/rate-limiter';
 import createConnectionHandler from './socket-handlers';
 import config from './config';
 import type { Room, RoomId } from '../../shared/types'
 import fs from 'node:fs'
 
 const app = express();
+
+// trust proxy if in production (for rate limiting)
+if (config.rateLimiting.trustProxy) {
+  app.set('trust proxy', 1);
+}
 
 const server = config.isProduction
   ? createHttpServer(app)
@@ -26,7 +32,10 @@ const io = new Server(server, {
 
 const rooms = new Map<RoomId, Room>();
 
-app.use(express.json());
+if (config.rateLimiting.enabled) {
+  app.use('/api/', generalApiLimiter);
+  console.log('🛡️ Rate limiting enabled for API endpoints');
+}
 
 app.post('/api/create-room', (req, res) => {
   const roomId: RoomId = generateRoomId();
@@ -59,4 +68,13 @@ const protocol = isHttps ? 'https' : 'http';
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${protocol}://${config.host}:${config.port}`);
   console.log(`🌍 Environment: ${config.nodeEnvironment}`);
+});
+
+// graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('📴 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
 });
