@@ -8,7 +8,6 @@ interface MessagesProps {
   socketRef: React.RefObject<TypedSocket | null>;
 }
 
-
 function useAutoScroll(dependencies: React.DependencyList) {
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -24,9 +23,6 @@ function useAutoScroll(dependencies: React.DependencyList) {
   }, [dependencies]);
   return elementRef;
 }
-
-
-
 
 export default function Messages({
   messages,
@@ -52,6 +48,20 @@ export default function Messages({
     }
   };
 
+  const renderUsername = (userId: string) => {
+    const currentUserId = socketRef.current?.id;
+    const isCurrentUser = userId === currentUserId;
+
+    return (
+      <strong
+        className={messagesStyles.username}
+        style={{ color: isCurrentUser ? '#667eea' : undefined }}
+      >
+        {isCurrentUser ? 'You' : 'Other'}
+      </strong>
+    );
+  };
+
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${messagesStyles.messagesCard}`}>
       <div className={messagesStyles.messagesContent}
@@ -68,7 +78,7 @@ export default function Messages({
             {messages.map((msg, index) => (
               <div key={index} className={messagesStyles.message}>
                 <div className={messagesStyles.messageHeader}>
-                  <strong className={messagesStyles.username}>{msg.userId}</strong>
+                  {renderUsername(msg.userId)}
                   <span className={messagesStyles.timestamp}>
                     {new Date(msg.timestamp).toLocaleTimeString('en-GB', {
                       hour: '2-digit',
