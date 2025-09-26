@@ -8,24 +8,34 @@ interface MessagesProps {
   socketRef: React.RefObject<TypedSocket | null>;
 }
 
+
+function useAutoScroll(...dependencies: React.DependencyList) {
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const containerElem = elementRef.current;
+    if (containerElem) {
+
+      containerElem.scrollTo({
+        top: containerElem.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [dependencies]);
+  return elementRef;
+}
+
+
+
+
 export default function Messages({
   messages,
   socketRef }: MessagesProps) {
 
   const [messageInput, setMessageInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const messagesRef = useAutoScroll([messages]);
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      // small delay to ensure DOM has updated
-      const timer = setTimeout(scrollToBottom, 50);
-      return () => clearTimeout(timer);
-    }
-  }, [messages]);
 
   const sendMessage = () => {
     const text = messageInput.trim();
@@ -44,13 +54,17 @@ export default function Messages({
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${messagesStyles.messagesCard}`}>
-      <div className={messagesStyles.messagesContent}>
+      <div className={messagesStyles.messagesContent}
+        ref={messagesRef}
+      >
         {messages.length === 0 ? (
           <div className={messagesStyles.emptyState}>
             No chat messages yet
           </div>
         ) : (
-          <div className={messagesStyles.messages}>
+          <div
+            className={messagesStyles.messages}
+          >
             {messages.map((msg, index) => (
               <div key={index} className={messagesStyles.message}>
                 <div className={messagesStyles.messageHeader}>
@@ -68,8 +82,7 @@ export default function Messages({
                 </div>
               </div>
             ))}
-            {/* invisible element at the bottom for scrolling */}
-            <div ref={messagesEndRef} />
+
           </div>
         )}
       </div>
