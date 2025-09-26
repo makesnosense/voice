@@ -9,7 +9,7 @@ interface MessagesProps {
 }
 
 
-function useAutoScroll(...dependencies: React.DependencyList) {
+function useAutoScroll(dependencies: React.DependencyList) {
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function Messages({
 
   const [messageInput, setMessageInput] = useState('');
 
-  const messagesRef = useAutoScroll([messages]);
+  const messagesRef = useAutoScroll(messages);
 
 
   const sendMessage = () => {
