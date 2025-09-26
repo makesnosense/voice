@@ -37,6 +37,16 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   // initialize WebRTC when conditions are met
   useEffect(() => {
     if (micPermissionStatus === 'granted' && connectionStatus === 'joined' && localStream && socketRef.current) {
+
+      const hasLiveTracks = localStream.getTracks().some(track => track.readyState === 'live');
+
+      if (!hasLiveTracks) {
+        console.log('🚫 Stream has ended tracks, requesting fresh stream...');
+        requestMicrophone(); // Request fresh stream
+        return;
+      }
+
+
       console.log('🎬 All conditions met, initializing WebRTC');
       initializeWebRTC(socketRef.current, localStream);
     }
