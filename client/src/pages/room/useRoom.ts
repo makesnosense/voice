@@ -50,7 +50,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       console.log('🎬 All conditions met, initializing WebRTC');
       initializeWebRTC(socketRef.current, localStream);
     }
-  }, [micPermissionStatus, connectionStatus, localStream, initializeWebRTC]);
+  }, [micPermissionStatus, connectionStatus, localStream, initializeWebRTC, requestMicrophone]);
 
   useEffect(() => {
     if (!roomId || initialStatus === 'error') {

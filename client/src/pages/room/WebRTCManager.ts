@@ -14,6 +14,9 @@ export class WebRTCManager {
   private localStream: MediaStream;
   private peerConnection: RTCPeerConnection | null = null;
   private socket: TypedSocket;
+  private currentRemoteUserId: SocketId | null = null;
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 5;
 
   // these are for audio analysis
   private audioContext: AudioContext;
@@ -44,7 +47,7 @@ export class WebRTCManager {
 
   private async createPeerConnection(remoteUserId: SocketId): Promise<RTCPeerConnection> {
     console.log(`🔗 Creating peer connection to ${remoteUserId}`);
-
+    this.currentRemoteUserId = remoteUserId;
     const iceServers = await this.getIceServers();
     const peerConnection = new RTCPeerConnection({ iceServers });
 
@@ -72,9 +75,16 @@ export class WebRTCManager {
 
 
     peerConnection.onconnectionstatechange = () => {
-      console.log(`📶 Connection state with ${remoteUserId}: ${peerConnection.connectionState}`);
+      const state = peerConnection.connectionState;
+      console.log(`📶 Connection state with ${remoteUserId}: ${state}`);
 
-      if (peerConnection.connectionState === 'failed' || peerConnection.connectionState === 'disconnected') {
+      if (state === 'connected') {
+        this.reconnectAttempts = 0; // Reset counter
+      } else if (state === 'failed') {
+        this.handleConnectionFailed();
+      }
+
+      if (peerConnection.connectionState === 'disconnected') {
         this.handlePeerDisconnect();
       }
     };
@@ -261,6 +271,28 @@ export class WebRTCManager {
       // emit mute status change to server
       console.log(`🔇 Emitting mute status change: ${this.isMuted ? 'muted' : 'unmuted'}`);
       this.socket.emit('mute-status-changed', { isMuted: this.isMuted });
+    }
+  }
+
+  private async handleConnectionFailed() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      console.log(`Retrying connection ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+
+      this.closePeerConnection();
+
+      // Simple 1-second delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Restart WebRTC
+      if (this.currentRemoteUserId) { await this.initiateCall(this.currentRemoteUserId); }
+      else {
+        console.log('Empty remote id (shall not happen)');
+        this.closePeerConnection();
+      }
+    } else {
+      console.log('Max reconnection attempts reached');
+      this.closePeerConnection();
     }
   }
 
