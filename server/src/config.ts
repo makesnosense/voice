@@ -28,7 +28,7 @@ const config = {
   },
   turnSecret: getRequiredEnv('COTURN_SECRET'),
   rateLimiting: {
-    enabled: true,
+    enabled: false,
     trustProxy: isProduction, // trust proxy headers in production
   }
 };

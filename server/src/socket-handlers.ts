@@ -1,3 +1,4 @@
+import config from './config';
 import { socketRateLimiter, SOCKET_RATE_LIMITS } from './utils/socket-rate-limiter';
 import type {
   Room,
@@ -60,6 +61,10 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
 
 // helper to check rate limits for socket events
 const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_LIMITS): boolean => {
+  if (!config.rateLimiting.enabled) {
+    return true; // always allow if rate limiting is disabled
+  }
+
   const limit = SOCKET_RATE_LIMITS[event];
   const allowed = socketRateLimiter.checkLimit(
     socket.id as SocketId,
