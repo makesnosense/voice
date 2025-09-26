@@ -5,23 +5,27 @@
   gap: 0px;
   padding: 16px 16px;
   padding-bottom: 10px;
+  height: 9lh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0px;
 }
 
 .messagesContent {
   flex: 1;
-  min-height: 80px;
-  max-height: 200px;
   overflow-y: auto;
   scrollbar-width: none;
-  /* firefox */
   -ms-overflow-style: none;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 6px;
 }
 
 .emptyState {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  flex: 1;
   color: #0000003c;
   font-size: 12px;
 }
