@@ -37,7 +37,7 @@ export default function LandingPage() {
       </div>
 
 
-      <main className={layoutStyles.content}>
+      <main className={`${layoutStyles.content} ${layoutStyles.landingContent}`}>
         <button onClick={handleCreateRoom}
           disabled={isCreating}
           className={`${buttonStyles.button} ${buttonStyles.lightGreen}`}>
