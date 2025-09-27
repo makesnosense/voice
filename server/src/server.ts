@@ -38,7 +38,7 @@ const rooms = new Map<RoomId, Room>();
 
 if (config.rateLimiting.enabled) {
   app.use('/api/', generalApiLimiter);
-  console.log('🛡️ Rate limiting enabled for API endpoints');
+  console.log('🛡️  Rate limiting enabled for API endpoints');
 }
 
 app.post('/api/create-room', (req, res) => {

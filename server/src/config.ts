@@ -6,13 +6,24 @@ const getRequiredEnv = (key: string): string => {
   return value;
 };
 
+const getEnvBoolean = (key: string): boolean => {
+  const value = process.env[key];
+
+  if (value === undefined) {
+    throw new Error(`missing environment variable: ${key}`);
+  }
+
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+
+  throw new Error(`${key} must be 'true' or 'false', got: ${value}`);
+};
 
 const nodeEnv = getRequiredEnv('NODE_ENVIRONMENT');
 const port = parseInt(getRequiredEnv('SERVER_PORT'), 10);
 const host = getRequiredEnv('SERVER_HOST');
-const corsOrigins = getRequiredEnv('CORS_ORIGINS')
-  .split(',')
-  .map(origin => origin.trim());
+const corsOrigins = getRequiredEnv('CORS_ORIGINS').split(',').map(origin => origin.trim());
+const rateLimitingEnabled = getEnvBoolean('RATE_LIMITING_ENABLED')
 
 const isProduction = nodeEnv === 'production';
 
@@ -28,7 +39,7 @@ const config = {
   },
   turnSecret: getRequiredEnv('COTURN_SECRET'),
   rateLimiting: {
-    enabled: false,
+    enabled: rateLimitingEnabled,
     trustProxy: isProduction, // trust proxy headers in production
   }
 };
