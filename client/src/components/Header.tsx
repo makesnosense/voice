@@ -1,4 +1,6 @@
+import ThemeSelector from './ThemeSelector';
 import baseStyles from '../styles/BaseCard.module.css';
+
 import voiceStyles from './Header.module.css';
 
 type VoiceState = 'active' | 'silent' | 'muted';
@@ -28,17 +30,22 @@ export default function Header({
   };
 
   return (
-    <header className={`${baseStyles.card} ${getVoiceStateClass()} ${className}`}>
-      <div className={voiceStyles.voiceIcon}>
-        <div className={voiceStyles.voiceWaves}>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
+    <div className={`${voiceStyles.headerContainer} ${className}`}>
+      <header className={`${baseStyles.card} ${getVoiceStateClass()} ${voiceStyles.mainHeader}`}>
+        <div className={voiceStyles.voiceIcon}>
+          <div className={voiceStyles.voiceWaves}>
+            <div className={voiceStyles.wave}></div>
+            <div className={voiceStyles.wave}></div>
+            <div className={voiceStyles.wave}></div>
+            <div className={voiceStyles.wave}></div>
+            <div className={voiceStyles.wave}></div>
+          </div>
         </div>
-      </div>
-      <h1 className={baseStyles.title}>{title}</h1>
-    </header>
+        <h1 className={baseStyles.title}>{title}</h1>
+      </header>
+
+      <ThemeSelector />
+
+    </div>
   );
 }

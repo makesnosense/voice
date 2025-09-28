@@ -1,3 +1,37 @@
+.headerContainer {
+  display: flex;
+  justify-content: center;
+  /* center the main content */
+  align-items: center;
+  width: 100%;
+  position: relative;
+  /* for absolute positioning of theme selector */
+}
+
+.mainHeader {
+  /* this will be centered */
+  display: flex;
+  align-items: center;
+}
+
+
+.themeContainer {
+  /* positioning styles */
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 768px) {
+  .themeContainer {
+    position: static;
+    transform: none;
+    margin-left: 1rem;
+  }
+}
+
+
 .voiceIcon {
   width: 28px;
   height: 28px;

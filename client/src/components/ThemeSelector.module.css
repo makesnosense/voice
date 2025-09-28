@@ -1,0 +1,16 @@
+.themeSelectorCard {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 5px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+
+}
+
+
+
+.buttonGroup {
+  display: flex;
+}
