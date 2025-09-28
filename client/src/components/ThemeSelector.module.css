@@ -1,7 +1,6 @@
 .themeSelectorCard {
   position: absolute;
   right: 90px;
-
   top: 0;
   transform: none;
   padding: 2px 4px;
@@ -10,7 +9,7 @@
 
 .buttonGroup {
   display: flex;
-  gap: px;
+  gap: 0px;
   align-items: center;
 }
 
@@ -23,7 +22,7 @@
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 36px;
@@ -32,45 +31,43 @@
 }
 
 .themeButton:hover {
-  color: #64748b;
+  color: var(--text-secondary);
   opacity: 0.8;
-  filter: drop-shadow(0 0 8px rgba(100, 116, 139, 0.3));
+  filter: drop-shadow(0 0 8px var(--border-secondary));
   transform: translateY(-1px);
 }
 
-.themeButton[data-theme="light"].active {
+/* specific button types when active */
+.light.active {
   color: #f59e0b;
   opacity: 1;
   filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7));
 }
 
-.themeButton[data-theme="light"].active:hover {
+.light.active:hover {
   filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.9));
   transform: translateY(-1px);
 }
 
-/* moon (dark theme) - keep blue as is */
-.themeButton[data-theme="dark"].active {
-  color: #667eea;
+.dark.active {
+  color: var(--accent-blue);
   opacity: 1;
   filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
 }
 
-.themeButton[data-theme="dark"].active:hover {
+.dark.active:hover {
   filter: drop-shadow(0 0 16px rgba(102, 126, 234, 0.8));
   transform: translateY(-1px);
 }
 
-/* system - black active, no glow */
-.themeButton[data-theme="system"].active {
-  color: #1e293b;
+.system.active {
+  color: var(--text-primary);
   opacity: 1;
   filter: none;
-  /* no glow for system */
 }
 
-.themeButton[data-theme="system"].active:hover {
-  color: #0f172a;
+.system.active:hover {
+  color: var(--text-primary);
   filter: none;
   transform: translateY(-1px);
 }

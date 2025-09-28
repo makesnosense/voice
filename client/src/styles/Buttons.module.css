@@ -15,44 +15,43 @@
   text-decoration: none;
 }
 
-
 .lightGreen {
   background: transparent;
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  color: #22c55e;
+  border: 1px solid var(--accent-green-border);
+  color: var(--accent-green);
 }
 
 .lightGreen:hover {
-  background: rgba(34, 197, 94, 0.05);
-  border-color: rgba(34, 197, 94, 0.5);
+  background: var(--accent-green-hover);
+  border-color: var(--accent-green);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 4px 12px -2px var(--accent-green-border);
 }
 
 .neutral {
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #1e293b;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
 }
 
 .neutral:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.2);
+  background: var(--bg-tertiary);
+  border-color: var(--border-secondary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .lightRed {
   background: transparent;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
+  border: 1px solid var(--accent-red-border);
+  color: var(--accent-red);
 }
 
 .lightRed:hover {
-  background: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.5);
+  background: var(--accent-red-hover);
+  border-color: var(--accent-red);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 4px 12px -2px var(--accent-red-border);
 }
 
 .lightRed.noBorder {
@@ -70,17 +69,16 @@
 }
 
 .lightGreen .icon {
-  color: #22c55e;
+  color: var(--accent-green);
 }
 
 .lightRed .icon {
-  color: #ef4444;
+  color: var(--accent-red);
 }
 
 .neutral .icon {
-  color: #1e293b;
+  color: var(--text-primary);
 }
-
 
 .iconButton {
   display: flex;

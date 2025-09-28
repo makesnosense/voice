@@ -3,11 +3,11 @@
   display: flex;
   gap: 12px;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
   border-radius: 16px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: var(--backdrop-blur);
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
   width: fit-content;
   box-sizing: border-box;
@@ -18,14 +18,14 @@
 }
 
 .card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-secondary);
+  box-shadow: var(--shadow-lg);
 }
 
 .title {
   font-size: 20px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
   margin: 0;
 }
@@ -34,7 +34,6 @@
   gap: 0;
 }
 
-/* new variants */
 .fullWidth {
   width: 100%;
 }
@@ -45,7 +44,6 @@
   gap: 1rem;
 }
 
-/* messages area specific */
 .messagesCard {
   min-height: 100px;
   max-height: 400px;

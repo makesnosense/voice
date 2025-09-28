@@ -1,0 +1,62 @@
+:root {
+  /* light theme (default) */
+  --bg-primary: rgba(255, 255, 255, 0.95);
+  --bg-secondary: rgba(248, 250, 252, 0.95);
+  --bg-tertiary: rgba(241, 245, 249, 0.1);
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  --border-primary: rgba(226, 232, 240, 0.8);
+  --border-secondary: rgba(99, 102, 241, 0.3);
+
+  --accent-blue: #667eea;
+  --accent-blue-hover: rgba(102, 126, 234, 0.1);
+
+  --accent-green: #22c55e;
+  --accent-green-hover: rgba(34, 197, 94, 0.05);
+  --accent-green-border: rgba(34, 197, 94, 0.3);
+
+  --accent-red: #ef4444;
+  --accent-red-hover: rgba(239, 68, 68, 0.05);
+  --accent-red-border: rgba(239, 68, 68, 0.3);
+
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --backdrop-blur: blur(10px);
+}
+
+/* dark theme overrides */
+[data-theme="dark"] {
+  --bg-primary: rgba(30, 41, 59, 0.95);
+  --bg-secondary: rgba(15, 23, 42, 0.95);
+  --bg-tertiary: rgba(51, 65, 85, 0.1);
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+
+  --border-primary: rgba(51, 65, 85, 0.8);
+  --border-secondary: rgba(102, 126, 234, 0.4);
+
+  --accent-blue: #818cf8;
+  --accent-blue-hover: rgba(129, 140, 248, 0.1);
+
+  --accent-green: #34d399;
+  --accent-green-hover: rgba(52, 211, 153, 0.1);
+  --accent-green-border: rgba(52, 211, 153, 0.3);
+
+  --accent-red: #f87171;
+  --accent-red-hover: rgba(248, 113, 113, 0.1);
+  --accent-red-border: rgba(248, 113, 113, 0.3);
+
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}

@@ -21,9 +21,8 @@ export default function ThemeSelector() {
           <button
             key={themeMode}
             onClick={() => setMode(themeMode)}
-            className={`${themeSelectorStyles.themeButton} ${mode === themeMode ? themeSelectorStyles.active : ''
-              }`}
-            data-theme={themeMode}
+            className={`${themeSelectorStyles.themeButton} ${themeSelectorStyles[themeMode]} ${mode === themeMode ? themeSelectorStyles.active : ''}`}
+            data-button={themeMode}
             title={`Switch to ${label.toLowerCase()} theme`}
             aria-label={`${label} theme`}
             aria-pressed={mode === themeMode}

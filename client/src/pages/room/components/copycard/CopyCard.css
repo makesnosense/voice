@@ -2,22 +2,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* padding: 16px 20px; */
   padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  /* border-radius: 16px; */
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
   border-radius: clamp(8px, 2vw, 12px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: var(--backdrop-blur);
+  box-shadow: var(--shadow-sm);
   gap: clamp(12px, 3vw, 16px);
   width: fit-content;
   transition: all 0.3s ease;
 }
 
 .copy-card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-secondary);
+  box-shadow: var(--shadow-lg);
 }
 
 .copy-card-content {
@@ -27,14 +25,14 @@
 
 .copy-card-title {
   font-size: clamp(11px, 2.8vw, 14px);
-  color: #64748b;
+  color: var(--text-secondary);
   margin: 0 0 4px 0;
   font-weight: 400;
 }
 
 .copy-card-link {
   font-size: clamp(10px, 3.2vw, 16px);
-  color: #1e293b;
+  color: var(--text-primary);
   margin: 0;
   font-weight: 500;
   word-break: break-all;
@@ -43,12 +41,10 @@
 
 .copy-card-button {
   background: transparent;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border-primary);
   border-radius: 12px;
-  /* padding: 10px; */
   padding: clamp(8px, 2vw, 10px);
-
-  color: #64748b;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
@@ -58,12 +54,12 @@
 }
 
 .copy-card-button:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #667eea;
+  border-color: var(--border-secondary);
+  color: var(--accent-blue);
 }
 
 .copy-card-button.copied {
-  color: #22c55e;
-  border-color: rgba(34, 197, 94, 0.3);
-  background: rgba(34, 197, 94, 0.05);
+  color: var(--accent-green);
+  border-color: var(--accent-green-border);
+  background: var(--accent-green-hover);
 }
