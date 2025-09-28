@@ -1,6 +1,6 @@
 .themeSelectorCard {
   position: absolute;
-  right: 90px;
+  left: calc(50% + 80px);
   top: 0;
   transform: none;
   padding: 2px 4px;
