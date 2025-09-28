@@ -1,4 +1,3 @@
-// client/src/components/ThemeSelector.tsx
 import { Monitor, Sun, Moon } from 'lucide-react';
 import { useThemeStore } from '../stores/useThemeStore';
 import baseStyles from '../styles/BaseCard.module.css';

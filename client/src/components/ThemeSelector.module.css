@@ -13,7 +13,6 @@
   align-items: center;
 }
 
-
 .themeButton {
   position: relative;
   display: flex;
@@ -73,8 +72,7 @@
   transform: translateY(-1px);
 }
 
-
-@media (max-width: 420px) {
+@media (max-width: 410px) {
   .buttonGroup {
     flex-direction: column;
     gap: 0px;
