@@ -1,16 +1,76 @@
 .themeSelectorCard {
   position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 5px;
-  padding-top: 13px;
-  padding-bottom: 13px;
+  right: 90px;
 
+  top: 0;
+  transform: none;
+  padding: 2px 4px;
+  min-width: fit-content;
 }
-
-
 
 .buttonGroup {
   display: flex;
+  gap: px;
+  align-items: center;
+}
+
+.themeButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 36px;
+  min-height: 36px;
+  opacity: 0.6;
+}
+
+.themeButton:hover {
+  color: #64748b;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 8px rgba(100, 116, 139, 0.3));
+  transform: translateY(-1px);
+}
+
+.themeButton[data-theme="light"].active {
+  color: #f59e0b;
+  opacity: 1;
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7));
+}
+
+.themeButton[data-theme="light"].active:hover {
+  filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.9));
+  transform: translateY(-1px);
+}
+
+/* moon (dark theme) - keep blue as is */
+.themeButton[data-theme="dark"].active {
+  color: #667eea;
+  opacity: 1;
+  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
+}
+
+.themeButton[data-theme="dark"].active:hover {
+  filter: drop-shadow(0 0 16px rgba(102, 126, 234, 0.8));
+  transform: translateY(-1px);
+}
+
+/* system - black active, no glow */
+.themeButton[data-theme="system"].active {
+  color: #1e293b;
+  opacity: 1;
+  filter: none;
+  /* no glow for system */
+}
+
+.themeButton[data-theme="system"].active:hover {
+  color: #0f172a;
+  filter: none;
+  transform: translateY(-1px);
 }

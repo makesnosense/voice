@@ -23,13 +23,6 @@
   transform: translateY(-50%);
 }
 
-@media (max-width: 768px) {
-  .themeContainer {
-    position: static;
-    transform: none;
-    margin-left: 1rem;
-  }
-}
 
 
 .voiceIcon {

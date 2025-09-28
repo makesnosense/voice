@@ -9,13 +9,6 @@
   box-sizing: border-box;
 }
 
-/* Mobile-specific adjustments */
-@media (max-width: 768px) {
-  .page {
-    padding: 16px 12px;
-    max-width: 100%;
-  }
-}
 
 /* For very small screens */
 @media (max-width: 480px) {

@@ -1,13 +1,14 @@
+// client/src/components/ThemeSelector.tsx
 import { Monitor, Sun, Moon } from 'lucide-react';
 import { useThemeStore } from '../stores/useThemeStore';
 import baseStyles from '../styles/BaseCard.module.css';
-import buttonStyles from '../styles/Buttons.module.css';
 import themeSelectorStyles from './ThemeSelector.module.css';
 
 const THEME_OPTIONS = [
-  { mode: 'system' as const, icon: Monitor, label: 'System' },
+
   { mode: 'light' as const, icon: Sun, label: 'Light' },
-  { mode: 'dark' as const, icon: Moon, label: 'Dark' }
+  { mode: 'dark' as const, icon: Moon, label: 'Dark' },
+  { mode: 'system' as const, icon: Monitor, label: 'System' },
 ];
 
 export default function ThemeSelector() {
@@ -15,20 +16,22 @@ export default function ThemeSelector() {
 
   return (
     <div className={`${baseStyles.card} ${themeSelectorStyles.themeSelectorCard}`}>
-      <div className={`${themeSelectorStyles.buttonGroup} `}>
+      <div className={themeSelectorStyles.buttonGroup}>
         {THEME_OPTIONS.map(({ mode: themeMode, icon: Icon, label }) => (
           <button
             key={themeMode}
             onClick={() => setMode(themeMode)}
-            className={`${buttonStyles.iconButton} ${buttonStyles.button}  `}
+            className={`${themeSelectorStyles.themeButton} ${mode === themeMode ? themeSelectorStyles.active : ''
+              }`}
+            data-theme={themeMode}
             title={`Switch to ${label.toLowerCase()} theme`}
             aria-label={`${label} theme`}
+            aria-pressed={mode === themeMode}
           >
-            <Icon
-              size={18} />
+            <Icon size={18} />
           </button>
         ))}
       </div>
-    </div >
+    </div>
   );
 }
