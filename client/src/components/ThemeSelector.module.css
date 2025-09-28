@@ -74,25 +74,20 @@
 }
 
 
-@media (max-width: 450px) {
+@media (max-width: 420px) {
   .buttonGroup {
     flex-direction: column;
     gap: 0px;
   }
 
   .themeSelectorCard {
-
-    /* padding: 1px 2px; */
-    /* reduced from 2px 4px */
     left: calc(50% + 80px);
-    /* reduced offset since header will be smaller too */
   }
 
   .themeButton {
     padding: 0px;
     min-width: 19px;
     min-height: 19px;
-
   }
 
   .themeButton svg {
