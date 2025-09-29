@@ -11,3 +11,18 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 )
+
+// remove loader after react mounts
+requestAnimationFrame(() => {
+  const loader = document.getElementById('app-loader');
+  const root = document.getElementById('root');
+
+  if (loader) {
+    loader.classList.add('fade-out');
+    // remove from DOM after fade
+    setTimeout(() => loader.remove(), 200);
+  }
+  if (root) {
+    root.classList.add('loaded');
+  }
+});
