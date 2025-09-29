@@ -12,14 +12,19 @@ import type {
   IceCandidate,
   UserDataClientSide
 } from '../../shared/types';
+import type RoomDestructionManager from './room-destruction-manager';
 
-export default function createConnectionHandler(io: TypedServer, rooms: Map<RoomId, Room>) {
+export default function createConnectionHandler(
+  io: TypedServer,
+  rooms: Map<RoomId, Room>,
+  roomDestructionManager: RoomDestructionManager) {
+
   const handleConnection = (socket: ExtendedSocket) => {
     console.log(`🔌 New connection: ${socket.id}`);
 
     socket.on('join-room', (roomId: RoomId) => {
       if (!checkRateLimit(socket, 'join-room')) return;
-      handleRoomJoin(io, rooms, socket, roomId);
+      handleRoomJoin(io, rooms, socket, roomId, roomDestructionManager);
     });
 
     socket.on('message', (data: { text: string }) => {
@@ -37,7 +42,7 @@ export default function createConnectionHandler(io: TypedServer, rooms: Map<Room
       handleMuteStatusChanged(io, rooms, socket, data);
     });
 
-    socket.on('disconnect', () => handleDisconnect(io, rooms, socket));
+    socket.on('disconnect', () => handleDisconnect(io, rooms, socket, roomDestructionManager));
 
     // WebRTC signaling events with rate limiting
     socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => {
@@ -123,8 +128,12 @@ const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number =
 
 
 
-const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
-  socket: ExtendedSocket, roomId: RoomId): void => {
+const handleRoomJoin = (io: TypedServer,
+  rooms: Map<RoomId, Room>,
+  socket: ExtendedSocket,
+  roomId: RoomId,
+  roomDestructionManager: RoomDestructionManager
+): void => {
   const room = rooms.get(roomId);
   if (!room) {
     socket.emit('room-not-found', 'Room not found');
@@ -143,6 +152,10 @@ const handleRoomJoin = (io: TypedServer, rooms: Map<RoomId, Room>,
   if (room.users.size >= 2) {
     socket.emit('room-full', 'Room is full (max 2 people)');
     return;
+  }
+
+  if (room.users.size === 0) {
+    roomDestructionManager.cancelDestruction(roomId);
   }
 
   room.users.set(socket.id, { webRTCReady: false, isMuted: false });
@@ -179,8 +192,13 @@ const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text:
   }
 }
 
-const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
+const handleDisconnect = (io: TypedServer,
+  rooms: Map<RoomId, Room>,
+  socket: ExtendedSocket,
+  roomDestructionManager: RoomDestructionManager) => {
+
   console.log(`👋 User disconnected: ${socket.id}`);
+
   if (!socket.roomId) return;
 
   const room = rooms.get(socket.roomId);
@@ -197,8 +215,8 @@ const handleDisconnect = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ext
   io.to(socket.roomId).emit('user-left', socket.id as SocketId);
 
   if (room.users.size === 0) {
-    // rooms.delete(socket.roomId); // temporarily commented out for easier debug
-    console.log(`🗑️ Deleted empty room: ${socket.roomId}`);
+    roomDestructionManager.scheduleDestruction(socket.roomId);
+    console.log(`🕐 Room ${socket.roomId} is now empty, scheduled for destruction`);
   }
 }
 

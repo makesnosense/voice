@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import { generateRoomId, generateTurnCredentials } from './utils/generators';
 import { generalApiLimiter, createRoomLimiter, turnCredentialsLimiter } from './utils/rate-limiter';
 import createConnectionHandler from './socket-handlers';
+import RoomDestructionManager from './room-destruction-manager';
 import config from './config';
 import type { Room, RoomId } from '../../shared/types'
 import fs from 'node:fs'
@@ -35,6 +36,8 @@ const io = new Server(server, {
 });
 
 const rooms = new Map<RoomId, Room>();
+const roomDestructionManager = new RoomDestructionManager(rooms);
+roomDestructionManager.start();
 
 if (config.rateLimiting.enabled) {
   app.use('/api/', generalApiLimiter);
@@ -62,7 +65,7 @@ app.get('/api/turn-credentials', (req, res) => {
   });
 });
 
-const handleConnection = createConnectionHandler(io, rooms);
+const handleConnection = createConnectionHandler(io, rooms, roomDestructionManager);
 io.on('connection', handleConnection);
 
 const isHttps = 'cert' in server && 'key' in server;
@@ -77,6 +80,9 @@ server.listen(config.port, config.host, () => {
 // graceful shutdown
 process.on('SIGTERM', () => {
   console.log('📴 SIGTERM received, shutting down gracefully');
+
+  roomDestructionManager.stop();
+
   server.close(() => {
     console.log('✅ Server closed');
     process.exit(0);
