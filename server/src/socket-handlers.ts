@@ -20,7 +20,7 @@ export default function createConnectionHandler(
   roomDestructionManager: RoomDestructionManager) {
 
   const handleConnection = (socket: ExtendedSocket) => {
-    console.log(`🔌 New connection: ${socket.id}`);
+    console.log(`🔌 [Socket] new connection: ${socket.id}`);
 
     socket.on('join-room', (roomId: RoomId) => {
       if (!checkRateLimit(socket, 'join-room')) return;
@@ -42,7 +42,11 @@ export default function createConnectionHandler(
       handleMuteStatusChanged(io, rooms, socket, data);
     });
 
-    socket.on('disconnect', () => handleDisconnect(io, rooms, socket, roomDestructionManager));
+    socket.on('disconnect', (reason: string) => {
+      console.log(`👋 [Socket] disconnecting ${socket.id}, reason: ${reason}`);
+      handleDisconnect(io, rooms, socket, roomDestructionManager, reason)
+    }
+    );
 
     // WebRTC signaling events with rate limiting
     socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => {
@@ -79,7 +83,7 @@ const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_
   );
 
   if (!allowed) {
-    console.warn(`🚫 Rate limit exceeded for ${socket.id} on event ${event}`);
+    console.warn(`🚫 [RateLimit] ${socket.id} exceeded limit for ${event}`);
     socket.emit('error' as any, {
       message: `Rate limit exceeded for ${event}. Please slow down.`
     });
@@ -104,7 +108,7 @@ const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number =
 
     // kick if socket is dead or disconnected
     if (!socket || !socket.connected) {
-      console.log(`💀 Force cleanup: removing dead socket ${userId}`);
+      console.log(`💀 [Cleanup] removing dead socket ${userId} from room ${roomId}`);
       room.users.delete(userId);
       io.to(roomId).emit('user-left', userId as SocketId);
       removedCount++;
@@ -113,7 +117,7 @@ const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number =
 
     // kick if not webrtc ready (stuck in some broken state)
     if (!userData.webRTCReady) {
-      console.log(`🚫 Force cleanup: removing non-webRTC-ready socket ${userId}`);
+      console.log(`🚫 [Cleanup] removing non-webRTC-ready socket ${userId} from room ${roomId}`);
       room.users.delete(userId);
 
       socket.disconnect(true);
@@ -136,6 +140,7 @@ const handleRoomJoin = (io: TypedServer,
 ): void => {
   const room = rooms.get(roomId);
   if (!room) {
+    console.warn(`❌ [Socket] room ${roomId} not found`);
     socket.emit('room-not-found', 'Room not found');
     return;
   }
@@ -150,11 +155,13 @@ const handleRoomJoin = (io: TypedServer,
 
   // check room capacity after cleanup
   if (room.users.size >= 2) {
+    console.warn(`🚫 [Socket] room ${roomId} is full`);
     socket.emit('room-full', 'Room is full (max 2 people)');
     return;
   }
 
   if (room.users.size === 0) {
+    console.log(`⏰ [Destruction] cancelling scheduled destruction for ${roomId}`);
     roomDestructionManager.cancelDestruction(roomId);
   }
 
@@ -163,7 +170,7 @@ const handleRoomJoin = (io: TypedServer,
   socket.join(roomId);
   socket.roomId = roomId;
 
-  console.log(`🚪 ${socket.id} joined room ${roomId} (${room.users.size} users)`);
+  console.log(`✅ [Socket] ${socket.id} joined room ${roomId} (${room.users.size}/2 users)`);
 
   const usersForClient = getUsersForClient(room);
   io.to(roomId).emit('room-users-update', usersForClient);
@@ -174,62 +181,83 @@ const handleRoomJoin = (io: TypedServer,
 }
 
 const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
-  if (socket.roomId) {
-
-    if (!data.text || data.text.length > 1000) {
-      socket.emit('error' as any, { message: 'Invalid message content' });
-      return;
-    }
-    console.log(`💬 Message in ${socket.roomId}: ${data.text}`);
-
-    const message: Message = {
-      text: data.text,
-      userId: socket.id as SocketId,
-      timestamp: Date.now()
-    };
-
-    io.to(socket.roomId).emit('message', message);
+  if (!socket.roomId) {
+    console.warn(`⚠️ [Message] ${socket.id} sent message but not in a room`);
+    return;
   }
+
+  if (!data.text || data.text.length > 1000) {
+    console.warn(`⚠️ [Message] invalid message from ${socket.id}`);
+    socket.emit('error' as any, { message: 'Invalid message content' });
+    return;
+  }
+  console.log(`💬 [Message] ${socket.id} in ${socket.roomId}: "${data.text.substring(0, 50)}${data.text.length > 50 ? '...' : ''}"`);
+
+  const message: Message = {
+    text: data.text,
+    userId: socket.id as SocketId,
+    timestamp: Date.now()
+  };
+
+  io.to(socket.roomId).emit('message', message);
+
 }
 
 const handleDisconnect = (io: TypedServer,
   rooms: Map<RoomId, Room>,
   socket: ExtendedSocket,
-  roomDestructionManager: RoomDestructionManager) => {
+  roomDestructionManager: RoomDestructionManager,
+  reason: string) => {
 
-  console.log(`👋 User disconnected: ${socket.id}`);
+  console.log(`👋 [Socket] ${socket.id} disconnected (socket.io reason: ${reason})`);
 
-  if (!socket.roomId) return;
 
-  const room = rooms.get(socket.roomId);
-  if (!room) {
-    console.warn(`⚠️ Socket ${socket.id} had roomId ${socket.roomId} but room not found`);
+  if (!socket.roomId) {
+    console.log(`ℹ️ [Socket] ${socket.id} wasn't in any room`);
     return;
   }
 
+  const room = rooms.get(socket.roomId);
+  if (!room) {
+    console.warn(`⚠️ [Socket] ${socket.id} had roomId ${socket.roomId} but room not found`);
+    return;
+  }
+
+  const wasInRoom = room.users.has(socket.id);
   room.users.delete(socket.id);
 
-  // notify other users about disconnect with updated user list
-  const usersForClient = getUsersForClient(room);
-  io.to(socket.roomId).emit('room-users-update', usersForClient);
-  io.to(socket.roomId).emit('user-left', socket.id as SocketId);
+
+  if (wasInRoom) {
+    console.log(`🔌 [Socket] removed ${socket.id} from room ${socket.roomId} (${room.users.size} remaining)`);
+
+    const usersForClient = getUsersForClient(room);
+    io.to(socket.roomId).emit('room-users-update', usersForClient);
+    io.to(socket.roomId).emit('user-left', socket.id as SocketId);
+  }
 
   if (room.users.size === 0) {
+    console.log(`⏰ [Destruction] scheduling destruction for empty room ${socket.roomId}`);
     roomDestructionManager.scheduleDestruction(socket.roomId);
-    console.log(`🕐 Room ${socket.roomId} is now empty, scheduled for destruction`);
   }
+
 }
 
 const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
-  if (!socket.roomId) return;
+  if (!socket.roomId) {
+    console.warn(`⚠️ [WebRTC] ${socket.id} is ready but not in a room`);
+    return;
+  }
 
   const room = rooms.get(socket.roomId);
-  if (!room) return;
+  if (!room) {
+    console.warn(`⚠️ [WebRTC] ${socket.id} is ready but room ${socket.roomId} not found`);
+    return;
+  }
 
   const userData = room.users.get(socket.id);
   if (userData) {
     room.users.set(socket.id, { ...userData, webRTCReady: true });
-    console.log(`🎤 ${socket.id} is WebRTC ready`);
+    console.log(`✅ [WebRTC] ${socket.id} is ready`);
 
     // Check if all users are audio ready
     const allReady = Array.from(room.users.values()).every(user => user.webRTCReady);
@@ -239,8 +267,10 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
     if (allReady && room.users.size === 2) {
       const users = Array.from(room.users.keys());
       const [firstUser, secondUser] = users;
-      console.log(`🎬 Both users ready, telling ${firstUser} to initiate WebRTC`);
+      console.log(`🎬 [WebRTC] both users ready, telling ${firstUser} to initiate call to ${secondUser}`);
       io.to(firstUser).emit('initiate-webrtc-call', secondUser as SocketId);
+    } else {
+      console.log(`⏳ [WebRTC] waiting for all users to be ready (${room.users.size}/2, all ready: ${allReady})`);
     }
   }
 }
@@ -256,7 +286,7 @@ const handleMuteStatusChanged = (io: TypedServer, rooms: Map<RoomId, Room>,
   if (userData) {
     // update mute status while preserving webRTCReady status
     room.users.set(socket.id, { ...userData, isMuted: data.isMuted });
-    console.log(`🔇 ${socket.id} mute status changed to: ${data.isMuted ? 'muted' : 'unmuted'}`);
+    console.log(`🔇 [Mute] ${socket.id} is now ${data.isMuted ? 'muted' : 'unmuted'}`);
 
     // broadcast updated user list to all users in room
     const usersForClient = getUsersForClient(room);
