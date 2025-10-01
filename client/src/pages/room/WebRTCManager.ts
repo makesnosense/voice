@@ -10,6 +10,17 @@ const BASE_ICE_SERVERS: RTCIceServer[] = [
   { urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}` }
 ];
 
+export const DisconnectReason = {
+  PEER_LEFT: 'peer-left',
+  CONNECTION_FAILED: 'connection-failed',
+  ICE_FAILED: 'ice-failed',
+  NETWORK_ERROR: 'network-error',
+  MANUAL_CLEANUP: 'manual-cleanup'
+} as const;
+
+
+export type DisconnectReason = typeof DisconnectReason[keyof typeof DisconnectReason];
+
 export class WebRTCManager {
   private localStream: MediaStream;
   private peerConnection: RTCPeerConnection | null = null;
@@ -25,13 +36,13 @@ export class WebRTCManager {
 
   // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
-  private onStreamRemoved: () => void;
+  private onStreamRemoved: (reason: DisconnectReason) => void;
 
   constructor(
     socket: TypedSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
-    onStreamRemoved: () => void,
+    onStreamRemoved: (reason: DisconnectReason) => void,
   ) {
     this.socket = socket;
     this.localStream = passedMicStream;
@@ -46,7 +57,7 @@ export class WebRTCManager {
   }
 
   private async createPeerConnection(remoteUserId: SocketId): Promise<RTCPeerConnection> {
-    console.log(`🔗 Creating peer connection to ${remoteUserId}`);
+    console.log(`🔗 [WebRTC] Creating peer connection to ${remoteUserId}`);
     this.currentRemoteUserId = remoteUserId;
     const iceServers = await this.getIceServers();
     const peerConnection = new RTCPeerConnection({ iceServers });
@@ -61,7 +72,7 @@ export class WebRTCManager {
     // (ICE candidate) that remote peer can use to reach us
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        console.log(`🧊 Sending ICE candidate to ${remoteUserId}`);
+        console.log(`🧊 [WebRTC] sending ICE candidate to ${remoteUserId}`);
         this.socket.emit('webrtc-ice-candidate', {
           candidate: {
             candidate: event.candidate.candidate,
@@ -70,32 +81,52 @@ export class WebRTCManager {
           },
           toUserId: remoteUserId
         });
+      } else {
+        console.log(`🧊 [WebRTC] ICE gathering completed`);
+      }
+    };
+
+    // ice connection state monitoring
+    peerConnection.oniceconnectionstatechange = () => {
+      const iceState = peerConnection.iceConnectionState;
+      console.log(`🧊 [WebRTC] ICE connection state: ${iceState}`);
+
+      if (iceState === 'failed') {
+        console.error(`❌ [WebRTC] ICE connection failed`);
+        this.handleConnectionFailed(DisconnectReason.ICE_FAILED);
+      } else if (iceState === 'disconnected') {
+        console.warn(`⚠️ [WebRTC] ICE disconnected (might reconnect)`);
+      } else if (iceState === 'closed') {
+        console.log(`🔒 [WebRTC] ICE connection closed`);
       }
     };
 
 
     peerConnection.onconnectionstatechange = () => {
       const state = peerConnection.connectionState;
-      console.log(`📶 Connection state with ${remoteUserId}: ${state}`);
+      console.log(`📶 [WebRTC] peer connection state: ${state}`);
 
       if (state === 'connected') {
-        this.reconnectAttempts = 0; // Reset counter
+        console.log(`✅ [WebRTC] peer connection established successfully`);
+        this.reconnectAttempts = 0;
       } else if (state === 'failed') {
-        this.handleConnectionFailed();
-      }
-
-      if (peerConnection.connectionState === 'disconnected') {
-        this.handlePeerDisconnect();
+        console.error(`❌ [WebRTC] peer connection failed`);
+        this.handleConnectionFailed(DisconnectReason.CONNECTION_FAILED);
+      } else if (state === 'disconnected') {
+        console.warn(`⚠️ [WebRTC] peer connection disconnected`);
+        this.handlePeerDisconnect(DisconnectReason.NETWORK_ERROR);
+      } else if (state === 'closed') {
+        console.log(`🔒 [WebRTC] peer connection closed`);
       }
     };
 
     // handle incoming audio stream from remote peer
     peerConnection.ontrack = (event) => {
-      console.log(`🎵 Received remote stream from ${remoteUserId}`);
+      console.log(`🎵 [WebRTC] received remote stream from ${remoteUserId}`);
       const [remoteStream] = event.streams;
 
       this.remoteAnalyser = new AudioAnalyser(this.audioContext, remoteStream);
-      console.log(`🎤 Set up remote audio analysis for ${remoteUserId}`);
+      console.log(`🎤 [WebRTC] set up remote audio analysis for ${remoteUserId}`);
 
       this.onStreamAdded(remoteUserId, remoteStream);
     };
@@ -117,44 +148,44 @@ export class WebRTCManager {
         credential: turn_credentials.credential
       });
 
-      console.log('✅ TURN credentials obtained');
+      console.log('✅ [WebRTC] TURN credentials obtained');
     } catch (error) {
-      console.error(error);
-      console.log('⚠️ TURN credentials unavailable, using STUN only');
+      console.error('❌ [WebRTC] failed to get TURN credentials:', error);
+      console.log('⚠️ [WebRTC] using STUN only (may not work behind strict NAT)');
     }
 
     return iceServers;
   }
 
   private setupSocketListeners() {
-    // the most important one
-    // when second user joins and is webrtc-ready
+    // second user joins - we initiate
     this.socket.on('initiate-webrtc-call', async (remoteUserId: SocketId) => {
-      console.log(`👋 Second user ${remoteUserId} joined - I'm initiating the call...`);
+      console.log(`👋 [Socket] second user ${remoteUserId} joined - initiating WebRTC call`);
       await this.initiateCall(remoteUserId);
     });
 
-    // if we are that second user that joined the room, we receive the offer
+    // we are second user - handle incoming offer
     this.socket.on('webrtc-offer', async (data: { fromUserId: SocketId; offer: WebRTCOffer; }) => {
-      console.log(`📞 Received call offer from ${data.fromUserId}`);
+      console.log(`📞 [Socket] received WebRTC offer from ${data.fromUserId}`);
       await this.handleOffer(data.fromUserId, data.offer);
     });
 
-    // we are the user that initiated the call and we handle the answer to our offer
+    // we initiated - handle answer
     this.socket.on('webrtc-answer', async (data: { fromUserId: SocketId; answer: WebRTCAnswer; }) => {
-      console.log(`✅ Received call answer from ${data.fromUserId}`);
+      console.log(`✅ [Socket] received WebRTC answer from ${data.fromUserId}`);
       await this.handleAnswer(data.fromUserId, data.answer);
     });
 
-    // asynchronously handle incoming ice candidates
+    // ice candidates
     this.socket.on('webrtc-ice-candidate', async (data: { fromUserId: SocketId; candidate: IceCandidate; }) => {
-      console.log(`🧊 Received ICE candidate from ${data.fromUserId}`);
+      console.log(`🧊 [Socket] received ICE candidate from ${data.fromUserId}`);
       await this.handleIceCandidate(data.candidate);
     });
 
+    // socket-level user left (not webrtc disconnect)
     this.socket.on('user-left', (userId: SocketId) => {
-      console.log(`👋 User ${userId} left`);
-      this.handlePeerDisconnect();
+      console.log(`👋 [Socket] user ${userId} left the room (socket disconnect)`);
+      this.handlePeerDisconnect(DisconnectReason.PEER_LEFT);
     });
   }
 
@@ -166,7 +197,7 @@ export class WebRTCManager {
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
 
-      console.log(`📤 Sending offer to ${remoteUserId}`);
+      console.log(`📤 [WebRTC] sending offer to ${remoteUserId}`);
       this.socket.emit('webrtc-offer', {
         offer: {
           sdp: offer.sdp!,
@@ -175,9 +206,10 @@ export class WebRTCManager {
         toUserId: remoteUserId
       });
     } catch (error) {
-      console.error('❌ Failed to initiate call:', error);
+      console.error('❌ [WebRTC] failed to initiate call:', error);
     }
   }
+
   // we are second user that joined the room, we receive the offer and handle it 
   // by creating answer
   private async handleOffer(fromUserId: SocketId, offer: WebRTCOffer) {
@@ -188,7 +220,7 @@ export class WebRTCManager {
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
 
-      console.log(`📤 Sending answer to ${fromUserId}`);
+      console.log(`📤 [WebRTC] sending answer to ${fromUserId}`);
       this.socket.emit('webrtc-answer', {
         answer: {
           sdp: answer.sdp!,
@@ -197,7 +229,7 @@ export class WebRTCManager {
         toUserId: fromUserId
       });
     } catch (error) {
-      console.error('❌ Failed to handle offer:', error);
+      console.error('❌ [WebRTC] failed to handle offer:', error);
     }
   }
 
@@ -206,10 +238,10 @@ export class WebRTCManager {
     try {
       if (this.peerConnection) {
         await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-        console.log(`✅ Call established with ${fromUserId}`);
+        console.log(`✅ [WebRTC] call established with ${fromUserId}`);
       }
     } catch (error) {
-      console.error('❌ Failed to handle answer:', error);
+      console.error('❌ [WebRTC] failed to handle answer:', error);
     }
   }
 
@@ -220,7 +252,7 @@ export class WebRTCManager {
         await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       }
     } catch (error) {
-      console.error('❌ Failed to handle ICE candidate:', error);
+      console.error('❌ [WebRTC] failed to handle ICE candidate:', error);
     }
   }
 
@@ -268,45 +300,45 @@ export class WebRTCManager {
 
       this.localAnalyser.setActive(this.inputAudioEnabled);
 
-      // emit mute status change to server
-      console.log(`🔇 Emitting mute status change: ${this.isMuted ? 'muted' : 'unmuted'}`);
+      console.log(`🔇 [WebRTC] mute status changed: ${this.isMuted ? 'muted' : 'unmuted'}`);
       this.socket.emit('mute-status-changed', { isMuted: this.isMuted });
     }
   }
 
-  private async handleConnectionFailed() {
+  private async handleConnectionFailed(reason: DisconnectReason) {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      console.log(`Retrying connection ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
+      console.log(`🔄 [WebRTC] retrying connection ${this.reconnectAttempts}/${this.maxReconnectAttempts} (reason: ${reason})`);
 
-      this.closePeerConnection();
+      this.closePeerConnection(reason);
 
-      // Simple 1-second delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Restart WebRTC
-      if (this.currentRemoteUserId) { await this.initiateCall(this.currentRemoteUserId); }
-      else {
-        console.log('Empty remote id (shall not happen)');
-        this.closePeerConnection();
+      if (this.currentRemoteUserId) {
+        await this.initiateCall(this.currentRemoteUserId);
+      } else {
+        console.error('❌ [WebRTC] no remote user id for reconnection');
+        this.closePeerConnection(reason);
       }
     } else {
-      console.log('Max reconnection attempts reached');
-      this.closePeerConnection();
+      console.error(`❌ [WebRTC] max reconnection attempts reached (reason: ${reason})`);
+      this.closePeerConnection(reason);
     }
   }
 
-  private handlePeerDisconnect() {
-    console.log(`👋 Peer disconnected`);
-    this.closePeerConnection();
+
+  private handlePeerDisconnect(reason: DisconnectReason) {
+    console.log(`👋 [WebRTC] peer disconnected (reason: ${reason})`);
+    this.closePeerConnection(reason);
   }
 
 
-  private closePeerConnection() {
+  private closePeerConnection(reason: DisconnectReason) {
     if (this.peerConnection) {
+      console.log(`🔌 [WebRTC] closing peer connection (reason: ${reason})`);
       this.peerConnection.close();
       this.peerConnection = null;
-      this.onStreamRemoved();
+      this.onStreamRemoved(reason);
     }
 
     // cleanup remote audio analysis
@@ -316,23 +348,27 @@ export class WebRTCManager {
     }
   }
 
+
   cleanup() {
+    console.log('🧹 [WebRTC] cleanup initiated');
+
     if (this.localStream) {
       this.localStream.getTracks().forEach(track => {
         track.stop();
-        console.log('🛑 Stopped track:', track.kind);
+        console.log(`🛑 [WebRTC] stopped local track: ${track.kind}`);
       });
     }
 
     if (this.audioContext) {
       this.audioContext.close();
+      console.log('🔇 [WebRTC] closed audio context');
     }
 
     if (this.localAnalyser) {
       this.localAnalyser.cleanup();
     }
 
-    this.closePeerConnection();
+    this.closePeerConnection(DisconnectReason.MANUAL_CLEANUP);
   }
 
 }
