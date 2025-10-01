@@ -87,6 +87,7 @@ export class WebRTCManager {
     };
 
     // ice connection state monitoring
+
     peerConnection.oniceconnectionstatechange = () => {
       const iceState = peerConnection.iceConnectionState;
       console.log(`🧊 [WebRTC] ICE connection state: ${iceState}`);
@@ -95,11 +96,16 @@ export class WebRTCManager {
         console.error(`❌ [WebRTC] ICE connection failed`);
         this.handleConnectionFailed(DisconnectReason.ICE_FAILED);
       } else if (iceState === 'disconnected') {
-        console.warn(`⚠️ [WebRTC] ICE disconnected (might reconnect)`);
+        console.warn(`⚠️ [WebRTC] ICE disconnected - waiting for reconnection...`);
+        // DO NOTHING - let ICE try to reconnect
+      } else if (iceState === 'connected' || iceState === 'completed') {
+        console.log(`✅ [WebRTC] ICE reconnected successfully`);
+        this.reconnectAttempts = 0;
       } else if (iceState === 'closed') {
         console.log(`🔒 [WebRTC] ICE connection closed`);
       }
     };
+
 
 
     peerConnection.onconnectionstatechange = () => {
@@ -110,13 +116,16 @@ export class WebRTCManager {
         console.log(`✅ [WebRTC] peer connection established successfully`);
         this.reconnectAttempts = 0;
       } else if (state === 'failed') {
-        console.error(`❌ [WebRTC] peer connection failed`);
+        console.error(`❌ [WebRTC] peer connection failed - cleaning up`);
         this.handleConnectionFailed(DisconnectReason.CONNECTION_FAILED);
       } else if (state === 'disconnected') {
-        console.warn(`⚠️ [WebRTC] peer connection disconnected`);
-        this.handlePeerDisconnect(DisconnectReason.NETWORK_ERROR);
+        console.warn(`⚠️ [WebRTC] peer connection disconnected - waiting for reconnection...`);
+        // DO NOTHING - WebRTC will try to reconnect automatically
+        // ICE will keep working to find new routes
       } else if (state === 'closed') {
         console.log(`🔒 [WebRTC] peer connection closed`);
+        // connection was intentionally closed, clean up
+        this.closePeerConnection(DisconnectReason.MANUAL_CLEANUP);
       }
     };
 
