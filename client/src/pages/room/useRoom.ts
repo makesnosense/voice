@@ -90,13 +90,23 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
     newSocket.on('disconnect', (
       reason: string,
-      details?: Error | { description?: string; context?: unknown }) => {
+      details?: Error | {
+        description?: string;
+        context?: unknown
+      }) => {
+
       console.error('❌ [Socket] Disconnect event:', {
         reason,
         details,
         transport: newSocket.io.engine?.transport?.name,
         timestamp: new Date().toISOString()
       });
+
+      // clean up webrtc manager when socket disconnects
+      // this ensures we start fresh when reconnecting
+      cleanupWebRTC();
+      // set status to connecting so reconnection triggers webrtc re-initialization
+      setConnectionStatus('connecting');
     });
 
     newSocket.on('connect_error', (error: Error) => {
