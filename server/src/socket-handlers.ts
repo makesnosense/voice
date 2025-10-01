@@ -1,5 +1,6 @@
 import config from './config';
 import { socketRateLimiter, SOCKET_RATE_LIMITS } from './utils/socket-rate-limiter';
+import type { Transport } from 'engine.io';
 import type {
   Room,
   RoomId,
@@ -21,6 +22,13 @@ export default function createConnectionHandler(
 
   const handleConnection = (socket: ExtendedSocket) => {
     console.log(`🔌 [Socket] new connection: ${socket.id}`);
+    console.log(`🔌 [Socket] transport: ${socket.conn.transport.name}`);
+    console.log(`🔌 [Socket] remote address: ${socket.handshake.address}`);
+
+    // log transport changes
+    socket.conn.on('upgrade', (transport: Transport) => {
+      console.log(`🔄 [Socket] ${socket.id} upgraded to ${transport.name}`);
+    });
 
     socket.on('join-room', (roomId: RoomId) => {
       if (!checkRateLimit(socket, 'join-room')) return;
@@ -43,10 +51,17 @@ export default function createConnectionHandler(
     });
 
     socket.on('disconnect', (reason: string) => {
-      console.log(`👋 [Socket] disconnecting ${socket.id}, reason: ${reason}`);
-      handleDisconnect(io, rooms, socket, roomDestructionManager, reason)
-    }
-    );
+      console.log(`👋 [Socket] ${socket.id} disconnecting...`);
+      console.log(`   Reason: ${reason}`);
+      console.log(`   Transport: ${socket.conn.transport.name}`);
+      console.log(`   Timestamp: ${new Date().toISOString()}`);
+
+      handleDisconnect(io, rooms, socket, roomDestructionManager, reason);
+    });
+
+    socket.on('error', (error: Error) => {
+      console.error(`❌ [Socket] ${socket.id} error:`, error);
+    });
 
     // WebRTC signaling events with rate limiting
     socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => {
@@ -84,8 +99,9 @@ const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_
 
   if (!allowed) {
     console.warn(`🚫 [RateLimit] ${socket.id} exceeded limit for ${event}`);
-    socket.emit('error' as any, {
-      message: `Rate limit exceeded for ${event}. Please slow down.`
+    socket.emit('error', {
+      message: `Rate limit exceeded for ${event}. Please slow down.`,
+      type: 'rate-limit'
     });
   }
 
@@ -188,7 +204,8 @@ const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text:
 
   if (!data.text || data.text.length > 1000) {
     console.warn(`⚠️ [Message] invalid message from ${socket.id}`);
-    socket.emit('error' as any, { message: 'Invalid message content' });
+    socket.emit('error',
+      { message: 'Invalid message content' });
     return;
   }
   console.log(`💬 [Message] ${socket.id} in ${socket.roomId}: "${data.text.substring(0, 50)}${data.text.length > 50 ? '...' : ''}"`);

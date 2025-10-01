@@ -29,9 +29,9 @@ const io = new Server(server, {
     origin: config.corsOrigins,
     methods: ["GET", "POST"]
   },
-  pingTimeout: 10000,
-  pingInterval: 5000,
-  upgradeTimeout: 5000,
+  pingTimeout: 20000,      // 20s (increased from 10s)
+  pingInterval: 25000,     // 25s (increased from 5s)
+  upgradeTimeout: 10000,   // 10s (increased from 5s)
   allowEIO3: false,
 });
 
