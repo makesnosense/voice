@@ -41,6 +41,8 @@ export interface ServerToClientEvents {
   'message': (message: Message) => void;
   'room-not-found': (error: string) => void;
 
+  'error': (data: { message: string; type?: string }) => void;
+
   'initiate-webrtc-call': (targetUserId: SocketId) => void;
 
   // WebRTC events

@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
 import type { RoomId, TypedSocket, Message, ConnectionStatus, UserDataClientSide } from '../../../../shared/types';
+import type { Transport } from 'engine.io-client';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
@@ -68,11 +69,11 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
     socketRef.current = newSocket;
 
-    newSocket.io.engine.on('upgrade', (transport) => {
+    newSocket.io.engine.on('upgrade', (transport: Transport) => {
       console.log('[Socket] 🔄 Transport upgraded to:', transport.name);
     });
 
-    newSocket.io.engine.on('close', (reason) => {
+    newSocket.io.engine.on('close', (reason: string) => {
       console.error('❌ [Engine] Transport closed:', reason);
     });
 
@@ -86,8 +87,10 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       newSocket.emit('join-room', roomId as RoomId);
     });
 
-    // enhanced disconnect logging
-    newSocket.on('disconnect', (reason, details) => {
+
+    newSocket.on('disconnect', (
+      reason: string,
+      details?: Error | { description?: string; context?: unknown }) => {
       console.error('❌ [Socket] Disconnect event:', {
         reason,
         details,
@@ -96,7 +99,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       });
     });
 
-    newSocket.on('connect_error', (error: any) => {
+    newSocket.on('connect_error', (error: Error) => {
       console.error('❌ [Socket] Connection error:', error.message);
     });
 
@@ -115,11 +118,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
       console.log('✅ Successfully joined room:', data.roomId);
       setConnectionStatus('joined');
     });
-
-    // newSocket.on('initiate-webrtc-call', () => {
-    //   console.log('🎬 Server says initiate WebRTC');
-    //   setShouldInitWebRTC(true);
-    // });
 
     newSocket.on('room-users-update', (users: UserDataClientSide[]) => {
       console.log('👥 Room users updated:', users);

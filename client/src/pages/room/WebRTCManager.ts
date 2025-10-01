@@ -87,7 +87,6 @@ export class WebRTCManager {
     };
 
     // ice connection state monitoring
-
     peerConnection.oniceconnectionstatechange = () => {
       const iceState = peerConnection.iceConnectionState;
       console.log(`🧊 [WebRTC] ICE connection state: ${iceState}`);
@@ -99,14 +98,12 @@ export class WebRTCManager {
         console.warn(`⚠️ [WebRTC] ICE disconnected - waiting for reconnection...`);
         // DO NOTHING - let ICE try to reconnect
       } else if (iceState === 'connected' || iceState === 'completed') {
-        console.log(`✅ [WebRTC] ICE reconnected successfully`);
+        console.log(`✅ [WebRTC] ICE connected successfully`);
         this.reconnectAttempts = 0;
       } else if (iceState === 'closed') {
         console.log(`🔒 [WebRTC] ICE connection closed`);
       }
     };
-
-
 
     peerConnection.onconnectionstatechange = () => {
       const state = peerConnection.connectionState;
