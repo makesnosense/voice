@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { WebRTCManager } from '../pages/room/WebRTCManager';
+import { WebRTCManager, DisconnectReason } from '../pages/room/WebRTCManager';
 import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/types';
 
 interface WebRTCStore {
@@ -17,7 +17,7 @@ interface WebRTCStore {
   updateAudioData: (data: AudioFrequencyData) => void;
   updateRemoteAudioData: (data: AudioFrequencyData) => void;
   setRemoteStream: (userId: SocketId, stream: MediaStream) => void;
-  clearRemoteStream: () => void;
+  clearRemoteStream: (reason: DisconnectReason) => void;
 }
 
 export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
@@ -31,13 +31,18 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
   initializeWebRTC: async (socket, localStream) => {
     const { manager } = get();
-    if (manager) return; // already initialized
+    if (manager) {
+      console.log('⚠️ [Store] WebRTC already initialized');
+      return;
+    }
+
+    console.log('🎬 [Store] initializing WebRTC manager');
 
     const newManager = new WebRTCManager(
       socket,
       localStream,
       (userId, stream) => get().setRemoteStream(userId, stream),
-      () => get().clearRemoteStream(),
+      (reason) => get().clearRemoteStream(reason),
     );
 
     set({
@@ -63,6 +68,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     };
     checkAudio();
 
+    console.log('✅ [Store] emitting webrtc-ready to server');
+
     socket.emit('webrtc-ready');
   },
 
@@ -85,10 +92,12 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   },
 
   setRemoteStream: (userId, stream) => {
+    console.log(`✅ [Store] remote stream set for user ${userId}`);
     set({ remoteStream: stream, remoteUserId: userId });
   },
 
-  clearRemoteStream: () => {
+  clearRemoteStream: (reason) => {
+    console.log(`🔌 [Store] clearing remote stream (reason: ${reason})`);
     set({
       remoteStream: null,
       remoteUserId: null,
