@@ -247,13 +247,6 @@ const handleDisconnect = (io: TypedServer,
   if (wasInRoom) {
     console.log(`🔌 [Socket] removed ${socket.id} from room ${socket.roomId} (${room.users.size} remaining)`);
 
-    // reset webRTCReady for all remaining users
-    // this ensures proper re-handshake when someone rejoins
-    for (const [userId, userData] of room.users.entries()) {
-      room.users.set(userId, { ...userData, webRTCReady: false });
-      console.log(`🔄 [WebRTC] reset webRTCReady flag for ${userId}`);
-    }
-
     const usersForClient = getUsersForClient(room);
     io.to(socket.roomId).emit('room-users-update', usersForClient);
     io.to(socket.roomId).emit('user-left', socket.id as SocketId);
