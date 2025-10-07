@@ -1,43 +1,24 @@
 .headerContainer {
   display: flex;
   justify-content: center;
-  /* center the main content */
   align-items: center;
-  width: 100%;
   position: relative;
-  /* for absolute positioning of theme selector */
 }
-
-.mainHeader {
-  /* this will be centered */
-  display: flex;
-  align-items: center;
-}
-
 
 .themeContainer {
-  /* positioning styles */
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
 }
 
-
-
-.voiceIcon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .voiceWaves {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
 }
 
 .wave {

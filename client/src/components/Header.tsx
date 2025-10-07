@@ -12,9 +12,7 @@ interface HeaderProps {
 }
 
 export default function Header({
-  title = 'Voice',
-  voiceState = 'active',
-  className = ''
+  voiceState = 'active'
 }: HeaderProps) {
 
   const getVoiceStateClass = () => {
@@ -30,22 +28,20 @@ export default function Header({
   };
 
   return (
-    <div className={`${voiceStyles.headerContainer} ${className}`}>
-      <header className={`${baseStyles.card} ${getVoiceStateClass()} ${voiceStyles.mainHeader}`}>
-        <div className={voiceStyles.voiceIcon}>
-          <div className={voiceStyles.voiceWaves}>
-            <div className={voiceStyles.wave}></div>
-            <div className={voiceStyles.wave}></div>
-            <div className={voiceStyles.wave}></div>
-            <div className={voiceStyles.wave}></div>
-            <div className={voiceStyles.wave}></div>
-          </div>
+    <header className={`${voiceStyles.headerContainer}`}>
+      <div className={`${baseStyles.card} ${getVoiceStateClass()}`}>
+        <div className={voiceStyles.voiceWaves}>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
+          <div className={voiceStyles.wave}></div>
         </div>
-        <h1 className={baseStyles.title}>{title}</h1>
-      </header>
+        <h1 className={baseStyles.title}>Voice</h1>
+      </div>
 
       <ThemeSelector />
 
-    </div>
+    </header>
   );
 }
