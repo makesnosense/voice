@@ -1,12 +1,12 @@
 import type { Server } from '../server/node_modules/socket.io';
 import type { Socket } from '../client/node_modules/socket.io';
 
+export type ObjectValues<T> = T[keyof T];
 
 export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
 
 type ConnectionStatus = 'connecting' | 'joined' | 'error' | 'room-full';
-type MicPermissionStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'not-supported';
 
 export interface UserDataServerSide {
   webRTCReady: boolean;
