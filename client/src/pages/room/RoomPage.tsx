@@ -11,22 +11,19 @@ export default function RoomPage() {
 
   return (
     <div className={layoutStyles.page}>
-      <div className={layoutStyles.header}>
-        <Header />
-      </div>
+      <Header />
 
-      <div className={layoutStyles.content}>
-        {(roomState.connectionStatus === 'error') && <RoomError errorType="not-found" />}
-        {(roomState.connectionStatus === 'room-full') && <RoomError errorType="room-full" />}
-        {(roomState.connectionStatus === 'joined') && (
-          <RoomInterior {...roomState} />
-        )}
-        {(roomState.connectionStatus === 'connecting') && (
-          <div style={{ textAlign: 'center', padding: '20px' }}>
-            Connecting to room...
-          </div>
-        )}
-      </div>
+      {(roomState.connectionStatus === 'error') && <RoomError errorType="not-found" />}
+      {(roomState.connectionStatus === 'room-full') && <RoomError errorType="room-full" />}
+      {(roomState.connectionStatus === 'joined') && (
+        <RoomInterior {...roomState} />
+      )}
+      {(roomState.connectionStatus === 'connecting') && (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          Connecting to room...
+        </div>
+      )}
+
     </div>
   )
 }
