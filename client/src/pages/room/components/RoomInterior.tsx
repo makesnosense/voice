@@ -40,7 +40,7 @@ export default function RoomInterior({
 }: RoomInteriorProps) {
 
   return (
-    <div className={layoutStyles.roomContainer}>
+    <div className={layoutStyles.roomInteriorContainer}>
       <CopyCard />
 
       {/* single remote audio component */}

@@ -1,4 +1,6 @@
 :root {
+  --section-gap: 1rem;
+
   /* light theme (default) */
   --bg-primary: rgba(255, 255, 255, 0.95);
   --bg-secondary: rgba(248, 250, 252, 0.95);
