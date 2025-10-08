@@ -1,8 +1,19 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import type { ObjectValues } from '../../../shared/types';
 
 
-type MicPermissionStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'not-supported';
+export const MIC_PERMISSION_STATUS = {
+  IDLE: 'idle',
+  REQUESTING: 'requesting',
+  GRANTED: 'granted',
+  DENIED: 'denied',
+  NOT_SUPPORTED: 'not-supported',
+} as const;
+
+export type MicPermissionStatus = ObjectValues<typeof MIC_PERMISSION_STATUS>;
+
+export type MicErrorStatus = Exclude<MicPermissionStatus, ['granted', "idle", "requesting"]>;
 
 interface MicrophoneStore {
   stream: MediaStream | null;

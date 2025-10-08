@@ -1,13 +1,14 @@
 import CopyCard from './copycard/CopyCard';
 import RemoteAudio from './RemoteAudio';
 import Users from './Users';
+import MicWarning from './MicWarning';
 import layoutStyles from '../../../styles/Layout.module.css'
-// import AudioSetupOverlay from './AudioSetupOverlay';
 import Messages from './messages/Messages';
-
+import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
+import type { MicPermissionStatus } from '../../../stores/useMicrophoneStore'
 import type {
   RoomId, Message, TypedSocket, SocketId,
-  AudioFrequencyData, MicPermissionStatus, UserDataClientSide
+  AudioFrequencyData, UserDataClientSide
 } from "../../../../../shared/types";
 
 interface RoomInteriorProps {
@@ -48,49 +49,22 @@ export default function RoomInterior({
         <RemoteAudio userId={remoteUserId} stream={remoteStream} />
       )}
 
-      <div>
-        <Users
-          roomUsers={roomUsers}
-          currentUserId={socketRef.current?.id as SocketId}
-          isMicActive={isMicActive}
-          audioFrequencyData={audioFrequencyData}
-          isMutedLocal={isMutedLocal}
-          onToggleMute={toggleMute}
-          remoteAudioFrequencyData={remoteAudioFrequencyData}
-          remoteUserId={remoteUserId}
-          hasRemoteStream={!!remoteStream}
-        />
 
-        {/* show mic permission status if there's an issue */}
-        {micPermissionStatus === 'denied' && (
-          <div style={{
-            marginTop: '8px',
-            padding: '8px',
-            background: '#fee2e2',
-            borderRadius: '4px',
-            fontSize: '14px',
-            color: '#991b1b',
-            textAlign: 'center'
-          }}>
-            ⚠️ Microphone permission denied. Please enable it in browser settings.
-          </div>
-        )}
+      <Users
+        roomUsers={roomUsers}
+        currentUserId={socketRef.current?.id as SocketId}
+        isMicActive={isMicActive}
+        audioFrequencyData={audioFrequencyData}
+        isMutedLocal={isMutedLocal}
+        onToggleMute={toggleMute}
+        remoteAudioFrequencyData={remoteAudioFrequencyData}
+        remoteUserId={remoteUserId}
+        hasRemoteStream={!!remoteStream}
+      />
 
-        {micPermissionStatus === 'not-supported' && (
-          <div style={{
-            marginTop: '8px',
-            padding: '8px',
-            background: '#fef3c7',
-            borderRadius: '4px',
-            fontSize: '14px',
-            color: '#92400e',
-            textAlign: 'center'
-          }}>
-            ⚠️ Your browser doesn't support audio input.
-          </div>
-        )}
-      </div>
-
+      {(micPermissionStatus === MIC_PERMISSION_STATUS.DENIED ||
+        micPermissionStatus === MIC_PERMISSION_STATUS.NOT_SUPPORTED)
+        && <MicWarning micPermissionStatus={micPermissionStatus} />}
 
       <Messages
         messages={messages}
