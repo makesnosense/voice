@@ -1,8 +1,7 @@
 .card {
   align-items: center;
   display: flex;
-  gap: 12px;
-  padding: 16px 24px;
+
   background: var(--bg-primary);
   border: 1px solid var(--border-primary);
   border-radius: 16px;
@@ -10,8 +9,9 @@
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
   width: fit-content;
-  box-sizing: border-box;
+  height: fit-content;
 }
+
 
 .card.messagesCard {
   align-items: flex-start;
@@ -51,6 +51,8 @@
 }
 
 .userCard {
+  gap: 12px;
+  padding: 16px 24px;
   width: 6rem;
   justify-content: center;
 }
