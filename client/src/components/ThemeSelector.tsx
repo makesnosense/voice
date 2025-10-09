@@ -14,7 +14,7 @@ export default function ThemeSelector() {
   const { mode, setMode } = useThemeStore();
 
   return (
-    <div className={`${baseStyles.card} ${themeSelectorStyles.themeSelectorCard}`}>
+    <div className={`${themeSelectorStyles.themeSelectorCard} ${baseStyles.card}`}>
       <div className={themeSelectorStyles.buttonGroup}>
         {THEME_OPTIONS.map(({ mode: themeMode, icon: Icon, label }) => (
           <button

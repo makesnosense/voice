@@ -1,33 +1,37 @@
 .themeSelectorCard {
-  position: absolute;
-  left: calc(50% + 80px);
-  top: 0;
-  transform: none;
-  padding: 2px 4px;
-  min-width: fit-content;
+  --icon-size: 18px;
+  --button-min-width: 36px;
+
+  padding: 10px 2px;
+  display: flex;
+  align-items: center;
+  justify-self: end;
 }
 
 .buttonGroup {
   display: flex;
   gap: 0px;
+  justify-content: center;
   align-items: center;
 }
 
 .themeButton {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-radius: 8px;
   border: none;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 36px;
-  min-height: 36px;
+  min-width: var(--button-min-width);
   opacity: 0.6;
+  display: flex;
+  gap: 0px;
+  justify-content: center;
+  align-items: center;
+}
+
+.themeButton svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .themeButton:hover {
@@ -37,7 +41,6 @@
   transform: translateY(-1px);
 }
 
-/* specific button types when active */
 .light.active {
   color: #f59e0b;
   opacity: 1;
@@ -72,24 +75,25 @@
   transform: translateY(-1px);
 }
 
-@media (max-width: 410px) {
-  .buttonGroup {
-    flex-direction: column;
-    gap: 0px;
-  }
 
+@media (max-width: 480px) {
   .themeSelectorCard {
-    left: calc(50% + 80px);
+    --icon-size: 16px;
+    --button-min-width: 32px;
   }
+}
 
-  .themeButton {
-    padding: 0px;
-    min-width: 19px;
-    min-height: 19px;
+@media (max-width: 420px) {
+  .themeSelectorCard {
+    --icon-size: 14px;
+    --button-min-width: 28px;
   }
+}
 
-  .themeButton svg {
-    width: 13px;
-    height: 13px;
+@media (max-width: 380px) {
+  .themeSelectorCard {
+    --icon-size: 12px;
+    --button-min-width: 24px;
+    padding: 8px 1px;
   }
 }

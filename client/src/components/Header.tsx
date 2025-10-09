@@ -29,7 +29,7 @@ export default function Header({
 
   return (
     <header className={`${voiceStyles.headerContainer}`}>
-      <div className={`${baseStyles.card} ${getVoiceStateClass()}`}>
+      <div className={`${baseStyles.card} ${voiceStyles.titleCard} ${getVoiceStateClass()}`}>
         <div className={voiceStyles.voiceWaves}>
           <div className={voiceStyles.wave}></div>
           <div className={voiceStyles.wave}></div>
