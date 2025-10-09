@@ -1,18 +1,18 @@
 import ThemeSelector from './ThemeSelector';
-import baseStyles from '../styles/BaseCard.module.css';
 
+import baseStyles from '../styles/BaseCard.module.css';
 import voiceStyles from './Header.module.css';
 
 type VoiceState = 'active' | 'silent' | 'muted';
 
 interface HeaderProps {
-  title?: string;
   voiceState?: VoiceState;
-  className?: string;
+  leftContent?: React.ReactNode;
 }
 
 export default function Header({
-  voiceState = 'active'
+  voiceState = 'active',
+  leftContent
 }: HeaderProps) {
 
   const getVoiceStateClass = () => {
@@ -29,6 +29,11 @@ export default function Header({
 
   return (
     <header className={`${voiceStyles.headerContainer}`}>
+
+      <div className={voiceStyles.leftSlot}>
+        {leftContent}
+      </div>
+
       <div className={`${baseStyles.card} ${voiceStyles.titleCard} ${getVoiceStateClass()}`}>
         <div className={voiceStyles.voiceWaves}>
           <div className={voiceStyles.wave}></div>

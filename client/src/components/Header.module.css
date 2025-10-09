@@ -3,6 +3,11 @@
   grid-template-columns: 1fr auto 1fr;
 }
 
+.leftSlot {
+  display: flex;
+  align-self: center;
+}
+
 .titleCard {
   gap: 12px;
   padding: 16px 24px;
