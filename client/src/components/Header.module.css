@@ -12,6 +12,7 @@
 .titleCard {
   gap: 12px;
   padding: 16px 24px;
+  justify-self: center;
 }
 
 .voiceWaves {
@@ -96,4 +97,10 @@
   animation: none;
   opacity: 0.2;
   background: #e2e8f0;
+}
+
+@media (max-width: 345px) {
+  .headerContainer {
+    gap: 0.5rem;
+  }
 }

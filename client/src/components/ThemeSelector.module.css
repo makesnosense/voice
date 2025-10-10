@@ -97,3 +97,18 @@
     padding: 8px 1px;
   }
 }
+
+@media (max-width: 345px) {
+  .themeSelectorCard {
+    --icon-size: 12px;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+    gap: 4.5px;
+  }
+
+  .themeButton {
+    height: 12px;
+  }
+}
