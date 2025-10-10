@@ -1,0 +1,7 @@
+.chevron {
+  transform: translateY(0.5px);
+}
+
+.exitRoomButton {
+  gap: 4px;
+}
