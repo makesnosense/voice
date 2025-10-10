@@ -20,6 +20,6 @@ docker compose up -d --build
 # reload nginx config (don't restart nginx, just reload)
 echo "🔄 Reloading nginx..."
 cd ../nginx-on-vps
-docker exec nginx-proxy nginx -s reload
+docker exec nginx-on-vps nginx -s reload
 
 echo "🚀 Deployment complete!"
