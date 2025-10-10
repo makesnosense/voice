@@ -1,4 +1,4 @@
-import ThemeSelector from './ThemeSelector';
+import ThemeSelector from './theme-selector/ThemeSelector';
 
 import baseStyles from '../styles/BaseCard.module.css';
 import voiceStyles from './Header.module.css';

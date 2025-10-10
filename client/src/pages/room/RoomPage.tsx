@@ -1,5 +1,5 @@
 
-import ExitRoomButton from './components/exitbutton/ExitRoomButton';
+import ExitRoomButton from './components/exit-room-button/ExitRoomButton';
 import layoutStyles from '../../styles/Layout.module.css'
 import useRoomIdValidation from './useRoomIdValidation';
 import useRoom from './useRoom';

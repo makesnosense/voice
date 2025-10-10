@@ -1,6 +1,6 @@
 import { Monitor, Sun, Moon } from 'lucide-react';
-import { useThemeStore } from '../stores/useThemeStore';
-import baseStyles from '../styles/BaseCard.module.css';
+import { useThemeStore } from '../../stores/useThemeStore';
+import baseStyles from '../../styles/BaseCard.module.css';
 import themeSelectorStyles from './ThemeSelector.module.css';
 
 const THEME_OPTIONS = [
