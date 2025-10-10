@@ -6,8 +6,6 @@ export type ObjectValues<T> = T[keyof T];
 export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
 
-type ConnectionStatus = 'connecting' | 'joined' | 'error' | 'room-full';
-
 export interface UserDataServerSide {
   webRTCReady: boolean;
   isMuted: boolean;

@@ -1,9 +1,18 @@
 import { useState, useEffect, useRef, } from 'react';
 import { io } from 'socket.io-client';
-import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
+import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
-import type { RoomId, TypedSocket, Message, ConnectionStatus, UserDataClientSide } from '../../../../shared/types';
+import type { RoomId, TypedSocket, Message, ObjectValues, UserDataClientSide } from '../../../../shared/types';
 import type { Transport } from 'engine.io-client';
+
+export const CONNECTION_STATUS = {
+  CONNECTING: 'connecting',
+  JOINED: 'joined',
+  ERROR: 'error',
+  ROOM_FULL: 'room-full',
+} as const;
+
+export type ConnectionStatus = ObjectValues<typeof CONNECTION_STATUS>;
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
@@ -37,7 +46,9 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
   // initialize WebRTC when conditions are met
   useEffect(() => {
-    if (micPermissionStatus === 'granted' && connectionStatus === 'joined' && localStream && socketRef.current) {
+    if (micPermissionStatus === MIC_PERMISSION_STATUS.GRANTED &&
+      connectionStatus === CONNECTION_STATUS.JOINED &&
+      localStream && socketRef.current) {
 
       const hasLiveTracks = localStream.getTracks().some(track => track.readyState === 'live');
 
@@ -54,7 +65,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
   }, [micPermissionStatus, connectionStatus, localStream, initializeWebRTC, requestMicrophone]);
 
   useEffect(() => {
-    if (!roomId || initialStatus === 'error') {
+    if (!roomId || initialStatus === CONNECTION_STATUS.ERROR) {
       return;
     }
 
