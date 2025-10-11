@@ -1,14 +1,15 @@
 import { Mic, MicOff } from 'lucide-react';
-import AudioWaves from './audiowaves/AudioWaves';
-import baseStyles from '../../../styles/BaseCard.module.css';
-import buttonStyles from '../../../styles/Buttons.module.css';
-import type { SocketId, AudioFrequencyData } from '../../../../../shared/types';
+import AudioWaves from '../audiowaves/AudioWaves';
+import baseStyles from '../../../../styles/BaseCard.module.css';
+import userCardStyles from './UserCard.module.css';
+import buttonStyles from '../../../../styles/Buttons.module.css';
+import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
 
 interface UserCardProps {
   userId: SocketId;
   isCurrentUser: boolean;
 
-  // audio visualization (for any user)
+  // audio visualization (for any user)§
   audioData?: AudioFrequencyData;
   isAudioActive?: boolean;
 
@@ -39,21 +40,19 @@ export default function UserCard({
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.textOnly} ${baseStyles.userCard}`}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-        <span className={baseStyles.title} style={{ fontSize: '16px' }}>
+      <div className={userCardStyles.userCardContent}>
+        <span className={`${baseStyles.title} ${userCardStyles.displayName}`}>
           {displayName}
         </span>
 
-        <div style={{
-          height: "1.5rem"
-        }}>
+        <div className={userCardStyles.audioWavesContainer}>
           {isMutedRemoteUser && (
             <MicOff
               className={`${buttonStyles.lightRed} ${buttonStyles.noBorder}`}
-              size={16} />
+              size={16}
+            />
           )}
 
-          {/* show audio waves when audio data is available */}
           {audioData && !isMutedRemoteUser && (
             <AudioWaves
               audioData={audioData}
@@ -61,25 +60,16 @@ export default function UserCard({
               size="medium"
             />
           )}
-
         </div>
 
-        {/* current user controls and status */}
         {isCurrentUser && (
           <>
-            {/* mic not connected status */}
             {!isMicConnected && (
-              <small style={{
-                fontSize: "10px",
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}>
+              <small className={userCardStyles.micStatus}>
                 <MicOff size={14} /> not connected
               </small>
             )}
 
-            {/* mute/unmute button */}
             {isMicConnected && onToggleMute && (
               <button
                 onClick={onToggleMute}
@@ -92,7 +82,6 @@ export default function UserCard({
             )}
           </>
         )}
-
       </div>
     </div>
   );

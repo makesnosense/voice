@@ -1,4 +1,4 @@
-import UserCard from './UserCard';
+import UserCard from './usercard/UserCard';
 import type { SocketId, AudioFrequencyData, UserDataClientSide } from '../../../../../shared/types';
 
 

@@ -1,0 +1,21 @@
+.userCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.displayName {
+  font-size: 16px;
+}
+
+.audioWavesContainer {
+  height: 1.5rem;
+}
+
+.micStatus {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
