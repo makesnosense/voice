@@ -1,5 +1,5 @@
 import { HEADER_ANIMATION_STATE } from './HeaderAnimationState';
-import headerStyles from './Header.module.css';
+import headerStyles from './HeaderAnimation.module.css';
 import type { HeaderAnimationState } from './HeaderAnimationState';
 
 interface HeaderAnimationProps {
@@ -23,7 +23,7 @@ export default function HeaderAnimation({
   };
 
   return (
-    <div className={`${headerStyles.voiceWaves} ${getAnimationStateClass()}`}>
+    <div className={`${headerStyles.wavesContainer} ${getAnimationStateClass()}`}>
       <div className={headerStyles.wave}></div>
       <div className={headerStyles.wave}></div>
       <div className={headerStyles.wave}></div>
