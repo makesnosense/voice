@@ -1,4 +1,4 @@
-import type { ObjectValues } from "../../../shared/types";
+import type { ObjectValues } from "../../../../../shared/types";
 
 export const HEADER_ANIMATION_STATE = {
   ACTIVE: 'active',

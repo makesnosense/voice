@@ -9,18 +9,11 @@ interface RemoteAudioProps {
 
 export default function RemoteAudio({ userId, stream, onAutoplayBlocked }: RemoteAudioProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  // const playPromiseRef = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
     const audioElement = audioRef.current;
     if (!audioElement || !stream) return;
 
-    // cancel any existing play promise
-    // if (playPromiseRef.current) {
-    //   playPromiseRef.current = null;
-    // }
-
-    // set the stream
     audioElement.srcObject = stream;
 
     // attempt to play with better error handling
@@ -28,7 +21,6 @@ export default function RemoteAudio({ userId, stream, onAutoplayBlocked }: Remot
       try {
         // store the promise reference
         const playPromise = audioElement.play();
-        // playPromiseRef.current = playPromise;
 
         await playPromise;
         console.log(`✅ Playing audio for user ${userId}`);
