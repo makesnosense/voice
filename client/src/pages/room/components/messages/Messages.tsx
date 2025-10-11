@@ -54,9 +54,7 @@ export default function Messages({
 
     return (
       <strong
-        className={messagesStyles.username}
-        style={{ color: isCurrentUser ? '#667eea' : undefined }}
-      >
+        className={`${messagesStyles.username} ${isCurrentUser ? messagesStyles.currentUser : ''}`}>
         {isCurrentUser ? 'You' : 'Other'}
       </strong>
     );
