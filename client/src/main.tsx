@@ -4,13 +4,19 @@ import { BrowserRouter } from 'react-router';
 import './index.css';
 import App from './App.tsx';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('failed to find root element');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </StrictMode>,
-)
+);
 
 // remove loader after react mounts
 requestAnimationFrame(() => {
