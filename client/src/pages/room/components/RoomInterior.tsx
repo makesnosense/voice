@@ -1,6 +1,6 @@
 import CopyCard from './copycard/CopyCard';
 import RemoteAudio from './RemoteAudio';
-import Users from './Users';
+import Users from './users/Users';
 import MicWarning from './mic-warning/MicWarning';
 import layoutStyles from '../../../styles/Layout.module.css'
 import Messages from './messages/Messages';

@@ -1,5 +1,5 @@
 import UserCard from './usercard/UserCard';
-import type { SocketId, AudioFrequencyData, UserDataClientSide } from '../../../../../shared/types';
+import type { SocketId, AudioFrequencyData, UserDataClientSide } from '../../../../../../shared/types';
 
 
 interface UsersListProps {
@@ -58,11 +58,9 @@ export default function Users({
             isCurrentUser={isCurrentUser}
             audioData={userAudioData}
             isAudioActive={isUserAudioActive}
-            // current user specific props
             isMutedLocal={isCurrentUser ? isMutedLocal : undefined}
             onToggleMute={isCurrentUser ? onToggleMute : undefined}
             isMicConnected={isCurrentUser ? isMicActive : undefined}
-            // remote user mute status
             isRemoteUserMuted={!isCurrentUser ? user.isMuted : undefined}
           />
         );

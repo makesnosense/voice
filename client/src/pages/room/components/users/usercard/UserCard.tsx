@@ -1,15 +1,15 @@
 import { Mic, MicOff } from 'lucide-react';
-import AudioWaves from '../audiowaves/AudioWaves';
-import baseStyles from '../../../../styles/BaseCard.module.css';
+import AudioWaves from '../../audiowaves/AudioWaves';
+import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from './UserCard.module.css';
-import buttonStyles from '../../../../styles/Buttons.module.css';
-import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
+import buttonStyles from '../../../../../styles/Buttons.module.css';
+import type { SocketId, AudioFrequencyData } from '../../../../../../../shared/types';
 
 interface UserCardProps {
   userId: SocketId;
   isCurrentUser: boolean;
 
-  // audio visualization (for any user)§
+  // audio visualization (for any user)
   audioData?: AudioFrequencyData;
   isAudioActive?: boolean;
 
