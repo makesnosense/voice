@@ -2,17 +2,10 @@ import { useState, useEffect, useRef, } from 'react';
 import { io } from 'socket.io-client';
 import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
-import type { RoomId, TypedSocket, Message, ObjectValues, UserDataClientSide } from '../../../../shared/types';
+import { CONNECTION_STATUS } from './RoomPage.constants';
+import type { ConnectionStatus } from './RoomPage.constants';
+import type { RoomId, TypedSocket, Message, UserDataClientSide } from '../../../../shared/types';
 import type { Transport } from 'engine.io-client';
-
-export const CONNECTION_STATUS = {
-  CONNECTING: 'connecting',
-  JOINED: 'joined',
-  ERROR: 'error',
-  ROOM_FULL: 'room-full',
-} as const;
-
-export type ConnectionStatus = ObjectValues<typeof CONNECTION_STATUS>;
 
 export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);

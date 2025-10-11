@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
-import { CONNECTION_STATUS } from './useRoom';
-import type { ConnectionStatus } from './useRoom';
+import { CONNECTION_STATUS } from './RoomPage.constants';
+import type { ConnectionStatus } from './RoomPage.constants';
 import type { RoomId } from '../../../../shared/types';
 
 interface RoomIdValidationResult {
@@ -8,7 +8,6 @@ interface RoomIdValidationResult {
   initialStatus: ConnectionStatus;
   errorMessage?: string;
 }
-
 
 export default function useRoomIdValidation(): RoomIdValidationResult {
   const { roomId: paramRoomId } = useParams<{ roomId: RoomId }>();

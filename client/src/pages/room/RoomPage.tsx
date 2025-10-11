@@ -2,7 +2,8 @@
 import ExitRoomButton from './components/exit-room-button/ExitRoomButton';
 import layoutStyles from '../../styles/Layout.module.css'
 import useRoomIdValidation from './useRoomIdValidation';
-import useRoom, { CONNECTION_STATUS } from './useRoom';
+import useRoom from './useRoom';
+import { CONNECTION_STATUS } from './RoomPage.constants';
 import Header from '../../components/header/Header';
 import Spinner from '../../components/spinner/Spinner';
 import RoomError from './components/RoomError';
@@ -39,9 +40,9 @@ export default function RoomPage() {
         animationState={getHeaderAnimationState()}
         leftContent={roomState.connectionStatus === CONNECTION_STATUS.JOINED ? <ExitRoomButton /> : null} />
 
-      {(roomState.connectionStatus === CONNECTION_STATUS.ERROR) && <RoomError errorType="not-found" />}
+      {(roomState.connectionStatus === CONNECTION_STATUS.ERROR) && <RoomError connectionError={CONNECTION_STATUS.ERROR} />}
 
-      {(roomState.connectionStatus === CONNECTION_STATUS.ROOM_FULL) && <RoomError errorType="room-full" />}
+      {(roomState.connectionStatus === CONNECTION_STATUS.ROOM_FULL) && <RoomError connectionError={CONNECTION_STATUS.ROOM_FULL} />}
 
       {(roomState.connectionStatus === CONNECTION_STATUS.JOINED) && (<RoomInterior {...roomState} />)}
 

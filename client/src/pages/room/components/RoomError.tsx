@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import buttonStyles from '../../../styles/Buttons.module.css';
+import roomErrorStyles from './RoomError.module.css';
+import { CONNECTION_STATUS } from '../RoomPage.constants';
+import type { ConnectionError } from '../RoomPage.constants';
 
 interface RoomErrorProps {
-  errorType?: 'not-found' | 'room-full';
+  connectionError: ConnectionError
 }
 
-export default function RoomError({ errorType = 'not-found' }: RoomErrorProps) {
+export default function RoomError({ connectionError }: RoomErrorProps) {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
 
@@ -25,14 +28,14 @@ export default function RoomError({ errorType = 'not-found' }: RoomErrorProps) {
   }, [countdown, navigate]);
 
   const getErrorMessage = () => {
-    switch (errorType) {
-      case 'room-full':
+    switch (connectionError) {
+      case CONNECTION_STATUS.ROOM_FULL:
         return {
           icon: '🚫',
           title: 'Room is full',
           description: 'This room already has 2 people (maximum capacity).'
         };
-      case 'not-found':
+      case CONNECTION_STATUS.ERROR:
       default:
         return {
           icon: '❌',
@@ -45,26 +48,19 @@ export default function RoomError({ errorType = 'not-found' }: RoomErrorProps) {
   const { icon, title, description } = getErrorMessage();
 
   return (
-    <div style={{
-      width: '100%',
-      textAlign: 'center',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '1.5rem'
-    }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div style={{ fontSize: '2rem' }}>
+    <div className={roomErrorStyles.container}>
+      <div className={roomErrorStyles.header}>
+        <div className={roomErrorStyles.icon}>
           {icon}
         </div>
         <h1 className={baseStyles.title}>{title}</h1>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <p style={{ color: '#64748b', margin: 0 }}>
+      <div className={roomErrorStyles.messageSection}>
+        <p className={roomErrorStyles.description}>
           {description}
         </p>
-        <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>
+        <p className={roomErrorStyles.countdown}>
           Redirecting to home page in {countdown} second{countdown !== 1 ? 's' : ''}...
         </p>
       </div>
