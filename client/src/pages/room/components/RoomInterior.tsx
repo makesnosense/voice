@@ -1,7 +1,7 @@
 import CopyCard from './copycard/CopyCard';
 import RemoteAudio from './RemoteAudio';
 import Users from './Users';
-import MicWarning from './MicWarning';
+import MicWarning from './mic-warning/MicWarning';
 import layoutStyles from '../../../styles/Layout.module.css'
 import Messages from './messages/Messages';
 import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';

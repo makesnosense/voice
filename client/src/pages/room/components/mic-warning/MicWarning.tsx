@@ -1,6 +1,6 @@
 import micWarningStyles from './MicWarning.module.css';
-import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
-import type { MicErrorStatus } from '../../../stores/useMicrophoneStore';
+import { MIC_PERMISSION_STATUS } from '../../../../stores/useMicrophoneStore';
+import type { MicErrorStatus } from '../../../../stores/useMicrophoneStore';
 
 interface MicWarningProps {
   micPermissionStatus: MicErrorStatus;
