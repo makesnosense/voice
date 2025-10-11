@@ -56,7 +56,6 @@
   }
 }
 
-/* Enhanced silent state */
 .silent .wave {
   animation: none;
   opacity: 0.3;
@@ -64,10 +63,11 @@
   height: 4px;
 }
 
-
-/* For completely muted appearance */
 .muted .wave {
   animation: none;
-  opacity: 0.2;
-  background: #e2e8f0;
+  opacity: 0.4;
+  background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+
+  height: 4px;
+  transform: translateY(1.5px);
 }
