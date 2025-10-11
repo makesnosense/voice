@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import baseStyles from '../../../styles/BaseCard.module.css';
-import buttonStyles from '../../../styles/Buttons.module.css';
+import baseStyles from '../../../../styles/BaseCard.module.css';
+import buttonStyles from '../../../../styles/Buttons.module.css';
 import roomErrorStyles from './RoomError.module.css';
-import { CONNECTION_STATUS } from '../RoomPage.constants';
-import type { ConnectionError } from '../RoomPage.constants';
+import { CONNECTION_STATUS } from '../../RoomPage.constants';
+import type { ConnectionError } from '../../RoomPage.constants';
 
 interface RoomErrorProps {
   connectionError: ConnectionError

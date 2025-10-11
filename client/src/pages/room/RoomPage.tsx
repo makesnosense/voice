@@ -6,7 +6,7 @@ import useRoom from './useRoom';
 import { CONNECTION_STATUS } from './RoomPage.constants';
 import Header from '../../components/header/Header';
 import Spinner from '../../components/spinner/Spinner';
-import RoomError from './components/RoomError';
+import RoomError from './components/room-error/RoomError';
 import RoomInterior from './components/RoomInterior';
 import { HEADER_ANIMATION_STATE } from './../../components/header/header-animation/HeaderAnimationState';
 import type { HeaderAnimationState } from '../../components/header/header-animation/HeaderAnimationState';
