@@ -12,7 +12,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'Voice Chat - Landing';
+    document.title = 'Voice';
   }, []);
 
   const handleCreateRoom = async () => {
