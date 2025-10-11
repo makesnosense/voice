@@ -1,52 +1,22 @@
+import TitleHeader from './TitleHeader';
 import ThemeSelector from './theme-selector/ThemeSelector';
-
-import baseStyles from '../styles/BaseCard.module.css';
-import voiceStyles from './Header.module.css';
-
-type VoiceState = 'active' | 'silent' | 'muted';
+import headerStyles from './Header.module.css';
+import type { HeaderAnimationState } from './HeaderAnimationState';
 
 interface HeaderProps {
-  voiceState?: VoiceState;
   leftContent?: React.ReactNode;
+  animationState?: HeaderAnimationState;
 }
 
 export default function Header({
-  voiceState = 'active',
-  leftContent
+  leftContent,
+  animationState
 }: HeaderProps) {
-
-  const getVoiceStateClass = () => {
-    switch (voiceState) {
-      case 'silent':
-        return voiceStyles.silent;
-      case 'muted':
-        return voiceStyles.muted;
-      case 'active':
-      default:
-        return '';
-    }
-  };
-
   return (
-    <header className={`${voiceStyles.headerContainer}`}>
-
-      <div className={voiceStyles.leftSlot}>
-        {leftContent}
-      </div>
-
-      <div className={`${baseStyles.card} ${voiceStyles.titleCard} ${getVoiceStateClass()}`}>
-        <div className={voiceStyles.voiceWaves}>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-          <div className={voiceStyles.wave}></div>
-        </div>
-        <h1 className={baseStyles.title}>Voice</h1>
-      </div>
-
+    <header className={`${headerStyles.headerContainer}`}>
+      <div className={headerStyles.leftSlot}>{leftContent}</div>
+      <TitleHeader animationState={animationState} />
       <ThemeSelector />
-
     </header>
   );
 }
