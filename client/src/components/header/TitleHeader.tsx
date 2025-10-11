@@ -1,8 +1,8 @@
-import HeaderAnimation from './HeaderAnimation';
-import baseStyles from '../styles/BaseCard.module.css';
+import HeaderAnimation from './header-animation/HeaderAnimation';
+import baseStyles from '../../styles/BaseCard.module.css';
 import headerStyles from './Header.module.css';
 
-import type { HeaderAnimationState } from './HeaderAnimationState';
+import type { HeaderAnimationState } from './header-animation/HeaderAnimationState';
 
 interface TitleHeaderProps {
   animationState?: HeaderAnimationState;

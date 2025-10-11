@@ -1,7 +1,7 @@
 import TitleHeader from './TitleHeader';
 import ThemeSelector from './theme-selector/ThemeSelector';
 import headerStyles from './Header.module.css';
-import type { HeaderAnimationState } from './HeaderAnimationState';
+import type { HeaderAnimationState } from './header-animation/HeaderAnimationState';
 
 interface HeaderProps {
   leftContent?: React.ReactNode;

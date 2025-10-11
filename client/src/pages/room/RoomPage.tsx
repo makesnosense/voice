@@ -3,12 +3,12 @@ import ExitRoomButton from './components/exit-room-button/ExitRoomButton';
 import layoutStyles from '../../styles/Layout.module.css'
 import useRoomIdValidation from './useRoomIdValidation';
 import useRoom, { CONNECTION_STATUS } from './useRoom';
-import Header from '../../components/Header';
+import Header from '../../components/header/Header';
 import Spinner from '../../components/spinner/Spinner';
 import RoomError from './components/RoomError';
 import RoomInterior from './components/RoomInterior';
-import { HEADER_ANIMATION_STATE } from '../../components/HeaderAnimationState';
-import type { HeaderAnimationState } from '../../components/HeaderAnimationState';
+import { HEADER_ANIMATION_STATE } from './../../components/header/header-animation/HeaderAnimationState';
+import type { HeaderAnimationState } from '../../components/header/header-animation/HeaderAnimationState';
 
 
 export default function RoomPage() {
