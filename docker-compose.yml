@@ -1,0 +1,128 @@
+networks:
+  voice-net:
+    driver: bridge
+
+services:
+  # === ONE-TIME SETUP ===
+  setup:
+    image: alpine:latest
+    volumes:
+      - ./client:/client
+      - ./shared:/shared
+      - client-dist:/client-dist
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    environment:
+      - DOMAIN=${DOMAIN}
+      - EMAIL=${EMAIL}
+      - VITE_TURN_SERVER_HOST=${DOMAIN}
+      - VITE_TURN_SERVER_PORT=${VITE_TURN_SERVER_PORT}
+    command: |
+      sh -c '
+        echo "🎨 Step 1: Building frontend..."
+        apk add --no-cache nodejs npm
+        
+        cd /client
+        npm install
+        npm run build
+        
+        # copy build to volume
+        cp -r dist/* /client-dist/
+        
+        echo "✅ Frontend built"
+        echo ""
+        echo "🔐 Step 2: Getting SSL certificate..."
+        
+        apk add --no-cache nginx certbot
+        
+        mkdir -p /run/nginx /etc/nginx/http.d
+        cat > /etc/nginx/http.d/default.conf << EOF
+      server {
+        listen 80;
+        server_name $$DOMAIN;
+        location /.well-known/acme-challenge/ {
+          root /var/www/certbot;
+        }
+      }
+      EOF
+        
+        nginx
+        sleep 3
+        
+        certbot certonly --webroot --webroot-path=/var/www/certbot \
+          --email "$$EMAIL" \
+          --agree-tos --no-eff-email --non-interactive \
+          -d "$$DOMAIN"
+        
+        if [ $$? -eq 0 ]; then
+          echo "✅ SSL certificate obtained"
+          echo ""
+          echo "✅ Setup complete! Now run: docker compose up -d"
+        else
+          echo "❌ Failed to get SSL certificate"
+          echo "Common issues:"
+          echo "  - DNS not pointing to this server yet"
+          echo "  - Port 80 blocked by firewall"
+          echo "  - Domain already used (Let'\''s Encrypt rate limit)"
+          exit 1
+        fi
+        
+        nginx -s stop
+      '
+    profiles: ["setup"]
+    network_mode: host
+
+  # === PRODUCTION SERVICES ===
+  
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/selfhost.conf:/etc/nginx/templates/nginx.conf.template:ro
+      - client-dist:/var/www/voice:ro
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+    environment:
+      - DOMAIN=${DOMAIN}
+      - SERVER_PORT=${SERVER_PORT}  
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+    depends_on:
+      - voice-server
+    networks:
+      - voice-net
+    container_name: voice-nginx
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done;'"
+
+  voice-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - voice-net
+    container_name: voice-server
+
+  coturn:
+    build: ./coturn
+    env_file:
+      - .env
+    restart: unless-stopped
+    network_mode: host
+    container_name: voice-coturn
+
+volumes:
+  certbot-conf:
+  certbot-www:
+  client-dist:
