@@ -2,24 +2,14 @@
 
 set -e
 
-# ensure we're in the voice directory
-cd "$(dirname "$0")/.."
+# build client static files
+./build.sh
 
-# build client
-./scripts/build.sh
+./copy-static-files-to-nginx.sh
 
-# copy to nginx (relative to voice directory)
-echo "📋 Copying static files to nginx..."
-sudo cp -r client/dist/* ../nginx-on-vps/www/voice/
+# restart serverside: express + socket.io server and coturn server
+./restart-voice-app.sh
 
-# restart voice app first (this directory)
-echo "🔄 Restarting voice app..."
-docker compose down
-docker compose up -d --build
-
-# reload nginx config (don't restart nginx, just reload)
-echo "🔄 Reloading nginx..."
-cd ../nginx-on-vps
-docker exec nginx-on-vps nginx -s reload
+./reload-nginx.sh
 
 echo "🚀 Deployment complete!"
