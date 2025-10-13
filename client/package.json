@@ -1,7 +1,6 @@
 {
   "name": "voice",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host --mode development",
@@ -31,5 +30,6 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
-  }
+  },
+  "license": "MIT"
 }
