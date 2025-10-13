@@ -1,6 +1,6 @@
 <img src=".github/header.svg" alt="Voice"/>   
 
-**A minimalistic, self-hostable WebRTC voice chat**
+**A minimalistic, self-hostable WebRTC voice chat.**
 
 ## Built with
 **Client:** React 19, TypeScript, Vite, Zustand, Socket.IO Client  
