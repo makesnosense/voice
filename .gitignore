@@ -31,6 +31,6 @@ certs/
 *.p12
 ssl/
 
-.env*
+.env
 .env.development
 .env.production
