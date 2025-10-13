@@ -17,7 +17,7 @@
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/voice.git
+git clone https://github.com/makesnosense/voice.git
 cd voice
 ```
 
