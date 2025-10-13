@@ -1,8 +1,8 @@
-# voice
+<img src=".github/header.svg" alt="Voice"/>   
 
-A minimalistic, self-hostable WebRTC voice chat.
+**A minimalistic, self-hostable WebRTC voice chat**
 
-## Tech
+## Built with
 **Client:** React 19, TypeScript, Vite, Zustand, Socket.IO Client  
 **Server:** Express, Socket.IO Server, Bun  
 **Infra:** Docker, nginx, coturn, Let's Encrypt
@@ -11,12 +11,7 @@ A minimalistic, self-hostable WebRTC voice chat.
 - **Server**: Linux VPS with 1 GB RAM or more
 - **Domain**: Any domain pointing to your server's IP (free options: [FreeDNS](https://freedns.afraid.org), [DuckDNS](https://www.duckdns.org))
 - **Docker**
-- **Open Ports**: 
-  - 80 (HTTP - for Let's Encrypt)
-  - 443 (HTTPS)
-  - 3478 (TURN server)
-  - 49152-49172 (TURN server UDP range)
-
+- **Open Ports**: 80 (HTTP), 443 (HTTPS), 3478 (TURN server), 49152-49172 (TURN server UDP range)
 ## Installation
 
 ### 1. Clone Repository
