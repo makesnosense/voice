@@ -24,7 +24,7 @@ cd voice
 ### 2. Configure Environment
 
 ```bash
-cp env.selfhost.example .env
+cp .env.selfhost.example .env
 nano .env  # or use vim, micro, etc.
 ```
 
