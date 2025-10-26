@@ -11,7 +11,11 @@
 - **Server**: Linux VPS with 1 GB RAM or more
 - **Domain**: Any domain pointing to your server's IP (free options: [FreeDNS](https://freedns.afraid.org), [DuckDNS](https://www.duckdns.org))
 - **Docker**
-- **Open Ports**: 80 (HTTP), 443 (HTTPS), 3478 (TURN server), 49152-49172 (TURN server UDP range)
+- **Open Ports**: 80 (HTTP), 443 (HTTPS), 3478 (TURN server), 49152-49172 (TURN server UDP range)  
+
+<br>
+<img src=".github/screenshot.png" alt="App screenshot" width=600px/>   
+
 ## Installation
 
 ### 1. Clone Repository
