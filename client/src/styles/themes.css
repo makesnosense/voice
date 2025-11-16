@@ -31,7 +31,7 @@
 }
 
 /* dark theme overrides */
-[data-theme="dark"] {
+:root[data-theme="dark"] {
   --bg-primary: rgba(30, 41, 59, 0.95);
   --bg-secondary: rgba(15, 23, 42, 0.95);
   --bg-tertiary: rgba(51, 65, 85, 0.1);
