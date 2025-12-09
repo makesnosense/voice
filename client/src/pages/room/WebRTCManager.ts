@@ -9,13 +9,8 @@ import type {
 } from "../../../../shared/types";
 
 const BASE_ICE_SERVERS: RTCIceServer[] = [
-  { urls: "stun:stun.l.google.com:19302" },
-  { urls: "stun:stun1.l.google.com:19302" },
-  {
-    urls: `stun:${import.meta.env.VITE_TURN_SERVER_HOST}:${
-      import.meta.env.VITE_TURN_SERVER_PORT
-    }`,
-  },
+  { urls: "stun:stun.cloudflare.com:3478" },
+  { urls: "stun:global.stun.twilio.com:3478" },
 ];
 
 export const DisconnectReason = {
@@ -172,9 +167,9 @@ export class WebRTCManager {
       const turn_credentials = await response.json();
 
       iceServers.push({
-        urls: `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${
-          import.meta.env.VITE_TURN_SERVER_PORT
-        }`,
+        urls: [`turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}?transport=tcp`,
+          `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}?transport=udp`
+        ],
         username: turn_credentials.username,
         credential: turn_credentials.credential,
       });
