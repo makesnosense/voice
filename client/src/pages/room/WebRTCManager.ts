@@ -86,6 +86,9 @@ export class WebRTCManager {
     // (ICE candidate) that remote peer can use to reach us
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log(
+          `🧊 [WebRTC] LOCAL candidate: ${event.candidate.type} ${event.candidate.address}:${event.candidate.port} ${event.candidate.protocol}`
+        );
         console.log(`🧊 [WebRTC] sending ICE candidate to ${remoteUserId}`);
         this.socket.emit("webrtc-ice-candidate", {
           candidate: {
@@ -317,6 +320,7 @@ export class WebRTCManager {
   // asynchronously handling ice candidates
   private async handleIceCandidate(candidate: IceCandidate) {
     try {
+      console.log(`🧊 [WebRTC] REMOTE candidate: ${candidate.candidate}`);
       // buffer if peer connection doesn't exist yet
       if (!this.peerConnection) {
         console.log(
