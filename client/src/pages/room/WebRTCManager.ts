@@ -38,6 +38,9 @@ export class WebRTCManager {
   private maxReconnectAttempts: number = 5;
   private isInitiator: boolean = false;
 
+  private pendingCandidates: IceCandidate[] = [];
+  private remoteDescriptionSet: boolean = false;
+
   // these are for audio analysis
   private audioContext: AudioContext;
   private localAnalyser: AudioAnalyser;
@@ -267,6 +270,11 @@ export class WebRTCManager {
         new RTCSessionDescription(offer)
       );
 
+      this.remoteDescriptionSet = true;
+
+      // drain buffered candidates
+      await this.processPendingCandidates();
+
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
 
@@ -293,12 +301,14 @@ export class WebRTCManager {
         return;
       }
 
-      if (this.peerConnection) {
-        await this.peerConnection.setRemoteDescription(
-          new RTCSessionDescription(answer)
-        );
-        console.log(`✅ [WebRTC] call established with ${fromUserId}`);
-      }
+      await this.peerConnection.setRemoteDescription(
+        new RTCSessionDescription(answer)
+      );
+
+      this.remoteDescriptionSet = true;
+      await this.processPendingCandidates();
+
+      console.log(`✅ [WebRTC] call established with ${fromUserId}`);
     } catch (error) {
       console.error("❌ [WebRTC] failed to handle answer:", error);
     }
@@ -307,14 +317,50 @@ export class WebRTCManager {
   // asynchronously handling ice candidates
   private async handleIceCandidate(candidate: IceCandidate) {
     try {
-      if (this.peerConnection) {
-        await this.peerConnection.addIceCandidate(
-          new RTCIceCandidate(candidate)
+      // buffer if peer connection doesn't exist yet
+      if (!this.peerConnection) {
+        console.log(
+          `📦 [WebRTC] buffering ICE candidate (no peer connection yet)`
         );
+        this.pendingCandidates.push(candidate);
+        return;
       }
+
+      // buffer if remote description not set yet (spec requirement)
+      if (!this.remoteDescriptionSet) {
+        console.log(
+          `📦 [WebRTC] buffering candidate (no remote description yet)`
+        );
+        this.pendingCandidates.push(candidate);
+        return;
+      }
+
+      // both conditions met - add immediately
+      await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      console.log(`✅ [WebRTC] added ICE candidate`);
     } catch (error) {
       console.error("❌ [WebRTC] failed to handle ICE candidate:", error);
     }
+  }
+
+  private async processPendingCandidates() {
+    if (this.pendingCandidates.length === 0) return;
+
+    console.log(
+      `🔄 [WebRTC] processing ${this.pendingCandidates.length} buffered candidates`
+    );
+
+    for (const candidate of this.pendingCandidates) {
+      try {
+        await this.peerConnection!.addIceCandidate(
+          new RTCIceCandidate(candidate)
+        );
+      } catch (error) {
+        console.error("❌ [WebRTC] failed to add buffered candidate:", error);
+      }
+    }
+
+    this.pendingCandidates = [];
   }
 
   private get inputAudioEnabled(): boolean {
@@ -405,6 +451,10 @@ export class WebRTCManager {
       console.log(`🔌 [WebRTC] closing peer connection (reason: ${reason})`);
       this.peerConnection.close();
       this.peerConnection = null;
+
+      this.remoteDescriptionSet = false;
+      this.pendingCandidates = [];
+
       this.onStreamRemoved(reason);
     }
 
