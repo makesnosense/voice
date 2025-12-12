@@ -7,11 +7,24 @@ import type {
   WebRTCAnswer,
   AudioFrequencyData,
 } from "../../../../shared/types";
+import type { ObjectValues } from "../../../../shared/types";
 
 const BASE_ICE_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.cloudflare.com:3478" },
   { urls: "stun:global.stun.twilio.com:3478" },
 ];
+
+export const WEBRTC_CONNECTION_STATE = {
+  WAITING_FOR_OTHER_PEER: "waiting-for-other-peer",
+  CONNECTING: "connecting",
+  CONNECTED: "connected",
+  RECONNECTING: "reconnecting",
+  FAILED: "failed",
+} as const;
+
+export type WebRTCConnectionState = ObjectValues<
+  typeof WEBRTC_CONNECTION_STATE
+>;
 
 export const DisconnectReason = {
   PEER_LEFT: "peer-left",
@@ -167,8 +180,13 @@ export class WebRTCManager {
       const turn_credentials = await response.json();
 
       iceServers.push({
-        urls: [`turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}?transport=tcp`,
-          `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${import.meta.env.VITE_TURN_SERVER_PORT}?transport=udp`
+        urls: [
+          `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${
+            import.meta.env.VITE_TURN_SERVER_PORT
+          }?transport=tcp`,
+          `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${
+            import.meta.env.VITE_TURN_SERVER_PORT
+          }?transport=udp`,
         ],
         username: turn_credentials.username,
         credential: turn_credentials.credential,
@@ -462,6 +480,41 @@ export class WebRTCManager {
       this.remoteAnalyser.cleanup();
       this.remoteAnalyser = null;
     }
+  }
+
+  getWebRtcConnectionState(): WebRTCConnectionState {
+    if (!this.peerConnection) {
+      return WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER;
+    }
+
+    const connState: RTCPeerConnectionState =
+      this.peerConnection.connectionState;
+    const iceState: RTCIceConnectionState =
+      this.peerConnection.iceConnectionState;
+
+    // truly connected
+    if (connState === "connected" && iceState === "connected") {
+      return WEBRTC_CONNECTION_STATE.CONNECTED;
+    }
+
+    // actively trying to recover
+    if (iceState === "disconnected" || iceState === "checking") {
+      return this.reconnectAttempts > 0
+        ? WEBRTC_CONNECTION_STATE.RECONNECTING
+        : WEBRTC_CONNECTION_STATE.CONNECTING;
+    }
+
+    // gave up
+    if (
+      connState === "failed" ||
+      iceState === "failed" ||
+      this.reconnectAttempts >= this.maxReconnectAttempts
+    ) {
+      return WEBRTC_CONNECTION_STATE.FAILED;
+    }
+
+    // still establishing initial connection
+    return WEBRTC_CONNECTION_STATE.CONNECTING;
   }
 
   cleanup() {

@@ -1,6 +1,14 @@
-import { create } from 'zustand';
-import { WebRTCManager, DisconnectReason } from '../pages/room/WebRTCManager';
-import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/types';
+import { create } from "zustand";
+import {
+  WebRTCManager,
+  DisconnectReason,
+  type WebRTCConnectionState,
+} from "../pages/room/WebRTCManager";
+import type {
+  TypedSocket,
+  SocketId,
+  AudioFrequencyData,
+} from "../../../shared/types";
 
 interface WebRTCStore {
   manager: WebRTCManager | null;
@@ -10,8 +18,12 @@ interface WebRTCStore {
   isMutedLocal: boolean;
   audioFrequencyData: AudioFrequencyData;
   remoteAudioFrequencyData: AudioFrequencyData;
+  webRtcConnectionState: WebRTCConnectionState | null;
 
-  initializeWebRTC: (socket: TypedSocket, localStream: MediaStream) => Promise<void>;
+  initializeWebRTC: (
+    socket: TypedSocket,
+    localStream: MediaStream
+  ) => Promise<void>;
   toggleMute: () => void;
   cleanup: () => void;
   updateAudioData: (data: AudioFrequencyData) => void;
@@ -28,27 +40,28 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   isMutedLocal: false,
   audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
   remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
+  webRtcConnectionState: null,
 
   initializeWebRTC: async (socket, localStream) => {
     const { manager } = get();
     if (manager) {
-      console.log('⚠️ [Store] WebRTC already initialized');
+      console.log("⚠️ [Store] WebRTC already initialized");
       return;
     }
 
-    console.log('🎬 [Store] initializing WebRTC manager');
+    console.log("🎬 [Store] initializing WebRTC manager");
 
     const newManager = new WebRTCManager(
       socket,
       localStream,
       (userId, stream) => get().setRemoteStream(userId, stream),
-      (reason) => get().clearRemoteStream(reason),
+      (reason) => get().clearRemoteStream(reason)
     );
 
     set({
       manager: newManager,
       isMicActive: true,
-      isMutedLocal: newManager.isMuted // sync initial state
+      isMutedLocal: newManager.isMuted, // sync initial state
     });
 
     // start audio monitoring for both local and remote
@@ -63,14 +76,18 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
         const remoteData = currentManager.getRemoteAudioFrequencyData();
         get().updateRemoteAudioData(remoteData);
 
+        // update WebRTC state
+        const displayState = currentManager.getWebRtcConnectionState();
+        set({ webRtcConnectionState: displayState });
+
         requestAnimationFrame(checkAudio); // the magic that sets continuous checkAudio calling
       }
     };
     checkAudio();
 
-    console.log('✅ [Store] emitting webrtc-ready to server');
+    console.log("✅ [Store] emitting webrtc-ready to server");
 
-    socket.emit('webrtc-ready');
+    socket.emit("webrtc-ready");
   },
 
   toggleMute: () => {
@@ -87,7 +104,8 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({ audioFrequencyData: data });
   },
 
-  updateRemoteAudioData: (data) => { // new
+  updateRemoteAudioData: (data) => {
+    // new
     set({ remoteAudioFrequencyData: data });
   },
 
@@ -101,7 +119,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({
       remoteStream: null,
       remoteUserId: null,
-      remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 } // reset remote audio data
+      remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 }, // reset remote audio data
     });
   },
 
@@ -116,7 +134,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       remoteUserId: null,
       isMicActive: false,
       audioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
-      remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 }
+      remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 },
     });
-  }
+  },
 }));
