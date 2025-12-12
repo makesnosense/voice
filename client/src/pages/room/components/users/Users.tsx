@@ -1,6 +1,7 @@
 import UserCard from './usercard/UserCard';
 import type { SocketId, AudioFrequencyData, UserDataClientSide } from '../../../../../../shared/types';
 
+import usersStyles from "./Users.module.css";
 
 interface UsersListProps {
   roomUsers: UserDataClientSide[];
@@ -28,14 +29,8 @@ export default function Users({
 }: UsersListProps) {
 
   return (
-    <div style={{
-      display: 'flex',
-      gap: '16px',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      alignItems: 'flex-start'
-    }}>
-      {roomUsers.map(user => {
+    <div className={usersStyles.usersContainer}>
+      {roomUsers.map((user) => {
         const isCurrentUser = user.userId === currentUserId;
         const isRemoteUser = user.userId === remoteUserId;
 
