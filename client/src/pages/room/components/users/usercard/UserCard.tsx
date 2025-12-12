@@ -42,7 +42,7 @@ export default function UserCard({
   const isMutedRemoteUser = !isCurrentUser && isRemoteUserMuted;
 
   return (
-    <div className={`${baseStyles.card} ${baseStyles.textOnly} ${baseStyles.userCard}`}>
+    <div className={`${baseStyles.card} ${userCardStyles.userCard}`}>
       <div className={userCardStyles.userCardContent}>
         <span className={`${baseStyles.title} ${userCardStyles.displayName}`}>
           {displayName}
