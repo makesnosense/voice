@@ -1,5 +1,10 @@
-import UserCard from './usercard/UserCard';
-import type { SocketId, AudioFrequencyData, UserDataClientSide } from '../../../../../../shared/types';
+import UserCard from "./usercard/UserCard";
+import type {
+  SocketId,
+  AudioFrequencyData,
+  UserDataClientSide,
+} from "../../../../../../shared/types";
+import type { WebRTCConnectionState } from "../../WebRTCManager";
 
 import usersStyles from "./Users.module.css";
 
@@ -15,6 +20,7 @@ interface UsersListProps {
   remoteAudioFrequencyData: AudioFrequencyData;
   remoteUserId: SocketId | null;
   hasRemoteStream: boolean;
+  webRtcConnectionState: WebRTCConnectionState | null;
 }
 
 export default function Users({
@@ -25,9 +31,9 @@ export default function Users({
   isMutedLocal,
   onToggleMute,
   remoteAudioFrequencyData,
-  remoteUserId
+  remoteUserId,
+  webRtcConnectionState,
 }: UsersListProps) {
-
   return (
     <div className={usersStyles.usersContainer}>
       {roomUsers.map((user) => {
@@ -57,6 +63,7 @@ export default function Users({
             onToggleMute={isCurrentUser ? onToggleMute : undefined}
             isMicConnected={isCurrentUser ? isMicActive : undefined}
             isRemoteUserMuted={!isCurrentUser ? user.isMuted : undefined}
+            webRtcConnectionState={webRtcConnectionState}
           />
         );
       })}

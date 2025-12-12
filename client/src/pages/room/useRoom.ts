@@ -41,6 +41,7 @@ export default function useRoom(
     remoteStream,
     remoteUserId,
     remoteAudioFrequencyData,
+    webRtcConnectionState,
     cleanup: cleanupWebRTC,
   } = useWebRTCStore();
 
@@ -187,5 +188,6 @@ export default function useRoom(
     remoteUserId,
     remoteAudioFrequencyData,
     micPermissionStatus,
+    webRtcConnectionState,
   };
 }

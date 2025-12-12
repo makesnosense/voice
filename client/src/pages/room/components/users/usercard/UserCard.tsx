@@ -22,6 +22,8 @@ interface UserCardProps {
 
   // remote user mute status
   isRemoteUserMuted?: boolean;
+
+  webRtcConnectionState: WebRTCConnectionState | null;
 }
 
 export default function UserCard({
@@ -31,7 +33,8 @@ export default function UserCard({
   isMutedLocal = false,
   onToggleMute,
   isMicConnected = false,
-  isRemoteUserMuted = false
+  isRemoteUserMuted = false,
+  webRtcConnectionState = null,
 }: UserCardProps) {
 
   const displayName = isCurrentUser ? 'You' : 'Other';
