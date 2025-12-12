@@ -1,9 +1,14 @@
-import { Mic, MicOff } from 'lucide-react';
-import AudioWaves from '../../audiowaves/AudioWaves';
-import baseStyles from '../../../../../styles/BaseCard.module.css';
-import userCardStyles from './UserCard.module.css';
-import buttonStyles from '../../../../../styles/Buttons.module.css';
-import type { SocketId, AudioFrequencyData } from '../../../../../../../shared/types';
+import { Mic, MicOff } from "lucide-react";
+import AudioWaves from "../../audiowaves/AudioWaves";
+import baseStyles from "../../../../../styles/BaseCard.module.css";
+import userCardStyles from "./UserCard.module.css";
+import buttonStyles from "../../../../../styles/Buttons.module.css";
+import WebRTCConnectionStatusDot from "./WebRTCConnectionStatusDot/WebRTCConnectionStatusDot";
+import type {
+  SocketId,
+  AudioFrequencyData,
+} from "../../../../../../../shared/types";
+import type { WebRTCConnectionState } from "../../../WebRTCManager";
 
 interface UserCardProps {
   userId: SocketId;
@@ -36,8 +41,7 @@ export default function UserCard({
   isRemoteUserMuted = false,
   webRtcConnectionState = null,
 }: UserCardProps) {
-
-  const displayName = isCurrentUser ? 'You' : 'Other';
+  const displayName = isCurrentUser ? "You" : "Other";
 
   const isMutedRemoteUser = !isCurrentUser && isRemoteUserMuted;
 
@@ -84,6 +88,10 @@ export default function UserCard({
               </button>
             )}
           </>
+        )}
+
+        {!isCurrentUser && (
+          <WebRTCConnectionStatusDot state={webRtcConnectionState ?? null} />
         )}
       </div>
     </div>

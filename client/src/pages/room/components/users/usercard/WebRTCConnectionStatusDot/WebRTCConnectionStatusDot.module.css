@@ -1,0 +1,70 @@
+.container {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.5rem;
+  color: var(--text-muted);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* waiting for other peer - gray */
+.waiting {
+  background: #94a3b8;
+  box-shadow: 0 0 8px rgba(148, 163, 184, 0.4);
+}
+
+/* connecting - yellow pulsing */
+.connecting {
+  background: #fbbf24;
+  animation: pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+}
+
+/* connected - green glowing */
+.connected {
+  background: #22c55e;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* reconnecting - amber pulsing faster */
+.reconnecting {
+  background: #f59e0b;
+  animation: pulse 1s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}
+
+/* failed - red */
+.failed {
+  background: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 1);
+  }
+}
+
