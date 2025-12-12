@@ -1,11 +1,14 @@
 import type { ObjectValues } from "../../../../shared/types";
 
-export const CONNECTION_STATUS = {
-  CONNECTING: 'connecting',
-  JOINED: 'joined',
-  ERROR: 'error',
-  ROOM_FULL: 'room-full',
+export const ROOM_CONNECTION_STATUS = {
+  CONNECTING: "connecting",
+  JOINED: "joined",
+  ERROR: "error",
+  ROOM_FULL: "room-full",
 } as const;
 
-export type ConnectionStatus = ObjectValues<typeof CONNECTION_STATUS>;
-export type ConnectionError = Exclude<ConnectionStatus, 'connecting' | 'joined'>;
+export type RoomConnectionStatus = ObjectValues<typeof ROOM_CONNECTION_STATUS>;
+export type RoomConnectionError = Exclude<
+  RoomConnectionStatus,
+  "connecting" | "joined"
+>;

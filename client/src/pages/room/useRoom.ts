@@ -1,13 +1,24 @@
-import { useState, useEffect, useRef, } from 'react';
-import { io } from 'socket.io-client';
-import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
-import { useWebRTCStore } from '../../stores/useWebRTCStore';
-import { CONNECTION_STATUS } from './RoomPage.constants';
-import type { ConnectionStatus } from './RoomPage.constants';
-import type { RoomId, TypedSocket, Message, UserDataClientSide } from '../../../../shared/types';
-import type { Transport } from 'engine.io-client';
+import { useState, useEffect, useRef } from "react";
+import { io } from "socket.io-client";
+import {
+  useMicrophoneStore,
+  MIC_PERMISSION_STATUS,
+} from "../../stores/useMicrophoneStore";
+import { useWebRTCStore } from "../../stores/useWebRTCStore";
+import { ROOM_CONNECTION_STATUS } from "./RoomPage.constants";
+import type { RoomConnectionStatus } from "./RoomPage.constants";
+import type {
+  RoomId,
+  TypedSocket,
+  Message,
+  UserDataClientSide,
+} from "../../../../shared/types";
+import type { Transport } from "engine.io-client";
 
-export default function useRoom(roomId: RoomId | null, initialStatus: ConnectionStatus) {
+export default function useRoom(
+  roomId: RoomId | null,
+  initialStatus: RoomConnectionStatus
+) {
   const [connectionStatus, setConnectionStatus] = useState(initialStatus);
   const [roomUsers, setRoomUsers] = useState<UserDataClientSide[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -18,7 +29,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     stream: localStream,
     status: micPermissionStatus,
     requestMicrophone,
-    cleanup: cleanupMicrophone
+    cleanup: cleanupMicrophone,
   } = useMicrophoneStore();
 
   const {
@@ -30,7 +41,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     remoteStream,
     remoteUserId,
     remoteAudioFrequencyData,
-    cleanup: cleanupWebRTC
+    cleanup: cleanupWebRTC,
   } = useWebRTCStore();
 
   useEffect(() => {
@@ -39,26 +50,35 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
   // initialize WebRTC when conditions are met
   useEffect(() => {
-    if (micPermissionStatus === MIC_PERMISSION_STATUS.GRANTED &&
-      connectionStatus === CONNECTION_STATUS.JOINED &&
-      localStream && socketRef.current) {
-
-      const hasLiveTracks = localStream.getTracks().some(track => track.readyState === 'live');
+    if (
+      micPermissionStatus === MIC_PERMISSION_STATUS.GRANTED &&
+      connectionStatus === ROOM_CONNECTION_STATUS.JOINED &&
+      localStream &&
+      socketRef.current
+    ) {
+      const hasLiveTracks = localStream
+        .getTracks()
+        .some((track) => track.readyState === "live");
 
       if (!hasLiveTracks) {
-        console.log('🚫 Stream has ended tracks, requesting fresh stream...');
+        console.log("🚫 Stream has ended tracks, requesting fresh stream...");
         requestMicrophone(); // Request fresh stream
         return;
       }
 
-
-      console.log('🎬 All conditions met, initializing WebRTC');
+      console.log("🎬 All conditions met, initializing WebRTC");
       initializeWebRTC(socketRef.current, localStream);
     }
-  }, [micPermissionStatus, connectionStatus, localStream, initializeWebRTC, requestMicrophone]);
+  }, [
+    micPermissionStatus,
+    connectionStatus,
+    localStream,
+    initializeWebRTC,
+    requestMicrophone,
+  ]);
 
   useEffect(() => {
-    if (!roomId || initialStatus === CONNECTION_STATUS.ERROR) {
+    if (!roomId || initialStatus === ROOM_CONNECTION_STATUS.ERROR) {
       return;
     }
 
@@ -73,82 +93,84 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
 
     socketRef.current = newSocket;
 
-    newSocket.io.engine.on('upgrade', (transport: Transport) => {
-      console.log('[Socket] 🔄 Transport upgraded to:', transport.name);
+    newSocket.io.engine.on("upgrade", (transport: Transport) => {
+      console.log("[Socket] 🔄 Transport upgraded to:", transport.name);
     });
 
-    newSocket.io.engine.on('close', (reason: string) => {
-      console.error('❌ [Engine] Transport closed:', reason);
+    newSocket.io.engine.on("close", (reason: string) => {
+      console.error("❌ [Engine] Transport closed:", reason);
     });
 
-
-    newSocket.on('connect', () => {
-      console.log('✅ Connected to server:', newSocket.id);
-      console.log('🔌 Transport:', newSocket.io.engine.transport.name);
-      console.log('🔌 Engine ID:', newSocket.io.engine.id);
+    newSocket.on("connect", () => {
+      console.log("✅ Connected to server:", newSocket.id);
+      console.log("🔌 Transport:", newSocket.io.engine.transport.name);
+      console.log("🔌 Engine ID:", newSocket.io.engine.id);
 
       console.log(`🏠 Attempting to join room: ${roomId}`);
-      newSocket.emit('join-room', roomId as RoomId);
+      newSocket.emit("join-room", roomId as RoomId);
     });
 
+    newSocket.on(
+      "disconnect",
+      (
+        reason: string,
+        details?:
+          | Error
+          | {
+              description?: string;
+              context?: unknown;
+            }
+      ) => {
+        console.error("❌ [Socket] Disconnect event:", {
+          reason,
+          details,
+          transport: newSocket.io.engine?.transport?.name,
+          timestamp: new Date().toISOString(),
+        });
 
-    newSocket.on('disconnect', (
-      reason: string,
-      details?: Error | {
-        description?: string;
-        context?: unknown
-      }) => {
+        // clean up webrtc manager when socket disconnects
+        // this ensures we start fresh when reconnecting
+        cleanupWebRTC();
+        // set status to connecting so reconnection triggers webrtc re-initialization
+        setConnectionStatus("connecting");
+      }
+    );
 
-      console.error('❌ [Socket] Disconnect event:', {
-        reason,
-        details,
-        transport: newSocket.io.engine?.transport?.name,
-        timestamp: new Date().toISOString()
-      });
-
-      // clean up webrtc manager when socket disconnects
-      // this ensures we start fresh when reconnecting
-      cleanupWebRTC();
-      // set status to connecting so reconnection triggers webrtc re-initialization
-      setConnectionStatus('connecting');
+    newSocket.on("connect_error", (error: Error) => {
+      console.error("❌ [Socket] Connection error:", error.message);
     });
 
-    newSocket.on('connect_error', (error: Error) => {
-      console.error('❌ [Socket] Connection error:', error.message);
-    });
-
-    newSocket.on('room-not-found', (error: string) => {
-      setConnectionStatus('error');
-      console.error('❌ Room error:', error);
+    newSocket.on("room-not-found", (error: string) => {
+      setConnectionStatus("error");
+      console.error("❌ Room error:", error);
     });
 
     // handle room full error
-    newSocket.on('room-full', (error: string) => {
-      setConnectionStatus('room-full');
-      console.error('🚫 Room full:', error);
+    newSocket.on("room-full", (error: string) => {
+      setConnectionStatus("room-full");
+      console.error("🚫 Room full:", error);
     });
 
-    newSocket.on('room-join-success', async (data: { roomId: RoomId }) => {
-      console.log('✅ Successfully joined room:', data.roomId);
-      setConnectionStatus('joined');
+    newSocket.on("room-join-success", async (data: { roomId: RoomId }) => {
+      console.log("✅ Successfully joined room:", data.roomId);
+      setConnectionStatus("joined");
     });
 
-    newSocket.on('room-users-update', (users: UserDataClientSide[]) => {
-      console.log('👥 Room users updated:', users);
+    newSocket.on("room-users-update", (users: UserDataClientSide[]) => {
+      console.log("👥 Room users updated:", users);
       setRoomUsers(users);
     });
 
-    newSocket.on('message', (message: Message) => {
-      setMessages(messages => [...messages, message]);
+    newSocket.on("message", (message: Message) => {
+      setMessages((messages) => [...messages, message]);
     });
     return () => {
-      console.log('🧹 [useRoom] Cleaning up socket connection');
+      console.log("🧹 [useRoom] Cleaning up socket connection");
       newSocket.off();
       newSocket.disconnect();
       cleanupWebRTC();
       cleanupMicrophone();
     };
-
   }, [roomId, initialStatus, cleanupWebRTC, cleanupMicrophone]);
 
   return {
@@ -164,6 +186,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: Connection
     remoteStream,
     remoteUserId,
     remoteAudioFrequencyData,
-    micPermissionStatus
+    micPermissionStatus,
   };
 }
