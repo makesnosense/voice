@@ -1,4 +1,5 @@
 .userCard {
+  position: relative;
   gap: 12px;
   padding: 16px 24px;
   width: 6rem;
