@@ -48,9 +48,3 @@
   overflow-y: auto;
 }
 
-.userCard {
-  gap: 12px;
-  padding: 16px 24px;
-  width: 6rem;
-  justify-content: center;
-}

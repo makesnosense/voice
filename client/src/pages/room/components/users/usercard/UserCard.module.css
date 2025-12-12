@@ -1,3 +1,12 @@
+.userCard {
+  gap: 12px;
+  padding: 16px 24px;
+  width: 6rem;
+  height: 8.5rem;
+  display: flex;
+  justify-content: center;
+}
+
 .userCardContent {
   display: flex;
   flex-direction: column;
