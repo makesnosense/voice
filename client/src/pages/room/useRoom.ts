@@ -98,10 +98,6 @@ export default function useRoom(
       console.log("[Socket] 🔄 Transport upgraded to:", transport.name);
     });
 
-    newSocket.io.engine.on("close", (reason: string) => {
-      console.error("❌ [Engine] Transport closed:", reason);
-    });
-
     newSocket.on("connect", () => {
       console.log("✅ Connected to server:", newSocket.id);
       console.log("🔌 Transport:", newSocket.io.engine.transport.name);
@@ -122,13 +118,16 @@ export default function useRoom(
               context?: unknown;
             }
       ) => {
-        console.error("❌ [Socket] Disconnect event:", {
-          reason,
-          details,
-          transport: newSocket.io.engine?.transport?.name,
-          timestamp: new Date().toISOString(),
-        });
-
+        if (reason === "io client disconnect") {
+          console.log("👋 [Socket] Intentional disconnect");
+        } else {
+          console.error("❌ [Socket] Disconnect event:", {
+            reason,
+            details,
+            transport: newSocket.io.engine?.transport?.name,
+            timestamp: new Date().toISOString(),
+          });
+        }
         // clean up webrtc manager when socket disconnects
         // this ensures we start fresh when reconnecting
         cleanupWebRTC();
@@ -167,7 +166,7 @@ export default function useRoom(
     });
     return () => {
       console.log("🧹 [useRoom] Cleaning up socket connection");
-      newSocket.off();
+      // newSocket.off();
       newSocket.disconnect();
       cleanupWebRTC();
       cleanupMicrophone();
