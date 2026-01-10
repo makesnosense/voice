@@ -1,31 +1,37 @@
-<img src=".github/header.svg" alt="Voice"/>   
+<img src=".github/header.svg" alt="Voice"/>
 
 **A minimalistic, self-hostable WebRTC voice chat.**
 
 ## Built with
+
 **Client:** React 19, TypeScript, Vite, Zustand, Socket.IO Client  
 **Server:** Express, Socket.IO Server, Bun  
 **Infra:** Docker, nginx, coturn, Let's Encrypt
 
-## Prerequisites
+<br>
+<img src=".github/screenshot.png" alt="App screenshot" width=600px/>
+
+## Self-hosting
+
+### Prerequisites
+
 - **Server**: Linux VPS with 1 GB RAM or more
 - **Domain**: Any domain pointing to your server's IP (free options: [FreeDNS](https://freedns.afraid.org), [DuckDNS](https://www.duckdns.org))
 - **Docker**
-- **Open Ports**: 80 (HTTP), 443 (HTTPS), 3478 (TURN server), 49152-49172 (TURN server UDP range)  
+- **Open Ports**: 80 (HTTP), 443 (HTTPS), 3478 (TURN server), 49152-49172 (TURN server UDP range)
 
-<br>
-<img src=".github/screenshot.png" alt="App screenshot" width=600px/>   
+### Installation
 
-## Installation
-
-### 1. Clone Repository
+#### 1. Clone the repository
 
 ```bash
-git clone https://github.com/makesnosense/voice.git
+git clone --branch v1.0-selfhost --depth 1 https://github.com/makesnosense/voice.git
 cd voice
 ```
 
-### 2. Configure Environment
+This downloads the stable self-hosted version (`v1.0-selfhost`) without full git history.
+
+#### 2. Set up environment
 
 ```bash
 cp .env.selfhost.example .env
@@ -46,9 +52,12 @@ To generate a strong secret:
 openssl rand -base64 32
 ```
 
-### 3. Choose Your Setup Path
-#### Option A: Setup script
+#### 3. Choose setup method
+
+##### Option A: Quick Setup
+
 If you don't mind using a setup script, this is the fastest way. (setup.sh is just two `docker run` commands)
+
 ```bash
 bash setup.sh
 docker compose up -d
@@ -58,9 +67,10 @@ That's it! ✨
 
 Your voice chat is now running at `https://your-domain.com`
 
+##### Option B: Manual Setup
 
-#### Option B: Manual Step-by-Step
-##### Step 1: Get SSL Certificate
+###### 1. Get SSL certificate
+
 Load environment variables and get certificate:
 
 ```bash
@@ -73,9 +83,10 @@ docker run --rm -p 80:80 \
   --agree-tos --no-eff-email --non-interactive \
   -d ${DOMAIN}
 ```
+
 You should see: `Successfully received certificate`
 
-##### Step 2: Build Frontend
+###### 2. Build frontend
 
 ```bash
 source .env
@@ -91,7 +102,8 @@ docker run --rm \
 ```
 
 This takes 1-2 minutes. You should see: `✓ built in XXs`
-##### Step 3: Start Services
+
+###### 3. Start services
 
 ```bash
 docker compose up -d
