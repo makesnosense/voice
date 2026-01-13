@@ -7,5 +7,5 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 docker run -d \
   --name voice-postgres-dev \
   --env-file "$PROJECT_ROOT/.env.development" \
-  -p 5433:5432 \
+  -p 5432:5432 \
   postgres:16-alpine
