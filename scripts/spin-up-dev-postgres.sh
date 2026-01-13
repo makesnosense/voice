@@ -8,4 +8,5 @@ docker run -d \
   --name voice-postgres-dev \
   --env-file "$PROJECT_ROOT/.env.development" \
   -p 5432:5432 \
+  -v voice-postgres-dev-data:/var/lib/postgresql/data \
   postgres:16-alpine
