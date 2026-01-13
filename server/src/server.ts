@@ -7,8 +7,8 @@ import { generalApiLimiter, createRoomLimiter, turnCredentialsLimiter } from './
 import createConnectionHandler from './socket-handlers';
 import RoomDestructionManager from './room-destruction-manager';
 import config from './config';
-import type { Room, RoomId } from '../../shared/types'
-import fs from 'node:fs'
+import type { Room, RoomId } from '../../shared/types';
+import fs from 'node:fs';
 
 const app = express();
 
@@ -19,19 +19,22 @@ if (config.rateLimiting.trustProxy) {
 
 const server = config.isProduction
   ? createHttpServer(app)
-  : createHttpsServer({
-    key: fs.readFileSync(config.ssl.keyPath),
-    cert: fs.readFileSync(config.ssl.certPath),
-  }, app);
+  : createHttpsServer(
+      {
+        key: fs.readFileSync(config.ssl.keyPath),
+        cert: fs.readFileSync(config.ssl.certPath),
+      },
+      app
+    );
 
 const io = new Server(server, {
   cors: {
     origin: config.corsOrigins,
-    methods: ["GET", "POST"]
+    methods: ['GET', 'POST'],
   },
-  pingTimeout: 20000,      // 20s (increased from 10s)
-  pingInterval: 25000,     // 25s (increased from 5s)
-  upgradeTimeout: 10000,   // 10s (increased from 5s)
+  pingTimeout: 20000, // 20s (increased from 10s)
+  pingInterval: 25000, // 25s (increased from 5s)
+  upgradeTimeout: 10000, // 10s (increased from 5s)
   allowEIO3: false,
 });
 
@@ -47,7 +50,7 @@ if (config.rateLimiting.enabled) {
 app.post('/api/create-room', (req, res) => {
   const roomId: RoomId = generateRoomId();
   rooms.set(roomId, {
-    users: new Map()
+    users: new Map(),
   });
 
   console.log(`📱 Created room: ${roomId}`);
@@ -57,11 +60,11 @@ app.post('/api/create-room', (req, res) => {
 app.get('/api/turn-credentials', (req, res) => {
   if (!config.turnSecret) {
     return res.status(500).json({ error: 'TURN server not configured' });
-  };
+  }
   const credentials = generateTurnCredentials(config.turnSecret);
   res.json({
     username: credentials.username,
-    credential: credentials.credential
+    credential: credentials.credential,
   });
 });
 
@@ -70,7 +73,6 @@ io.on('connection', handleConnection);
 
 const isHttps = 'cert' in server && 'key' in server;
 const protocol = isHttps ? 'https' : 'http';
-
 
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${protocol}://${config.host}:${config.port}`);
