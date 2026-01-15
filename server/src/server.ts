@@ -1,4 +1,5 @@
 import express from 'express';
+import authRoutes from './routes/auth';
 import { createServer as createHttpServer } from 'http';
 import { createServer as createHttpsServer } from 'https';
 import { Server } from 'socket.io';
@@ -11,6 +12,8 @@ import type { Room, RoomId } from '../../shared/types';
 import fs from 'node:fs';
 
 const app = express();
+
+app.use(express.json());
 
 // trust proxy if in production (for rate limiting)
 if (config.rateLimiting.trustProxy) {
@@ -46,6 +49,8 @@ if (config.rateLimiting.enabled) {
   app.use('/api/', generalApiLimiter);
   console.log('🛡️  Rate limiting enabled for API endpoints');
 }
+
+app.use('/api/auth', authRoutes); // add this line
 
 app.post('/api/create-room', (req, res) => {
   const roomId: RoomId = generateRoomId();
