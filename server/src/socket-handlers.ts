@@ -1,5 +1,5 @@
 import config from './config';
-import { socketRateLimiter, SOCKET_RATE_LIMITS } from './utils/socket-rate-limiter';
+import { socketRateLimiter, SOCKET_RATE_LIMITS } from './middleware/socket-rate-limiter';
 import type { Transport } from 'engine.io';
 import type {
   Room,
@@ -11,15 +11,15 @@ import type {
   WebRTCOffer,
   WebRTCAnswer,
   IceCandidate,
-  UserDataClientSide
+  UserDataClientSide,
 } from '../../shared/types';
-import type RoomDestructionManager from './room-destruction-manager';
+import type RoomDestructionManager from './managers/room-destruction-manager';
 
 export default function createConnectionHandler(
   io: TypedServer,
   rooms: Map<RoomId, Room>,
-  roomDestructionManager: RoomDestructionManager) {
-
+  roomDestructionManager: RoomDestructionManager
+) {
   const handleConnection = (socket: ExtendedSocket) => {
     console.log(`🔌 [Socket] new connection: ${socket.id}`);
     console.log(`🔌 [Socket] transport: ${socket.conn.transport.name}`);
@@ -64,17 +64,17 @@ export default function createConnectionHandler(
     });
 
     // WebRTC signaling events with rate limiting
-    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId; }) => {
+    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId }) => {
       if (!checkRateLimit(socket, 'webrtc-offer')) return;
       handleWebRTCOffer(io, socket, data);
     });
 
-    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toUserId: SocketId; }) => {
+    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toUserId: SocketId }) => {
       if (!checkRateLimit(socket, 'webrtc-answer')) return;
       handleWebRTCAnswer(io, socket, data);
     });
 
-    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toUserId: SocketId; }) => {
+    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toUserId: SocketId }) => {
       if (!checkRateLimit(socket, 'webrtc-ice-candidate')) return;
       handleWebRTCIceCandidate(io, socket, data);
     });
@@ -84,7 +84,10 @@ export default function createConnectionHandler(
 }
 
 // helper to check rate limits for socket events
-const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_LIMITS): boolean => {
+const checkRateLimit = (
+  socket: ExtendedSocket,
+  event: keyof typeof SOCKET_RATE_LIMITS
+): boolean => {
   if (!config.rateLimiting.enabled) {
     return true; // always allow if rate limiting is disabled
   }
@@ -101,7 +104,7 @@ const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_
     console.warn(`🚫 [RateLimit] ${socket.id} exceeded limit for ${event}`);
     socket.emit('error', {
       message: `Rate limit exceeded for ${event}. Please slow down.`,
-      type: 'rate-limit'
+      type: 'rate-limit',
     });
   }
 
@@ -112,7 +115,7 @@ const checkRateLimit = (socket: ExtendedSocket, event: keyof typeof SOCKET_RATE_
 const getUsersForClient = (room: Room): UserDataClientSide[] => {
   return Array.from(room.users.entries()).map(([userId, userData]) => ({
     userId,
-    isMuted: userData.isMuted
+    isMuted: userData.isMuted,
   }));
 };
 
@@ -146,9 +149,8 @@ const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number =
   return removedCount;
 };
 
-
-
-const handleRoomJoin = (io: TypedServer,
+const handleRoomJoin = (
+  io: TypedServer,
   rooms: Map<RoomId, Room>,
   socket: ExtendedSocket,
   roomId: RoomId,
@@ -165,7 +167,9 @@ const handleRoomJoin = (io: TypedServer,
   if (room.users.size >= 2) {
     const removedCount = forceCleanupRoom(io, room, roomId);
     if (removedCount > 0) {
-      console.log(`🧹 Force cleaned up ${removedCount} problematic connections from room ${roomId}`);
+      console.log(
+        `🧹 Force cleaned up ${removedCount} problematic connections from room ${roomId}`
+      );
     }
   }
 
@@ -193,8 +197,7 @@ const handleRoomJoin = (io: TypedServer,
 
   // send success to the joining user
   socket.emit('room-join-success', { roomId });
-
-}
+};
 
 const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
   if (!socket.roomId) {
@@ -204,30 +207,32 @@ const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text:
 
   if (!data.text || data.text.length > 1000) {
     console.warn(`⚠️ [Message] invalid message from ${socket.id}`);
-    socket.emit('error',
-      { message: 'Invalid message content' });
+    socket.emit('error', { message: 'Invalid message content' });
     return;
   }
-  console.log(`💬 [Message] ${socket.id} in ${socket.roomId}: "${data.text.substring(0, 50)}${data.text.length > 50 ? '...' : ''}"`);
+  console.log(
+    `💬 [Message] ${socket.id} in ${socket.roomId}: "${data.text.substring(0, 50)}${
+      data.text.length > 50 ? '...' : ''
+    }"`
+  );
 
   const message: Message = {
     text: data.text,
     userId: socket.id as SocketId,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   io.to(socket.roomId).emit('message', message);
+};
 
-}
-
-const handleDisconnect = (io: TypedServer,
+const handleDisconnect = (
+  io: TypedServer,
   rooms: Map<RoomId, Room>,
   socket: ExtendedSocket,
   roomDestructionManager: RoomDestructionManager,
-  reason: string) => {
-
+  reason: string
+) => {
   console.log(`👋 [Socket] ${socket.id} disconnected (socket.io reason: ${reason})`);
-
 
   if (!socket.roomId) {
     console.log(`ℹ️ [Socket] ${socket.id} wasn't in any room`);
@@ -243,9 +248,10 @@ const handleDisconnect = (io: TypedServer,
   const wasInRoom = room.users.has(socket.id);
   room.users.delete(socket.id);
 
-
   if (wasInRoom) {
-    console.log(`🔌 [Socket] removed ${socket.id} from room ${socket.roomId} (${room.users.size} remaining)`);
+    console.log(
+      `🔌 [Socket] removed ${socket.id} from room ${socket.roomId} (${room.users.size} remaining)`
+    );
 
     const usersForClient = getUsersForClient(room);
     io.to(socket.roomId).emit('room-users-update', usersForClient);
@@ -256,8 +262,7 @@ const handleDisconnect = (io: TypedServer,
     console.log(`⏰ [Destruction] scheduling destruction for empty room ${socket.roomId}`);
     roomDestructionManager.scheduleDestruction(socket.roomId);
   }
-
-}
+};
 
 const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
   if (!socket.roomId) {
@@ -277,23 +282,29 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
     console.log(`✅ [WebRTC] ${socket.id} is ready`);
 
     // Check if all users are audio ready
-    const allReady = Array.from(room.users.values()).every(user => user.webRTCReady);
-
-
+    const allReady = Array.from(room.users.values()).every((user) => user.webRTCReady);
 
     if (allReady && room.users.size === 2) {
       const users = Array.from(room.users.keys());
       const [firstUser, secondUser] = users;
-      console.log(`🎬 [WebRTC] both users ready, telling ${firstUser} to initiate call to ${secondUser}`);
+      console.log(
+        `🎬 [WebRTC] both users ready, telling ${firstUser} to initiate call to ${secondUser}`
+      );
       io.to(firstUser).emit('initiate-webrtc-call', secondUser as SocketId);
     } else {
-      console.log(`⏳ [WebRTC] waiting for all users to be ready (${room.users.size}/2, all ready: ${allReady})`);
+      console.log(
+        `⏳ [WebRTC] waiting for all users to be ready (${room.users.size}/2, all ready: ${allReady})`
+      );
     }
   }
-}
+};
 
-const handleMuteStatusChanged = (io: TypedServer, rooms: Map<RoomId, Room>,
-  socket: ExtendedSocket, data: { isMuted: boolean }) => {
+const handleMuteStatusChanged = (
+  io: TypedServer,
+  rooms: Map<RoomId, Room>,
+  socket: ExtendedSocket,
+  data: { isMuted: boolean }
+) => {
   if (!socket.roomId) return;
 
   const room = rooms.get(socket.roomId);
@@ -309,35 +320,44 @@ const handleMuteStatusChanged = (io: TypedServer, rooms: Map<RoomId, Room>,
     const usersForClient = getUsersForClient(room);
     io.to(socket.roomId).emit('room-users-update', usersForClient);
   }
-}
+};
 
 // WebRTC signaling handlers
-const handleWebRTCOffer = (io: TypedServer, socket: ExtendedSocket,
-  data: { offer: WebRTCOffer; toUserId: SocketId }) => {
+const handleWebRTCOffer = (
+  io: TypedServer,
+  socket: ExtendedSocket,
+  data: { offer: WebRTCOffer; toUserId: SocketId }
+) => {
   console.log(`📞 Relaying offer from ${socket.id} to ${data.toUserId}`);
 
   io.to(data.toUserId).emit('webrtc-offer', {
     offer: data.offer,
-    fromUserId: socket.id as SocketId
+    fromUserId: socket.id as SocketId,
   });
-}
+};
 
-const handleWebRTCAnswer = (io: TypedServer, socket: ExtendedSocket,
-  data: { answer: WebRTCAnswer; toUserId: SocketId }) => {
+const handleWebRTCAnswer = (
+  io: TypedServer,
+  socket: ExtendedSocket,
+  data: { answer: WebRTCAnswer; toUserId: SocketId }
+) => {
   console.log(`✅ Relaying answer from ${socket.id} to ${data.toUserId}`);
 
   io.to(data.toUserId).emit('webrtc-answer', {
     answer: data.answer,
-    fromUserId: socket.id as SocketId
+    fromUserId: socket.id as SocketId,
   });
-}
+};
 
-const handleWebRTCIceCandidate = (io: TypedServer, socket: ExtendedSocket,
-  data: { candidate: IceCandidate; toUserId: SocketId }) => {
+const handleWebRTCIceCandidate = (
+  io: TypedServer,
+  socket: ExtendedSocket,
+  data: { candidate: IceCandidate; toUserId: SocketId }
+) => {
   console.log(`🧊 Relaying ICE candidate from ${socket.id} to ${data.toUserId}`);
 
   io.to(data.toUserId).emit('webrtc-ice-candidate', {
     candidate: data.candidate,
-    fromUserId: socket.id as SocketId
+    fromUserId: socket.id as SocketId,
   });
-}
+};

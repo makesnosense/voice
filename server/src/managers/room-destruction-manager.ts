@@ -1,4 +1,4 @@
-import type { RoomId, Room } from '../../shared/types';
+import type { RoomId, Room } from '../../../shared/types';
 
 interface DestructionEntry {
   roomId: RoomId;
@@ -16,7 +16,6 @@ export default class RoomDestructionManager {
     this.rooms = rooms;
   }
 
-
   // start the interval checker
   start(): void {
     if (this.intervalId) {
@@ -30,7 +29,9 @@ export default class RoomDestructionManager {
       this.performDestructions();
     }, this.checkIntervalMs);
 
-    console.log(`🔄 Room destruction checker started (checking every ${this.checkIntervalMs / 1000} seconds)`);
+    console.log(
+      `🔄 Room destruction checker started (checking every ${this.checkIntervalMs / 1000} seconds)`
+    );
   }
 
   private performDestructions(): void {
@@ -53,7 +54,6 @@ export default class RoomDestructionManager {
       // perform the actual destruction
       this.destroyRoom(roomId);
     }
-
   }
 
   private destroyRoom(roomId: RoomId): void {
@@ -68,7 +68,9 @@ export default class RoomDestructionManager {
       this.rooms.delete(roomId);
       console.log(`💥 Destroyed empty room ${roomId} after timeout`);
     } else {
-      console.log(`⚠️ Room ${roomId} was scheduled for destruction but is no longer empty (${room.users.size} users)`);
+      console.log(
+        `⚠️ Room ${roomId} was scheduled for destruction but is no longer empty (${room.users.size} users)`
+      );
     }
   }
 
@@ -77,11 +79,13 @@ export default class RoomDestructionManager {
 
     this.destructionQueue.set(roomId, {
       roomId,
-      scheduledDestructionTime: scheduledTime
+      scheduledDestructionTime: scheduledTime,
     });
 
     const destructionDate = new Date(scheduledTime);
-    console.log(`⏰ Scheduled destruction for room ${roomId} at ${destructionDate.toLocaleTimeString()}`);
+    console.log(
+      `⏰ Scheduled destruction for room ${roomId} at ${destructionDate.toLocaleTimeString()}`
+    );
   }
 
   cancelDestruction(roomId: RoomId): void {

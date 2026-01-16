@@ -31,7 +31,7 @@ class SocketRateLimiter {
       // first request or window expired
       this.limits.set(key, {
         count: 1,
-        resetTime: now + windowMs
+        resetTime: now + windowMs,
       });
       return true;
     }
@@ -57,7 +57,7 @@ export const socketRateLimiter = new SocketRateLimiter();
 // rate limiting configurations for different socket events
 export const SOCKET_RATE_LIMITS = {
   'join-room': { max: 10, windowMs: 60 * 1000 },
-  'message': { max: 60, windowMs: 60 * 1000 },
+  message: { max: 60, windowMs: 60 * 1000 },
   'webrtc-offer': { max: 20, windowMs: 60 * 1000 },
   'webrtc-answer': { max: 20, windowMs: 60 * 1000 },
   'webrtc-ice-candidate': { max: 200, windowMs: 60 * 1000 },

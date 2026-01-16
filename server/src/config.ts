@@ -1,3 +1,6 @@
+import type { Server } from 'http';
+import type { Server as HttpsServer } from 'https';
+
 const getRequiredEnv = (key: string): string => {
   const value = process.env[key];
   if (!value) {
@@ -22,8 +25,10 @@ const getEnvBoolean = (key: string): boolean => {
 const nodeEnv = getRequiredEnv('NODE_ENVIRONMENT');
 const port = parseInt(getRequiredEnv('SERVER_PORT'), 10);
 const host = getRequiredEnv('SERVER_HOST');
-const corsOrigins = getRequiredEnv('CORS_ORIGINS').split(',').map(origin => origin.trim());
-const rateLimitingEnabled = getEnvBoolean('RATE_LIMITING_ENABLED')
+const corsOrigins = getRequiredEnv('CORS_ORIGINS')
+  .split(',')
+  .map((origin) => origin.trim());
+const rateLimitingEnabled = getEnvBoolean('RATE_LIMITING_ENABLED');
 
 const isProduction = nodeEnv === 'production';
 
@@ -35,15 +40,19 @@ const config = {
   isProduction,
   ssl: {
     keyPath: isProduction ? '' : getRequiredEnv('SSL_KEY_PATH'),
-    certPath: isProduction ? '' : getRequiredEnv('SSL_CERT_PATH')
+    certPath: isProduction ? '' : getRequiredEnv('SSL_CERT_PATH'),
   },
   turnSecret: getRequiredEnv('COTURN_SECRET'),
   rateLimiting: {
     enabled: rateLimitingEnabled,
     trustProxy: isProduction, // trust proxy headers in production
-  }
+  },
 };
 
+export function getProtocol(server: Server | HttpsServer): string {
+  const isHttps = 'cert' in server && 'key' in server;
+  return isHttps ? 'https' : 'http';
+}
 
 // logging
 console.log('🔧 Server configuration:');
