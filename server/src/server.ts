@@ -1,6 +1,6 @@
 import { createApp } from './create-app';
 import { createServer } from './create-server';
-import { setupSocketIO } from './setup-socketio';
+import { createSocketIO } from './create-socketio';
 import RoomDestructionManager from './managers/room-destruction-manager';
 import config, { getProtocol } from './config';
 import type { Room, RoomId } from '../../shared/types';
@@ -15,7 +15,7 @@ authCleanupManager.start();
 
 const app = createApp(rooms);
 const server = createServer(app);
-const io = setupSocketIO(server, rooms, roomDestructionManager);
+const io = createSocketIO(server, rooms, roomDestructionManager);
 
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${getProtocol(server)}://${config.host}:${config.port}`);

@@ -5,7 +5,7 @@ import type { Server as HttpServer } from 'http';
 import type { Room, RoomId } from '../../shared/types';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 
-export function setupSocketIO(
+export function createSocketIO(
   server: HttpServer,
   rooms: Map<RoomId, Room>,
   roomDestructionManager: RoomDestructionManager
