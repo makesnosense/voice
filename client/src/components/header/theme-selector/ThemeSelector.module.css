@@ -16,6 +16,7 @@
   align-items: center;
   gap: 4px;
   padding: 10px;
+
   border: none;
   background: transparent;
   cursor: pointer;
@@ -45,7 +46,10 @@
 
 .chevron {
   color: var(--text-muted);
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+}
+.chevron:hover {
+  opacity: 0.8;
 }
 
 .chevron.open {
@@ -62,7 +66,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 12px;
+  padding: 10px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -77,12 +81,13 @@
 .dropdown {
   position: absolute;
   top: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0%;
+  left: -1px;
+  /* transform: translateX(-50%); */
   display: flex;
   flex-direction: column;
-  padding: 6px;
-  gap: 2px;
+  /* padding: 6px; */
+  /* gap: 2px; */
   z-index: 100;
 }
 
@@ -90,7 +95,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: 10px;
   border: none;
   background: transparent;
   border-radius: 8px;
@@ -138,47 +143,4 @@
 .system.active:hover {
   filter: none;
   transform: translateY(-1px);
-}
-
-@media (max-width: 480px) {
-  .themeButton,
-  .authButton {
-    padding: 8px;
-  }
-
-  .triggerIcon,
-  .chevron {
-    width: 16px;
-    height: 16px;
-  }
-
-  .chevron {
-    width: 12px;
-    height: 12px;
-  }
-
-  .separator {
-    height: 14px;
-  }
-}
-
-@media (max-width: 380px) {
-  .themeButton,
-  .authButton {
-    padding: 6px;
-  }
-
-  .triggerIcon {
-    width: 14px;
-    height: 14px;
-  }
-
-  .chevron {
-    width: 10px;
-    height: 10px;
-  }
-
-  .separator {
-    height: 12px;
-  }
 }
