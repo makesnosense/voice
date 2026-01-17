@@ -1,43 +1,109 @@
-.themeSelectorCard {
-  --icon-size: 18px;
-  --button-min-width: 36px;
-
-  padding: 10px 2px;
+.pill {
   display: flex;
   align-items: center;
+  padding: 0;
+  gap: 0;
   justify-self: end;
+  z-index: 100;
 }
 
-.buttonGroup {
-  display: flex;
-  gap: 0px;
-  justify-content: center;
-  align-items: center;
+.themeSection {
+  position: relative;
 }
 
 .themeButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
   cursor: pointer;
+}
+
+.triggerIcon {
   transition: all 0.3s ease;
-  min-width: var(--button-min-width);
-  opacity: 0.6;
+}
+
+.triggerIcon:hover {
+  opacity: 0.7;
+}
+
+.triggerIcon.light {
+  color: #f59e0b;
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7));
+}
+
+.triggerIcon.dark {
+  color: var(--accent-blue);
+  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
+}
+
+.triggerIcon.system {
+  color: var(--text-primary);
+}
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.separator {
+  width: 1px;
+  height: 18px;
+  background: var(--border-primary);
+}
+
+.authButton {
   display: flex;
-  gap: 0px;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
 }
 
-.themeButton svg {
-  width: var(--icon-size);
-  height: var(--icon-size);
+.authButton:hover {
+  color: var(--text-secondary);
 }
 
-.themeButton:hover {
+.dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 2px;
+  z-index: 100;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.option:hover {
   color: var(--text-secondary);
   opacity: 0.8;
-  filter: drop-shadow(0 0 8px var(--border-secondary));
+  /* filter: drop-shadow(0 0 8px var(--border-secondary)); */
   transform: translateY(-1px);
 }
 
@@ -70,45 +136,49 @@
 }
 
 .system.active:hover {
-  color: var(--text-primary);
   filter: none;
   transform: translateY(-1px);
 }
 
-
 @media (max-width: 480px) {
-  .themeSelectorCard {
-    --icon-size: 16px;
-    --button-min-width: 32px;
+  .themeButton,
+  .authButton {
+    padding: 8px;
   }
-}
 
-@media (max-width: 420px) {
-  .themeSelectorCard {
-    --icon-size: 14px;
-    --button-min-width: 28px;
+  .triggerIcon,
+  .chevron {
+    width: 16px;
+    height: 16px;
+  }
+
+  .chevron {
+    width: 12px;
+    height: 12px;
+  }
+
+  .separator {
+    height: 14px;
   }
 }
 
 @media (max-width: 380px) {
-  .themeSelectorCard {
-    --icon-size: 12px;
-    --button-min-width: 24px;
-    padding: 8px 1px;
-  }
-}
-
-@media (max-width: 345px) {
-  .themeSelectorCard {
-    --icon-size: 12px;
+  .themeButton,
+  .authButton {
+    padding: 6px;
   }
 
-  .buttonGroup {
-    flex-direction: column;
-    gap: 4.5px;
+  .triggerIcon {
+    width: 14px;
+    height: 14px;
   }
 
-  .themeButton {
+  .chevron {
+    width: 10px;
+    height: 10px;
+  }
+
+  .separator {
     height: 12px;
   }
 }

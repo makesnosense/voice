@@ -1,27 +1,28 @@
 import { create } from 'zustand';
 
-type ThemeMode = 'light' | 'dark' | 'system';
+export const MODES = ['light', 'dark', 'system'] as const;
+export type Mode = (typeof MODES)[number];
+
 type ResolvedTheme = 'light' | 'dark';
 
 interface ThemeStore {
-  mode: ThemeMode;
+  selectedMode: Mode;
   resolvedTheme: ResolvedTheme;
 
-  setMode: (mode: ThemeMode) => void;
+  setSelectedMode: (mode: Mode) => void;
 }
-
 
 const getSystemTheme = (): ResolvedTheme => {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-const resolveTheme = (mode: ThemeMode): ResolvedTheme => {
+const resolveTheme = (mode: Mode): ResolvedTheme => {
   if (mode === 'system') return getSystemTheme();
   return mode;
 };
 
-const loadSavedMode = (): ThemeMode | null => {
+const loadSavedMode = (): Mode | null => {
   const saved = localStorage.getItem('theme-mode');
   if (saved === 'light' || saved === 'dark' || saved === 'system') {
     return saved;
@@ -35,20 +36,19 @@ export const useThemeStore = create<ThemeStore>((set) => {
 
   document.documentElement.setAttribute('data-theme', initialResolvedTheme);
 
-
   return {
-    mode: initialMode,
+    selectedMode: initialMode,
     resolvedTheme: initialResolvedTheme,
 
-    setMode: (mode: ThemeMode) => {
+    setSelectedMode: (mode: Mode) => {
       const resolvedTheme = resolveTheme(mode);
 
       localStorage.setItem('theme-mode', mode);
 
       document.documentElement.setAttribute('data-theme', resolvedTheme);
 
-      set({ mode, resolvedTheme });
-    }
+      set({ selectedMode: mode, resolvedTheme });
+    },
   };
 });
 
@@ -56,7 +56,7 @@ const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 mediaQuery.addEventListener('change', (event) => {
   const store = useThemeStore.getState(); // does not trigger any rerenders
-  if (store.mode === 'system') {
+  if (store.selectedMode === 'system') {
     const userPrefersDark: boolean = event.matches;
     const newResolvedTheme = userPrefersDark ? 'dark' : 'light';
 
