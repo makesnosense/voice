@@ -10,41 +10,11 @@
   border: none;
   background: transparent;
   cursor: pointer;
-}
-
-.triggerIcon {
   transition: all 0.3s ease;
 }
 
-.triggerIcon:hover {
+.themeButton:hover {
   opacity: 0.7;
-}
-
-.triggerIcon.light {
-  color: #f59e0b;
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7));
-}
-
-.triggerIcon.dark {
-  color: var(--accent-blue);
-  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
-}
-
-.triggerIcon.system {
-  color: var(--text-primary);
-}
-
-.chevron {
-  color: var(--text-muted);
-  transition: all 0.2s ease;
-}
-
-.chevron:hover {
-  opacity: 0.8;
-}
-
-.chevron.open {
-  transform: rotate(180deg);
 }
 
 .dropdown {
@@ -67,6 +37,15 @@
   }
 }
 
+.chevron {
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
 .option {
   display: flex;
   align-items: center;
@@ -82,40 +61,45 @@
 }
 
 .option:hover {
-  color: var(--text-secondary);
-  opacity: 0.8;
   transform: translateY(-1px);
 }
 
-.light.active {
+/* shared colors between trigger and dropdown */
+.triggerIcon.light,
+.light.active,
+.light:hover {
   color: #f59e0b;
-  opacity: 1;
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7));
 }
 
-.light.active:hover {
-  filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.9));
-  transform: translateY(-1px);
-}
-
-.dark.active {
+.triggerIcon.dark,
+.dark.active,
+.dark:hover {
   color: var(--accent-blue);
-  opacity: 1;
-  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.6));
 }
 
-.dark.active:hover {
-  filter: drop-shadow(0 0 16px rgba(102, 126, 234, 0.8));
-  transform: translateY(-1px);
-}
-
-.system.active {
+.triggerIcon.system,
+.system.active,
+.system:hover {
   color: var(--text-primary);
-  opacity: 1;
-  filter: none;
 }
 
-.system.active:hover {
-  filter: none;
-  transform: translateY(-1px);
+/* dropdown-specific: full opacity on active/hover */
+.option.light.active,
+.option.light:hover,
+.option.dark.active,
+.option.dark:hover,
+.option.system.active,
+.option.system:hover {
+  opacity: 1;
+}
+
+/* dropdown-specific: glows on active/hover */
+.light.active,
+.light:hover {
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.8));
+}
+
+.dark.active,
+.dark:hover {
+  filter: drop-shadow(0 0 16px rgba(102, 126, 234, 1));
 }
