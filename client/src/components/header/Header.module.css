@@ -4,6 +4,12 @@
   gap: 1rem;
 }
 
+@media (max-width: 390px) {
+  .headerContainer {
+    gap: 0.5rem;
+  }
+}
+
 .leftSlot {
   display: flex;
   align-self: center;
@@ -16,8 +22,8 @@
   justify-self: center;
 }
 
-@media (max-width: 345px) {
-  .headerContainer {
-    gap: 0.5rem;
+@media (max-width: 370px) {
+  .titleCard {
+    padding: 16px 20px;
   }
 }
