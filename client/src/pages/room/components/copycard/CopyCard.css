@@ -10,6 +10,7 @@
   box-shadow: var(--shadow-sm);
   gap: clamp(12px, 3vw, 16px);
   width: fit-content;
+  max-width: 364px;
   transition: all 0.3s ease;
 }
 
@@ -31,7 +32,10 @@
 }
 
 .copy-card-link {
-  font-size: clamp(10px, 3.2vw, 16px);
+  font-size: clamp(0.625rem, 3.2vw, 1rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--text-primary);
   margin: 0;
   font-weight: 500;
