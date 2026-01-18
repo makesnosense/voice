@@ -1,0 +1,30 @@
+.pill {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  gap: 0;
+  justify-self: end;
+  z-index: 100;
+}
+
+.separator {
+  width: 1px;
+  height: 18px;
+  background: var(--border-primary);
+}
+
+.authButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.authButton:hover {
+  color: var(--text-secondary);
+}
