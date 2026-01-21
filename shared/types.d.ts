@@ -1,5 +1,5 @@
-import type { Server } from '../server/node_modules/socket.io';
-import type { Socket } from '../client/node_modules/socket.io';
+import type { Server } from 'socket.io';
+import type { Socket } from 'socket.io-client';
 
 export type ObjectValues<T> = T[keyof T];
 
@@ -20,7 +20,6 @@ export interface Room {
   users: Map<SocketId, UserDataServerSide>;
 }
 
-
 export interface Message {
   text: string;
   userId: SocketId;
@@ -36,10 +35,10 @@ export interface ServerToClientEvents {
   'room-users-update': (users: UserDataClientSide[]) => void;
   'room-join-success': (data: { roomId: RoomId }) => void;
   'room-full': (error: string) => void;
-  'message': (message: Message) => void;
+  message: (message: Message) => void;
   'room-not-found': (error: string) => void;
 
-  'error': (data: { message: string; type?: string }) => void;
+  error: (data: { message: string; type?: string }) => void;
 
   'initiate-webrtc-call': (targetUserId: SocketId) => void;
 
@@ -52,7 +51,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   'join-room': (roomId: RoomId) => void;
-  'message': (data: { text: string }) => void;
+  message: (data: { text: string }) => void;
   'webrtc-ready': () => void;
   'mute-status-changed': (data: { isMuted: boolean }) => void;
 
