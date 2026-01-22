@@ -6,6 +6,7 @@ import { generateOtpCode, sendOtpEmail } from '../utils/otp';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/auth';
 import { OTP_EXPIRY_MS } from '../utils/otp';
+import { VerifyOtpRequest, VerifyOtpResponse, RequestOtpRequest } from '../../../shared/auth-types';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.post('/request-otp', async (req, res) => {
     return res.status(400).json({ error: 'Invalid email' });
   }
 
-  const { email } = req.body;
+  const { email } = result.data;
 
   const code = generateOtpCode();
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
@@ -32,7 +33,7 @@ router.post('/verify-otp', async (req, res) => {
     return res.status(400).json({ error: 'Invalid email or code' });
   }
 
-  const { email, code } = req.body;
+  const { email, code } = result.data;
 
   // find valid OTP
   const [otpRecord] = await db
@@ -71,7 +72,8 @@ router.post('/verify-otp', async (req, res) => {
     userId: user.id,
   });
 
-  res.json({ accessToken, refreshToken });
+  const response: VerifyOtpResponse = { accessToken, refreshToken };
+  res.json(response);
 });
 
 router.post('/refresh', async (req, res) => {

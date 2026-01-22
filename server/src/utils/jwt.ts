@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
-import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types';
+import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/auth-types';
 const ACCESS_TOKEN_EXPIRY = '120m';
 
 if (!process.env.JWT_SECRET) {
