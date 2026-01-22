@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
-
+import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types';
 const ACCESS_TOKEN_EXPIRY = '120m';
 
 if (!process.env.JWT_SECRET) {
@@ -8,17 +8,7 @@ if (!process.env.JWT_SECRET) {
 }
 const JWT_SECRET = process.env.JWT_SECRET;
 
-interface AccessTokenPayload {
-  userId: string;
-  email: string;
-}
-
-interface RefreshTokenPayload {
-  userId: string;
-  jti: string;
-}
-
-export function generateAccessToken(payload: AccessTokenPayload): string {
+export function generateAccessToken(payload: Omit<AccessTokenPayload, 'exp' | 'iat'>): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
 }
 

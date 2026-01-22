@@ -88,3 +88,18 @@ export interface AudioFrequencyData {
   bands: number[]; // array of frequency band levels
   overallLevel: number; // keep the existing single level for compatibility
 }
+
+// JWT auth
+
+export interface AccessTokenPayload {
+  userId: string;
+  email: string;
+  exp: number;
+  iat: number;
+}
+
+export interface RefreshTokenPayload {
+  userId: string;
+  jti: string;
+  iat: number;
+}
