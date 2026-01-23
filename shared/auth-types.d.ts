@@ -14,24 +14,24 @@ export interface RefreshTokenPayload {
 }
 
 // auth DTOs
-export interface RequestOtpRequest {
+export interface OtpRequest {
   email: string;
 }
 
-export interface VerifyOtpRequest {
+export interface OtpVerificationRequest {
   email: string;
   code: string;
 }
 
-export interface VerifyOtpResponse {
+export interface OtpVerificationResponse {
   accessToken: string;
   refreshToken: string;
 }
 
-export interface RefreshAccessTokenRequest {
+export interface RenewAccessTokenRequest {
   refreshToken: string;
 }
 
-export interface RefreshAccessTokenResponse {
+export interface RenewAccessTokenResponse {
   accessToken: string;
 }
