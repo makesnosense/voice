@@ -6,7 +6,7 @@ import { generateOtpCode, sendOtpEmail } from '../utils/otp';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/auth';
 import { OTP_EXPIRY_MS } from '../utils/otp';
-import { VerifyOtpRequest, VerifyOtpResponse, RequestOtpRequest } from '../../../shared/auth-types';
+import { OtpVerificationResponse } from '../../../shared/auth-types';
 
 const router = Router();
 
@@ -65,14 +65,13 @@ router.post('/verify-otp', async (req, res) => {
   });
 
   const { token: refreshToken, jti } = generateRefreshToken(user.id);
-  const refreshExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
   await db.insert(refreshTokens).values({
     jti,
     userId: user.id,
   });
 
-  const response: VerifyOtpResponse = { accessToken, refreshToken };
+  const response: OtpVerificationResponse = { accessToken, refreshToken };
   res.json(response);
 });
 
