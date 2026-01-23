@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Monitor, Sun, Moon, ChevronDown } from 'lucide-react';
-import { useThemeStore, MODES, type Mode } from '../../../stores/useThemeStore';
-import baseStyles from '../../../styles/BaseCard.module.css';
+import { useThemeStore, MODES, type Mode } from '../../../../stores/useThemeStore';
+import baseStyles from '../../../../styles/BaseCard.module.css';
 import styles from './ThemeSelector.module.css';
 
 const MODE_ICONS = {

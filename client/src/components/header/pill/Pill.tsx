@@ -1,4 +1,4 @@
-import ThemeSelector from '../theme-selector/ThemeSelector';
+import ThemeSelector from './theme-selector/ThemeSelector';
 import { User } from 'lucide-react';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import styles from './Pill.module.css';

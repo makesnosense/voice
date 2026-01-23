@@ -1,21 +1,18 @@
-import ExitRoomButton from "./components/exit-room-button/ExitRoomButton";
-import layoutStyles from "../../styles/Layout.module.css";
-import useRoomIdValidation from "./useRoomIdValidation";
-import useRoom from "./useRoom";
-import { ROOM_CONNECTION_STATUS } from "./RoomPage.constants";
-import Header from "../../components/header/Header";
-import Spinner from "../../components/spinner/Spinner";
-import RoomError from "./components/room-error/RoomError";
-import RoomInterior from "./components/RoomInterior";
-import { HEADER_ANIMATION_STATE } from "./../../components/header/header-animation/HeaderAnimationState";
-import type { HeaderAnimationState } from "../../components/header/header-animation/HeaderAnimationState";
+import ExitRoomButton from './components/exit-room-button/ExitRoomButton';
+import layoutStyles from '../../styles/Layout.module.css';
+import useRoomIdValidation from './useRoomIdValidation';
+import useRoom from './useRoom';
+import { ROOM_CONNECTION_STATUS } from './RoomPage.constants';
+import Header from '../../components/header/Header';
+import Spinner from '../../components/spinner/Spinner';
+import RoomError from './components/room-error/RoomError';
+import RoomInterior from './components/RoomInterior';
+import { HEADER_ANIMATION_STATE } from './../../components/header/title-header/header-animation/HeaderAnimationState';
+import type { HeaderAnimationState } from '../../components/header/title-header/header-animation/HeaderAnimationState';
 
 export default function RoomPage() {
   const validationResult = useRoomIdValidation();
-  const roomState = useRoom(
-    validationResult.roomId,
-    validationResult.initialStatus
-  );
+  const roomState = useRoom(validationResult.roomId, validationResult.initialStatus);
 
   const getHeaderAnimationState = (): HeaderAnimationState => {
     if (roomState.connectionStatus !== ROOM_CONNECTION_STATUS.JOINED) {
@@ -39,9 +36,7 @@ export default function RoomPage() {
       <Header
         animationState={getHeaderAnimationState()}
         leftContent={
-          roomState.connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? (
-            <ExitRoomButton />
-          ) : null
+          roomState.connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? <ExitRoomButton /> : null
         }
       />
 
@@ -57,9 +52,7 @@ export default function RoomPage() {
         <RoomInterior {...roomState} />
       )}
 
-      {roomState.connectionStatus === ROOM_CONNECTION_STATUS.CONNECTING && (
-        <Spinner />
-      )}
+      {roomState.connectionStatus === ROOM_CONNECTION_STATUS.CONNECTING && <Spinner />}
     </div>
   );
 }
