@@ -83,7 +83,11 @@
   font-size: 12px;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .messageInput input:focus {
@@ -101,7 +105,9 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,5 +152,5 @@
 }
 
 .currentUser {
-  color: #667eea;
+  color: var(--accent-blue);
 }
