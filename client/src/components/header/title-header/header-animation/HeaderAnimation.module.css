@@ -10,11 +10,21 @@
 .wave {
   transform: translateY(1.5px);
   width: 3px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  background: var(--text-primary);
+
   border-radius: 2px;
   animation: voice-wave 1.5s ease-in-out infinite;
   transition: all 0.3s ease;
+}
 
+[data-theme='light'] .wave {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .wave {
+  background: #e2e8f0; /* light gray solid */
+  filter: drop-shadow(0 0 8px #06b6d4) drop-shadow(0 0 12px #ec4899) drop-shadow(0 0 16px #a78bfa);
 }
 
 .wave:nth-child(1) {
@@ -43,7 +53,6 @@
 }
 
 @keyframes voice-wave {
-
   0%,
   100% {
     transform: translateY(1.5px) scaleY(0.3);
