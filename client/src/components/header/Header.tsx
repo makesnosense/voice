@@ -1,7 +1,7 @@
 import TitleHeader from './title-header/TitleHeader';
 import Pill from './pill/Pill';
 import headerStyles from './Header.module.css';
-import type { HeaderAnimationState } from './header-animation/HeaderAnimationState';
+import type { HeaderAnimationState } from './title-header/header-animation/HeaderAnimationState';
 
 interface HeaderProps {
   leftContent?: React.ReactNode;
