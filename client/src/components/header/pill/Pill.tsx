@@ -1,20 +1,65 @@
+import { useState, useRef, useEffect } from 'react';
 import ThemeSelector from './theme-selector/ThemeSelector';
-import { User } from 'lucide-react';
+import { User, KeyRound } from 'lucide-react';
 import baseStyles from '../../../styles/BaseCard.module.css';
-import styles from './Pill.module.css';
+import pillStyles from './Pill.module.css';
+import { useAuthStore } from '../../../stores/useAuthStore';
+import LoginDropdown from './login-dropdown/LoginDropdown';
+import UserMenu from './user-menu/UserMenu';
+import type { ObjectValues } from '../../../../../shared/types';
+
+const OPEN_DROPDOWN = {
+  THEME: 'theme',
+  USER: 'user',
+} as const;
+
+type OpenDropdown = ObjectValues<typeof OPEN_DROPDOWN> | null;
 
 export default function Pill() {
-  const handleAuthClick = () => {
-    console.log('auth clicked');
+  const { isAuthenticated } = useAuthStore();
+  const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
+  const pillRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pillRef.current && !pillRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openDropdown]);
+
+  const handleUserToggle = () => {
+    setOpenDropdown(openDropdown === OPEN_DROPDOWN.USER ? null : OPEN_DROPDOWN.USER);
+  };
+
+  const handleThemeToggle = () => {
+    setOpenDropdown(openDropdown === OPEN_DROPDOWN.THEME ? null : OPEN_DROPDOWN.THEME);
   };
 
   return (
-    <div className={`${styles.pill} ${baseStyles.card}`}>
-      <ThemeSelector />
-      <div className={styles.separator} />
-      <button className={styles.authButton} onClick={handleAuthClick}>
-        <User size={18} />
-      </button>
+    <div className={`${pillStyles.pill} ${baseStyles.card}`} ref={pillRef}>
+      <ThemeSelector isOpen={openDropdown === OPEN_DROPDOWN.THEME} onToggle={handleThemeToggle} />
+      <div className={pillStyles.separator} />
+      <div className={pillStyles.userSection}>
+        <button className={pillStyles.userButton} onClick={handleUserToggle}>
+          {isAuthenticated ? <User size={18} /> : <KeyRound size={18} />}
+        </button>
+
+        {openDropdown === OPEN_DROPDOWN.USER && (
+          <>
+            {isAuthenticated ? (
+              <UserMenu onClose={() => setOpenDropdown(null)} />
+            ) : (
+              <LoginDropdown onClose={() => setOpenDropdown(null)} />
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
