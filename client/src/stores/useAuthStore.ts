@@ -22,10 +22,12 @@ interface AuthStore {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  authSuccessDelay: boolean;
 
   initialize: () => Promise<void>;
   requestOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, code: string) => Promise<void>;
+  setAuthSuccessDelay: (value: boolean) => void;
   logout: () => void;
 
   // helper to get valid token (refreshes if needed)
@@ -96,6 +98,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  authSuccessDelay: false,
 
   initialize: async () => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
@@ -154,12 +157,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
+  setAuthSuccessDelay: (value: boolean) => {
+    set({ authSuccessDelay: value });
+  },
+
   logout: () => {
     localStorage.removeItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
     set({
       accessToken: null,
       user: null,
       isAuthenticated: false,
+      authSuccessDelay: false,
     });
     console.log('👋 logged out');
   },

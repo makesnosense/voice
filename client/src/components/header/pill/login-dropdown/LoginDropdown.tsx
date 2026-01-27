@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Mail } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Mail, Check } from 'lucide-react';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import buttonStyles from '../../../../styles/Buttons.module.css';
@@ -9,23 +9,27 @@ import type { ObjectValues } from '../../../../../../shared/types';
 const LOGIN_STEP = {
   EMAIL_INPUT: 'email-input',
   CODE_INPUT: 'code-input',
+  SUCCESS: 'success',
 } as const;
 
 type LoginStep = ObjectValues<typeof LOGIN_STEP>;
 
 const PENDING_EMAIL_KEY = 'pending_auth_email';
+const SUCCESS_DISPLAY_DURATION = 1500; // 1.5 seconds
 
 interface LoginDropdownProps {
   onClose: () => void;
 }
 
 export default function LoginDropdown({ onClose }: LoginDropdownProps) {
-  const { requestOtp, verifyOtp, isLoading } = useAuthStore();
+  const { requestOtp, verifyOtp, isLoading, setAuthSuccessDelay } = useAuthStore();
 
   const [loginStep, setLoginStep] = useState<LoginStep>(LOGIN_STEP.EMAIL_INPUT);
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const successTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // restore email from localStorage on mount
   useEffect(() => {
@@ -36,13 +40,21 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
     }
   }, []);
 
+  // cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (successTimeoutRef.current) {
+        clearTimeout(successTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSendCode = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
 
     try {
       await requestOtp(email);
-      // only save to localStorage after successful send
       localStorage.setItem(PENDING_EMAIL_KEY, email);
       setLoginStep(LOGIN_STEP.CODE_INPUT);
     } catch (err) {
@@ -55,13 +67,20 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
     setError(null);
 
     try {
+      setAuthSuccessDelay(true);
       await verifyOtp(email, code);
-      // clear saved email on successful login
       localStorage.removeItem(PENDING_EMAIL_KEY);
-      onClose();
+
+      setLoginStep(LOGIN_STEP.SUCCESS);
+
+      successTimeoutRef.current = setTimeout(() => {
+        setAuthSuccessDelay(false);
+        onClose();
+      }, SUCCESS_DISPLAY_DURATION);
     } catch (err) {
+      setAuthSuccessDelay(false);
       setError('Invalid code. Please try again.');
-      setCode(''); // clear code on error
+      setCode('');
     }
   };
 
@@ -73,7 +92,6 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
   };
 
   const handleCodeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // sanitizing input to let only 6 numeric characters
     const value = event.target.value.replace(/\D/g, '').slice(0, 6);
     setCode(value);
   };
@@ -106,7 +124,7 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
             {isLoading ? 'Sending...' : 'Send code'}
           </button>
         </form>
-      ) : (
+      ) : loginStep === LOGIN_STEP.CODE_INPUT ? (
         <form onSubmit={handleVerifyCode} className={loginDropdownStyles.form}>
           <div className={loginDropdownStyles.codeStepHeader}>
             <button
@@ -143,6 +161,13 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
             {isLoading ? 'Verifying...' : 'Verify'}
           </button>
         </form>
+      ) : (
+        <div className={loginDropdownStyles.successState}>
+          <div className={loginDropdownStyles.successIcon}>
+            <Check size={32} />
+          </div>
+          <span className={loginDropdownStyles.successText}>Success!</span>
+        </div>
       )}
     </div>
   );

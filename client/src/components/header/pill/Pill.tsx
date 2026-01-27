@@ -16,9 +16,14 @@ const OPEN_DROPDOWN = {
 type OpenDropdown = ObjectValues<typeof OPEN_DROPDOWN> | null;
 
 export default function Pill() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, authSuccessDelay, setAuthSuccessDelay } = useAuthStore();
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const pillRef = useRef<HTMLDivElement>(null);
+
+  // any change in dropdowns resets delay
+  useEffect(() => {
+    setAuthSuccessDelay(false);
+  }, [openDropdown]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,7 +57,7 @@ export default function Pill() {
 
         {openDropdown === OPEN_DROPDOWN.USER && (
           <>
-            {isAuthenticated ? (
+            {isAuthenticated && !authSuccessDelay ? (
               <UserMenu onClose={() => setOpenDropdown(null)} />
             ) : (
               <LoginDropdown onClose={() => setOpenDropdown(null)} />
