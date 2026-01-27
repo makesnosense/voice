@@ -98,12 +98,12 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .emailDisplay {
   font-size: 0.8rem;
-  max-width: 174px;
+  max-width: 172px;
   text-align: center;
   padding: 7px 6px;
   color: rgba(124, 124, 124, 0.8);
