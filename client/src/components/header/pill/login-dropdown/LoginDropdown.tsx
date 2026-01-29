@@ -15,7 +15,7 @@ const LOGIN_STEP = {
 type LoginStep = ObjectValues<typeof LOGIN_STEP>;
 
 const PENDING_EMAIL_KEY = 'pending_auth_email';
-const SUCCESS_DISPLAY_DURATION = 1500; // 1.5 seconds
+const SUCCESS_DISPLAY_DURATION = 2000; // 2 seconds
 
 interface LoginDropdownProps {
   onClose: () => void;
