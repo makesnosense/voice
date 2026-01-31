@@ -109,7 +109,7 @@
   max-width: 172px;
   text-align: center;
   padding: 7px 6px;
-  color: rgba(124, 124, 124, 0.8);
+  color: var(--text-muted);
   background: var(--bg-secondary);
   border-radius: 6px;
   overflow: hidden;
