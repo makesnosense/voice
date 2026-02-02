@@ -7,6 +7,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '.
 import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/auth';
 import { OTP_EXPIRY_MS } from '../utils/otp';
 import { OtpVerificationResponse } from '../../../shared/auth-types';
+import { requireRefreshToken } from '../middleware/auth';
 
 const router = Router();
 
@@ -75,26 +76,12 @@ router.post('/verify-otp', async (req, res) => {
   res.json(response);
 });
 
-router.post('/refresh', async (req, res) => {
-  const result = refreshSchema.safeParse(req.body);
-
-  if (!result.success) {
-    return res.status(400).json({ error: 'Invalid refresh token' });
-  }
-
-  const { refreshToken } = result.data;
-
-  let payload;
-  try {
-    payload = verifyRefreshToken(refreshToken);
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid refresh token' });
-  }
+router.post('/refresh', requireRefreshToken, async (req, res) => {
   // check if jti exists in database (not revoked)
   const [tokenRecord] = await db
     .select()
     .from(refreshTokens)
-    .where(eq(refreshTokens.jti, payload.jti))
+    .where(eq(refreshTokens.jti, req.refreshPayload!.jti))
     .limit(1);
 
   if (!tokenRecord) {
@@ -102,7 +89,11 @@ router.post('/refresh', async (req, res) => {
   }
 
   // get user
-  const [user] = await db.select().from(users).where(eq(users.id, payload.userId)).limit(1);
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, req.refreshPayload!.userId))
+    .limit(1);
 
   if (!user) {
     return res.status(401).json({ error: 'User not found' });
