@@ -1,5 +1,5 @@
 {
-  "id": "fe5a8c94-72ec-4a1d-91c8-2e212e5054ce",
+  "id": "e5c528ac-6f3e-4234-8812-bb2511075cca",
   "prevId": "2bcdc19d-c44e-4d7b-aff0-218551ad7ed4",
   "version": "7",
   "dialect": "postgresql",
@@ -8,12 +8,11 @@
       "name": "devices",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "jti": {
+          "name": "jti",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "user_id": {
           "name": "user_id",
@@ -25,12 +24,6 @@
           "name": "platform",
           "type": "platform",
           "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "refresh_token_jti": {
-          "name": "refresh_token_jti",
-          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -69,6 +62,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "devices_jti_refresh_tokens_jti_fk": {
+          "name": "devices_jti_refresh_tokens_jti_fk",
+          "tableFrom": "devices",
+          "tableTo": "refresh_tokens",
+          "columnsFrom": [
+            "jti"
+          ],
+          "columnsTo": [
+            "jti"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "devices_user_id_users_id_fk": {
           "name": "devices_user_id_users_id_fk",
           "tableFrom": "devices",
@@ -78,19 +84,6 @@
           ],
           "columnsTo": [
             "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "devices_refresh_token_jti_refresh_tokens_jti_fk": {
-          "name": "devices_refresh_token_jti_refresh_tokens_jti_fk",
-          "tableFrom": "devices",
-          "tableTo": "refresh_tokens",
-          "columnsFrom": [
-            "refresh_token_jti"
-          ],
-          "columnsTo": [
-            "jti"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"

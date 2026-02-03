@@ -43,21 +43,15 @@ export type Platform = ObjectValues<typeof PLATFORM>;
 export const platformEnum = pgEnum('platform', [PLATFORM.WEB, PLATFORM.IOS, PLATFORM.ANDROID]);
 
 export const devices = pgTable('devices', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  jti: uuid('jti')
+    .primaryKey()
+    .references(() => refreshTokens.jti, { onDelete: 'cascade' }),
   userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   platform: platformEnum('platform').notNull(),
-
-  refreshTokenJti: uuid('refresh_token_jti')
-    .notNull()
-    .references(() => refreshTokens.jti, { onDelete: 'cascade' }),
-
-  // push notification tokens (NULL for web)
   fcmToken: varchar('fcm_token', { length: 255 }),
   voipPushToken: varchar('voip_push_token', { length: 255 }),
-
-  // metadata
   deviceName: varchar('device_name', { length: 100 }),
   lastSeen: timestamp('last_seen').notNull().defaultNow(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
