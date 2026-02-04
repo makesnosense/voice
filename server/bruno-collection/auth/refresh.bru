@@ -1,19 +1,18 @@
 meta {
-  name: verify-otp
+  name: refresh
   type: http
   seq: 3
 }
 
 post {
-  url: https://localhost:3003/api/auth/verify-otp
+  url: https://localhost:3003/api/auth/refresh
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "email": "berezovskyaa@gmail.com",
-    "code": "899503"
+    "refreshToken": "{{voiceRefreshToken}}"
   }
 }
 
@@ -21,7 +20,6 @@ script:post-response {
   const response = res.getBody();
   if (response && response.accessToken) {
     bru.setVar("voiceAccessToken", response.accessToken);
-    bru.setVar("voiceRefreshToken", response.refreshToken);
   }
 }
 
