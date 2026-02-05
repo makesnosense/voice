@@ -1,0 +1,22 @@
+meta {
+  name: current-session
+  type: http
+  seq: 5
+}
+
+delete {
+  url: https://localhost:3003/api/auth/sessions/current
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "refreshToken": "{{voiceRefreshToken}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
