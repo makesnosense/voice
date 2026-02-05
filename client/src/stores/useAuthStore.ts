@@ -148,6 +148,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isAuthenticated: true,
       });
 
+      // 🆕 register device after successful auth
+      try {
+        await axios.post('/api/devices/register', {
+          refreshToken: data.refreshToken,
+          platform: 'web',
+          deviceName: navigator.userAgent.includes('Mobile') ? 'Mobile Browser' : 'Desktop Browser',
+        });
+        console.log('✅ device registered');
+      } catch (error) {
+        // non-fatal - log but don't fail login
+        console.warn('⚠️ device registration failed:', error);
+      }
+
       console.log('✅ authenticated as', user.email);
     } catch (error) {
       console.error('❌ failed to verify OTP:', error);
@@ -161,7 +174,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ authSuccessDelay: value });
   },
 
-  logout: () => {
+  logout: async () => {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
+
+    // 🆕 delete session on server before clearing local state
+    if (refreshToken) {
+      try {
+        await axios.delete('/api/auth/sessions/current', {
+          data: { refreshToken },
+        });
+        console.log('✅ session deleted on server');
+      } catch (error) {
+        console.warn('⚠️ failed to delete session on server:', error);
+      }
+    }
+
     localStorage.removeItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
     set({
       accessToken: null,
