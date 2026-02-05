@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { users, otpCodes, refreshTokens } from '../db/schema';
-import { eq, and, gt } from 'drizzle-orm';
+import { eq, and, gt, ne } from 'drizzle-orm';
 import { generateOtpCode, sendOtpEmail } from '../utils/otp';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/auth';
@@ -106,6 +106,49 @@ router.post('/refresh', requireRefreshToken, async (req, res) => {
   });
 
   res.json({ accessToken: newAccessToken });
+});
+
+router.delete('/sessions/current', requireRefreshToken, async (req, res) => {
+  const { jti, userId } = req.refreshPayload!;
+
+  try {
+    await db.delete(refreshTokens).where(eq(refreshTokens.jti, jti));
+    console.log(`👋 logged out session ${jti} for user ${userId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('failed to logout:', error);
+    res.status(500).json({ error: 'logout failed' });
+  }
+});
+
+router.delete('/sessions/:jti', requireRefreshToken, async (req, res) => {
+  const { jti } = req.params;
+  const { userId } = req.refreshPayload!;
+
+  // verify that authorized user owns the jti
+  const [existingToken] = await db
+    .select()
+    .from(refreshTokens)
+    .where(and(eq(refreshTokens.jti, jti), eq(refreshTokens.userId, userId)))
+    .limit(1);
+
+  if (!existingToken) {
+    return res.status(404).json({ error: 'Session not found' });
+  }
+
+  await db.delete(refreshTokens).where(eq(refreshTokens.jti, jti));
+  res.json({ success: true });
+});
+
+router.delete('/sessions', requireRefreshToken, async (req, res) => {
+  const { userId, jti: currentJti } = req.refreshPayload!;
+
+  const deleted = await db
+    .delete(refreshTokens)
+    .where(and(eq(refreshTokens.userId, userId), ne(refreshTokens.jti, currentJti)))
+    .returning();
+
+  res.json({ success: true, count: deleted.length });
 });
 
 export default router;
