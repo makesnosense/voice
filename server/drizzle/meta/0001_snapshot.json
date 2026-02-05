@@ -1,5 +1,5 @@
 {
-  "id": "e5c528ac-6f3e-4234-8812-bb2511075cca",
+  "id": "ff32900c-d6e4-453c-ada9-f630e879ecd3",
   "prevId": "2bcdc19d-c44e-4d7b-aff0-218551ad7ed4",
   "version": "7",
   "dialect": "postgresql",
@@ -27,6 +27,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "device_name": {
+          "name": "device_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "fcm_token": {
           "name": "fcm_token",
           "type": "varchar(255)",
@@ -36,12 +42,6 @@
         "voip_push_token": {
           "name": "voip_push_token",
           "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "device_name": {
-          "name": "device_name",
-          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },

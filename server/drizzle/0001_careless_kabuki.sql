@@ -3,9 +3,9 @@ CREATE TABLE "devices" (
 	"jti" uuid PRIMARY KEY NOT NULL,
 	"user_id" uuid NOT NULL,
 	"platform" "platform" NOT NULL,
+	"device_name" varchar(100),
 	"fcm_token" varchar(255),
 	"voip_push_token" varchar(255),
-	"device_name" varchar(100),
 	"last_seen" timestamp DEFAULT now() NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );

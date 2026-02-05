@@ -50,9 +50,9 @@ export const devices = pgTable('devices', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   platform: platformEnum('platform').notNull(),
+  deviceName: varchar('device_name', { length: 100 }),
   fcmToken: varchar('fcm_token', { length: 255 }),
   voipPushToken: varchar('voip_push_token', { length: 255 }),
-  deviceName: varchar('device_name', { length: 100 }),
   lastSeen: timestamp('last_seen').notNull().defaultNow(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
