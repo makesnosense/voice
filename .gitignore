@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+
 dist
 dist-ssr
 *.local
@@ -34,3 +35,55 @@ ssl/
 .env
 .env.development
 .env.production
+
+# React Native / Android / iOS
+*.apk
+*.aab
+*.ipa
+*.jks
+*.keystore
+
+# Android - mobile specific
+mobile/android/app/build/
+mobile/android/build/
+mobile/android/.gradle/
+mobile/android/.cxx/
+mobile/android/app/.cxx/
+mobile/android/local.properties
+mobile/android/app/release/
+
+# iOS - mobile specific
+mobile/ios/Pods/
+mobile/ios/build/
+mobile/ios/*.xcworkspace
+mobile/ios/*.xcodeproj/xcuserdata
+mobile/ios/*.xcodeproj/project.xcworkspace/xcuserdata
+mobile/Gemfile.lock
+
+# iOS build config (machine-specific)
+mobile/ios/.xcode.env.local
+mobile/ios/.xcode.env
+
+# Expo
+mobile/.expo/
+mobile/.expo-shared/
+
+# Metro bundler
+mobile/.metro-health-check*
+mobile/metro.config.js.map
+
+# Watchman
+mobile/.watchmanconfig
+
+# Temporary files
+*.tmp
+*.temp
+mobile/.bundle/
+
+# React Native specific
+mobile/.buckconfig.local
+mobile/buck-out/
+
+# Google Services
+mobile/android/app/google-services.json
+mobile/ios/GoogleService-Info.plist

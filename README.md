@@ -108,3 +108,27 @@ This takes 1-2 minutes. You should see: `✓ built in XXs`
 ```bash
 docker compose up -d
 ```
+
+## Mobile Development
+
+### Setup
+
+1. Install dependencies: `cd mobile && npm install`
+2. Download `google-services.json` from Firebase Console
+3. Place in `mobile/android/app/google-services.json`
+
+### Running
+
+```bash
+cd mobile
+npm start          # Start Metro bundler
+npm run android    # Run on Android device
+```
+
+### Building
+
+```bash
+cd mobile/android
+./gradlew assembleDebug    # Debug APK
+./gradlew assembleRelease  # Release APK (requires signing)
+```
