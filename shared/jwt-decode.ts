@@ -4,7 +4,7 @@ const getJwtPayload = (token: string): Record<string, any> | null => {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(window.atob(base64));
+    return JSON.parse(atob(base64));
   } catch (error) {
     console.error('failed to parse JWT:', error);
     return null;

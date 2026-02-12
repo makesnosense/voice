@@ -2,11 +2,16 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { getFcmToken } from './utils/fcm';
 import { ensureNotificationPermissions } from './utils/permissions';
+import { useAuthStore } from './stores/useAuthStore';
 
 export default function App() {
   const [permissionStatus, setPermissionStatus] =
     useState<string>('checking...');
   const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    useAuthStore.getState().initialize();
+  }, []);
 
   useEffect(() => {
     const initialize = async () => {
