@@ -5,7 +5,7 @@ import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
 import type { User } from '../../../shared/auth-types';
 
 const API_BASE_URL = __DEV__
-  ? 'http://localhost:3003/api'
+  ? 'https://localhost:3003/api'
   : 'https://voice.k.vu/api';
 
 interface AuthStore {
@@ -68,12 +68,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   requestOtp: async (email: string) => {
     set({ isLoading: true });
     try {
+      console.log(`requesting ${API_BASE_URL}/auth/request-otp`);
       const response = await fetch(`${API_BASE_URL}/auth/request-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      if (!response.ok) throw new Error('otp request failed');
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error ?? `http ${response.status}`);
+      }
+
       console.log('✅ otp sent to', email);
     } finally {
       set({ isLoading: false });
