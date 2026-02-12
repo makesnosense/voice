@@ -29,6 +29,7 @@ certs/
 *.pem
 *.key
 *.crt
+!mobile/android/app/src/main/res/raw/dev_cert.crt
 *.p12
 ssl/
 
