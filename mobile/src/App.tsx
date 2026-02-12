@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { getFcmToken } from './utils/fcm';
 import { ensureNotificationPermissions } from './utils/permissions';
 import { useAuthStore } from './stores/useAuthStore';
+import Auth from './components/Auth';
 
 export default function App() {
   const [permissionStatus, setPermissionStatus] =
     useState<string>('checking...');
   const [token, setToken] = useState<string | null>(null);
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   useEffect(() => {
     useAuthStore.getState().initialize();
@@ -33,15 +35,29 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Voice</Text>
-      <Text style={styles.info}>
-        Notifications permission: {permissionStatus}
-      </Text>
-      <Text style={styles.info}>
-        Token: {token ? `${token.substring(0, 20)}...` : 'none'}
-      </Text>
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>Voice</Text>
+
+        {isAuthenticated ? (
+          <>
+            <Text style={styles.info}>logged in as {user?.email}</Text>
+            <TouchableOpacity style={styles.button} onPress={logout}>
+              <Text style={styles.buttonText}>log out</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <Auth />
+        )}
+
+        <Text style={styles.info}>
+          Notifications permission: {permissionStatus}
+        </Text>
+        <Text style={styles.info}>
+          Token: {token ? `${token.substring(0, 20)}...` : 'none'}
+        </Text>
+      </View>
+    </>
   );
 }
 
@@ -61,5 +77,16 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 14,
     color: '#cbd5e1',
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#1e40af',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#f1f5f9',
+    fontSize: 16,
   },
 });
