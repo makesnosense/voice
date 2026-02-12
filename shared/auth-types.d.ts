@@ -1,5 +1,10 @@
 // JWT auth
 
+export interface User {
+  userId: string;
+  email: string;
+}
+
 export interface AccessTokenPayload {
   userId: string;
   email: string;

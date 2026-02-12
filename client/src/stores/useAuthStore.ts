@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import type { StoreApi } from 'zustand';
+import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
 import axios from 'axios';
+import type { StoreApi } from 'zustand';
+import type { User } from '../../../shared/auth-types';
 
 import type {
   OtpRequest,
@@ -11,11 +13,6 @@ import type {
 } from '../../../shared/auth-types';
 
 const REFRESH_TOKEN_LOCAL_STORAGE_KEY = 'refresh_token';
-
-interface User {
-  userId: string;
-  email: string;
-}
 
 interface AuthStore {
   accessToken: string | null;
@@ -62,35 +59,6 @@ const renewAccessToken = async (
   } finally {
     renewalPromise = null;
   }
-};
-
-const getJwtPayload = (token: string): Record<string, any> | null => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(window.atob(base64));
-  } catch (error) {
-    console.error('failed to parse JWT:', error);
-    return null;
-  }
-};
-
-const getUserFromJwt = (token: string): User | null => {
-  const payload = getJwtPayload(token);
-  if (!payload) return null;
-
-  if (payload.userId && payload.email) {
-    return { userId: payload.userId, email: payload.email };
-  }
-  return null;
-};
-
-const isTokenExpired = (token: string): boolean => {
-  const payload = getJwtPayload(token);
-  if (!payload || !payload.exp) return true;
-
-  // consider expired if less than 1 minute remaining
-  return Date.now() >= payload.exp * 1000 - 60000;
 };
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
