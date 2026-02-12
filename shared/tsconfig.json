@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "moduleResolution": "bundler",
+    "paths": {
+      "socket.io": ["../server/node_modules/socket.io"],
+      "socket.io-client": ["../client/node_modules/socket.io-client"]
+    }
+  },
+  "include": ["./**/*"]
+}
