@@ -12,6 +12,7 @@ export class ApiBase {
       throw new Error(body.error ?? `http ${response.status}`);
     }
 
-    return response.json();
+    const text = await response.text();
+    return text ? JSON.parse(text) : (undefined as T);
   }
 }
