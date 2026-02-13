@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { keychainStorage } from '../utils/keychain';
 import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
-import * as authApi from '../api/auth';
+import { api } from '../api';
 
 import type { User } from '../../../shared/auth-types';
 
@@ -25,7 +25,7 @@ const renewAccessToken = async (
   set: (partial: Partial<AuthStore>) => void,
 ): Promise<string> => {
   try {
-    const { accessToken } = await authApi.renewAccessToken(refreshToken);
+    const { accessToken } = await api.auth.renewAccessToken(refreshToken);
     const user = getUserFromJwt(accessToken);
 
     set({ accessToken: accessToken, user, isAuthenticated: true });
@@ -57,7 +57,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   requestOtp: async (email: string) => {
     set({ isLoading: true });
     try {
-      await authApi.requestOtp(email);
+      await api.auth.requestOtp(email);
 
       console.log('✅ otp sent to', email);
     } finally {
@@ -68,7 +68,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   verifyOtp: async (email: string, code: string) => {
     set({ isLoading: true });
     try {
-      const { accessToken, refreshToken } = await authApi.verifyOtp(
+      const { accessToken, refreshToken } = await api.auth.verifyOtp(
         email,
         code,
       );
@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     if (refreshToken) {
       try {
-        await authApi.deleteSession(refreshToken);
+        await api.auth.deleteSession(refreshToken);
       } catch {
         console.warn('⚠️ failed to delete session on server');
       }
