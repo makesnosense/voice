@@ -1,12 +1,9 @@
 import { create } from 'zustand';
 import { keychainStorage } from '../utils/keychain';
 import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
+import * as authApi from '../api/auth';
 
 import type { User } from '../../../shared/auth-types';
-
-const API_BASE_URL = __DEV__
-  ? 'https://localhost:3003/api'
-  : 'https://voice.k.vu/api';
 
 interface AuthStore {
   accessToken: string | null;
@@ -28,19 +25,11 @@ const renewAccessToken = async (
   set: (partial: Partial<AuthStore>) => void,
 ): Promise<string> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
+    const { accessToken } = await authApi.renewAccessToken(refreshToken);
+    const user = getUserFromJwt(accessToken);
 
-    if (!response.ok) throw new Error('Token renewal failed');
-
-    const data = await response.json();
-    const user = getUserFromJwt(data.accessToken);
-
-    set({ accessToken: data.accessToken, user, isAuthenticated: true });
-    return data.accessToken;
+    set({ accessToken: accessToken, user, isAuthenticated: true });
+    return accessToken;
   } finally {
     renewalPromise = null;
   }
@@ -68,17 +57,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   requestOtp: async (email: string) => {
     set({ isLoading: true });
     try {
-      console.log(`requesting ${API_BASE_URL}/auth/request-otp`);
-      const response = await fetch(`${API_BASE_URL}/auth/request-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(body.error ?? `http ${response.status}`);
-      }
+      await authApi.requestOtp(email);
 
       console.log('✅ otp sent to', email);
     } finally {
@@ -89,20 +68,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   verifyOtp: async (email: string, code: string) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
-      });
-
-      if (!response.ok) throw new Error('otp verification failed');
-
-      const data = await response.json();
-      const user = getUserFromJwt(data.accessToken);
+      const { accessToken, refreshToken } = await authApi.verifyOtp(
+        email,
+        code,
+      );
+      const user = getUserFromJwt(accessToken);
       if (!user) throw new Error('invalid token payload');
 
-      await keychainStorage.setRefreshToken(data.refreshToken);
-      set({ accessToken: data.accessToken, user, isAuthenticated: true });
+      await keychainStorage.setRefreshToken(refreshToken);
+      set({ accessToken: accessToken, user, isAuthenticated: true });
 
       console.log('✅ authenticated as', user.email);
     } finally {
@@ -115,11 +89,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     if (refreshToken) {
       try {
-        await fetch(`${API_BASE_URL}/auth/sessions/current`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
-        });
+        await authApi.deleteSession(refreshToken);
       } catch {
         console.warn('⚠️ failed to delete session on server');
       }
