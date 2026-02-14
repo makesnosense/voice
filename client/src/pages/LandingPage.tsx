@@ -3,9 +3,11 @@ import layoutStyles from '../styles/Layout.module.css';
 import { Phone } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
-import type { CreateRoomResponse } from '../../../shared/types';
+// import axios from 'axios';
+// import type { CreateRoomResponse } from '../../../shared/types';
 import Header from '../components/header/Header';
+
+import { api } from '../api';
 
 export default function LandingPage() {
   const [isCreating, setIsCreating] = useState(false);
@@ -19,9 +21,10 @@ export default function LandingPage() {
     if (isCreating) return;
     setIsCreating(true);
     try {
-      const { data } = await axios.post<CreateRoomResponse>('/api/create-room');
-      console.log('🏠 Created room:', data.roomId);
-      navigate(`/${data.roomId}`);
+      // const { data } = await axios.post<CreateRoomResponse>('/api/create-room');
+      const { roomId } = await api.rooms.createRoom();
+      console.log('🏠 Created room:', roomId);
+      navigate(`/${roomId}`);
     } catch (error) {
       console.error('Failed to create room:', error);
       alert('Failed to create room');
@@ -36,17 +39,16 @@ export default function LandingPage() {
         <Header />
       </div>
 
-
       <main className={`${layoutStyles.content} ${layoutStyles.landingContent}`}>
-        <button onClick={handleCreateRoom}
+        <button
+          onClick={handleCreateRoom}
           disabled={isCreating}
-          className={`${buttonStyles.button} ${buttonStyles.lightGreen}`}>
+          className={`${buttonStyles.button} ${buttonStyles.lightGreen}`}
+        >
           <Phone size={20} className={buttonStyles.icon} />
           Create Call
         </button>
       </main>
-    </div >
+    </div>
   );
-
-
 }
