@@ -1,5 +1,9 @@
 export class ApiBase {
-  constructor(private baseUrl: string) {}
+  private baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
 
   protected async apiFetch<T>(path: string, options: RequestInit): Promise<T> {
     const response = await fetch(`${this.baseUrl}${path}`, {
