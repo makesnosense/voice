@@ -33,9 +33,9 @@ export interface OtpVerificationResponse {
   refreshToken: string;
 }
 
-export interface RenewAccessTokenRequest {
-  refreshToken: string;
-}
+// export interface RenewAccessTokenRequest {
+//   refreshToken: string;
+// }
 
 export interface RenewAccessTokenResponse {
   accessToken: string;

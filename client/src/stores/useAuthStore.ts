@@ -1,16 +1,10 @@
 import { create } from 'zustand';
 import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
-import axios from 'axios';
+import { api } from '../api';
 import type { StoreApi } from 'zustand';
 import type { User } from '../../../shared/auth-types';
 
-import type {
-  OtpRequest,
-  OtpVerificationRequest,
-  OtpVerificationResponse,
-  RenewAccessTokenRequest,
-  RenewAccessTokenResponse,
-} from '../../../shared/auth-types';
+import { PLATFORM } from '../../../shared/platform';
 
 const REFRESH_TOKEN_LOCAL_STORAGE_KEY = 'refresh_token';
 
@@ -40,22 +34,20 @@ const renewAccessToken = async (
   set: StoreApi<AuthStore>['setState']
 ): Promise<string> => {
   try {
-    const body: RenewAccessTokenRequest = { refreshToken };
-    const { data } = await axios.post<RenewAccessTokenResponse>('/api/auth/refresh', body);
-
-    const user = getUserFromJwt(data.accessToken);
+    const { accessToken } = await api.auth.renewAccessToken(refreshToken);
+    const user = getUserFromJwt(accessToken);
     if (!user) {
       throw new Error('invalid token payload');
     }
 
     set({
-      accessToken: data.accessToken,
+      accessToken: accessToken,
       user,
       isAuthenticated: true,
     });
 
     console.log('✅ access token refreshed');
-    return data.accessToken;
+    return accessToken;
   } finally {
     renewalPromise = null;
   }
@@ -86,8 +78,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   requestOtp: async (email: string) => {
     set({ isLoading: true });
     try {
-      const body: OtpRequest = { email };
-      await axios.post('/api/auth/request-otp', body);
+      await api.auth.requestOtp(email);
       console.log('✅ OTP sent to', email);
     } catch (error) {
       console.error('❌ failed to request OTP:', error);
@@ -100,29 +91,28 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   verifyOtp: async (email: string, code: string) => {
     set({ isLoading: true });
     try {
-      const body: OtpVerificationRequest = { email, code };
-      const { data } = await axios.post<OtpVerificationResponse>('/api/auth/verify-otp', body);
+      const { accessToken, refreshToken } = await api.auth.verifyOtp(email, code);
 
-      const user = getUserFromJwt(data.accessToken);
+      const user = getUserFromJwt(accessToken);
       if (!user) {
         throw new Error('invalid token payload');
       }
 
-      localStorage.setItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY, data.refreshToken);
+      localStorage.setItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY, refreshToken);
 
       set({
-        accessToken: data.accessToken,
+        accessToken,
         user,
         isAuthenticated: true,
       });
 
       // 🆕 register device after successful auth
       try {
-        await axios.post('/api/devices/register', {
-          refreshToken: data.refreshToken,
-          platform: 'web',
-          deviceName: navigator.userAgent.includes('Mobile') ? 'Mobile Browser' : 'Desktop Browser',
-        });
+        const deviceName = navigator.userAgent.includes('Mobile')
+          ? 'Mobile Browser'
+          : 'Desktop Browser';
+
+        await api.devices.registerDevice(refreshToken, PLATFORM.WEB, deviceName);
         console.log('✅ device registered');
       } catch (error) {
         // non-fatal - log but don't fail login
@@ -148,9 +138,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     // 🆕 delete session on server before clearing local state
     if (refreshToken) {
       try {
-        await axios.delete('/api/auth/sessions/current', {
-          data: { refreshToken },
-        });
+        await api.auth.deleteSession(refreshToken);
+
         console.log('✅ session deleted on server');
       } catch (error) {
         console.warn('⚠️ failed to delete session on server:', error);
