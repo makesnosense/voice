@@ -1,22 +1,15 @@
-import {
-  WEBRTC_CONNECTION_STATE,
-  type WebRTCConnectionState,
-} from "../../../../WebRTCManager";
-import connectionDotStyles from "./WebRTCConnectionStatusDot.module.css";
+import { WEBRTC_CONNECTION_STATE } from '../../../../WebRTCManager';
+import connectionDotStyles from './WebRTCConnectionStatusDot.module.css';
+import { useWebRTCStore } from '../../../../../../stores/useWebRTCStore';
 
-interface WebRTCConnectionStatusDotProps {
-  state: WebRTCConnectionState | null;
-}
-
-export default function WebRTCConnectionStatusDot({
-  state,
-}: WebRTCConnectionStatusDotProps) {
-  if (!state) {
+export default function WebRTCConnectionStatusDot() {
+  const webRTCConnectionState = useWebRTCStore((state) => state.webRTCConnectionState);
+  if (!webRTCConnectionState) {
     return null; // don't show before WebRTC initialized
   }
 
   const getStateClass = () => {
-    switch (state) {
+    switch (webRTCConnectionState) {
       case WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER:
         return connectionDotStyles.waiting;
       case WEBRTC_CONNECTION_STATE.CONNECTING:
@@ -28,24 +21,24 @@ export default function WebRTCConnectionStatusDot({
       case WEBRTC_CONNECTION_STATE.FAILED:
         return connectionDotStyles.failed;
       default:
-        return "";
+        return '';
     }
   };
 
   const getLabel = () => {
-    switch (state) {
+    switch (webRTCConnectionState) {
       case WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER:
-        return "waiting";
+        return 'waiting';
       case WEBRTC_CONNECTION_STATE.CONNECTING:
-        return "connecting";
+        return 'connecting';
       case WEBRTC_CONNECTION_STATE.CONNECTED:
-        return "connected";
+        return 'connected';
       case WEBRTC_CONNECTION_STATE.RECONNECTING:
-        return "reconnecting";
+        return 'reconnecting';
       case WEBRTC_CONNECTION_STATE.FAILED:
-        return "failed";
+        return 'failed';
       default:
-        return "";
+        return '';
     }
   };
 

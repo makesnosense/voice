@@ -1,21 +1,17 @@
-import { Mic, MicOff } from "lucide-react";
-import AudioWaves from "../../audiowaves/AudioWaves";
-import baseStyles from "../../../../../styles/BaseCard.module.css";
-import userCardStyles from "./UserCard.module.css";
-import buttonStyles from "../../../../../styles/Buttons.module.css";
-import WebRTCConnectionStatusDot from "./WebRTCConnectionStatusDot/WebRTCConnectionStatusDot";
-import type {
-  SocketId,
-  AudioFrequencyData,
-} from "../../../../../../../shared/types";
-import type { WebRTCConnectionState } from "../../../WebRTCManager";
+import { Mic, MicOff } from 'lucide-react';
+import AudioWaves from '../../audiowaves/AudioWaves';
+import baseStyles from '../../../../../styles/BaseCard.module.css';
+import userCardStyles from './UserCard.module.css';
+import buttonStyles from '../../../../../styles/Buttons.module.css';
+import WebRTCConnectionStatusDot from './WebRTCConnectionStatusDot/WebRTCConnectionStatusDot';
+import type { SocketId, AudioFrequencyData } from '../../../../../../../shared/types';
 
 interface UserCardProps {
   userId: SocketId;
   isCurrentUser: boolean;
 
   // audio visualization (for any user)
-  audioData?: AudioFrequencyData;
+  getAudioData?: () => AudioFrequencyData;
   isAudioActive?: boolean;
 
   // controls (only for current user)
@@ -27,45 +23,33 @@ interface UserCardProps {
 
   // remote user mute status
   isRemoteUserMuted?: boolean;
-
-  webRtcConnectionState: WebRTCConnectionState | null;
 }
 
 export default function UserCard({
   isCurrentUser,
-  audioData,
+  getAudioData,
   isAudioActive = false,
   isMutedLocal = false,
   onToggleMute,
   isMicConnected = false,
   isRemoteUserMuted = false,
-  webRtcConnectionState = null,
 }: UserCardProps) {
-  const displayName = isCurrentUser ? "You" : "Other";
+  const displayName = isCurrentUser ? 'You' : 'Other';
 
   const isMutedRemoteUser = !isCurrentUser && isRemoteUserMuted;
 
   return (
     <div className={`${baseStyles.card} ${userCardStyles.userCard}`}>
       <div className={userCardStyles.userCardContent}>
-        <span className={`${baseStyles.title} ${userCardStyles.displayName}`}>
-          {displayName}
-        </span>
+        <span className={`${baseStyles.title} ${userCardStyles.displayName}`}>{displayName}</span>
 
         <div className={userCardStyles.audioWavesContainer}>
           {isMutedRemoteUser && (
-            <MicOff
-              className={`${buttonStyles.lightRed} ${buttonStyles.noBorder}`}
-              size={16}
-            />
+            <MicOff className={`${buttonStyles.lightRed} ${buttonStyles.noBorder}`} size={16} />
           )}
 
-          {audioData && !isMutedRemoteUser && (
-            <AudioWaves
-              audioData={audioData}
-              isActive={isAudioActive}
-              size="medium"
-            />
+          {getAudioData && !isMutedRemoteUser && (
+            <AudioWaves getAudioData={getAudioData} isActive={isAudioActive} size="medium" />
           )}
         </div>
 
@@ -90,9 +74,7 @@ export default function UserCard({
           </>
         )}
 
-        {!isCurrentUser && (
-          <WebRTCConnectionStatusDot state={webRtcConnectionState ?? null} />
-        )}
+        {!isCurrentUser && <WebRTCConnectionStatusDot />}
       </div>
     </div>
   );

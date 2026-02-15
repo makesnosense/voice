@@ -1,68 +1,51 @@
-import { useEffect, useRef } from "react";
-import type { AudioFrequencyData } from "../../../../../../shared/types";
-import audioWavesStyles from "./AudioWaves.module.css";
+import { useEffect, useRef } from 'react';
+import type { AudioFrequencyData } from '../../../../../../shared/types';
+import audioWavesStyles from './AudioWaves.module.css';
 
 interface AudioWavesProps {
-  audioData: AudioFrequencyData;
+  getAudioData: () => AudioFrequencyData;
   isActive: boolean;
-  size?: "small" | "medium" | "large";
+  size?: 'small' | 'medium' | 'large';
 }
 
-export default function AudioWaves({
-  audioData,
-  isActive,
-  size = "medium",
-}: AudioWavesProps) {
+export default function AudioWaves({ getAudioData, isActive, size = 'medium' }: AudioWavesProps) {
   const waveRefs = useRef<(HTMLDivElement | null)[]>([]);
   const smoothedBands = useRef<number[]>([0, 0, 0, 0, 0]);
   const rafIdRef = useRef<number>(null);
-  const audioDataRef = useRef(audioData);
+  const getAudioDataRef = useRef(getAudioData);
   const isActiveRef = useRef(isActive);
 
   // keep refs in sync with props
   useEffect(() => {
-    audioDataRef.current = audioData;
     isActiveRef.current = isActive;
-  }, [audioData, isActive]);
+    getAudioDataRef.current = getAudioData;
+  }, [isActive, getAudioData]);
 
   useEffect(() => {
-    // visual update loop - runs independently of React renders
     const animate = () => {
-      const currentActive = isActiveRef.current;
-      const currentData: AudioFrequencyData = audioDataRef.current;
-
-      if (!currentActive) {
+      if (!isActiveRef.current) {
         smoothedBands.current = [0, 0, 0, 0, 0];
-
-        waveRefs.current.forEach((ref: HTMLDivElement | null) => {
-          if (ref) ref.style.height = "20%"; // minimum 20% height
+        waveRefs.current.forEach((ref) => {
+          if (ref) ref.style.height = '20%';
         });
       } else {
-        // smooth and update DOM directly
+        const data = getAudioDataRef.current();
         const smoothingFactor = 0.3;
-        currentData.bands.forEach((current, i) => {
+        data.bands.forEach((current, i) => {
           smoothedBands.current[i] =
-            smoothedBands.current[i] * (1 - smoothingFactor) +
-            current * smoothingFactor;
-
+            smoothedBands.current[i] * (1 - smoothingFactor) + current * smoothingFactor;
           const ref = waveRefs.current[i];
-          if (ref) {
-            ref.style.height = `${Math.max(20, smoothedBands.current[i])}%`;
-          }
+          if (ref) ref.style.height = `${Math.max(20, smoothedBands.current[i])}%`;
         });
       }
-
       rafIdRef.current = requestAnimationFrame(animate);
     };
 
     rafIdRef.current = requestAnimationFrame(animate);
-
     return () => {
-      if (rafIdRef.current) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
-  }, []); // only run once on mount
+  }, []);
 
   const sizeClass = audioWavesStyles[size];
 
@@ -74,12 +57,10 @@ export default function AudioWaves({
           ref={(htmlElement) => {
             waveRefs.current[i] = htmlElement;
           }}
-          className={`${audioWavesStyles.wave} ${
-            !isActive ? audioWavesStyles.inactive : ""
-          }`}
+          className={`${audioWavesStyles.wave} ${!isActive ? audioWavesStyles.inactive : ''}`}
           style={{
             animationDelay: `${i * 0.1}s`,
-            height: "20%", // initial height
+            height: '20%', // initial height
           }}
         />
       ))}
