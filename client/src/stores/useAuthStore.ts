@@ -3,9 +3,7 @@ import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
 import { api } from '../api';
 import type { User } from '../../../shared/auth-types';
 
-import { PLATFORM } from '../../../shared/platform';
-
-const REFRESH_TOKEN_LOCAL_STORAGE_KEY = 'refresh_token';
+export const REFRESH_TOKEN_LOCAL_STORAGE_KEY = 'refresh_token';
 
 interface AuthStore {
   accessToken: string | null;
@@ -102,19 +100,6 @@ export const useAuthStore = create<AuthStore>((set, get) => {
           user,
           isAuthenticated: true,
         });
-
-        // 🆕 register device after successful auth
-        try {
-          const deviceName = navigator.userAgent.includes('Mobile')
-            ? 'Mobile Browser'
-            : 'Desktop Browser';
-
-          await api.devices.registerDevice(refreshToken, PLATFORM.WEB, deviceName);
-          console.log('✅ device registered');
-        } catch (error) {
-          // non-fatal - log but don't fail login
-          console.warn('⚠️ device registration failed:', error);
-        }
 
         console.log('✅ authenticated as', user.email);
       } catch (error) {
