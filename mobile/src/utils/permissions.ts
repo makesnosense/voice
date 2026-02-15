@@ -1,3 +1,4 @@
+// not used now
 import { getApp } from '@react-native-firebase/app';
 import {
   getMessaging,

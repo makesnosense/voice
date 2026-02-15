@@ -1,38 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { getFcmToken } from './utils/fcm';
-import { ensureNotificationPermissions } from './utils/permissions';
 import { useAuthStore } from './stores/useAuthStore';
 import Auth from './components/Auth';
+import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 
 export default function App() {
-  const [permissionStatus, setPermissionStatus] =
-    useState<string>('checking...');
-  const [token, setToken] = useState<string | null>(null);
   const { isAuthenticated, user, logout } = useAuthStore();
 
   useEffect(() => {
     useAuthStore.getState().initialize();
   }, []);
 
-  useEffect(() => {
-    const initialize = async () => {
-      // one-liner: check and request if needed
-      const status = await ensureNotificationPermissions();
-      setPermissionStatus(status);
-
-      // get token after permissions resolved
-      const fcmToken = await getFcmToken();
-      setToken(fcmToken);
-
-      if (fcmToken && status === 'authorized') {
-        // TODO: register device with backend
-        console.log('✅ ready to register device');
-      }
-    };
-
-    initialize();
-  }, []);
+  useDeviceRegistration();
 
   return (
     <>
@@ -49,13 +28,6 @@ export default function App() {
         ) : (
           <Auth />
         )}
-
-        <Text style={styles.info}>
-          Notifications permission: {permissionStatus}
-        </Text>
-        <Text style={styles.info}>
-          Token: {token ? `${token.substring(0, 20)}...` : 'none'}
-        </Text>
       </View>
     </>
   );
