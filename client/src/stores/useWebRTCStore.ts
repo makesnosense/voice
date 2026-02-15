@@ -1,14 +1,10 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import {
   WebRTCManager,
   DisconnectReason,
   type WebRTCConnectionState,
-} from "../pages/room/WebRTCManager";
-import type {
-  TypedSocket,
-  SocketId,
-  AudioFrequencyData,
-} from "../../../shared/types";
+} from '../pages/room/WebRTCManager';
+import type { TypedSocket, SocketId, AudioFrequencyData } from '../../../shared/types';
 
 interface WebRTCStore {
   manager: WebRTCManager | null;
@@ -20,10 +16,7 @@ interface WebRTCStore {
   remoteAudioFrequencyData: AudioFrequencyData;
   webRtcConnectionState: WebRTCConnectionState | null;
 
-  initializeWebRTC: (
-    socket: TypedSocket,
-    localStream: MediaStream
-  ) => Promise<void>;
+  initializeWebRTC: (socket: TypedSocket, localStream: MediaStream) => Promise<void>;
   toggleMute: () => void;
   cleanup: () => void;
   updateAudioData: (data: AudioFrequencyData) => void;
@@ -45,11 +38,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   initializeWebRTC: async (socket, localStream) => {
     const { manager } = get();
     if (manager) {
-      console.log("⚠️ [Store] WebRTC already initialized");
+      console.log('⚠️ [Store] WebRTC already initialized');
       return;
     }
 
-    console.log("🎬 [Store] initializing WebRTC manager");
+    console.log('🎬 [Store] initializing WebRTC manager');
 
     const newManager = new WebRTCManager(
       socket,
@@ -85,9 +78,9 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     };
     checkAudio();
 
-    console.log("✅ [Store] emitting webrtc-ready to server");
+    console.log('✅ [Store] emitting webrtc-ready to server');
 
-    socket.emit("webrtc-ready");
+    socket.emit('webrtc-ready');
   },
 
   toggleMute: () => {
