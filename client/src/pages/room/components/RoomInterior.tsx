@@ -4,8 +4,10 @@ import Users from './users/Users';
 import MicWarning from './mic-warning/MicWarning';
 import layoutStyles from '../../../styles/Layout.module.css';
 import Messages from './messages/Messages';
+import { useWebRTCStore } from '../../../stores/useWebRTCStore';
+import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
-import type { MicPermissionStatus } from '../../../stores/useMicrophoneStore';
+// import type { MicPermissionStatus } from '../../../stores/useMicrophoneStore';
 import type {
   RoomId,
   Message,
@@ -19,25 +21,13 @@ interface RoomInteriorProps {
   roomUsers: UserDataClientSide[];
   messages: Message[];
   socketRef: React.RefObject<TypedSocket | null>;
-  isMicActive: boolean;
-  isMutedLocal: boolean;
-  toggleMute: () => void;
-  remoteStream: MediaStream | null;
-  remoteUserId: SocketId | null;
-  micPermissionStatus: MicPermissionStatus;
 }
 
-export default function RoomInterior({
-  roomUsers,
-  messages,
-  socketRef,
-  isMicActive,
-  isMutedLocal,
-  toggleMute,
-  remoteStream,
-  remoteUserId,
-  micPermissionStatus,
-}: RoomInteriorProps) {
+export default function RoomInterior({ roomUsers, messages, socketRef }: RoomInteriorProps) {
+  const remoteStream = useWebRTCStore((state) => state.remoteStream);
+  const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
+  const micPermissionStatus = useMicrophoneStore((state) => state.status);
+
   return (
     <div className={layoutStyles.roomInteriorContainer}>
       <CopyCard />
@@ -45,15 +35,7 @@ export default function RoomInterior({
       {/* single remote audio component */}
       {remoteStream && remoteUserId && <RemoteAudio userId={remoteUserId} stream={remoteStream} />}
 
-      <Users
-        roomUsers={roomUsers}
-        currentUserId={socketRef.current?.id as SocketId}
-        isMicActive={isMicActive}
-        isMutedLocal={isMutedLocal}
-        onToggleMute={toggleMute}
-        remoteUserId={remoteUserId}
-        hasRemoteStream={!!remoteStream}
-      />
+      <Users roomUsers={roomUsers} currentUserId={socketRef.current?.id as SocketId} />
 
       {(micPermissionStatus === MIC_PERMISSION_STATUS.DENIED ||
         micPermissionStatus === MIC_PERMISSION_STATUS.NOT_SUPPORTED) && (
