@@ -21,10 +21,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
   }, [requestMicrophone]);
 
   useEffect(() => {
-    requestMicrophone();
-  }, [requestMicrophone]);
-
-  useEffect(() => {
     if (!roomId || initialStatus === ROOM_CONNECTION_STATUS.ERROR) {
       return;
     }
