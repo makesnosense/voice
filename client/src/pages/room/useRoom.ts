@@ -121,7 +121,6 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
   }, [roomId, initialStatus]);
 
   return {
-    roomId: roomId as RoomId,
     connectionStatus,
     roomUsers,
     messages,

@@ -10,30 +10,31 @@ import RoomInterior from './components/RoomInterior';
 
 export default function RoomPage() {
   const validationResult = useRoomIdValidation();
-  const roomState = useRoom(validationResult.roomId, validationResult.initialStatus);
+  const { connectionStatus, roomUsers, messages, socketRef } = useRoom(
+    validationResult.roomId,
+    validationResult.initialStatus
+  );
 
   return (
     <div className={layoutStyles.page}>
       <Header
-        leftContent={
-          roomState.connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? <ExitRoomButton /> : null
-        }
-        connectionStatus={roomState.connectionStatus}
+        leftContent={connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? <ExitRoomButton /> : null}
+        connectionStatus={connectionStatus}
       />
 
-      {roomState.connectionStatus === ROOM_CONNECTION_STATUS.ERROR && (
+      {connectionStatus === ROOM_CONNECTION_STATUS.ERROR && (
         <RoomError connectionError={ROOM_CONNECTION_STATUS.ERROR} />
       )}
 
-      {roomState.connectionStatus === ROOM_CONNECTION_STATUS.ROOM_FULL && (
+      {connectionStatus === ROOM_CONNECTION_STATUS.ROOM_FULL && (
         <RoomError connectionError={ROOM_CONNECTION_STATUS.ROOM_FULL} />
       )}
 
-      {roomState.connectionStatus === ROOM_CONNECTION_STATUS.JOINED && (
-        <RoomInterior {...roomState} />
+      {connectionStatus === ROOM_CONNECTION_STATUS.JOINED && (
+        <RoomInterior roomUsers={roomUsers} messages={messages} socketRef={socketRef} />
       )}
 
-      {roomState.connectionStatus === ROOM_CONNECTION_STATUS.CONNECTING && <Spinner />}
+      {connectionStatus === ROOM_CONNECTION_STATUS.CONNECTING && <Spinner />}
     </div>
   );
 }

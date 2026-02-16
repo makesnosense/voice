@@ -9,7 +9,6 @@ import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
 // import type { MicPermissionStatus } from '../../../stores/useMicrophoneStore';
 import type {
-  RoomId,
   Message,
   TypedSocket,
   SocketId,
@@ -17,7 +16,6 @@ import type {
 } from '../../../../../shared/types';
 
 interface RoomInteriorProps {
-  roomId: RoomId;
   roomUsers: UserDataClientSide[];
   messages: Message[];
   socketRef: React.RefObject<TypedSocket | null>;
