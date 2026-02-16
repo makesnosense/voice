@@ -1,22 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { ROOM_CONNECTION_STATUS } from './RoomPage.constants';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
+import { useRoomStore } from '../../stores/useRoomStore';
+
 import useWebRTCInit from './useWebRTCInit';
 import type { RoomConnectionStatus } from './RoomPage.constants';
 import type { RoomId, TypedSocket, Message, UserDataClientSide } from '../../../../shared/types';
 import type { Transport } from 'engine.io-client';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnectionStatus) {
-  const [connectionStatus, setConnectionStatus] = useState(initialStatus);
-  const [roomUsers, setRoomUsers] = useState<UserDataClientSide[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
   const socketRef = useRef<TypedSocket | null>(null);
-
   const requestMicrophone = useMicrophoneStore((state) => state.requestMicrophone);
 
-  useWebRTCInit(socketRef, connectionStatus);
+  useWebRTCInit(socketRef);
 
   useEffect(() => {
     requestMicrophone();
@@ -30,6 +28,8 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
     if (!roomId || initialStatus === ROOM_CONNECTION_STATUS.ERROR) {
       return;
     }
+
+    useRoomStore.getState().setConnectionStatus(initialStatus);
 
     document.title = `Room ${roomId}`;
 
@@ -79,7 +79,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
         // this ensures we start fresh when reconnecting
         useWebRTCStore.getState().cleanup();
         // set status to connecting so reconnection triggers webrtc re-initialization
-        setConnectionStatus('connecting');
+        useRoomStore.getState().setConnectionStatus('connecting');
       }
     );
 
@@ -88,28 +88,28 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
     });
 
     newSocket.on('room-not-found', (error: string) => {
-      setConnectionStatus('error');
+      useRoomStore.getState().setConnectionStatus('error');
       console.error('❌ Room error:', error);
     });
 
     // handle room full error
     newSocket.on('room-full', (error: string) => {
-      setConnectionStatus('room-full');
+      useRoomStore.getState().setConnectionStatus('room-full');
       console.error('🚫 Room full:', error);
     });
 
     newSocket.on('room-join-success', (data: { roomId: RoomId }) => {
       console.log('✅ Successfully joined room:', data.roomId);
-      setConnectionStatus('joined');
+      useRoomStore.getState().setConnectionStatus('joined');
     });
 
     newSocket.on('room-users-update', (users: UserDataClientSide[]) => {
       console.log('👥 Room users updated:', users);
-      setRoomUsers(users);
+      useRoomStore.getState().setRoomUsers(users);
     });
 
     newSocket.on('message', (message: Message) => {
-      setMessages((messages) => [...messages, message]);
+      useRoomStore.getState().addMessage(message);
     });
 
     return () => {
@@ -117,13 +117,11 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
       newSocket.disconnect();
       useWebRTCStore.getState().cleanup();
       useMicrophoneStore.getState().cleanup();
+      useRoomStore.getState().reset();
     };
   }, [roomId, initialStatus]);
 
   return {
-    connectionStatus,
-    roomUsers,
-    messages,
     socketRef,
   };
 }

@@ -1,18 +1,15 @@
 import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../stores/useWebRTCStore';
 import usersStyles from './Users.module.css';
-import type {
-  SocketId,
-  AudioFrequencyData,
-  UserDataClientSide,
-} from '../../../../../../shared/types';
+import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
+import { useRoomStore } from '../../../../stores/useRoomStore';
 
 interface UsersProps {
-  roomUsers: UserDataClientSide[];
   currentUserId: SocketId | undefined;
 }
 
-export default function Users({ roomUsers, currentUserId }: UsersProps) {
+export default function Users({ currentUserId }: UsersProps) {
+  const roomUsers = useRoomStore((state) => state.roomUsers);
   const manager = useWebRTCStore((state) => state.manager);
   const isMicActive = useWebRTCStore((state) => state.isMicActive);
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
