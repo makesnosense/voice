@@ -1,4 +1,3 @@
-import ExitRoomButton from './components/exit-room-button/ExitRoomButton';
 import layoutStyles from '../../styles/Layout.module.css';
 import { useRoomStore } from '../../stores/useRoomStore';
 import useRoomIdValidation from './useRoomIdValidation';
@@ -16,9 +15,7 @@ export default function RoomPage() {
 
   return (
     <div className={layoutStyles.page}>
-      <Header
-        leftContent={connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? <ExitRoomButton /> : null}
-      />
+      <Header />
 
       {connectionStatus === ROOM_CONNECTION_STATUS.ERROR && (
         <RoomError connectionError={ROOM_CONNECTION_STATUS.ERROR} />
