@@ -1,5 +1,5 @@
 import { Mic, MicOff } from 'lucide-react';
-import AudioWaves from '../../audiowaves/AudioWaves';
+import AudioWaves from './audiowaves/AudioWaves';
 import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from './UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';

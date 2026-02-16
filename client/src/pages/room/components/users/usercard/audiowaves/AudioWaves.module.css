@@ -8,7 +8,9 @@
 .wave {
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   border-radius: 1px;
-  transition: height 0.1s ease-out, background-color 0.3s ease;
+  transition:
+    height 0.1s ease-out,
+    background-color 0.3s ease;
   min-height: 4px;
 }
 
@@ -46,7 +48,6 @@
 
 /* subtle animation for life */
 @keyframes subtle-pulse {
-
   0%,
   100% {
     opacity: 0.8;
