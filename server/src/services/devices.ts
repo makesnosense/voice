@@ -1,6 +1,7 @@
 import { devices, refreshTokens } from '../db/schema';
 import { db } from '../db';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, inArray, isNotNull } from 'drizzle-orm';
+import { PLATFORM } from '../db/schema';
 import type { Platform } from '../db/schema';
 
 export async function findDeviceByRefreshJti(jti: string) {
@@ -57,18 +58,33 @@ export async function updateDevice(
   return updated;
 }
 
+const deviceSelect = {
+  jti: devices.jti,
+  platform: devices.platform,
+  deviceName: devices.deviceName,
+  fcmToken: devices.fcmToken,
+  lastSeen: devices.lastSeen,
+  createdAt: devices.createdAt,
+};
+
 export async function getUserDevices(userId: string) {
-  const userDevices = await db
-    .select({
-      jti: devices.jti,
-      platform: devices.platform,
-      deviceName: devices.deviceName,
-      lastSeen: devices.lastSeen,
-      createdAt: devices.createdAt,
-    })
+  return db
+    .select(deviceSelect)
     .from(devices)
     .where(eq(devices.userId, userId))
     .orderBy(desc(devices.lastSeen));
+}
 
-  return userDevices;
+export async function getUserMobileDevices(userId: string) {
+  return db
+    .select(deviceSelect)
+    .from(devices)
+    .where(
+      and(
+        eq(devices.userId, userId),
+        inArray(devices.platform, [PLATFORM.ANDROID, PLATFORM.IOS]),
+        isNotNull(devices.fcmToken)
+      )
+    )
+    .orderBy(desc(devices.lastSeen));
 }
