@@ -2,7 +2,7 @@ import express from 'express';
 import authRoutes from './routes/auth';
 import devicesRoutes from './routes/devices';
 import turnRoutes from './routes/turn';
-
+import createCallRouter from './routes/call';
 import createRoomsRouter from './routes/rooms';
 import { generalApiLimiter } from './middleware/api-rate-limiters';
 import config from './config';
@@ -23,6 +23,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
   }
 
   app.use('/api', createRoomsRouter(rooms));
+  app.use('/api', createCallRouter(rooms));
   app.use('/api', turnRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/devices', devicesRoutes);

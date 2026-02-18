@@ -47,6 +47,11 @@ const config = {
     enabled: rateLimitingEnabled,
     trustProxy: isProduction, // trust proxy headers in production
   },
+  fcm: {
+    projectId: getRequiredEnv('FCM_PROJECT_ID'),
+    privateKey: getRequiredEnv('FCM_PRIVATE_KEY'),
+    clientEmail: getRequiredEnv('FCM_CLIENT_EMAIL'),
+  },
 };
 
 export function getProtocol(server: Server | HttpsServer): string {
