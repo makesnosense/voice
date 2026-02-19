@@ -22,7 +22,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
     console.log('🛡️  Rate limiting enabled for API endpoints');
   }
 
-  app.use('/api', createRoomsRouter(rooms));
+  app.use('/api/rooms', createRoomsRouter(rooms));
   app.use('/api', createCallRouter(rooms));
   app.use('/api', turnRoutes);
   app.use('/api/auth', authRoutes);

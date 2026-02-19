@@ -5,7 +5,7 @@ import type { Room, RoomId } from '../../../shared/types';
 export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
   const router = Router();
 
-  router.post('/create-room', (req, res) => {
+  router.post('/', (req, res) => {
     const roomId = createRoom(rooms);
     res.json({ roomId });
   });
