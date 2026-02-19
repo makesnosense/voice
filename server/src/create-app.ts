@@ -24,7 +24,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
 
   app.use('/api/rooms', createRoomsRouter(rooms));
   app.use('/api', createCallRouter(rooms));
-  app.use('/api', turnRoutes);
+  app.use('/api/turn-credentials', turnRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/devices', devicesRoutes);
 

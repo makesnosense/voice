@@ -4,7 +4,7 @@ import config from '../config';
 
 const router = Router();
 
-router.get('/turn-credentials', (req, res) => {
+router.get('/', (req, res) => {
   if (!config.turnSecret) {
     return res.status(500).json({ error: 'TURN server not configured' });
   }
