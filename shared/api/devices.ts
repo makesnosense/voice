@@ -7,7 +7,7 @@ export class DevicesApi extends ApiBase {
     platform: Platform,
     options?: { fcmToken?: string; deviceName?: string }
   ): Promise<void> {
-    return this.apiFetch('/devices/register', {
+    return this.apiFetch('/devices', {
       method: 'POST',
       body: JSON.stringify({ refreshToken, platform, ...options }),
     });

@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 
-router.post('/register', requireRefreshToken, async (req, res) => {
+router.post('/', requireRefreshToken, async (req, res) => {
   const result = registerDeviceSchema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({ error: 'invalid request', details: result.error.issues });
