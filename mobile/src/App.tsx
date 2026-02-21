@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAuthStore } from './stores/useAuthStore';
 import Auth from './components/Auth';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
+import { DeviceEventEmitter } from 'react-native';
 
 export default function App() {
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -12,6 +13,17 @@ export default function App() {
   }, []);
 
   useDeviceRegistration();
+
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener(
+      'incomingCallAccepted',
+      ({ roomId }) => {
+        // navigate to the call room
+        // navigation.navigate('Room', { roomId });
+      },
+    );
+    return () => sub.remove();
+  }, []);
 
   return (
     <>

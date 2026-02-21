@@ -1,9 +1,12 @@
 package org.voicepopuli.voice
 
+import android.content.Intent
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+import com.facebook.react.modules.core.DeviceEventManagerModule
 
 class MainActivity : ReactActivity() {
 
@@ -19,4 +22,21 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingCallIntent(intent)
+    }
+
+    private fun handleIncomingCallIntent(intent: Intent) {
+        val roomId = intent.getStringExtra("incomingCallRoomId") ?: return
+        // break the chain so kotlin can infer the generic type on getJSModule
+        val context = reactInstanceManager?.currentReactContext ?: return
+        val emitter = context.getJSModule(
+            DeviceEventManagerModule.RCTDeviceEventEmitter::class.java
+        ) ?: return
+        val params = Arguments.createMap()
+        params.putString("roomId", roomId)
+        emitter.emit("incomingCallAccepted", params)
+    }
 }
