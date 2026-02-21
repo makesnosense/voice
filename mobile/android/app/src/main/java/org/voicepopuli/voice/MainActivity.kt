@@ -22,21 +22,11 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        handleIncomingCallIntent(intent)
-    }
 
-    private fun handleIncomingCallIntent(intent: Intent) {
-        val roomId = intent.getStringExtra("incomingCallRoomId") ?: return
-        // break the chain so kotlin can infer the generic type on getJSModule
-        val context = reactInstanceManager?.currentReactContext ?: return
-        val emitter = context.getJSModule(
-            DeviceEventManagerModule.RCTDeviceEventEmitter::class.java
-        ) ?: return
-        val params = Arguments.createMap()
-        params.putString("roomId", roomId)
-        emitter.emit("incomingCallAccepted", params)
-    }
+  override fun onNewIntent(intent: Intent) {
+    // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
+    // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
+      super.onNewIntent(intent)
+      setIntent(intent)
+  }
 }

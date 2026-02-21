@@ -77,9 +77,9 @@ class IncomingCallActivity : AppCompatActivity() {
 
     private fun acceptCall(roomId: String?) {
         cancelNotification()
-        // launch the main RN app with roomId so it can navigate to the call screen
         val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra("incomingCallRoomId", roomId)
+            action = Intent.ACTION_VIEW
+            data = android.net.Uri.parse("voice://call?roomId=$roomId")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         startActivity(intent)
