@@ -82,6 +82,7 @@ class IncomingCallActivity : AppCompatActivity() {
         val options = android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
         startActivity(intent, options.toBundle())
         finish()
+        overridePendingTransition(0, 0) 
     }
 
     private fun declineCall() {
