@@ -9,9 +9,10 @@ import RoomError from './components/room-error/RoomError';
 import RoomInterior from './components/RoomInterior';
 
 export default function RoomPage() {
-  const connectionStatus = useRoomStore((state) => state.connectionStatus);
   const validationResult = useRoomIdValidation();
   const { socketRef } = useRoom(validationResult.roomId, validationResult.initialStatus);
+
+  const connectionStatus = useRoomStore((state) => state.connectionStatus);
 
   return (
     <div className={layoutStyles.page}>
