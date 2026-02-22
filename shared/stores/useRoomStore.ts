@@ -21,5 +21,6 @@ export const useRoomStore = create<RoomStore>((set) => ({
   setRoomUsers: (users) => set({ roomUsers: users }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
   setConnectionStatus: (status) => set({ connectionStatus: status }),
-  reset: () => set({ roomUsers: [], messages: [] }),
+  reset: () =>
+    set({ roomUsers: [], messages: [], connectionStatus: ROOM_CONNECTION_STATUS.CONNECTING }),
 }));

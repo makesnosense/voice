@@ -6,7 +6,7 @@ import roomErrorStyles from './RoomError.module.css';
 import { ROOM_CONNECTION_STATUS, type RoomConnectionError } from '../../../../../../shared/room';
 
 interface RoomErrorProps {
-  connectionError: RoomConnectionError;
+  connectionError?: RoomConnectionError;
 }
 
 export default function RoomError({ connectionError }: RoomErrorProps) {
