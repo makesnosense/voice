@@ -3,7 +3,7 @@ import { Send } from 'lucide-react';
 import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';
 import baseStyles from '../../../../styles/BaseCard.module.css';
-import { useRoomStore } from '../../../../stores/useRoomStore';
+import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 interface MessagesProps {
   socketRef: React.RefObject<TypedClientSocket | null>;
 }

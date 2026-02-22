@@ -2,7 +2,7 @@ import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../stores/useWebRTCStore';
 import usersStyles from './Users.module.css';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
-import { useRoomStore } from '../../../../stores/useRoomStore';
+import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 
 interface UsersProps {
   currentUserId: SocketId | undefined;

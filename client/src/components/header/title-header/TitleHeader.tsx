@@ -2,7 +2,7 @@ import HeaderAnimation from './header-animation/HeaderAnimation';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import headerStyles from '../Header.module.css';
 import { useWebRTCStore } from '../../../stores/useWebRTCStore';
-import { useRoomStore } from '../../../stores/useRoomStore';
+import { useRoomStore } from '../../../../../shared/stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../../../../../shared/room';
 import { HEADER_ANIMATION_STATE } from '../title-header/header-animation/HeaderAnimationState';
 

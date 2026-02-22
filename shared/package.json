@@ -1,0 +1,7 @@
+{
+  "name": "shared",
+  "private": true,
+  "devDependencies": {
+    "zustand": "^5.0.11"
+  }
+}

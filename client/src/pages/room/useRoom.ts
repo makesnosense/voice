@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../../../../shared/room';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
-import { useRoomStore } from '../../stores/useRoomStore';
+import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 
 import useWebRTCInit from './useWebRTCInit';
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { UserDataClientSide, Message } from '../../../shared/types';
-import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../../../shared/room';
+import type { UserDataClientSide, Message } from '../types';
+import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../room';
 
 interface RoomStore {
   roomUsers: UserDataClientSide[];

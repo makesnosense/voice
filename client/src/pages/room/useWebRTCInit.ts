@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
-import { useRoomStore } from '../../stores/useRoomStore';
+import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';
 import type { TypedClientSocket } from '../../../../shared/types';
 

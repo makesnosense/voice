@@ -1,5 +1,5 @@
 import layoutStyles from '../../styles/Layout.module.css';
-import { useRoomStore } from '../../stores/useRoomStore';
+import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import useRoomIdValidation from './useRoomIdValidation';
 import useRoom from './useRoom';
 import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';
