@@ -5,7 +5,7 @@ import type {
   Room,
   RoomId,
   TypedServer,
-  ExtendedSocket,
+  ExtendedConnectedSocket,
   Message,
   SocketId,
   WebRTCOffer,
@@ -20,7 +20,7 @@ export default function createConnectionHandler(
   rooms: Map<RoomId, Room>,
   roomDestructionManager: RoomDestructionManager
 ) {
-  const handleConnection = (socket: ExtendedSocket) => {
+  const handleConnection = (socket: ExtendedConnectedSocket) => {
     console.log(`🔌 [Socket] new connection: ${socket.id}`);
     console.log(`🔌 [Socket] transport: ${socket.conn.transport.name}`);
     console.log(`🔌 [Socket] remote address: ${socket.handshake.address}`);
@@ -85,7 +85,7 @@ export default function createConnectionHandler(
 
 // helper to check rate limits for socket events
 const checkRateLimit = (
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   event: keyof typeof SOCKET_RATE_LIMITS
 ): boolean => {
   if (!config.rateLimiting.enabled) {
@@ -152,7 +152,7 @@ const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number =
 const handleRoomJoin = (
   io: TypedServer,
   rooms: Map<RoomId, Room>,
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   roomId: RoomId,
   roomDestructionManager: RoomDestructionManager
 ): void => {
@@ -185,10 +185,10 @@ const handleRoomJoin = (
     roomDestructionManager.cancelDestruction(roomId);
   }
 
-  room.users.set(socket.id, { webRTCReady: false, isMuted: false });
+  room.users.set(socket.id as SocketId, { webRTCReady: false, isMuted: false });
 
   socket.join(roomId);
-  socket.roomId = roomId;
+  socket.roomId = roomId as RoomId;
 
   console.log(`✅ [Socket] ${socket.id} joined room ${roomId} (${room.users.size}/2 users)`);
 
@@ -199,7 +199,11 @@ const handleRoomJoin = (
   socket.emit('room-join-success', { roomId });
 };
 
-const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text: string }) => {
+const handleNewMessage = (
+  io: TypedServer,
+  socket: ExtendedConnectedSocket,
+  data: { text: string }
+) => {
   if (!socket.roomId) {
     console.warn(`⚠️ [Message] ${socket.id} sent message but not in a room`);
     return;
@@ -228,7 +232,7 @@ const handleNewMessage = (io: TypedServer, socket: ExtendedSocket, data: { text:
 const handleDisconnect = (
   io: TypedServer,
   rooms: Map<RoomId, Room>,
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   roomDestructionManager: RoomDestructionManager,
   reason: string
 ) => {
@@ -245,8 +249,8 @@ const handleDisconnect = (
     return;
   }
 
-  const wasInRoom = room.users.has(socket.id);
-  room.users.delete(socket.id);
+  const wasInRoom = room.users.has(socket.id as SocketId);
+  room.users.delete(socket.id as SocketId);
 
   if (wasInRoom) {
     console.log(
@@ -264,7 +268,11 @@ const handleDisconnect = (
   }
 };
 
-const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: ExtendedSocket) => {
+const handleWebRTCReady = (
+  io: TypedServer,
+  rooms: Map<RoomId, Room>,
+  socket: ExtendedConnectedSocket
+) => {
   if (!socket.roomId) {
     console.warn(`⚠️ [WebRTC] ${socket.id} is ready but not in a room`);
     return;
@@ -276,9 +284,9 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
     return;
   }
 
-  const userData = room.users.get(socket.id);
+  const userData = room.users.get(socket.id as SocketId);
   if (userData) {
-    room.users.set(socket.id, { ...userData, webRTCReady: true });
+    room.users.set(socket.id as SocketId, { ...userData, webRTCReady: true });
     console.log(`✅ [WebRTC] ${socket.id} is ready`);
 
     // Check if all users are audio ready
@@ -302,7 +310,7 @@ const handleWebRTCReady = (io: TypedServer, rooms: Map<RoomId, Room>, socket: Ex
 const handleMuteStatusChanged = (
   io: TypedServer,
   rooms: Map<RoomId, Room>,
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   data: { isMuted: boolean }
 ) => {
   if (!socket.roomId) return;
@@ -310,10 +318,10 @@ const handleMuteStatusChanged = (
   const room = rooms.get(socket.roomId);
   if (!room) return;
 
-  const userData = room.users.get(socket.id);
+  const userData = room.users.get(socket.id as SocketId);
   if (userData) {
     // update mute status while preserving webRTCReady status
-    room.users.set(socket.id, { ...userData, isMuted: data.isMuted });
+    room.users.set(socket.id as SocketId, { ...userData, isMuted: data.isMuted });
     console.log(`🔇 [Mute] ${socket.id} is now ${data.isMuted ? 'muted' : 'unmuted'}`);
 
     // broadcast updated user list to all users in room
@@ -325,7 +333,7 @@ const handleMuteStatusChanged = (
 // WebRTC signaling handlers
 const handleWebRTCOffer = (
   io: TypedServer,
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   data: { offer: WebRTCOffer; toUserId: SocketId }
 ) => {
   console.log(`📞 Relaying offer from ${socket.id} to ${data.toUserId}`);
@@ -338,7 +346,7 @@ const handleWebRTCOffer = (
 
 const handleWebRTCAnswer = (
   io: TypedServer,
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   data: { answer: WebRTCAnswer; toUserId: SocketId }
 ) => {
   console.log(`✅ Relaying answer from ${socket.id} to ${data.toUserId}`);
@@ -351,7 +359,7 @@ const handleWebRTCAnswer = (
 
 const handleWebRTCIceCandidate = (
   io: TypedServer,
-  socket: ExtendedSocket,
+  socket: ExtendedConnectedSocket,
   data: { candidate: IceCandidate; toUserId: SocketId }
 ) => {
   console.log(`🧊 Relaying ICE candidate from ${socket.id} to ${data.toUserId}`);

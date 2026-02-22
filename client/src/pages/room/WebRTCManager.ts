@@ -1,6 +1,6 @@
 import AudioAnalyser from './AudioAnalyser';
 import type {
-  TypedSocket,
+  TypedClientSocket,
   SocketId,
   IceCandidate,
   WebRTCOffer,
@@ -37,7 +37,7 @@ export type DisconnectReason = (typeof DisconnectReason)[keyof typeof Disconnect
 export class WebRTCManager {
   private localStream: MediaStream;
   private peerConnection: RTCPeerConnection | null = null;
-  private socket: TypedSocket;
+  private socket: TypedClientSocket;
   private currentRemoteUserId: SocketId | null = null;
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
@@ -59,7 +59,7 @@ export class WebRTCManager {
   private onConnectionStateChange: (state: WebRTCConnectionState) => void;
 
   constructor(
-    socket: TypedSocket,
+    socket: TypedClientSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: (reason: DisconnectReason) => void,

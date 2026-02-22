@@ -8,10 +8,10 @@ import { useWebRTCStore } from '../../../stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
 
-import type { TypedSocket, SocketId } from '../../../../../shared/types';
+import type { TypedClientSocket, SocketId } from '../../../../../shared/types';
 
 interface RoomInteriorProps {
-  socketRef: React.RefObject<TypedSocket | null>;
+  socketRef: React.RefObject<TypedClientSocket | null>;
 }
 
 export default function RoomInterior({ socketRef }: RoomInteriorProps) {

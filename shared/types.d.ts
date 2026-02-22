@@ -1,5 +1,5 @@
-import type { Server } from 'socket.io';
-import type { Socket } from 'socket.io-client';
+import type { Server, Socket as ConnectedSocket } from 'socket.io';
+import type { Socket as ClientSocket } from 'socket.io-client';
 
 export type ObjectValues<T> = T[keyof T];
 
@@ -62,9 +62,12 @@ export interface ClientToServerEvents {
 }
 
 export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
-export type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
+export type TypedClientSocket = ClientSocket<ServerToClientEvents, ClientToServerEvents>;
 
-export type ExtendedSocket = TypedSocket & {
+export type ExtendedConnectedSocket = ConnectedSocket<
+  ClientToServerEvents,
+  ServerToClientEvents
+> & {
   roomId?: RoomId;
 };
 

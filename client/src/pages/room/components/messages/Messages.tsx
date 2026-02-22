@@ -1,11 +1,11 @@
-import type { TypedSocket } from '../../../../../../shared/types';
+import type { TypedClientSocket } from '../../../../../../shared/types';
 import { Send } from 'lucide-react';
 import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import { useRoomStore } from '../../../../stores/useRoomStore';
 interface MessagesProps {
-  socketRef: React.RefObject<TypedSocket | null>;
+  socketRef: React.RefObject<TypedClientSocket | null>;
 }
 
 function useAutoScroll(dependencies: React.DependencyList) {

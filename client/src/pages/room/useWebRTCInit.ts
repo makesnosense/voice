@@ -4,9 +4,9 @@ import { useWebRTCStore } from '../../stores/useWebRTCStore';
 import { useRoomStore } from '../../stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from './RoomPage.constants';
 
-import type { TypedSocket } from '../../../../shared/types';
+import type { TypedClientSocket } from '../../../../shared/types';
 
-export default function useWebRTCInit(socketRef: React.RefObject<TypedSocket | null>) {
+export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSocket | null>) {
   const connectionStatus = useRoomStore((state) => state.connectionStatus);
   const localStream = useMicrophoneStore((state) => state.stream);
   const micPermissionStatus = useMicrophoneStore((state) => state.status);

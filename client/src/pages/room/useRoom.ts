@@ -7,11 +7,16 @@ import { useRoomStore } from '../../stores/useRoomStore';
 
 import useWebRTCInit from './useWebRTCInit';
 import type { RoomConnectionStatus } from './RoomPage.constants';
-import type { RoomId, TypedSocket, Message, UserDataClientSide } from '../../../../shared/types';
+import type {
+  RoomId,
+  TypedClientSocket,
+  Message,
+  UserDataClientSide,
+} from '../../../../shared/types';
 import type { Transport } from 'engine.io-client';
 
 export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnectionStatus) {
-  const socketRef = useRef<TypedSocket | null>(null);
+  const socketRef = useRef<TypedClientSocket | null>(null);
   const requestMicrophone = useMicrophoneStore((state) => state.requestMicrophone);
 
   useWebRTCInit(socketRef);
@@ -29,7 +34,7 @@ export default function useRoom(roomId: RoomId | null, initialStatus: RoomConnec
 
     document.title = `Room ${roomId}`;
 
-    const newSocket: TypedSocket = io({
+    const newSocket: TypedClientSocket = io({
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,

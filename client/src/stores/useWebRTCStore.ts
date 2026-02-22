@@ -4,7 +4,7 @@ import {
   DisconnectReason,
   type WebRTCConnectionState,
 } from '../pages/room/WebRTCManager';
-import type { TypedSocket, SocketId } from '../../../shared/types';
+import type { TypedClientSocket, SocketId } from '../../../shared/types';
 
 interface WebRTCStore {
   manager: WebRTCManager | null;
@@ -14,7 +14,7 @@ interface WebRTCStore {
   isMutedLocal: boolean;
   webRTCConnectionState: WebRTCConnectionState | null;
 
-  initializeWebRTC: (socket: TypedSocket, localStream: MediaStream) => Promise<void>;
+  initializeWebRTC: (socket: TypedClientSocket, localStream: MediaStream) => Promise<void>;
   toggleMute: () => void;
   cleanup: () => void;
   setRemoteStream: (userId: SocketId, stream: MediaStream) => void;
