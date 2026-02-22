@@ -1,6 +1,8 @@
 package org.voicepopuli.voice
 
+import android.os.Bundle
 import android.content.Intent
+import android.app.NotificationManager
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.bridge.Arguments
@@ -23,10 +25,26 @@ class MainActivity : ReactActivity() {
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+      super.onCreate(savedInstanceState)
+      cancelCallNotificationIfNeeded(intent)
+  }
+
   override fun onNewIntent(intent: Intent) {
     // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
     // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
       super.onNewIntent(intent)
       setIntent(intent)
+      cancelCallNotificationIfNeeded(intent)
+  }
+
+  private fun cancelCallNotificationIfNeeded(intent: Intent) {
+      val data = intent.data
+      if (intent.action == Intent.ACTION_VIEW && 
+          data?.scheme == "voice" &&
+          data.host == "call") {
+          getSystemService(NotificationManager::class.java)
+              .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+      }
   }
 }

@@ -72,14 +72,16 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notifAcceptIntent = Intent(this, IncomingCallActivity::class.java).apply {
-            putExtra("action", "accept")
-            putExtra("roomId", roomId)
-            putExtra("callerName", callerName)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val notificationBarAcceptIntent = Intent(Intent.ACTION_VIEW, 
+            android.net.Uri.parse("voice://call?roomId=$roomId")).apply {
+            setClass(applicationContext, MainActivity::class.java)
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or 
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_NO_ANIMATION
         }
-        val notifAcceptPendingIntent = PendingIntent.getActivity(
-            this, 2, notifAcceptIntent,
+
+        val notificationBarAcceptPendingIntent = PendingIntent.getActivity(
+            this, 2, notificationBarAcceptIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -93,7 +95,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             .setOngoing(true)
             .setAutoCancel(false)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "decline", notifDeclinePendingIntent)
-            .addAction(android.R.drawable.ic_menu_call, "accept", notifAcceptPendingIntent)
+            .addAction(android.R.drawable.ic_menu_call, "accept", notificationBarAcceptPendingIntent)
             .build()
 
         notificatonManager.notify(NOTIFICATION_ID, notification)

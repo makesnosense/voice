@@ -66,13 +66,10 @@ class IncomingCallActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // handles action buttons when activity is already in foreground
-        val action = intent.getStringExtra("action")
-        val roomId = intent.getStringExtra("roomId")
-        when (action) {
-            "accept" -> acceptCall(roomId)
-            "decline" -> declineCall()
-        }
+        setIntent(intent)
+        // cancel the call notification
+        getSystemService(NotificationManager::class.java)
+            .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 
     private fun acceptCall(roomId: String?) {
@@ -80,9 +77,10 @@ class IncomingCallActivity : AppCompatActivity() {
         val intent = Intent(this, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
             data = android.net.Uri.parse("voice://call?roomId=$roomId")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        startActivity(intent)
+        val options = android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
+        startActivity(intent, options.toBundle())
         finish()
     }
 
