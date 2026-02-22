@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
 import { findUserByEmail } from '../services/users';
 import { getUserMobileDevices } from '../services/devices';
-import { sendCallNotification } from '../utils/fcm';
+import { notifyDevicesOfCall } from '../services/call';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/call';
 import type { Room, RoomId } from '../../../shared/types';
@@ -35,16 +35,7 @@ export default function createCallRouter(rooms: Map<RoomId, Room>) {
       }
 
       const roomId = createRoom(rooms);
-
-      await Promise.allSettled(
-        mobileDevices.map((device) =>
-          sendCallNotification(device.fcmToken!, {
-            callerEmail: caller.email,
-            callerName: null,
-            roomId,
-          })
-        )
-      );
+      await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
 
       res.json({ roomId });
     } catch (error) {
