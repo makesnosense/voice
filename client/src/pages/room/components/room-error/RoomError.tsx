@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import baseStyles from "../../../../styles/BaseCard.module.css";
-import buttonStyles from "../../../../styles/Buttons.module.css";
-import roomErrorStyles from "./RoomError.module.css";
-import { ROOM_CONNECTION_STATUS } from "../../RoomPage.constants";
-import type { RoomConnectionError } from "../../RoomPage.constants";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import baseStyles from '../../../../styles/BaseCard.module.css';
+import buttonStyles from '../../../../styles/Buttons.module.css';
+import roomErrorStyles from './RoomError.module.css';
+import { ROOM_CONNECTION_STATUS, type RoomConnectionError } from '../../../../../../shared/room';
 
 interface RoomErrorProps {
   connectionError: RoomConnectionError;
@@ -23,7 +22,7 @@ export default function RoomError({ connectionError }: RoomErrorProps) {
 
   useEffect(() => {
     if (countdown === 0) {
-      navigate("/");
+      navigate('/');
     }
   }, [countdown, navigate]);
 
@@ -31,15 +30,15 @@ export default function RoomError({ connectionError }: RoomErrorProps) {
     switch (connectionError) {
       case ROOM_CONNECTION_STATUS.ROOM_FULL:
         return {
-          icon: "🚫",
-          title: "Room is full",
-          description: "This room already has 2 people (maximum capacity).",
+          icon: '🚫',
+          title: 'Room is full',
+          description: 'This room already has 2 people (maximum capacity).',
         };
       case ROOM_CONNECTION_STATUS.ERROR:
       default:
         return {
-          icon: "❌",
-          title: "Room does not exist",
+          icon: '❌',
+          title: 'Room does not exist',
           description: "The room you're looking for could not be found.",
         };
     }
@@ -58,12 +57,12 @@ export default function RoomError({ connectionError }: RoomErrorProps) {
         <p className={roomErrorStyles.description}>{description}</p>
         <p className={roomErrorStyles.countdown}>
           Redirecting to home page in {countdown} second
-          {countdown !== 1 ? "s" : ""}...
+          {countdown !== 1 ? 's' : ''}...
         </p>
       </div>
 
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate('/')}
         className={`${buttonStyles.button} ${buttonStyles.neutral}`}
       >
         Go Home Now

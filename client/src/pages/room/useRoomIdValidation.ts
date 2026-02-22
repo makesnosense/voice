@@ -1,7 +1,6 @@
-import { useParams } from "react-router";
-import { ROOM_CONNECTION_STATUS } from "./RoomPage.constants";
-import type { RoomConnectionStatus } from "./RoomPage.constants";
-import type { RoomId } from "../../../../shared/types";
+import { useParams } from 'react-router';
+import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../../../../shared/room';
+import type { RoomId } from '../../../../shared/types';
 
 interface RoomIdValidationResult {
   roomId: RoomId | null;
@@ -16,7 +15,7 @@ export default function useRoomIdValidation(): RoomIdValidationResult {
     return {
       roomId: null,
       initialStatus: ROOM_CONNECTION_STATUS.ERROR,
-      errorMessage: "Room ID is required",
+      errorMessage: 'Room ID is required',
     };
   }
 
@@ -24,7 +23,7 @@ export default function useRoomIdValidation(): RoomIdValidationResult {
     return {
       roomId: null,
       initialStatus: ROOM_CONNECTION_STATUS.ERROR,
-      errorMessage: "Invalid room ID format",
+      errorMessage: 'Invalid room ID format',
     };
   }
 

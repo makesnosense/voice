@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
-import { ROOM_CONNECTION_STATUS } from './RoomPage.constants';
+import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../../../../shared/room';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
 import { useRoomStore } from '../../stores/useRoomStore';
 
 import useWebRTCInit from './useWebRTCInit';
-import type { RoomConnectionStatus } from './RoomPage.constants';
+
 import type {
   RoomId,
   TypedClientSocket,

@@ -3,7 +3,7 @@ import baseStyles from '../../../styles/BaseCard.module.css';
 import headerStyles from '../Header.module.css';
 import { useWebRTCStore } from '../../../stores/useWebRTCStore';
 import { useRoomStore } from '../../../stores/useRoomStore';
-import { ROOM_CONNECTION_STATUS } from '../../../pages/room/RoomPage.constants';
+import { ROOM_CONNECTION_STATUS } from '../../../../../shared/room';
 import { HEADER_ANIMATION_STATE } from '../title-header/header-animation/HeaderAnimationState';
 
 export default function TitleHeader() {

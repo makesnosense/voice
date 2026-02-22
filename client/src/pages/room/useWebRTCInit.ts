@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
 import { useRoomStore } from '../../stores/useRoomStore';
-import { ROOM_CONNECTION_STATUS } from './RoomPage.constants';
-
+import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';
 import type { TypedClientSocket } from '../../../../shared/types';
 
 export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSocket | null>) {
