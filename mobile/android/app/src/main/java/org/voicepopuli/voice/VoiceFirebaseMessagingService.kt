@@ -62,12 +62,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         )
 
         // decline action (handled inside IncomingCallActivity via broadcast)
-        val notifDeclineIntent = Intent(this, IncomingCallActivity::class.java).apply {
-            putExtra("action", "decline")
-            putExtra("roomId", roomId)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val notifDeclinePendingIntent = PendingIntent.getActivity(
+        val notifDeclineIntent = Intent(this, DeclineCallReceiver::class.java)
+        val notifDeclinePendingIntent = PendingIntent.getBroadcast(
             this, 1, notifDeclineIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

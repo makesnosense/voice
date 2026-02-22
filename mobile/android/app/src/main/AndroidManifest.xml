@@ -60,6 +60,6 @@
         </intent-filter>
       </service>
 
-
+      <receiver android:name=".DeclineCallReceiver" android:exported="false" />
     </application>
 </manifest>

@@ -67,7 +67,8 @@ class IncomingCallActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // cancel the call notification
+        // reached only if a second call arrives while this screen is showing
+        // TODO: remove once server-side busy detection is implemented
         getSystemService(NotificationManager::class.java)
             .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
