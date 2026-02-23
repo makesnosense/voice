@@ -11,11 +11,16 @@ const SOCKET_OPTIONS = {
   reconnectionAttempts: 10,
 } as const;
 
-export function useRoomSocket(roomId: RoomId, onDisconnect: () => void, onCleanup: () => void) {
+export function useRoomSocket(
+  roomId: RoomId,
+  onDisconnect: () => void,
+  onCleanup: () => void,
+  url?: string
+) {
   const socketRef = useRef<TypedClientSocket | null>(null);
 
   useEffect(() => {
-    const socket: TypedClientSocket = io(SOCKET_OPTIONS);
+    const socket: TypedClientSocket = url ? io(url, SOCKET_OPTIONS) : io(SOCKET_OPTIONS);
     socketRef.current = socket;
 
     socket.on('connect', () => {
