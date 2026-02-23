@@ -1,6 +1,6 @@
-import { WEBRTC_CONNECTION_STATE } from '../../../../WebRTCManager';
+import { WEBRTC_CONNECTION_STATE } from '../../../../../../../../shared/webrtc/WebRTCManager';
 import connectionDotStyles from './WebRTCConnectionStatusDot.module.css';
-import { useWebRTCStore } from '../../../../../../stores/useWebRTCStore';
+import { useWebRTCStore } from '../../../../../../../../shared/stores/useWebRTCStore';
 
 export default function WebRTCConnectionStatusDot() {
   const webRTCConnectionState = useWebRTCStore((state) => state.webRTCConnectionState);

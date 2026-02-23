@@ -1,5 +1,5 @@
 import UserCard from './usercard/UserCard';
-import { useWebRTCStore } from '../../../../stores/useWebRTCStore';
+import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
 import { useAudioAnalyserStore } from '../../../../stores/useAudioAnalyserStore';
 import usersStyles from './Users.module.css';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';

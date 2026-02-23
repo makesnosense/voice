@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
-import { useWebRTCStore } from '../../stores/useWebRTCStore';
+import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useAudioAnalyserStore } from '../../stores/useAudioAnalyserStore';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';

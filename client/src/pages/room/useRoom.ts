@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import useWebRTCInit from './useWebRTCInit';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { useAudioAnalyserStore } from '../../stores/useAudioAnalyserStore';
-import { useWebRTCStore } from '../../stores/useWebRTCStore';
+import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useRoomSocket } from '../../../../shared/hooks/useRoomSocket';
 
 import type { RoomId } from '../../../../shared/types';

@@ -4,7 +4,7 @@ import Users from './users/Users';
 import MicWarning from './mic-warning/MicWarning';
 import layoutStyles from '../../../styles/Layout.module.css';
 import Messages from './messages/Messages';
-import { useWebRTCStore } from '../../../stores/useWebRTCStore';
+import { useWebRTCStore } from './../../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
 

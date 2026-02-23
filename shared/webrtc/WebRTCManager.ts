@@ -4,8 +4,8 @@ import type {
   IceCandidate,
   WebRTCOffer,
   WebRTCAnswer,
-} from '../../../../shared/types';
-import type { ObjectValues } from '../../../../shared/types';
+} from '../types';
+import type { ObjectValues } from '../types';
 
 const BASE_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.cloudflare.com:3478' },

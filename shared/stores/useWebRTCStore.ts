@@ -3,8 +3,8 @@ import {
   WebRTCManager,
   DisconnectReason,
   type WebRTCConnectionState,
-} from '../pages/room/WebRTCManager';
-import type { TypedClientSocket, SocketId } from '../../../shared/types';
+} from '../webrtc/WebRTCManager';
+import type { TypedClientSocket, SocketId } from '../types';
 
 interface WebRTCStore {
   manager: WebRTCManager | null;
