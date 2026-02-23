@@ -84,11 +84,9 @@ export class WebRTCManager {
     const iceServers = await this.getIceServers();
     const peerConnection = new RTCPeerConnection({ iceServers });
 
-    if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, this.localStream!);
-      });
-    }
+    this.localStream.getTracks().forEach((track) => {
+      peerConnection.addTrack(track, this.localStream!);
+    });
 
     // registering handler that fires when LOCAL RTCPeerConnection discovers a new network path
     // (ICE candidate) that remote peer can use to reach us
