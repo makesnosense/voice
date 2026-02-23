@@ -1,12 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAuthStore } from './stores/useAuthStore';
 import Auth from './components/Auth';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
+import { RoomId } from '../../shared/types';
+import RoomScreen from './screens/RoomScreen';
 
 export default function App() {
   const { isAuthenticated, user, logout } = useAuthStore();
+  const [activeRoomId, setActiveRoomId] = useState<RoomId | null>(null);
 
   useEffect(() => {
     useAuthStore.getState().initialize();
@@ -14,9 +17,13 @@ export default function App() {
 
   useDeviceRegistration();
 
-  useIncomingCall(roomId => {
-    console.log('onRoomId callback fired:', roomId);
-  });
+  useIncomingCall(roomId => setActiveRoomId(roomId as RoomId));
+
+  if (activeRoomId) {
+    return (
+      <RoomScreen roomId={activeRoomId} onLeave={() => setActiveRoomId(null)} />
+    );
+  }
 
   return (
     <>
