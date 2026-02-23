@@ -7,6 +7,7 @@ const monorepoRoot = path.resolve(mobileProjectRoot, '..');
 const config = {
   watchFolders: [path.resolve(monorepoRoot, 'shared')],
   resolver: {
+    blockList: new RegExp(`${monorepoRoot}/shared/node_modules/.*`),
     nodeModulesPaths: [path.resolve(mobileProjectRoot, 'node_modules')],
   },
 };
