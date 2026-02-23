@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useMicrophoneStore, MIC_PERMISSION_STATUS } from '../../stores/useMicrophoneStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
+import { useAudioAnalyserStore } from '../../stores/useAudioAnalyserStore';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';
 import type { TypedClientSocket } from '../../../../shared/types';
@@ -28,6 +29,14 @@ export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSock
     }
 
     console.log('🎬 All conditions met, initializing WebRTC');
-    useWebRTCStore.getState().initializeWebRTC(socketRef.current, localStream); // initializeWebRTC never changes
+
+    const analyserCallbacks = {
+      onLocalStream: (stream: MediaStream) =>
+        useAudioAnalyserStore.getState().initializeLocalAnalyser(stream),
+      onRemoteStream: (stream: MediaStream) =>
+        useAudioAnalyserStore.getState().initializeRemoteAnalyser(stream),
+    };
+
+    useWebRTCStore.getState().initializeWebRTC(socketRef.current, localStream, analyserCallbacks);
   }, [micPermissionStatus, connectionStatus, localStream, socketRef, requestMicrophone]);
 }

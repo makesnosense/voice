@@ -1,11 +1,9 @@
-import AudioAnalyser from './AudioAnalyser';
 import type {
   TypedClientSocket,
   SocketId,
   IceCandidate,
   WebRTCOffer,
   WebRTCAnswer,
-  AudioFrequencyData,
 } from '../../../../shared/types';
 import type { ObjectValues } from '../../../../shared/types';
 
@@ -46,24 +44,28 @@ export class WebRTCManager {
   private pendingCandidates: IceCandidate[] = [];
   private remoteDescriptionSet: boolean = false;
 
-  // these are for audio analysis
-  private audioContext: AudioContext;
-  private localAnalyser: AudioAnalyser;
-  private remoteAnalyser: AudioAnalyser | null = null;
-
-  // callbacks for UI updates
   private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
   private onStreamRemoved: (reason: DisconnectReason) => void;
 
   // callback to update WebRTCState in Zustand
   private onConnectionStateChange: (state: WebRTCConnectionState) => void;
 
+  // only on web
+  private analyserCallbacks?: {
+    onLocalStream: (stream: MediaStream) => void;
+    onRemoteStream: (stream: MediaStream) => void;
+  };
+
   constructor(
     socket: TypedClientSocket,
     passedMicStream: MediaStream,
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: (reason: DisconnectReason) => void,
-    onConnectionStateChange: (state: WebRTCConnectionState) => void
+    onConnectionStateChange: (state: WebRTCConnectionState) => void,
+    analyserCallbacks?: {
+      onLocalStream: (stream: MediaStream) => void;
+      onRemoteStream: (stream: MediaStream) => void;
+    }
   ) {
     this.socket = socket;
     this.localStream = passedMicStream;
@@ -71,9 +73,8 @@ export class WebRTCManager {
     this.onStreamRemoved = onStreamRemoved;
     this.onConnectionStateChange = onConnectionStateChange;
 
-    // initialize audio analysis
-    this.audioContext = new AudioContext();
-    this.localAnalyser = new AudioAnalyser(this.audioContext, this.localStream);
+    this.analyserCallbacks = analyserCallbacks;
+    this.analyserCallbacks?.onLocalStream(this.localStream);
 
     this.setupSocketListeners();
   }
@@ -158,10 +159,8 @@ export class WebRTCManager {
       console.log(`🎵 [WebRTC] received remote stream from ${remoteUserId}`);
       const [remoteStream] = event.streams;
 
-      this.remoteAnalyser = new AudioAnalyser(this.audioContext, remoteStream);
-      console.log(`🎤 [WebRTC] set up remote audio analysis for ${remoteUserId}`);
-
       this.onStreamAdded(remoteUserId, remoteStream);
+      this.analyserCallbacks?.onRemoteStream(remoteStream);
     };
 
     this.peerConnection = peerConnection;
@@ -358,37 +357,11 @@ export class WebRTCManager {
     return !this.inputAudioEnabled;
   }
 
-  getAudioFrequencyData(): AudioFrequencyData {
-    if (!this.localAnalyser || !this.localStream) {
-      return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
-    }
-
-    if (!this.inputAudioEnabled) {
-      return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
-    }
-
-    return this.localAnalyser.getFrequencyData();
-  }
-
-  getRemoteAudioFrequencyData(): AudioFrequencyData {
-    if (!this.remoteAnalyser) {
-      return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
-    }
-
-    return this.remoteAnalyser.getFrequencyData();
-  }
-
-  getAudioLevel(): number {
-    return this.getAudioFrequencyData().overallLevel;
-  }
-
   toggleMute() {
     if (this.localStream) {
       this.localStream.getAudioTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
-
-      this.localAnalyser.setActive(this.inputAudioEnabled);
 
       console.log(`🔇 [WebRTC] mute status changed: ${this.isMuted ? 'muted' : 'unmuted'}`);
       this.socket.emit('mute-status-changed', { isMuted: this.isMuted });
@@ -440,12 +413,6 @@ export class WebRTCManager {
 
       this.onStreamRemoved(reason);
     }
-
-    // cleanup remote audio analysis
-    if (this.remoteAnalyser) {
-      this.remoteAnalyser.cleanup();
-      this.remoteAnalyser = null;
-    }
   }
 
   getWebRtcConnectionState(): WebRTCConnectionState {
@@ -489,15 +456,6 @@ export class WebRTCManager {
         track.stop();
         console.log(`🛑 [WebRTC] stopped local track: ${track.kind}`);
       });
-    }
-
-    if (this.audioContext) {
-      this.audioContext.close();
-      console.log('🔇 [WebRTC] closed audio context');
-    }
-
-    if (this.localAnalyser) {
-      this.localAnalyser.cleanup();
     }
 
     this.closePeerConnection(DisconnectReason.MANUAL_CLEANUP);

@@ -1,5 +1,6 @@
 import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../stores/useWebRTCStore';
+import { useAudioAnalyserStore } from '../../../../stores/useAudioAnalyserStore';
 import usersStyles from './Users.module.css';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
@@ -10,7 +11,6 @@ interface UsersProps {
 
 export default function Users({ currentUserId }: UsersProps) {
   const roomUsers = useRoomStore((state) => state.roomUsers);
-  const manager = useWebRTCStore((state) => state.manager);
   const isMicActive = useWebRTCStore((state) => state.isMicActive);
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
   const toggleMute = useWebRTCStore((state) => state.toggleMute);
@@ -25,11 +25,11 @@ export default function Users({ currentUserId }: UsersProps) {
         let getAudioData: (() => AudioFrequencyData) | undefined;
         let isUserAudioActive = false;
 
-        if (isCurrentUser && isMicActive && manager) {
-          getAudioData = () => manager.getAudioFrequencyData();
+        if (isCurrentUser && isMicActive) {
+          getAudioData = () => useAudioAnalyserStore.getState().getLocalAudioData();
           isUserAudioActive = !isMutedLocal;
-        } else if (isRemoteUser && manager) {
-          getAudioData = () => manager.getRemoteAudioFrequencyData();
+        } else if (isRemoteUser) {
+          getAudioData = () => useAudioAnalyserStore.getState().getRemoteAudioData();
           isUserAudioActive = !user.isMuted;
         }
 

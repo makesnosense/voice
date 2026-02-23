@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import useWebRTCInit from './useWebRTCInit';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
+import { useAudioAnalyserStore } from '../../stores/useAudioAnalyserStore';
 import { useWebRTCStore } from '../../stores/useWebRTCStore';
 import { useRoomSocket } from '../../../../shared/hooks/useRoomSocket';
 
@@ -19,6 +20,7 @@ export default function useRoom(roomId: RoomId) {
     () => {
       useWebRTCStore.getState().cleanup();
       useMicrophoneStore.getState().cleanup();
+      useAudioAnalyserStore.getState().cleanup();
     }
   );
 
