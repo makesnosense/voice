@@ -12,8 +12,11 @@ export class ApiBase {
     });
 
     if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(body.error ?? `http ${response.status}`);
+      type ErrorBody = { error?: string };
+      const body: ErrorBody | null = await (response.json() as Promise<ErrorBody>).catch(
+        () => null
+      );
+      throw new Error(body?.error ?? `http ${response.status}`);
     }
 
     const text = await response.text();
