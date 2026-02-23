@@ -37,6 +37,14 @@ export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSock
         useAudioAnalyserStore.getState().initializeRemoteAnalyser(stream),
     };
 
-    useWebRTCStore.getState().initializeWebRTC(socketRef.current, localStream, analyserCallbacks);
+    const turnServerConfig = {
+      credentialsUrl: '/api/turn-credentials',
+      host: import.meta.env.VITE_TURN_SERVER_HOST,
+      port: import.meta.env.VITE_TURN_SERVER_PORT,
+    };
+
+    useWebRTCStore
+      .getState()
+      .initializeWebRTC(socketRef.current, localStream, turnServerConfig, analyserCallbacks);
   }, [micPermissionStatus, connectionStatus, localStream, socketRef, requestMicrophone]);
 }

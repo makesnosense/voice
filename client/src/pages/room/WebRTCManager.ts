@@ -50,6 +50,12 @@ export class WebRTCManager {
   // callback to update WebRTCState in Zustand
   private onConnectionStateChange: (state: WebRTCConnectionState) => void;
 
+  private turnServerConfig: {
+    credentialsUrl: string;
+    host: string;
+    port: string;
+  };
+
   // only on web
   private analyserCallbacks?: {
     onLocalStream: (stream: MediaStream) => void;
@@ -62,6 +68,11 @@ export class WebRTCManager {
     onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: (reason: DisconnectReason) => void,
     onConnectionStateChange: (state: WebRTCConnectionState) => void,
+    turnServerConfig: {
+      credentialsUrl: string;
+      host: string;
+      port: string;
+    },
     analyserCallbacks?: {
       onLocalStream: (stream: MediaStream) => void;
       onRemoteStream: (stream: MediaStream) => void;
@@ -72,6 +83,8 @@ export class WebRTCManager {
     this.onStreamAdded = onStreamAdded;
     this.onStreamRemoved = onStreamRemoved;
     this.onConnectionStateChange = onConnectionStateChange;
+
+    this.turnServerConfig = turnServerConfig;
 
     this.analyserCallbacks = analyserCallbacks;
     this.analyserCallbacks?.onLocalStream(this.localStream);
@@ -171,17 +184,13 @@ export class WebRTCManager {
     const iceServers = [...BASE_ICE_SERVERS];
 
     try {
-      const response = await fetch('/api/turn-credentials');
+      const response = await fetch(this.turnServerConfig.credentialsUrl);
       const turn_credentials = await response.json();
 
       iceServers.push({
         urls: [
-          `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${
-            import.meta.env.VITE_TURN_SERVER_PORT
-          }?transport=tcp`,
-          `turn:${import.meta.env.VITE_TURN_SERVER_HOST}:${
-            import.meta.env.VITE_TURN_SERVER_PORT
-          }?transport=udp`,
+          `turn:${this.turnServerConfig.host}:${this.turnServerConfig.port}?transport=tcp`,
+          `turn:${this.turnServerConfig.host}:${this.turnServerConfig.port}?transport=udp`,
         ],
         username: turn_credentials.username,
         credential: turn_credentials.credential,

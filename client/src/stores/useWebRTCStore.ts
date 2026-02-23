@@ -17,6 +17,11 @@ interface WebRTCStore {
   initializeWebRTC: (
     socket: TypedClientSocket,
     localStream: MediaStream,
+    turnServerConfig: {
+      credentialsUrl: string;
+      host: string;
+      port: string;
+    },
     analyserCallbacks?: {
       onLocalStream: (stream: MediaStream) => void;
       onRemoteStream: (stream: MediaStream) => void;
@@ -36,7 +41,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   isMutedLocal: false,
   webRTCConnectionState: null,
 
-  initializeWebRTC: async (socket, localStream, analyserCallbacks) => {
+  initializeWebRTC: async (socket, localStream, turnServerConfig, analyserCallbacks) => {
     const { manager } = get();
     if (manager) {
       console.log('⚠️ [Store] WebRTC already initialized');
@@ -51,6 +56,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       (userId, stream) => get().setRemoteStream(userId, stream),
       (reason) => get().clearRemoteStream(reason),
       (state) => set({ webRTCConnectionState: state }),
+      turnServerConfig,
       analyserCallbacks
     );
 
