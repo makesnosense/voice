@@ -7,7 +7,6 @@ import type {
   WebRTCOffer,
   WebRTCAnswer,
 } from '../types';
-import type { ObjectValues } from '../types';
 
 const BASE_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.cloudflare.com:3478' },
