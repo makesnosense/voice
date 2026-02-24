@@ -1,19 +1,10 @@
-import { create } from "zustand";
-import type { ObjectValues } from "../../../shared/types";
+import { create } from 'zustand';
+import {
+  MIC_PERMISSION_STATUS,
+  type MicPermissionStatus,
+} from '../../../shared/constants/microphone';
 
-export const MIC_PERMISSION_STATUS = {
-  IDLE: "idle",
-  REQUESTING: "requesting",
-  GRANTED: "granted",
-  DENIED: "denied",
-  NOT_SUPPORTED: "not-supported",
-} as const;
-
-export type MicPermissionStatus = ObjectValues<typeof MIC_PERMISSION_STATUS>;
-export type MicErrorStatus = Exclude<
-  MicPermissionStatus,
-  "granted" | "idle" | "requesting"
->;
+export type MicErrorStatus = Exclude<MicPermissionStatus, 'granted' | 'idle' | 'requesting'>;
 
 interface MicrophoneStore {
   stream: MediaStream | null;
@@ -31,10 +22,7 @@ export const useMicrophoneStore = create<MicrophoneStore>((set, get) => ({
     const currentState = get();
 
     // already have a stream or currently requesting
-    if (
-      currentState.stream ||
-      currentState.status === MIC_PERMISSION_STATUS.REQUESTING
-    ) {
+    if (currentState.stream || currentState.status === MIC_PERMISSION_STATUS.REQUESTING) {
       return;
     }
 
@@ -46,7 +34,7 @@ export const useMicrophoneStore = create<MicrophoneStore>((set, get) => ({
     }
 
     try {
-      console.log("🎤 Requesting microphone access...");
+      console.log('🎤 Requesting microphone access...');
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -55,10 +43,10 @@ export const useMicrophoneStore = create<MicrophoneStore>((set, get) => ({
         },
       });
 
-      console.log("✅ Microphone stream obtained");
+      console.log('✅ Microphone stream obtained');
       set({ stream, status: MIC_PERMISSION_STATUS.GRANTED });
     } catch (error) {
-      console.error("❌ Microphone access denied:", error);
+      console.error('❌ Microphone access denied:', error);
       set({ status: MIC_PERMISSION_STATUS.DENIED });
     }
   },
@@ -66,10 +54,10 @@ export const useMicrophoneStore = create<MicrophoneStore>((set, get) => ({
   cleanup: () => {
     const { stream } = get();
     if (stream) {
-      console.log("🧹 Cleaning up microphone stream");
+      console.log('🧹 Cleaning up microphone stream');
       stream.getTracks().forEach((track) => {
         track.stop();
-        console.log("🛑 Stopped track:", track.kind);
+        console.log('🛑 Stopped track:', track.kind);
       });
       set({ stream: null, status: MIC_PERMISSION_STATUS.IDLE });
     }

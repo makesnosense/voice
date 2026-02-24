@@ -6,7 +6,7 @@ import layoutStyles from '../../../styles/Layout.module.css';
 import Messages from './messages/Messages';
 import { useWebRTCStore } from './../../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
-import { MIC_PERMISSION_STATUS } from '../../../stores/useMicrophoneStore';
+import { MIC_PERMISSION_STATUS } from '../../../../../shared/constants/microphone';
 
 import type { TypedClientSocket, SocketId } from '../../../../../shared/types';
 
