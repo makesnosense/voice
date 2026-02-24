@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useRoomStore } from '../stores/useRoomStore';
-import { ROOM_CONNECTION_STATUS } from '../room';
+import { ROOM_CONNECTION_STATUS } from '../constants/room';
 import type { RoomId, TypedClientSocket } from '../types';
 
 const SOCKET_OPTIONS = {

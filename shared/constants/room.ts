@@ -1,4 +1,4 @@
-import type { ObjectValues } from './types';
+import type { ObjectValues } from '../types';
 
 export const ROOM_CONNECTION_STATUS = {
   CONNECTING: 'connecting',

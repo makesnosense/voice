@@ -1,7 +1,7 @@
 import TitleHeader from './title-header/TitleHeader';
 import Pill from './pill/Pill';
 import headerStyles from './Header.module.css';
-import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';
+import { ROOM_CONNECTION_STATUS } from '../../../../shared/constants/room';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import ExitRoomButton from '../../pages/room/components/exit-room-button/ExitRoomButton';
 

@@ -2,7 +2,7 @@ import layoutStyles from '../../styles/Layout.module.css';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import useRoomId from './useRoomId';
 import useRoom from './useRoom';
-import { ROOM_CONNECTION_STATUS } from '../../../../shared/room';
+import { ROOM_CONNECTION_STATUS } from '../../../../shared/constants/room';
 import Header from '../../components/header/Header';
 import Spinner from '../../components/spinner/Spinner';
 import RoomError from './components/room-error/RoomError';

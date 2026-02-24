@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import buttonStyles from '../../../../styles/Buttons.module.css';
 import roomErrorStyles from './RoomError.module.css';
-import { ROOM_CONNECTION_STATUS, type RoomConnectionError } from '../../../../../../shared/room';
+import {
+  ROOM_CONNECTION_STATUS,
+  type RoomConnectionError,
+} from '../../../../../../shared/constants/room';
 
 interface RoomErrorProps {
   connectionError?: RoomConnectionError;
