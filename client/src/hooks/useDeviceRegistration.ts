@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { api } from '../api';
 import { REFRESH_TOKEN_LOCAL_STORAGE_KEY } from '../stores/useAuthStore';
-import { PLATFORM } from '../../../shared/platform';
+import { PLATFORM } from '../../../shared/constants/platform';
 
 const getDeviceName = () =>
   navigator.userAgent.includes('Mobile') ? 'Mobile Browser' : 'Desktop Browser';

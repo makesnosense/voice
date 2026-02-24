@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import type { Platform } from '../platform';
+import type { Platform } from '../constants/platform';
 
 export class DevicesApi extends ApiBase {
   syncDevice(
