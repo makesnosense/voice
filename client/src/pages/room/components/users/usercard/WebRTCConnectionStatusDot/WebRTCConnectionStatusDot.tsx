@@ -1,4 +1,4 @@
-import { WEBRTC_CONNECTION_STATE } from '../../../../../../../../shared/webrtc/WebRTCManager';
+import { WEBRTC_CONNECTION_STATE } from '../../../../../../../../shared/constants/webrtc';
 import connectionDotStyles from './WebRTCConnectionStatusDot.module.css';
 import { useWebRTCStore } from '../../../../../../../../shared/stores/useWebRTCStore';
 

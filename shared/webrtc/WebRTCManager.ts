@@ -1,3 +1,5 @@
+import { WEBRTC_CONNECTION_STATE, type WebRTCConnectionState } from '../constants/webrtc';
+import { DISCONNECT_REASON, type DisconnectReason } from '../constants/webrtc';
 import type {
   TypedClientSocket,
   SocketId,
@@ -11,26 +13,6 @@ const BASE_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.cloudflare.com:3478' },
   { urls: 'stun:global.stun.twilio.com:3478' },
 ];
-
-export const WEBRTC_CONNECTION_STATE = {
-  WAITING_FOR_OTHER_PEER: 'waiting-for-other-peer',
-  CONNECTING: 'connecting',
-  CONNECTED: 'connected',
-  RECONNECTING: 'reconnecting',
-  FAILED: 'failed',
-} as const;
-
-export type WebRTCConnectionState = ObjectValues<typeof WEBRTC_CONNECTION_STATE>;
-
-export const DisconnectReason = {
-  PEER_LEFT: 'peer-left',
-  CONNECTION_FAILED: 'connection-failed',
-  ICE_FAILED: 'ice-failed',
-  NETWORK_ERROR: 'network-error',
-  MANUAL_CLEANUP: 'manual-cleanup',
-} as const;
-
-export type DisconnectReason = (typeof DisconnectReason)[keyof typeof DisconnectReason];
 
 export class WebRTCManager {
   private localStream: MediaStream;
@@ -130,7 +112,7 @@ export class WebRTCManager {
 
       if (iceState === 'failed') {
         console.error(`❌ [WebRTC] ICE connection failed`);
-        this.handleConnectionFailed(DisconnectReason.ICE_FAILED);
+        this.handleConnectionFailed(DISCONNECT_REASON.ICE_FAILED);
       } else if (iceState === 'disconnected') {
         console.warn(`⚠️ [WebRTC] ICE disconnected - waiting for reconnection...`);
         // DO NOTHING - let ICE try to reconnect
@@ -153,7 +135,7 @@ export class WebRTCManager {
         this.reconnectAttempts = 0;
       } else if (state === 'failed') {
         console.error(`❌ [WebRTC] peer connection failed - cleaning up`);
-        this.handleConnectionFailed(DisconnectReason.CONNECTION_FAILED);
+        this.handleConnectionFailed(DISCONNECT_REASON.CONNECTION_FAILED);
       } else if (state === 'disconnected') {
         console.warn(`⚠️ [WebRTC] peer connection disconnected - waiting for reconnection...`);
         // DO NOTHING - WebRTC will try to reconnect automatically
@@ -161,7 +143,7 @@ export class WebRTCManager {
       } else if (state === 'closed') {
         console.log(`🔒 [WebRTC] peer connection closed`);
         // connection was intentionally closed, clean up
-        this.closePeerConnection(DisconnectReason.MANUAL_CLEANUP);
+        this.closePeerConnection(DISCONNECT_REASON.MANUAL_CLEANUP);
       }
 
       this.onConnectionStateChange(this.getWebRtcConnectionState());
@@ -241,7 +223,7 @@ export class WebRTCManager {
     // socket-level user left (not webrtc disconnect)
     this.socket.on('user-left', (userId: SocketId) => {
       console.log(`👋 [Socket] user ${userId} left the room (socket disconnect)`);
-      this.handlePeerDisconnect(DisconnectReason.PEER_LEFT);
+      this.handlePeerDisconnect(DISCONNECT_REASON.PEER_LEFT);
     });
   }
 
@@ -467,6 +449,6 @@ export class WebRTCManager {
       });
     }
 
-    this.closePeerConnection(DisconnectReason.MANUAL_CLEANUP);
+    this.closePeerConnection(DISCONNECT_REASON.MANUAL_CLEANUP);
   }
 }

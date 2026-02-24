@@ -1,9 +1,6 @@
 import { create } from 'zustand';
-import {
-  WebRTCManager,
-  DisconnectReason,
-  type WebRTCConnectionState,
-} from '../webrtc/WebRTCManager';
+import { WebRTCManager } from '../webrtc/WebRTCManager';
+import type { WebRTCConnectionState, DisconnectReason } from '../constants/webrtc';
 import type { TypedClientSocket, SocketId } from '../types';
 
 interface WebRTCStore {
