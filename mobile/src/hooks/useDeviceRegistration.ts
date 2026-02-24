@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { keychainStorage } from '../utils/keychain';
 import { api } from '../api';
 import { getFcmToken } from '../utils/fcm';
-import { PLATFORM } from '../../../shared/platform';
+import { PLATFORM } from '../../../shared/constants/platform';
 
 const getNativePlatform = () =>
   RNPlatform.OS === 'ios' ? PLATFORM.IOS : PLATFORM.ANDROID;
