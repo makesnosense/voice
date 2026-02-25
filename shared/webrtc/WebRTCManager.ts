@@ -424,7 +424,7 @@ export class WebRTCManager {
     // truly connected
     if (
       connState === PEER_CONNECTION_STATE.CONNECTED &&
-      iceState === ICE_CONNECTION_STATE.CONNECTED
+      (iceState === ICE_CONNECTION_STATE.CONNECTED || iceState === ICE_CONNECTION_STATE.COMPLETED)
     ) {
       return WEBRTC_CONNECTION_STATE.CONNECTED;
     }
