@@ -9,6 +9,29 @@ export const WEBRTC_CONNECTION_STATE = {
 
 export type WebRTCConnectionState = ObjectValues<typeof WEBRTC_CONNECTION_STATE>;
 
+export const ICE_CONNECTION_STATE = {
+  NEW: 'new',
+  CHECKING: 'checking',
+  CONNECTED: 'connected',
+  COMPLETED: 'completed',
+  DISCONNECTED: 'disconnected',
+  FAILED: 'failed',
+  CLOSED: 'closed',
+} as const;
+
+export type IceConnectionState = ObjectValues<typeof ICE_CONNECTION_STATE>;
+
+export const PEER_CONNECTION_STATE = {
+  NEW: 'new',
+  CONNECTING: 'connecting',
+  CONNECTED: 'connected',
+  DISCONNECTED: 'disconnected',
+  FAILED: 'failed',
+  CLOSED: 'closed',
+} as const;
+
+export type PeerConnectionState = ObjectValues<typeof PEER_CONNECTION_STATE>;
+
 export const DISCONNECT_REASON = {
   PEER_LEFT: 'peer-left',
   CONNECTION_FAILED: 'connection-failed',

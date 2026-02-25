@@ -1,4 +1,9 @@
-import { WEBRTC_CONNECTION_STATE, type WebRTCConnectionState } from '../constants/webrtc';
+import {
+  WEBRTC_CONNECTION_STATE,
+  ICE_CONNECTION_STATE,
+  PEER_CONNECTION_STATE,
+  type WebRTCConnectionState,
+} from '../constants/webrtc';
 import { DISCONNECT_REASON, type DisconnectReason } from '../constants/webrtc';
 import type {
   TypedClientSocket,
@@ -109,16 +114,19 @@ export class WebRTCManager {
       const iceState = peerConnection.iceConnectionState;
       console.log(`🧊 [WebRTC] ICE connection state: ${iceState}`);
 
-      if (iceState === 'failed') {
+      if (iceState === ICE_CONNECTION_STATE.FAILED) {
         console.error(`❌ [WebRTC] ICE connection failed`);
         this.handleConnectionFailed(DISCONNECT_REASON.ICE_FAILED);
-      } else if (iceState === 'disconnected') {
+      } else if (iceState === ICE_CONNECTION_STATE.DISCONNECTED) {
         console.warn(`⚠️ [WebRTC] ICE disconnected - waiting for reconnection...`);
         // DO NOTHING - let ICE try to reconnect
-      } else if (iceState === 'connected' || iceState === 'completed') {
+      } else if (
+        iceState === ICE_CONNECTION_STATE.CONNECTED ||
+        iceState === ICE_CONNECTION_STATE.COMPLETED
+      ) {
         console.log(`✅ [WebRTC] ICE connected successfully`);
         this.reconnectAttempts = 0;
-      } else if (iceState === 'closed') {
+      } else if (iceState === ICE_CONNECTION_STATE.CLOSED) {
         console.log(`🔒 [WebRTC] ICE connection closed`);
       }
 
@@ -129,17 +137,17 @@ export class WebRTCManager {
       const state = peerConnection.connectionState;
       console.log(`📶 [WebRTC] peer connection state: ${state}`);
 
-      if (state === 'connected') {
+      if (state === PEER_CONNECTION_STATE.CONNECTED) {
         console.log(`✅ [WebRTC] peer connection established successfully`);
         this.reconnectAttempts = 0;
-      } else if (state === 'failed') {
+      } else if (state === PEER_CONNECTION_STATE.FAILED) {
         console.error(`❌ [WebRTC] peer connection failed - cleaning up`);
         this.handleConnectionFailed(DISCONNECT_REASON.CONNECTION_FAILED);
-      } else if (state === 'disconnected') {
+      } else if (state === PEER_CONNECTION_STATE.DISCONNECTED) {
         console.warn(`⚠️ [WebRTC] peer connection disconnected - waiting for reconnection...`);
         // DO NOTHING - WebRTC will try to reconnect automatically
         // ICE will keep working to find new routes
-      } else if (state === 'closed') {
+      } else if (state === PEER_CONNECTION_STATE.CLOSED) {
         console.log(`🔒 [WebRTC] peer connection closed`);
         // connection was intentionally closed, clean up
         this.closePeerConnection(DISCONNECT_REASON.MANUAL_CLEANUP);
@@ -414,12 +422,18 @@ export class WebRTCManager {
     const iceState: RTCIceConnectionState = this.peerConnection.iceConnectionState;
 
     // truly connected
-    if (connState === 'connected' && iceState === 'connected') {
+    if (
+      connState === PEER_CONNECTION_STATE.CONNECTED &&
+      iceState === ICE_CONNECTION_STATE.CONNECTED
+    ) {
       return WEBRTC_CONNECTION_STATE.CONNECTED;
     }
 
     // actively trying to recover
-    if (iceState === 'disconnected' || iceState === 'checking') {
+    if (
+      iceState === ICE_CONNECTION_STATE.DISCONNECTED ||
+      iceState === ICE_CONNECTION_STATE.CHECKING
+    ) {
       return this.reconnectAttempts > 0
         ? WEBRTC_CONNECTION_STATE.RECONNECTING
         : WEBRTC_CONNECTION_STATE.CONNECTING;
@@ -427,8 +441,8 @@ export class WebRTCManager {
 
     // gave up
     if (
-      connState === 'failed' ||
-      iceState === 'failed' ||
+      connState === PEER_CONNECTION_STATE.FAILED ||
+      iceState === ICE_CONNECTION_STATE.FAILED ||
       this.reconnectAttempts >= this.maxReconnectAttempts
     ) {
       return WEBRTC_CONNECTION_STATE.FAILED;
