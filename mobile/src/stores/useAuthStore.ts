@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { keychainStorage } from '../utils/keychain';
 import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
+import { ApiError } from '../../../shared/api/base';
 import { api } from '../api';
 
 import type { User } from '../../../shared/auth-types';
@@ -39,15 +40,28 @@ export const useAuthStore = create<AuthStore>((set, get) => {
     isLoading: false,
 
     initialize: async () => {
-      const refreshToken = await keychainStorage.getRefreshToken();
+      let refreshToken: string | null;
+      try {
+        refreshToken = await keychainStorage.getRefreshToken();
+      } catch (error) {
+        console.error('❌ failed to read keychain:', error);
+        return; // can't do anything, but don't log out
+      }
       if (!refreshToken) return;
 
       try {
         await get().getValidAccessToken();
         console.log('✅ session restored');
-      } catch {
-        console.error('❌ failed to restore session, clearing credentials');
-        await get().logout();
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          console.error('❌ Auth rejected by server, clearing credentials');
+          await get().logout();
+        } else {
+          console.error(
+            '❌ Session restore failed, keeping credentials:',
+            error,
+          );
+        }
       }
     },
 
