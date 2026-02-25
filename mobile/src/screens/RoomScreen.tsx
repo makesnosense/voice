@@ -1,7 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRoomSocket } from '../../../shared/hooks/useRoomSocket';
 import { useRoomStore } from '../../../shared/stores/useRoomStore';
-
+import { useWebRTCStore } from '../../../shared/stores/useWebRTCStore';
+import { useMicrophoneStore } from '../stores/useMicrophoneStore';
+import useWebRTCInit from '../hooks/useWebRTCInit';
+import { BASE_URL } from '../config';
 import type { RoomId } from '../../../shared/types';
 
 interface RoomScreenProps {
@@ -9,15 +13,34 @@ interface RoomScreenProps {
   onLeave: () => void;
 }
 
-export const SOCKET_URL = __DEV__
-  ? 'https://localhost:3003'
-  : 'https://voice.k.vu';
+const handleDisconnect = () => {
+  useWebRTCStore.getState().cleanup();
+};
+
+const handleCleanup = () => {
+  useWebRTCStore.getState().cleanup();
+  useMicrophoneStore.getState().cleanup();
+};
 
 export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
-  useRoomSocket(roomId, () => {}, onLeave, SOCKET_URL);
-
   const connectionStatus = useRoomStore(state => state.connectionStatus);
   const roomUsers = useRoomStore(state => state.roomUsers);
+  const requestMicrophone = useMicrophoneStore(
+    state => state.requestMicrophone,
+  );
+
+  useEffect(() => {
+    requestMicrophone();
+  }, [requestMicrophone]);
+
+  const socketRef = useRoomSocket(
+    roomId,
+    handleDisconnect,
+    handleCleanup,
+    BASE_URL,
+  );
+
+  useWebRTCInit(socketRef);
 
   return (
     <View style={styles.container}>
@@ -30,9 +53,9 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
         </Text>
       ))}
 
-      <TouchableOpacity style={styles.leaveButton} onPress={onLeave}>
+      <Pressable style={styles.leaveButton} onPress={onLeave}>
         <Text style={styles.leaveText}>leave</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
