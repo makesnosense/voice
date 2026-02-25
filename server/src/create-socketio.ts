@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import createConnectionHandler from './socket-handlers';
 import config from './config';
 import type { Server as HttpServer } from 'http';
-import type { Room, RoomId } from '../../shared/types';
+import type { Room, RoomId, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 
 export function createSocketIO(
@@ -10,7 +10,7 @@ export function createSocketIO(
   rooms: Map<RoomId, Room>,
   roomDestructionManager: RoomDestructionManager
 ) {
-  const io = new Server(server, {
+  const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
     cors: {
       origin: config.corsOrigins,
       methods: ['GET', 'POST'],

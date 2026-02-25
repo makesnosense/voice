@@ -4,7 +4,11 @@
     "lib": ["ES2022", "DOM"],
     "module": "ES2022",
     "moduleResolution": "bundler",
-    "composite": true
+    "composite": true,
+    "paths": {
+      "socket.io": ["../server/node_modules/socket.io"],
+      "socket.io-client": ["../client/node_modules/socket.io-client"]
+    }
   },
   "include": ["./**/*"]
 }
