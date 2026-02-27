@@ -29,10 +29,10 @@ export default function UserMenu({ onClose }: UserMenuProps) {
       <div className={userMenuStyles.divider} />
 
       <div className={userMenuStyles.actions}>
-        <button className={userMenuStyles.menuButton} onClick={handlePreferences}>
+        {/* <button className={userMenuStyles.menuButton} onClick={handlePreferences}>
           <Settings size={16} />
           <span className={userMenuStyles.menuButtonText}>Settings</span>
-        </button>
+        </button> */}
 
         <button
           className={`${userMenuStyles.menuButton} ${userMenuStyles.logout}`}
