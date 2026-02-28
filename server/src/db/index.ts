@@ -14,7 +14,7 @@ export const db = drizzle(client, { schema });
 
 export async function runMigrations(): Promise<void> {
   // separate single-connection client just for migrations
-  const migrationClient = postgres(connectionString!, { max: 1 });
+  const migrationClient = postgres(connectionString!, { max: 1, onnotice: () => {} });
   await migrate(drizzle(migrationClient), {
     migrationsFolder: 'drizzle',
   });
