@@ -7,7 +7,7 @@ import {
   boolean,
   primaryKey,
 } from 'drizzle-orm/pg-core';
-import { ObjectValues } from '../../../shared/types';
+import type { ObjectValues } from '../../../shared/types';
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
