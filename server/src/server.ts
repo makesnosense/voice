@@ -1,10 +1,14 @@
 import { createApp } from './create-app';
 import { createServer } from './create-server';
 import { createSocketIO } from './create-socketio';
+import { runMigrations } from './db';
 import RoomDestructionManager from './managers/room-destruction-manager';
 import config, { getProtocol } from './config';
 import type { Room, RoomId } from '../../shared/types';
 import AuthCleanupManager from './managers/auth-cleanup-manager';
+
+await runMigrations();
+console.log('🗄️  DB schema up to date');
 
 const rooms = new Map<RoomId, Room>();
 const roomDestructionManager = new RoomDestructionManager(rooms);
