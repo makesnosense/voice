@@ -20,6 +20,7 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodeapp -u 1001
 
 COPY --from=builder /app/server/dist/server.js ./server.js
+COPY server/drizzle/ ./drizzle/
 
 RUN chown -R nodeapp:nodejs /app
 USER nodeapp
