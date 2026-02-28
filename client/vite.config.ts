@@ -9,6 +9,9 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [react()],
     envDir: '../',
+    resolve: {
+      dedupe: ['react', 'react-dom','socket.io-client'],
+    },
 
     // production build config
     build: {
