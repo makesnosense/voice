@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY server/package*.json server/bun.lock* ./server/
 COPY server/src/ ./server/src/ 
-COPY shared ./
+COPY shared ./shared/
 
 WORKDIR /app/server
 
