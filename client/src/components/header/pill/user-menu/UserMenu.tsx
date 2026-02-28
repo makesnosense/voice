@@ -1,4 +1,4 @@
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut} from 'lucide-react';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import userMenuStyles from './UserMenu.module.css';
@@ -15,10 +15,10 @@ export default function UserMenu({ onClose }: UserMenuProps) {
     onClose();
   };
 
-  const handlePreferences = () => {
-    // TODO: implement user preferences modal
-    console.log('user preferences clicked');
-  };
+  // const handlePreferences = () => {
+  //   // TODO: implement user preferences modal
+  //   console.log('user preferences clicked');
+  // };
 
   return (
     <div className={`${userMenuStyles.dropdown} ${baseStyles.card}`}>
