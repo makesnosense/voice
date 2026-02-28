@@ -1,6 +1,8 @@
 networks:
   web:
     external: true
+  voice-db:
+    internal: true # no external connectivity at all
 
 services:
   postgres:
@@ -11,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - web
+      - voice-db
     restart: unless-stopped
 
   voice-server:
@@ -25,6 +27,7 @@ services:
     restart: unless-stopped
     networks:
       - web
+      - voice-db
     container_name: voice-server
 
   coturn:
@@ -34,3 +37,6 @@ services:
     restart: unless-stopped
     network_mode: host
     container_name: voice-coturn
+
+volumes:
+  postgres_data:
