@@ -16,7 +16,7 @@ export async function runMigrations(): Promise<void> {
   // separate single-connection client just for migrations
   const migrationClient = postgres(connectionString!, { max: 1 });
   await migrate(drizzle(migrationClient), {
-    migrationsFolder: new URL('../../drizzle', import.meta.url).pathname,
+    migrationsFolder: 'drizzle',
   });
   await migrationClient.end();
 }
