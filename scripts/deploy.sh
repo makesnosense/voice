@@ -3,7 +3,7 @@
 set -e
 
 # build client static files
-./build.sh
+./build-client.sh
 
 ./copy-static-files-to-nginx.sh
 

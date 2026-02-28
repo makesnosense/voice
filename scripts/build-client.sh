@@ -17,6 +17,6 @@ docker run --rm \
   -e VITE_TURN_SERVER_PORT=${VITE_TURN_SERVER_PORT} \
   -w /app/client \
   node:alpine \
-  sh -c "npm ci && npm run build"
+  sh -c "cd /app/shared && npm ci && cd /app/client && npm ci && npm run build"
 
 echo "✅ build complete"
