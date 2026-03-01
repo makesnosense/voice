@@ -434,9 +434,7 @@ export class WebRTCManager {
       iceState === ICE_CONNECTION_STATE.DISCONNECTED ||
       iceState === ICE_CONNECTION_STATE.CHECKING
     ) {
-      return this.reconnectAttempts > 0
-        ? WEBRTC_CONNECTION_STATE.RECONNECTING
-        : WEBRTC_CONNECTION_STATE.CONNECTING;
+      return WEBRTC_CONNECTION_STATE.CONNECTING;
     }
 
     // gave up
@@ -461,7 +459,6 @@ export class WebRTCManager {
         console.log(`🛑 [WebRTC] stopped local track: ${track.kind}`);
       });
     }
-
     this.closePeerConnection(DISCONNECT_REASON.MANUAL_CLEANUP);
   }
 }

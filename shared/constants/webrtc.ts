@@ -3,7 +3,6 @@ export const WEBRTC_CONNECTION_STATE = {
   WAITING_FOR_OTHER_PEER: 'waiting-for-other-peer',
   CONNECTING: 'connecting',
   CONNECTED: 'connected',
-  RECONNECTING: 'reconnecting',
   FAILED: 'failed',
 } as const;
 

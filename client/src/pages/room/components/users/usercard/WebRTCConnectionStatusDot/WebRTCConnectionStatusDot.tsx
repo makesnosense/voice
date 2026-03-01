@@ -16,8 +16,6 @@ export default function WebRTCConnectionStatusDot() {
         return connectionDotStyles.connecting;
       case WEBRTC_CONNECTION_STATE.CONNECTED:
         return connectionDotStyles.connected;
-      case WEBRTC_CONNECTION_STATE.RECONNECTING:
-        return connectionDotStyles.reconnecting;
       case WEBRTC_CONNECTION_STATE.FAILED:
         return connectionDotStyles.failed;
       default:
@@ -33,8 +31,6 @@ export default function WebRTCConnectionStatusDot() {
         return 'connecting';
       case WEBRTC_CONNECTION_STATE.CONNECTED:
         return 'connected';
-      case WEBRTC_CONNECTION_STATE.RECONNECTING:
-        return 'reconnecting';
       case WEBRTC_CONNECTION_STATE.FAILED:
         return 'failed';
       default:

@@ -1,8 +1,8 @@
 .container {
   position: absolute;
-  bottom: 0.75rem; 
+  bottom: 0.75rem;
   left: 50%;
-  transform: translateX(-50%); 
+  transform: translateX(-50%);
 
   display: flex;
   flex-direction: column;
@@ -39,13 +39,6 @@
   animation: glow 2s ease-in-out infinite;
 }
 
-/* reconnecting - amber pulsing faster */
-.reconnecting {
-  background: #f59e0b;
-  animation: pulse 1s ease-in-out infinite;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-}
-
 /* failed - red */
 .failed {
   background: #ef4444;
@@ -53,7 +46,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -64,11 +58,11 @@
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
   }
   50% {
     box-shadow: 0 0 20px rgba(34, 197, 94, 1);
   }
 }
-
