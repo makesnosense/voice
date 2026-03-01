@@ -48,6 +48,35 @@ export class WebRTCManager {
     onRemoteStream: (stream: MediaStream) => void;
   };
 
+  private readonly socketHandlers = {
+    // second user joins - we initiate
+    initiateWebRTCCall: async (remoteUserId: SocketId) => {
+      this.isInitiator = true;
+      console.log(`👋 [Socket] second user ${remoteUserId} joined - initiating WebRTC call`);
+      await this.initiateCall(remoteUserId);
+    },
+    // we are second user - handle incoming offer
+    webRTCOffer: async (data: { fromUserId: SocketId; offer: WebRTCOffer }) => {
+      console.log(`📞 [Socket] received WebRTC offer from ${data.fromUserId}`);
+      this.isInitiator = false;
+      await this.handleOffer(data.fromUserId, data.offer);
+    },
+    // we initiated - handle answer
+    webRTCAnswer: async (data: { fromUserId: SocketId; answer: WebRTCAnswer }) => {
+      console.log(`✅ [Socket] received WebRTC answer from ${data.fromUserId}`);
+      await this.handleAnswer(data.fromUserId, data.answer);
+    },
+    webRTCIceCandidate: async (data: { fromUserId: SocketId; candidate: IceCandidate }) => {
+      console.log(`🧊 [Socket] received ICE candidate from ${data.fromUserId}`);
+      await this.handleIceCandidate(data.candidate);
+    },
+    // socket-level user left (not webrtc disconnect)
+    userLeft: (userId: SocketId) => {
+      console.log(`👋 [Socket] user ${userId} left the room (socket disconnect)`);
+      this.handlePeerDisconnect(DISCONNECT_REASON.PEER_LEFT);
+    },
+  };
+
   constructor(
     socket: TypedClientSocket,
     passedMicStream: MediaStream,
@@ -199,43 +228,19 @@ export class WebRTCManager {
   }
 
   private setupSocketListeners() {
-    // second user joins - we initiate
-    this.socket.on('initiate-webrtc-call', async (remoteUserId: SocketId) => {
-      this.isInitiator = true;
-      console.log(`👋 [Socket] second user ${remoteUserId} joined - initiating WebRTC call`);
-      await this.initiateCall(remoteUserId);
-    });
+    this.socket.on('initiate-webrtc-call', this.socketHandlers.initiateWebRTCCall);
+    this.socket.on('webrtc-offer', this.socketHandlers.webRTCOffer);
+    this.socket.on('webrtc-answer', this.socketHandlers.webRTCAnswer);
+    this.socket.on('webrtc-ice-candidate', this.socketHandlers.webRTCIceCandidate);
+    this.socket.on('user-left', this.socketHandlers.userLeft);
+  }
 
-    // we are second user - handle incoming offer
-    this.socket.on('webrtc-offer', async (data: { fromUserId: SocketId; offer: WebRTCOffer }) => {
-      console.log(`📞 [Socket] received WebRTC offer from ${data.fromUserId}`);
-      this.isInitiator = false;
-      await this.handleOffer(data.fromUserId, data.offer);
-    });
-
-    // we initiated - handle answer
-    this.socket.on(
-      'webrtc-answer',
-      async (data: { fromUserId: SocketId; answer: WebRTCAnswer }) => {
-        console.log(`✅ [Socket] received WebRTC answer from ${data.fromUserId}`);
-        await this.handleAnswer(data.fromUserId, data.answer);
-      }
-    );
-
-    // ice candidates
-    this.socket.on(
-      'webrtc-ice-candidate',
-      async (data: { fromUserId: SocketId; candidate: IceCandidate }) => {
-        console.log(`🧊 [Socket] received ICE candidate from ${data.fromUserId}`);
-        await this.handleIceCandidate(data.candidate);
-      }
-    );
-
-    // socket-level user left (not webrtc disconnect)
-    this.socket.on('user-left', (userId: SocketId) => {
-      console.log(`👋 [Socket] user ${userId} left the room (socket disconnect)`);
-      this.handlePeerDisconnect(DISCONNECT_REASON.PEER_LEFT);
-    });
+  private removeSocketListeners() {
+    this.socket.off('initiate-webrtc-call', this.socketHandlers.initiateWebRTCCall);
+    this.socket.off('webrtc-offer', this.socketHandlers.webRTCOffer);
+    this.socket.off('webrtc-answer', this.socketHandlers.webRTCAnswer);
+    this.socket.off('webrtc-ice-candidate', this.socketHandlers.webRTCIceCandidate);
+    this.socket.off('user-left', this.socketHandlers.userLeft);
   }
 
   // we are first user and initiate the call when second user joins
@@ -456,7 +461,7 @@ export class WebRTCManager {
 
   cleanup() {
     console.log('🧹 [WebRTC] cleanup initiated');
-
+    this.removeSocketListeners();
     if (this.localStream) {
       this.localStream.getTracks().forEach((track) => {
         track.stop();
