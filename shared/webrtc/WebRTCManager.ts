@@ -116,7 +116,7 @@ export class WebRTCManager {
 
       if (iceState === ICE_CONNECTION_STATE.FAILED) {
         console.error(`❌ [WebRTC] ICE connection failed`);
-        this.handleConnectionFailed(DISCONNECT_REASON.ICE_FAILED);
+        // this.handleConnectionFailed(DISCONNECT_REASON.ICE_FAILED);
       } else if (iceState === ICE_CONNECTION_STATE.DISCONNECTED) {
         console.warn(`⚠️ [WebRTC] ICE disconnected - waiting for reconnection...`);
         // DO NOTHING - let ICE try to reconnect
