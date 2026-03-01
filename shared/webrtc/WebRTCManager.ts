@@ -91,6 +91,7 @@ export class WebRTCManager {
     // registering handler that fires when LOCAL RTCPeerConnection discovers a new network path
     // (ICE candidate) that remote peer can use to reach us
     peerConnection.onicecandidate = (event) => {
+      if (peerConnection !== this.peerConnection) return;
       if (event.candidate && event.candidate.candidate !== '') {
         console.log(
           `🧊 [WebRTC] LOCAL candidate: ${event.candidate.type} ${event.candidate.address}:${event.candidate.port} ${event.candidate.protocol}`
@@ -111,6 +112,7 @@ export class WebRTCManager {
 
     // ice connection state monitoring
     peerConnection.oniceconnectionstatechange = () => {
+      if (peerConnection !== this.peerConnection) return;
       const iceState = peerConnection.iceConnectionState;
       console.log(`🧊 [WebRTC] ICE connection state: ${iceState}`);
 
@@ -134,6 +136,7 @@ export class WebRTCManager {
     };
 
     peerConnection.onconnectionstatechange = () => {
+      if (peerConnection !== this.peerConnection) return;
       const state = peerConnection.connectionState;
       console.log(`📶 [WebRTC] peer connection state: ${state}`);
 
@@ -158,6 +161,7 @@ export class WebRTCManager {
 
     // handle incoming audio stream from remote peer
     peerConnection.ontrack = (event) => {
+      if (peerConnection !== this.peerConnection) return;
       console.log(`🎵 [WebRTC] received remote stream from ${remoteUserId}`);
       const [remoteStream] = event.streams;
 
