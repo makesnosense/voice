@@ -411,8 +411,9 @@ export class WebRTCManager {
   private closePeerConnection(reason: DisconnectReason) {
     if (this.peerConnection) {
       console.log(`🔌 [WebRTC] closing peer connection (reason: ${reason})`);
-      this.peerConnection.close();
+      const pc = this.peerConnection;
       this.peerConnection = null;
+      pc.close();
       this.onConnectionStateChange(this.getWebRtcConnectionState());
 
       this.remoteDescriptionSet = false;
