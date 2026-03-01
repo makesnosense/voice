@@ -91,7 +91,7 @@ export class WebRTCManager {
     // registering handler that fires when LOCAL RTCPeerConnection discovers a new network path
     // (ICE candidate) that remote peer can use to reach us
     peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
+      if (event.candidate && event.candidate.candidate !== '') {
         console.log(
           `🧊 [WebRTC] LOCAL candidate: ${event.candidate.type} ${event.candidate.address}:${event.candidate.port} ${event.candidate.protocol}`
         );
