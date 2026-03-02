@@ -57,7 +57,7 @@ export default function UserCard({
           <>
             {!isMicConnected && (
               <small className={userCardStyles.micStatus}>
-                <MicOff size={14} /> not connected
+                <MicOff size={14} /> not provided
               </small>
             )}
 

@@ -24,8 +24,9 @@
 }
 
 .micStatus {
-  font-size: 10px;
+  font-size: 9px;
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
