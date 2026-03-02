@@ -9,8 +9,11 @@ export class ApiBase {
     let response: Response;
     try {
       response = await fetch(`${this.baseUrl}${path}`, {
-        headers: { 'Content-Type': 'application/json' },
         ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
       });
     } catch {
       throw new NetworkError();
