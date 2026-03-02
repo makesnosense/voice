@@ -143,7 +143,7 @@ export class WebRTCManager {
     peerConnection.oniceconnectionstatechange = () => {
       if (peerConnection !== this.peerConnection) return;
       const iceState = peerConnection.iceConnectionState;
-      console.log(`🧊 [WebRTC] ICE connection state: ${iceState}`);
+      console.log(`🧊 [WebRTC] ICE connection state changed: ${iceState}`);
 
       if (iceState === ICE_CONNECTION_STATE.FAILED) {
         console.error(`❌ [WebRTC] ICE connection failed`);
@@ -167,13 +167,13 @@ export class WebRTCManager {
     peerConnection.onconnectionstatechange = () => {
       if (peerConnection !== this.peerConnection) return;
       const state = peerConnection.connectionState;
-      console.log(`📶 [WebRTC] peer connection state: ${state}`);
+      console.log(`📶 [WebRTC] peer connection state changed to: ${state}`);
 
       if (state === PEER_CONNECTION_STATE.CONNECTED) {
         console.log(`✅ [WebRTC] peer connection established successfully`);
         this.reconnectAttempts = 0;
       } else if (state === PEER_CONNECTION_STATE.FAILED) {
-        console.error(`❌ [WebRTC] peer connection failed - cleaning up`);
+        console.error(`❌ [WebRTC] peer connection failed`);
         this.handleConnectionFailed(DISCONNECT_REASON.CONNECTION_FAILED);
       } else if (state === PEER_CONNECTION_STATE.DISCONNECTED) {
         console.warn(`⚠️ [WebRTC] peer connection disconnected - waiting for reconnection...`);
