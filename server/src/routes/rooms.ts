@@ -37,13 +37,10 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
 
     try {
       const targetUser = await findUserByEmail(targetEmail);
-      if (!targetUser) {
-        return res.status(404).json({ error: 'user not found' });
-      }
+      const mobileDevices = targetUser ? await getUserMobileDevices(targetUser.id) : [];
 
-      const mobileDevices = await getUserMobileDevices(targetUser.id);
-      if (mobileDevices.length === 0) {
-        return res.status(404).json({ error: 'target has no reachable devices' });
+      if (!targetUser || mobileDevices.length === 0) {
+        return res.status(404).json({ error: 'user not reachable' });
       }
 
       await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
