@@ -48,7 +48,7 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
 
       await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
 
-      res.json({ roomId });
+      res.status(204).end();
     } catch (error) {
       console.error('failed to send invite:', error);
       res.status(500).json({ error: 'failed to send invite' });
