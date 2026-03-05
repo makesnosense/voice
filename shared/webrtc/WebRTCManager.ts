@@ -268,6 +268,15 @@ export class WebRTCManager {
   // by creating answer
   private async handleOffer(fromUserId: SocketId, offer: WebRTCOffer) {
     try {
+      // close any existing connection before handling the new offer,
+      // otherwise the stale pc holds TURN allocations and interferes with ICE
+      if (this.peerConnection) {
+        console.warn(
+          '⚠️ [WebRTC] STALE PC DETECTED — closing before handling new offer. if this never appears, the fix was unnecessary'
+        );
+        this.closePeerConnection(DISCONNECT_REASON.MANUAL_CLEANUP);
+      }
+
       const peerConnection = await this.createPeerConnection(fromUserId);
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
