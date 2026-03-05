@@ -1,20 +1,37 @@
+import { useEffect, useState } from 'react';
+import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
 import { useAudioAnalyserStore } from '../../../../stores/useAudioAnalyserStore';
+import { useAuthStore } from '../../../../stores/useAuthStore';
 import usersStyles from './Users.module.css';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
+import useRoomId from '../../useRoomId';
 
 interface UsersProps {
   currentUserId: SocketId | undefined;
 }
 
 export default function Users({ currentUserId }: UsersProps) {
+  const roomId = useRoomId();
+
+  const [emailToInvite, setEmailToInvite] = useState<string | null>(null);
+
   const roomUsers = useRoomStore((state) => state.roomUsers);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isMicActive = useWebRTCStore((state) => state.isMicActive);
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
   const toggleMute = useWebRTCStore((state) => state.toggleMute);
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
+
+  useEffect(() => {
+    if (roomUsers.length >= 2) {
+      setEmailToInvite(null);
+    }
+  }, [roomUsers.length]);
+
+  const isAlone = roomUsers.length === 1;
 
   return (
     <div className={usersStyles.usersContainer}>
@@ -47,6 +64,10 @@ export default function Users({ currentUserId }: UsersProps) {
           />
         );
       })}
+
+      {isAlone && isAuthenticated && (
+        <InviteCard roomId={roomId!} onUserInvited={(email) => setEmailToInvite(email)} />
+      )}
     </div>
   );
 }
