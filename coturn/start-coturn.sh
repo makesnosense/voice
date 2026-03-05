@@ -17,4 +17,6 @@ exec turnserver \
   --stale-nonce=600 \
   --max-allocate-lifetime=600 \
   --channel-lifetime=600 \
+  --mobility \
+  --no-rfc5780 \
   --log-binding
