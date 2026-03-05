@@ -2,8 +2,8 @@
   position: relative;
   gap: 12px;
   padding: 16px 24px;
-  width: 6rem;
-  height: 8.5rem;
+  width: var(--user-card-width);
+  height: var(--user-card-height);
   display: flex;
   justify-content: center;
 }
