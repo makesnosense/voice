@@ -24,15 +24,23 @@ export default function useWebRTCInit(
   const connectionStatus = useRoomStore(state => state.connectionStatus);
   const localStream = useMicrophoneStore(state => state.stream);
   const micPermissionStatus = useMicrophoneStore(state => state.status);
+  const requestMicrophone = useMicrophoneStore(
+    state => state.requestMicrophone,
+  );
 
   useEffect(() => {
+    // hard prerequisites — nothing works without these
     if (
-      micPermissionStatus !== MIC_PERMISSION_STATUS.GRANTED ||
       connectionStatus !== ROOM_CONNECTION_STATUS.JOINED ||
-      !localStream ||
       !socketRef.current
     )
       return;
+
+    // mic was cleaned up between calls — re-request it
+    if (micPermissionStatus !== MIC_PERMISSION_STATUS.GRANTED || !localStream) {
+      requestMicrophone();
+      return;
+    }
 
     useWebRTCStore
       .getState()
@@ -41,5 +49,11 @@ export default function useWebRTCInit(
         localStream as unknown as MediaStream,
         TURN_SERVER_CONFIG,
       );
-  }, [micPermissionStatus, connectionStatus, localStream, socketRef]);
+  }, [
+    micPermissionStatus,
+    connectionStatus,
+    localStream,
+    socketRef,
+    requestMicrophone,
+  ]);
 }
