@@ -9,7 +9,7 @@ import type { TypedClientSocket } from '../../../shared/types';
 const TURN_SERVER_CONFIG = __DEV__
   ? {
       credentialsUrl: 'https://localhost:3003/api/turn-credentials',
-      host: 'localhost',
+      host: 'voice.k.vu',
       port: '3478',
     }
   : {
