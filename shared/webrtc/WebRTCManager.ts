@@ -13,10 +13,10 @@ import type {
   WebRTCAnswer,
 } from '../types';
 
-const BASE_ICE_SERVERS: RTCIceServer[] = [
-  { urls: 'stun:stun.cloudflare.com:3478' },
-  { urls: 'stun:global.stun.twilio.com:3478' },
-];
+// const BASE_ICE_SERVERS: RTCIceServer[] = [
+//   { urls: 'stun:stun.cloudflare.com:3478' },
+//   { urls: 'stun:global.stun.twilio.com:3478' },
+// ];
 
 export class WebRTCManager {
   private localStream: MediaStream;
@@ -111,7 +111,10 @@ export class WebRTCManager {
     console.log(`🔗 [WebRTC] Creating peer connection to ${remoteUserId}`);
     this.currentRemoteUserId = remoteUserId;
     const iceServers = await this.getIceServers();
-    const peerConnection = new RTCPeerConnection({ iceServers });
+    const peerConnection = new RTCPeerConnection({
+      iceServers,
+      iceTransportPolicy: 'relay',
+    });
 
     this.localStream.getTracks().forEach((track) => {
       peerConnection.addTrack(track, this.localStream!);
@@ -203,7 +206,8 @@ export class WebRTCManager {
   }
 
   private async getIceServers(): Promise<RTCIceServer[]> {
-    const iceServers = [...BASE_ICE_SERVERS];
+    // const iceServers = [...BASE_ICE_SERVERS];
+    const iceServers = [];
 
     try {
       const response = await fetch(this.turnServerConfig.credentialsUrl);
@@ -221,7 +225,8 @@ export class WebRTCManager {
       console.log('✅ [WebRTC] TURN credentials obtained');
     } catch (error) {
       console.error('❌ [WebRTC] failed to get TURN credentials:', error);
-      console.log('⚠️ [WebRTC] using STUN only (may not work behind strict NAT)');
+      // console.log('⚠️ [WebRTC] using STUN only (may not work behind strict NAT)');
+      throw new Error('TURN credentials unavailable — cannot establish relay connection');
     }
 
     return iceServers;
