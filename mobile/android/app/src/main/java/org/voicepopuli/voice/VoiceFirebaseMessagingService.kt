@@ -48,23 +48,23 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun showIncomingCallNotification(callerName: String, roomId: String) {
-        val notificatonManager = getSystemService(NotificationManager::class.java)
+        val notificationManager = getSystemService(NotificationManager::class.java)
 
         //  incoming call screen — shown when device is locked or screen is off
-        val incomingCallScreenIntent = Intent(this, IncomingCallActivity::class.java).apply {
+        val incomingCallFullscreenIntent = Intent(this, IncomingCallFullScreenActivity::class.java).apply {
             putExtra("callerName", callerName)
             putExtra("roomId", roomId)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
-        val incomingCallScreenPendingIntent = PendingIntent.getActivity(
-            this, 0, incomingCallScreenIntent,
+        val incomingCallFullscreenPendingIntent = PendingIntent.getActivity(
+            this, 0, incomingCallFullscreenIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // decline action (handled inside IncomingCallActivity via broadcast)
-        val notifDeclineIntent = Intent(this, DeclineCallReceiver::class.java)
-        val notifDeclinePendingIntent = PendingIntent.getBroadcast(
-            this, 1, notifDeclineIntent,
+        // decline action — handled by DeclineCallReceiver
+        val notificationBarDeclineIntent = Intent(this, DeclineCallReceiver::class.java)
+        val notificationBarDeclinePendingIntent = PendingIntent.getBroadcast(
+            this, 1, notificationBarDeclineIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -87,14 +87,14 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             .setContentText(callerName)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setFullScreenIntent(incomingCallScreenPendingIntent, true)
+            .setFullScreenIntent(incomingCallFullscreenPendingIntent, true)
             .setOngoing(true)
             .setAutoCancel(false)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "decline", notifDeclinePendingIntent)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "decline", notificationBarDeclinePendingIntent)
             .addAction(android.R.drawable.ic_menu_call, "accept", notificationBarAcceptPendingIntent)
             .build()
 
-        notificatonManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
 }

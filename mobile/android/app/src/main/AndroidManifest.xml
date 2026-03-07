@@ -49,7 +49,7 @@
 
       <!-- incoming call screen — no taskAffinity so it floats independently -->
       <activity
-        android:name=".IncomingCallActivity"
+        android:name=".IncomingCallFullScreenActivity"
         android:exported="false"
         android:showOnLockScreen="true"
         android:turnScreenOn="true"
