@@ -1,6 +1,8 @@
 package org.voicepopuli.voice
 
 import android.os.Bundle
+import android.os.Build
+import android.view.WindowManager
 import android.content.Intent
 import android.app.NotificationManager
 import com.facebook.react.ReactActivity
@@ -27,6 +29,7 @@ class MainActivity : ReactActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
+      applyLockScreenFlagsIfCallIntent(intent)
       cancelCallNotificationIfNeeded(intent)
   }
 
@@ -34,6 +37,7 @@ class MainActivity : ReactActivity() {
     // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
     // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
       super.onNewIntent(intent)
+      applyLockScreenFlagsIfCallIntent(intent)
       setIntent(intent)
       cancelCallNotificationIfNeeded(intent)
   }
@@ -47,4 +51,23 @@ class MainActivity : ReactActivity() {
               .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
       }
   }
+
+
+    private fun applyLockScreenFlagsIfCallIntent(intent: Intent?) {
+        val data = intent?.data
+        val isCallIntent = data?.scheme == "voice" && data.host == "call"
+        if (!isCallIntent) return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            )
+        }
+    }
 }

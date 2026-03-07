@@ -28,11 +28,7 @@ class IncomingCallActivity : AppCompatActivity() {
             )
         }
 
-        // dismiss keyguard so buttons are tappable without unlock
-        val km = getSystemService(KeyguardManager::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            km.requestDismissKeyguard(this, null)
-        }
+
 
         // handle action extras (from notification action buttons)
         val action = intent.getStringExtra("action")
