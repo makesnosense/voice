@@ -2,6 +2,9 @@ package org.voicepopuli.voice
 
 import android.os.Bundle
 import android.os.Build
+import android.net.Uri
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.WindowManager
 import android.content.Intent
 import android.app.NotificationManager
@@ -33,6 +36,12 @@ class MainActivity : ReactActivity() {
       cancelCallNotificationIfNeeded(intent)
   }
 
+  override fun onResume() {
+        super.onResume()
+        ensureFullScreenIntentPermission()
+        ensureBatteryOptimizationExemption()
+  }
+
   override fun onNewIntent(intent: Intent) {
     // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
     // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
@@ -41,6 +50,29 @@ class MainActivity : ReactActivity() {
       setIntent(intent)
       cancelCallNotificationIfNeeded(intent)
   }
+
+
+    private fun ensureFullScreenIntentPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return // api 34+
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        if (notificationManager.canUseFullScreenIntent()) return
+
+        startActivity(
+            Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+                .setData(Uri.parse("package:$packageName"))
+        )
+    }
+
+    private fun ensureBatteryOptimizationExemption() {
+        val powerManager = getSystemService(PowerManager::class.java)
+        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
+
+        startActivity(
+            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                .setData(Uri.parse("package:$packageName"))
+        )
+    }
 
   private fun cancelCallNotificationIfNeeded(intent: Intent) {
       val data = intent.data
