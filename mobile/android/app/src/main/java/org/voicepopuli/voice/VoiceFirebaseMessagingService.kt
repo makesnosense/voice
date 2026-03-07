@@ -1,6 +1,5 @@
 package org.voicepopuli.voice
 
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,6 +7,10 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.VibrationAttributes
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -16,8 +19,14 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         const val CHANNEL_ID = "incoming_calls"
-            // arbitrary id — used to cancel this specific notification later via notificatonManager.cancel(NOTIFICATION_ID)
         const val NOTIFICATION_ID = 3333
+
+        private var vibrator: Vibrator? = null
+
+        fun cancelVibration() {
+            vibrator?.cancel()
+            vibrator = null
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -30,20 +39,21 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
         ensureNotificationChannel()
         showIncomingCallNotification(callerName, roomId)
+        startVibration()
     }
 
     private fun ensureNotificationChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
         val manager = getSystemService(NotificationManager::class.java)
-        if (manager.getNotificationChannel(CHANNEL_ID) != null) return
+        // delete old soundless channel if it exists, recreate with correct sound
+        manager.deleteNotificationChannel(CHANNEL_ID)
 
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
-
 
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -52,16 +62,43 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "incoming voice call alerts"
+            // channel vibration as fallback for ringer-on mode
             enableVibration(true)
             setSound(ringtoneUri, audioAttributes)
         }
         manager.createNotificationChannel(channel)
     }
 
+    private fun startVibration() {
+        // repeating: 0ms delay, 500ms on, 500ms off
+        val effect = VibrationEffect.createWaveform(longArrayOf(0, 500, 500), 0)
+
+        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            getSystemService(VibratorManager::class.java).defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Vibrator::class.java)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // USAGE_RINGTONE bypasses silent/ringer mode
+            val attrs = VibrationAttributes.Builder()
+                .setUsage(VibrationAttributes.USAGE_RINGTONE)
+                .build()
+            vibrator?.vibrate(effect, attrs)
+        } else {
+            // USAGE_ALARM is the closest pre-api-33 equivalent
+            @Suppress("DEPRECATION")
+            val attrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build()
+            vibrator?.vibrate(effect, attrs)
+        }
+    }
+
     private fun showIncomingCallNotification(callerName: String, roomId: String) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
-        //  incoming call screen — shown when device is locked or screen is off
         val incomingCallFullscreenIntent = Intent(this, IncomingCallFullScreenActivity::class.java).apply {
             putExtra("callerName", callerName)
             putExtra("roomId", roomId)
@@ -72,22 +109,16 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // decline action — handled by DeclineCallReceiver
         val notificationBarDeclineIntent = Intent(this, DeclineCallReceiver::class.java)
         val notificationBarDeclinePendingIntent = PendingIntent.getBroadcast(
             this, 1, notificationBarDeclineIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notificationBarAcceptIntent = Intent(Intent.ACTION_VIEW, 
-            android.net.Uri.parse("voice://call?roomId=$roomId")).apply {
-            setClass(applicationContext, MainActivity::class.java)
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or 
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_NO_ANIMATION
+        val notificationBarAcceptIntent = Intent(this, AcceptCallReceiver::class.java).apply {
+            putExtra("roomId", roomId)
         }
-
-        val notificationBarAcceptPendingIntent = PendingIntent.getActivity(
+        val notificationBarAcceptPendingIntent = PendingIntent.getBroadcast(
             this, 2, notificationBarAcceptIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -107,5 +138,4 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
-
 }

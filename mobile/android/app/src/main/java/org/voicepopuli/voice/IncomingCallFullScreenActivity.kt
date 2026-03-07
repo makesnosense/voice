@@ -88,6 +88,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     }
 
     private fun cancelNotification() {
+        VoiceFirebaseMessagingService.cancelVibration()
         getSystemService(NotificationManager::class.java)
             .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }

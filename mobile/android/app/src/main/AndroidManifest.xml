@@ -69,6 +69,7 @@
         </intent-filter>
       </service>
 
+      <receiver android:name=".AcceptCallReceiver" android:exported="false" />
       <receiver android:name=".DeclineCallReceiver" android:exported="false" />
     </application>
 </manifest>

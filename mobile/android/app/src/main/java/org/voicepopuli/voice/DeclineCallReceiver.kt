@@ -7,6 +7,7 @@ import android.content.Intent
 
 class DeclineCallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        VoiceFirebaseMessagingService.cancelVibration()
         context.getSystemService(NotificationManager::class.java)
             .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
         // TODO: notify server call was declined
