@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { revokeLockScreenBypass } from '../native/lock-screen-bypass';
 import { useRoomSocket } from '../../../shared/hooks/useRoomSocket';
 import { useRoomStore } from '../../../shared/stores/useRoomStore';
 import { useWebRTCStore } from '../../../shared/stores/useWebRTCStore';
@@ -41,6 +42,12 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   );
 
   useWebRTCInit(socketRef);
+
+  useEffect(() => {
+    return () => {
+      revokeLockScreenBypass();
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
