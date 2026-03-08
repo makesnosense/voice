@@ -5,11 +5,15 @@ import Auth from './components/Auth';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
 import { RoomId } from '../../shared/types';
+import { useAppPermissions } from './hooks/useAppPermissions.android';
 import RoomScreen from './screens/RoomScreen';
+import PermissionsScreen from './screens/PermissionsScreen';
 
 export default function App() {
   const { isAuthenticated, user, logout } = useAuthStore();
   const [activeRoomId, setActiveRoomId] = useState<RoomId | null>(null);
+
+  const permissions = useAppPermissions();
 
   useEffect(() => {
     useAuthStore.getState().initialize();
@@ -18,6 +22,9 @@ export default function App() {
   useDeviceRegistration();
 
   useIncomingCall(roomId => setActiveRoomId(roomId as RoomId));
+
+  if (!permissions.allGranted)
+    return <PermissionsScreen permissions={permissions} />;
 
   if (activeRoomId) {
     return (
