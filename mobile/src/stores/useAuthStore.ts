@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { keychainStorage } from '../utils/keychain';
 import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
-import { ApiError } from '../../../shared/api/base';
+import { ApiError } from '../../../shared/errors';
 import { api } from '../api';
 
 import type { User } from '../../../shared/auth-types';
