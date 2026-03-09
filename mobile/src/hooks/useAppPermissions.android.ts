@@ -12,6 +12,7 @@ import {
   type PermissionStatus,
   type AppPermissions,
 } from './useAppPermissions.types';
+import { waitForActivity } from '../utils/wait-for-activity';
 
 function toStatus(granted: boolean): PermissionStatus {
   return granted ? PERMISSION_STATUS.GRANTED : PERMISSION_STATUS.DENIED;
@@ -54,12 +55,14 @@ export function useAppPermissions(): AppPermissions {
   );
 
   useEffect(() => {
-    checkAll()
+    waitForActivity()
+      .then(() => checkAll())
       .then(applyStatuses)
       .catch(() => {});
   }, [applyStatuses]);
 
   const handleRequestAll = useCallback(async () => {
+    await waitForActivity();
     applyStatuses(await requestAll());
   }, [applyStatuses]);
 

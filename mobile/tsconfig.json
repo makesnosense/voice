@@ -1,6 +1,7 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
+    "lib": ["ES2022"],
     "types": ["jest"]
   },
   "references": [{ "path": "../shared" }],
