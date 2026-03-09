@@ -1,3 +1,5 @@
+import { NetworkError, ApiError } from '../errors';
+
 export class ApiBase {
   private baseUrl: string;
 
@@ -29,21 +31,5 @@ export class ApiBase {
 
     const text = await response.text();
     return text ? JSON.parse(text) : (undefined as T);
-  }
-}
-
-export class ApiError extends Error {
-  public readonly status: number;
-  constructor(status: number, message: string) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-  }
-}
-
-export class NetworkError extends Error {
-  constructor() {
-    super('Network request failed');
-    this.name = 'NetworkError';
   }
 }
