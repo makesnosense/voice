@@ -23,6 +23,7 @@ export default function App() {
 
   useIncomingCall(roomId => setActiveRoomId(roomId as RoomId));
 
+  if (permissions.isChecking) return null;
   if (!permissions.allGranted)
     return <PermissionsScreen permissions={permissions} />;
 

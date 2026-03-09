@@ -70,9 +70,14 @@ export function useAppPermissions(): AppPermissions {
     notificationsStatus === PERMISSION_STATUS.GRANTED &&
     microphoneStatus === PERMISSION_STATUS.GRANTED;
 
+  const isChecking =
+    notificationsStatus === PERMISSION_STATUS.CHECKING ||
+    microphoneStatus === PERMISSION_STATUS.CHECKING;
+
   return {
     notificationsPermission: { status: notificationsStatus },
     microphonePermission: { status: microphoneStatus },
+    isChecking,
     allGranted,
     requestAll: handleRequestAll,
   };

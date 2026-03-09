@@ -15,6 +15,7 @@ export interface PermissionState {
 export interface AppPermissions {
   notificationsPermission: PermissionState;
   microphonePermission: PermissionState;
+  isChecking: boolean;
   allGranted: boolean;
   requestAll: () => Promise<void>;
 }
