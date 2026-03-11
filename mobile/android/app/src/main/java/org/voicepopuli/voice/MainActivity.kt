@@ -14,6 +14,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.zoontek.rnbootsplash.RNBootSplash
 
 class MainActivity : ReactActivity() {
 
@@ -30,12 +31,12 @@ class MainActivity : ReactActivity() {
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-      setTheme(R.style.AppTheme)
-      super.onCreate(savedInstanceState)
-      applyLockScreenFlagsIfCallIntent(intent)
-      cancelCallNotificationIfNeeded(intent)
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        RNBootSplash.init(this, R.style.BootTheme)
+        super.onCreate(savedInstanceState)
+        applyLockScreenFlagsIfCallIntent(intent)
+        cancelCallNotificationIfNeeded(intent)
+    }
 
   override fun onResume() {
         super.onResume()

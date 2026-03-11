@@ -1,3 +1,4 @@
+import RNBootSplash from 'react-native-bootsplash';
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAuthStore } from './stores/useAuthStore';
@@ -14,6 +15,10 @@ export default function App() {
   const [activeRoomId, setActiveRoomId] = useState<RoomId | null>(null);
 
   const permissions = useAppPermissions();
+
+  useEffect(() => {
+    RNBootSplash.hide({ fade: true });
+  }, []);
 
   useEffect(() => {
     useAuthStore.getState().initialize();
