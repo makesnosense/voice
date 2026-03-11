@@ -31,6 +31,7 @@ class MainActivity : ReactActivity() {
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
   override fun onCreate(savedInstanceState: Bundle?) {
+      setTheme(R.style.AppTheme)
       super.onCreate(savedInstanceState)
       applyLockScreenFlagsIfCallIntent(intent)
       cancelCallNotificationIfNeeded(intent)
