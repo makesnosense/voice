@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { api } from '../../../../../api';
 import { useAuthStore } from '../../../../../stores/useAuthStore';
-import { ApiError } from '../../../../../../../shared/api/base';
+import { ApiError } from '../../../../../../../shared/errors';
 import styles from './InviteModal.module.css';
 import type { RoomId } from '../../../../../../../shared/types';
 
