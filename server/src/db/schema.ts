@@ -56,3 +56,17 @@ export const devices = pgTable('devices', {
   lastSeen: timestamp('last_seen').notNull().defaultNow(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+
+export const contacts = pgTable(
+  'contacts',
+  {
+    ownerId: uuid('owner_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    contactId: uuid('contact_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.ownerId, t.contactId] })]
+);

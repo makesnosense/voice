@@ -1,0 +1,27 @@
+meta {
+  name: my-contacts
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://localhost:3003/api/contacts/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{voiceAccessToken}}
+}
+
+script:post-response {
+  const contacts = res.getBody();
+  if (contacts.length > 0) {
+    bru.setVar('contactId', contacts[0].id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

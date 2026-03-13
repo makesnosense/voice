@@ -4,6 +4,7 @@ import devicesRoutes from './routes/devices';
 import turnRoutes from './routes/turn';
 import createCallRouter from './routes/call';
 import createRoomsRouter from './routes/rooms';
+import contactsRoutes from './routes/contacts';
 import { generalApiLimiter } from './middleware/api-rate-limiters';
 import config from './config';
 import type { Room, RoomId } from '../../shared/types';
@@ -27,6 +28,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
   app.use('/api/turn-credentials', turnRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/devices', devicesRoutes);
+  app.use('/api/contacts', contactsRoutes);
 
   return app;
 }

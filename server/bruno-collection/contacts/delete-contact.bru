@@ -1,0 +1,20 @@
+meta {
+  name: delete-contact
+  type: http
+  seq: 3
+}
+
+delete {
+  url: https://localhost:3003/api/contacts/{{contactId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{voiceAccessToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
