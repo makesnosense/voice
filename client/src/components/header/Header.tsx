@@ -1,17 +1,16 @@
 import TitleHeader from './title-header/TitleHeader';
 import Pill from './pill/Pill';
 import headerStyles from './Header.module.css';
-import { ROOM_CONNECTION_STATUS } from '../../../../shared/constants/room';
-import { useRoomStore } from '../../../../shared/stores/useRoomStore';
-import ExitRoomButton from '../../pages/room/components/exit-room-button/ExitRoomButton';
+import type { ReactNode } from 'react';
 
-export default function Header() {
-  const connectionStatus = useRoomStore((state) => state.connectionStatus);
+interface HeaderProps {
+  leftSlot?: ReactNode;
+}
+
+export default function Header({ leftSlot }: HeaderProps) {
   return (
     <header className={`${headerStyles.headerContainer}`}>
-      <div className={headerStyles.leftSlot}>
-        {connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? <ExitRoomButton /> : null}
-      </div>
+      <div className={headerStyles.leftSlot}>{leftSlot}</div>
       <TitleHeader />
       <Pill />
     </header>

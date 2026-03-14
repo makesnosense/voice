@@ -8,13 +8,20 @@ import Spinner from '../../components/spinner/Spinner';
 import RoomError from './components/room-error/RoomError';
 import RoomInterior from './components/RoomInterior';
 import type { RoomId } from '../../../../shared/types';
+import BackButton from '../../components/header/back-button/BackButton';
+import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackButton.constants';
+
+const exitButton = <BackButton label="Exit" variant={BACK_BUTTON_VARIANT.RED} />;
 
 export default function RoomPage() {
   const roomId = useRoomId(); // returns RoomId | null
+  const connectionStatus = useRoomStore((state) => state.connectionStatus);
+
+  const leftSlot = connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? exitButton : null;
 
   return (
     <div className={layoutStyles.page}>
-      <Header />
+      <Header leftSlot={leftSlot} />
       {roomId ? <RoomPageContent roomId={roomId} /> : <RoomError />}
     </div>
   );
