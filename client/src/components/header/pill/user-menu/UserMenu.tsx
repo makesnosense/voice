@@ -1,4 +1,5 @@
-import { LogOut} from 'lucide-react';
+import { Link } from 'react-router';
+import { LogOut, Users } from 'lucide-react';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import userMenuStyles from './UserMenu.module.css';
@@ -31,8 +32,17 @@ export default function UserMenu({ onClose }: UserMenuProps) {
       <div className={userMenuStyles.actions}>
         {/* <button className={userMenuStyles.menuButton} onClick={handlePreferences}>
           <Settings size={16} />
-          <span className={userMenuStyles.menuButtonText}>Settings</span>
+          <span>Settings</span>
         </button> */}
+
+        <Link
+          to="/contacts"
+          className={`${userMenuStyles.menuButton} ${userMenuStyles.menuLink}`}
+          onClick={onClose}
+        >
+          <Users size={16} />
+          <span>Contacts</span>
+        </Link>
 
         <button
           className={`${userMenuStyles.menuButton} ${userMenuStyles.logout}`}

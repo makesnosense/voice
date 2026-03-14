@@ -71,8 +71,8 @@
   background: var(--bg-tertiary);
 }
 
-.menuButtonText {
-  align-items: center;
+.menuLink {
+  text-decoration: none;
 }
 
 .menuButton.logout {
