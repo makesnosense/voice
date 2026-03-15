@@ -16,9 +16,9 @@ const exitButton = <BackButton label="Exit" variant={BACK_BUTTON_VARIANT.RED} />
 
 export default function RoomPage() {
   const roomId = useRoomId(); // returns RoomId | null
-  const connectionStatus = useRoomStore((state) => state.connectionStatus);
+  const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);
 
-  const leftSlot = connectionStatus === ROOM_CONNECTION_STATUS.JOINED ? exitButton : null;
+  const leftSlot = roomConnectionStatus === ROOM_CONNECTION_STATUS.JOINED ? exitButton : null;
 
   return (
     <div className={layoutStyles.page}>
@@ -30,13 +30,13 @@ export default function RoomPage() {
 
 function RoomPageContent({ roomId }: { roomId: RoomId }) {
   const { socketRef } = useRoom(roomId);
-  const connectionStatus = useRoomStore((state) => state.connectionStatus);
+  const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);
 
-  if (connectionStatus === ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND)
+  if (roomConnectionStatus === ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND)
     return <AppError error={ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND} />;
-  if (connectionStatus === ROOM_CONNECTION_STATUS.ROOM_FULL)
+  if (roomConnectionStatus === ROOM_CONNECTION_STATUS.ROOM_FULL)
     return <AppError error={ROOM_CONNECTION_STATUS.ROOM_FULL} />;
-  if (connectionStatus === ROOM_CONNECTION_STATUS.CONNECTING) return <Spinner />;
+  if (roomConnectionStatus === ROOM_CONNECTION_STATUS.CONNECTING) return <Spinner />;
 
   return <RoomInterior socketRef={socketRef} />;
 }

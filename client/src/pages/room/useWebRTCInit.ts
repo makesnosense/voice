@@ -8,7 +8,7 @@ import { ROOM_CONNECTION_STATUS } from '../../../../shared/constants/room';
 import type { TypedClientSocket } from '../../../../shared/types';
 
 export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSocket | null>) {
-  const connectionStatus = useRoomStore((state) => state.connectionStatus);
+  const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);
   const localStream = useMicrophoneStore((state) => state.stream);
   const micPermissionStatus = useMicrophoneStore((state) => state.status);
   const requestMicrophone = useMicrophoneStore((state) => state.requestMicrophone);
@@ -16,7 +16,7 @@ export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSock
   useEffect(() => {
     if (
       micPermissionStatus !== MIC_PERMISSION_STATUS.GRANTED ||
-      connectionStatus !== ROOM_CONNECTION_STATUS.JOINED ||
+      roomConnectionStatus !== ROOM_CONNECTION_STATUS.JOINED ||
       !localStream ||
       !socketRef.current
     )
@@ -47,5 +47,5 @@ export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSock
     useWebRTCStore
       .getState()
       .initializeWebRTC(socketRef.current, localStream, turnServerConfig, analyserCallbacks);
-  }, [micPermissionStatus, connectionStatus, localStream, socketRef, requestMicrophone]);
+  }, [micPermissionStatus, roomConnectionStatus, localStream, socketRef, requestMicrophone]);
 }

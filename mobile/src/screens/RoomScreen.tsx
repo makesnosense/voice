@@ -24,7 +24,9 @@ const handleCleanup = () => {
 };
 
 export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
-  const connectionStatus = useRoomStore(state => state.connectionStatus);
+  const roomConnectionStatus = useRoomStore(
+    state => state.roomConnectionStatus,
+  );
   const roomUsers = useRoomStore(state => state.roomUsers);
   const requestMicrophone = useMicrophoneStore(
     state => state.requestMicrophone,
@@ -52,7 +54,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Voice</Text>
-      <Text style={styles.status}>{connectionStatus}</Text>
+      <Text style={styles.status}>{roomConnectionStatus}</Text>
 
       {roomUsers.map(user => (
         <Text key={user.userId} style={styles.user}>

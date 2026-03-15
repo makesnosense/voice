@@ -5,7 +5,7 @@ import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../constants/
 interface RoomStore {
   roomUsers: UserDataClientSide[];
   messages: Message[];
-  connectionStatus: RoomConnectionStatus;
+  roomConnectionStatus: RoomConnectionStatus;
 
   setRoomUsers: (users: UserDataClientSide[]) => void;
   addMessage: (message: Message) => void;
@@ -16,11 +16,11 @@ interface RoomStore {
 export const useRoomStore = create<RoomStore>((set) => ({
   roomUsers: [],
   messages: [],
-  connectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
+  roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
 
   setRoomUsers: (users) => set({ roomUsers: users }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
-  setConnectionStatus: (status) => set({ connectionStatus: status }),
+  setConnectionStatus: (status) => set({ roomConnectionStatus: status }),
   reset: () =>
-    set({ roomUsers: [], messages: [], connectionStatus: ROOM_CONNECTION_STATUS.CONNECTING }),
+    set({ roomUsers: [], messages: [], roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING }),
 }));

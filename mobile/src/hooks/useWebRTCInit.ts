@@ -21,7 +21,9 @@ const TURN_SERVER_CONFIG = __DEV__
 export default function useWebRTCInit(
   socketRef: React.RefObject<TypedClientSocket | null>,
 ) {
-  const connectionStatus = useRoomStore(state => state.connectionStatus);
+  const roomConnectionStatus = useRoomStore(
+    state => state.roomConnectionStatus,
+  );
   const localStream = useMicrophoneStore(state => state.stream);
   const micPermissionStatus = useMicrophoneStore(state => state.status);
   const requestMicrophone = useMicrophoneStore(
@@ -31,7 +33,7 @@ export default function useWebRTCInit(
   useEffect(() => {
     // hard prerequisites — nothing works without these
     if (
-      connectionStatus !== ROOM_CONNECTION_STATUS.JOINED ||
+      roomConnectionStatus !== ROOM_CONNECTION_STATUS.JOINED ||
       !socketRef.current
     )
       return;
@@ -51,7 +53,7 @@ export default function useWebRTCInit(
       );
   }, [
     micPermissionStatus,
-    connectionStatus,
+    roomConnectionStatus,
     localStream,
     socketRef,
     requestMicrophone,

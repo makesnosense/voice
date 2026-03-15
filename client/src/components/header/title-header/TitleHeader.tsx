@@ -9,10 +9,10 @@ import { HEADER_ANIMATION_STATE } from '../title-header/header-animation/HeaderA
 export default function TitleHeader() {
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
   const remoteStream = useWebRTCStore((state) => state.remoteStream);
-  const connectionStatus = useRoomStore((state) => state.connectionStatus);
+  const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);
 
   const getAnimationState = () => {
-    if (connectionStatus !== ROOM_CONNECTION_STATUS.JOINED) {
+    if (roomConnectionStatus !== ROOM_CONNECTION_STATUS.JOINED) {
       return HEADER_ANIMATION_STATE.ACTIVE;
     }
     if (isMutedLocal) {
