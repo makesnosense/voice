@@ -56,3 +56,12 @@
 .error {
   color: var(--accent-red);
 }
+
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
