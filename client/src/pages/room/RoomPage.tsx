@@ -5,11 +5,12 @@ import useRoom from './useRoom';
 import { ROOM_CONNECTION_STATUS } from '../../../../shared/constants/room';
 import Header from '../../components/header/Header';
 import Spinner from '../../components/spinner/Spinner';
-import RoomError from './components/room-error/RoomError';
+import AppError from '../../components/app-error/AppError';
 import RoomInterior from './components/RoomInterior';
 import type { RoomId } from '../../../../shared/types';
 import BackButton from '../../components/header/back-button/BackButton';
 import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackButton.constants';
+import { APP_ERROR } from '../../components/app-error/AppError.constants';
 
 const exitButton = <BackButton label="Exit" variant={BACK_BUTTON_VARIANT.RED} />;
 
@@ -22,7 +23,7 @@ export default function RoomPage() {
   return (
     <div className={layoutStyles.page}>
       <Header leftSlot={leftSlot} />
-      {roomId ? <RoomPageContent roomId={roomId} /> : <RoomError />}
+      {roomId ? <RoomPageContent roomId={roomId} /> : <AppError error={APP_ERROR.ROOM_NOT_FOUND} />}
     </div>
   );
 }
@@ -31,9 +32,10 @@ function RoomPageContent({ roomId }: { roomId: RoomId }) {
   const { socketRef } = useRoom(roomId);
   const connectionStatus = useRoomStore((state) => state.connectionStatus);
 
-  if (connectionStatus === ROOM_CONNECTION_STATUS.ERROR) return <RoomError />;
+  if (connectionStatus === ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND)
+    return <AppError error={ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND} />;
   if (connectionStatus === ROOM_CONNECTION_STATUS.ROOM_FULL)
-    return <RoomError connectionError={ROOM_CONNECTION_STATUS.ROOM_FULL} />;
+    return <AppError error={ROOM_CONNECTION_STATUS.ROOM_FULL} />;
   if (connectionStatus === ROOM_CONNECTION_STATUS.CONNECTING) return <Spinner />;
 
   return <RoomInterior socketRef={socketRef} />;

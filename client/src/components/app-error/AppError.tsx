@@ -1,18 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import baseStyles from '../../../../styles/BaseCard.module.css';
-import buttonStyles from '../../../../styles/Buttons.module.css';
-import roomErrorStyles from './RoomError.module.css';
-import {
-  ROOM_CONNECTION_STATUS,
-  type RoomConnectionError,
-} from '../../../../../../shared/constants/room';
+import baseStyles from '../../styles/BaseCard.module.css';
+import buttonStyles from '../../styles/Buttons.module.css';
+import roomErrorStyles from './AppError.module.css';
+import { APP_ERROR, type AppErrorType } from './AppError.constants';
 
-interface RoomErrorProps {
-  connectionError?: RoomConnectionError;
+interface AppErrorProps {
+  error: AppErrorType;
 }
 
-export default function RoomError({ connectionError }: RoomErrorProps) {
+const ERROR_CONTENT: Record<AppErrorType, { icon: string; title: string; description: string }> = {
+  [APP_ERROR.ROOM_NOT_FOUND]: {
+    icon: '❌',
+    title: 'Room does not exist',
+    description: "The room you're looking for could not be found.",
+  },
+  [APP_ERROR.ROOM_FULL]: {
+    icon: '🚫',
+    title: 'Room is full',
+    description: 'This room already has 2 people (maximum capacity).',
+  },
+  [APP_ERROR.UNAUTHORIZED]: {
+    icon: '🔒',
+    title: 'Not logged in',
+    description: 'You need to be logged in to view this page.',
+  },
+};
+
+export default function AppError({ error }: AppErrorProps) {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
 
@@ -29,25 +44,7 @@ export default function RoomError({ connectionError }: RoomErrorProps) {
     }
   }, [countdown, navigate]);
 
-  const getErrorMessage = () => {
-    switch (connectionError) {
-      case ROOM_CONNECTION_STATUS.ROOM_FULL:
-        return {
-          icon: '🚫',
-          title: 'Room is full',
-          description: 'This room already has 2 people (maximum capacity).',
-        };
-      case ROOM_CONNECTION_STATUS.ERROR:
-      default:
-        return {
-          icon: '❌',
-          title: 'Room does not exist',
-          description: "The room you're looking for could not be found.",
-        };
-    }
-  };
-
-  const { icon, title, description } = getErrorMessage();
+  const { icon, title, description } = ERROR_CONTENT[error];
 
   return (
     <div className={roomErrorStyles.container}>

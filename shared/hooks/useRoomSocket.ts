@@ -44,7 +44,7 @@ export function useRoomSocket(
 
     socket.on('room-not-found', (error) => {
       console.error('❌ Room error:', error);
-      useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.ERROR);
+      useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND);
     });
 
     socket.on('room-full', (error) => {
