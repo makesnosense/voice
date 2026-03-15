@@ -1,15 +1,22 @@
 .container {
   width: min(100%, 420px);
   gap: 0;
-  padding: 0 6px 6px;
+  padding: 4px 6px;
   overflow: hidden;
 }
 
-.header {
+.headerRow {
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 6px 6px;
+  padding: 6px 4px;
 }
 
 .addButton {

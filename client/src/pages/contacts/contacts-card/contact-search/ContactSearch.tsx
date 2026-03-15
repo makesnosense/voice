@@ -5,7 +5,7 @@ export default function ContactSearch() {
   return (
     <div className={styles.row}>
       <Search size={14} className={styles.icon} />
-      <input type="text" placeholder="search" className={styles.input} />
+      <input type="text" placeholder="Search" className={styles.input} />
     </div>
   );
 }

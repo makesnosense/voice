@@ -1,7 +1,7 @@
 import { UserPlus } from 'lucide-react';
 import { useContactsStore } from '../../../stores/useContactsStore';
 import baseStyles from '../../../styles/BaseCard.module.css';
-import styles from './ContactsCard.module.css';
+import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
 import ContactSearch from './contact-search/ContactSearch';
 
@@ -9,18 +9,24 @@ export default function ContactsCard() {
   const { contacts, isLoading, error } = useContactsStore();
 
   return (
-    <div className={`${baseStyles.card} ${baseStyles.column} ${styles.container}`}>
-      <div className={styles.header}>
-        <ContactSearch />
-        <button className={styles.addButton}>
-          <UserPlus size={24} />
+    <div className={`${baseStyles.card} ${baseStyles.column} ${contactsCardStyles.container}`}>
+      <div className={`${contactsCardStyles.headerRow}`}>
+        <span className={baseStyles.title}>Contacts</span>
+        <button className={contactsCardStyles.addButton}>
+          <UserPlus size={22} />
         </button>
       </div>
 
-      {isLoading && <p className={styles.state}>loading...</p>}
-      {error && <p className={`${styles.state} ${styles.error}`}>{error}</p>}
+      <div className={contactsCardStyles.searchRow}>
+        <ContactSearch />
+      </div>
+
+      {isLoading && <p className={contactsCardStyles.state}>loading...</p>}
+      {error && (
+        <p className={`${contactsCardStyles.state} ${contactsCardStyles.error}`}>{error}</p>
+      )}
       {!isLoading && !error && contacts.length === 0 && (
-        <p className={styles.state}>no contacts yet</p>
+        <p className={contactsCardStyles.state}>no contacts yet</p>
       )}
       {!isLoading &&
         !error &&
