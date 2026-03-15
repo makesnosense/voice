@@ -1,0 +1,31 @@
+.row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+}
+
+.icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}

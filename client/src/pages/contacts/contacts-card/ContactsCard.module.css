@@ -1,0 +1,51 @@
+.container {
+  width: min(100%, 420px);
+  gap: 0;
+  padding: 0 6px 6px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 6px 6px;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.addButton:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-primary);
+  margin: 0 16px;
+}
+
+.state {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.error {
+  color: var(--accent-red);
+}

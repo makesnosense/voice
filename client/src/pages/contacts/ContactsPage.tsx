@@ -8,8 +8,8 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import layoutStyles from '../../styles/Layout.module.css';
 import contactsStyles from './ContactsPage.module.css';
-// import AddContactForm from './components/AddContactForm';
-// import ContactList from './components/ContactList';
+
+import ContactsCard from './contacts-card/ContactsCard';
 
 const backButton = <BackButton label="Back" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
 
@@ -26,8 +26,7 @@ export default function ContactsPage() {
       <Header leftSlot={backButton} />
       {isAuthenticated ? (
         <main className={contactsStyles.content}>
-          {/* <AddContactForm />
-          <ContactList /> */}
+          <ContactsCard />
         </main>
       ) : (
         <AppError error={APP_ERROR.UNAUTHORIZED} />

@@ -1,6 +1,6 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--section-gap);
-  width: min(100%, 420px);
+  align-items: center;
+  width: 100%;
 }
