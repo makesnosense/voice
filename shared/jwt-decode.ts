@@ -1,4 +1,4 @@
-import type { User } from './auth-types';
+import type { User } from './types/auth';
 
 const getJwtPayload = (token: string): Record<string, any> | null => {
   try {

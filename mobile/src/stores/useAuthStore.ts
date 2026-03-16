@@ -4,7 +4,7 @@ import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
 import { ApiError } from '../../../shared/errors';
 import { api } from '../api';
 
-import type { User } from '../../../shared/auth-types';
+import type { User } from '../../../shared/types/auth';
 
 interface AuthStore {
   accessToken: string | null;

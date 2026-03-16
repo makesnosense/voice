@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import type { OtpVerificationResponse, RenewAccessTokenResponse } from '../auth-types';
+import type { OtpVerificationResponse, RenewAccessTokenResponse } from '../types/auth';
 
 export class AuthApi extends ApiBase {
   requestOtp(email: string): Promise<void> {

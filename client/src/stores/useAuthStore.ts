@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { getUserFromJwt, isTokenExpired } from '../../../shared/jwt-decode';
 import { api } from '../api';
-import type { User } from '../../../shared/auth-types';
+import type { User } from '../../../shared/types/auth';
 
 export const REFRESH_TOKEN_LOCAL_STORAGE_KEY = 'refresh_token';
 

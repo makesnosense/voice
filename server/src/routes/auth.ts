@@ -6,7 +6,7 @@ import { generateOtpCode, sendOtpEmail } from '../utils/otp';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/auth';
 import { OTP_EXPIRY_MS } from '../utils/otp';
-import { OtpVerificationResponse } from '../../../shared/auth-types';
+import { OtpVerificationResponse } from '../../../shared/types/auth';
 import { requireRefreshToken } from '../middleware/auth';
 
 const router = Router();

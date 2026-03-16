@@ -4,7 +4,7 @@ import { verifyAccessToken, verifyRefreshToken } from '../utils/jwt';
 import { db } from '../db';
 import { refreshTokens } from '../db/schema';
 import { refreshSchema } from '../schemas/auth';
-import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/auth-types';
+import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types/auth';
 
 declare global {
   namespace Express {
