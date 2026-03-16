@@ -1,4 +1,4 @@
-import type { ObjectValues } from '../../../../../shared/types';
+import type { ObjectValues } from '../../../../../shared/types/core';
 
 export const BACK_BUTTON_VARIANT = {
   RED: 'red',

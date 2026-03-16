@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useRoomStore } from '../stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../constants/room';
-import type { RoomId, TypedClientSocket } from '../types';
+import type { RoomId, TypedClientSocket } from '../types/core';
 
 const SOCKET_OPTIONS = {
   reconnection: true,

@@ -7,7 +7,7 @@ import createRoomsRouter from './routes/rooms';
 import contactsRoutes from './routes/contacts';
 import { generalApiLimiter } from './middleware/api-rate-limiters';
 import config from './config';
-import type { Room, RoomId } from '../../shared/types';
+import type { Room, RoomId } from '../../shared/types/core';
 
 export function createApp(rooms: Map<RoomId, Room>) {
   const app = express();

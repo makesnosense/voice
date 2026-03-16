@@ -5,7 +5,7 @@ import { getUserMobileDevices } from '../services/devices';
 import { notifyDevicesOfCall } from '../services/call';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/call';
-import type { Room, RoomId } from '../../../shared/types';
+import type { Room, RoomId } from '../../../shared/types/core';
 
 export default function createCallRouter(rooms: Map<RoomId, Room>) {
   const router = Router();

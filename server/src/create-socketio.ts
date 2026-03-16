@@ -2,7 +2,12 @@ import { Server } from 'socket.io';
 import createConnectionHandler from './socket-handlers';
 import config from './config';
 import type { Server as HttpServer } from 'http';
-import type { Room, RoomId, ClientToServerEvents, ServerToClientEvents } from '../../shared/types';
+import type {
+  Room,
+  RoomId,
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 
 export function createSocketIO(

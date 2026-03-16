@@ -5,7 +5,7 @@ import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useAudioAnalyserStore } from '../../stores/useAudioAnalyserStore';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../../../../shared/constants/room';
-import type { TypedClientSocket } from '../../../../shared/types';
+import type { TypedClientSocket } from '../../../../shared/types/core';
 
 export default function useWebRTCInit(socketRef: React.RefObject<TypedClientSocket | null>) {
   const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);

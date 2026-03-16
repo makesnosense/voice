@@ -1,5 +1,5 @@
 import { generateRoomId } from '../utils/generators';
-import type { Room, RoomId } from '../../../shared/types';
+import type { Room, RoomId } from '../../../shared/types/core';
 
 export function createRoom(rooms: Map<RoomId, Room>): RoomId {
   let roomId: RoomId;

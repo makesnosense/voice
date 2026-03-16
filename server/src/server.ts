@@ -4,7 +4,7 @@ import { createSocketIO } from './create-socketio';
 import { runMigrations } from './db';
 import RoomDestructionManager from './managers/room-destruction-manager';
 import config, { getProtocol } from './config';
-import type { Room, RoomId } from '../../shared/types';
+import type { Room, RoomId } from '../../shared/types/core';
 import AuthCleanupManager from './managers/auth-cleanup-manager';
 
 await runMigrations();

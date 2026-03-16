@@ -7,7 +7,7 @@ import { useWebRTCStore } from '../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../stores/useMicrophoneStore';
 import useWebRTCInit from '../hooks/useWebRTCInit';
 import { BASE_URL } from '../config';
-import type { RoomId } from '../../../shared/types';
+import type { RoomId } from '../../../shared/types/core';
 
 interface RoomScreenProps {
   roomId: RoomId;

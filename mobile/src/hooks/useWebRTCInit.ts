@@ -4,7 +4,7 @@ import { useWebRTCStore } from '../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../shared/constants/microphone';
 import { ROOM_CONNECTION_STATUS } from '../../../shared/constants/room';
-import type { TypedClientSocket } from '../../../shared/types';
+import type { TypedClientSocket } from '../../../shared/types/core';
 
 const TURN_SERVER_CONFIG = __DEV__
   ? {

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router';
 
-import type { RoomId } from '../../../../shared/types';
+import type { RoomId } from '../../../../shared/types/core';
 
 export default function useRoomIdValidation(): RoomId | null {
   const { roomId } = useParams<{ roomId: RoomId }>();

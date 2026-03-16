@@ -5,7 +5,7 @@ import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
 import { useAudioAnalyserStore } from '../../../../stores/useAudioAnalyserStore';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import usersStyles from './Users.module.css';
-import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types';
+import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import useRoomId from '../../useRoomId';
 

@@ -1,4 +1,4 @@
-import type { RoomId, Room } from '../../../shared/types';
+import type { RoomId, Room } from '../../../shared/types/core';
 
 interface DestructionEntry {
   roomId: RoomId;

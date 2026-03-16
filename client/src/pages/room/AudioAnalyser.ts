@@ -1,4 +1,4 @@
-import type { AudioFrequencyData } from '../../../../shared/types';
+import type { AudioFrequencyData } from '../../../../shared/types/core';
 
 export default class AudioAnalyser {
   private audioContext: AudioContext;
@@ -33,11 +33,11 @@ export default class AudioAnalyser {
 
     // human voice frequency ranges
     const frequencyRanges = [
-      { min: 80, max: 250 },    // low fundamentals
-      { min: 250, max: 500 },   // vocal fry, low voice  
-      { min: 500, max: 1000 },  // main vocal range
+      { min: 80, max: 250 }, // low fundamentals
+      { min: 250, max: 500 }, // vocal fry, low voice
+      { min: 500, max: 1000 }, // main vocal range
       { min: 1000, max: 2000 }, // clarity, consonants
-      { min: 2000, max: 4000 }  // presence, sibilance
+      { min: 2000, max: 4000 }, // presence, sibilance
     ];
 
     const bands: number[] = [];
@@ -67,8 +67,8 @@ export default class AudioAnalyser {
       bands.push(bandLevel);
     }
 
-    const overallLevel = totalSamples > 0 ?
-      Math.min(100, Math.sqrt(totalEnergy / totalSamples) * 3) : 0;
+    const overallLevel =
+      totalSamples > 0 ? Math.min(100, Math.sqrt(totalEnergy / totalSamples) * 3) : 0;
 
     return { bands, overallLevel };
   }
@@ -76,7 +76,6 @@ export default class AudioAnalyser {
   getOverallLevel(): number {
     return this.getFrequencyData().overallLevel;
   }
-
 
   setActive(active: boolean) {
     this.isActive = active;

@@ -12,7 +12,7 @@ import type {
   WebRTCAnswer,
   IceCandidate,
   UserDataClientSide,
-} from '../../shared/types';
+} from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 
 export default function createConnectionHandler(

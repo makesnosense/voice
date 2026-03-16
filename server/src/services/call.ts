@@ -1,5 +1,5 @@
 import { sendCallNotification } from '../utils/fcm';
-import type { RoomId } from '../../../shared/types';
+import type { RoomId } from '../../../shared/types/core';
 
 export async function notifyDevicesOfCall(
   callerEmail: string,

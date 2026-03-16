@@ -7,7 +7,7 @@ import Header from '../../components/header/Header';
 import Spinner from '../../components/spinner/Spinner';
 import AppError from '../../components/app-error/AppError';
 import RoomInterior from './components/RoomInterior';
-import type { RoomId } from '../../../../shared/types';
+import type { RoomId } from '../../../../shared/types/core';
 import BackButton from '../../components/header/back-button/BackButton';
 import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackButton.constants';
 import { APP_ERROR } from '../../components/app-error/AppError.constants';

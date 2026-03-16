@@ -4,7 +4,7 @@ import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from './UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import WebRTCConnectionStatusDot from './WebRTCConnectionStatusDot/WebRTCConnectionStatusDot';
-import type { SocketId, AudioFrequencyData } from '../../../../../../../shared/types';
+import type { SocketId, AudioFrequencyData } from '../../../../../../../shared/types/core';
 
 interface UserCardProps {
   userId: SocketId;

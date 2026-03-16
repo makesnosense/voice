@@ -1,4 +1,4 @@
-import type { TypedClientSocket } from '../../../../../../shared/types';
+import type { TypedClientSocket } from '../../../../../../shared/types/core';
 import { Send } from 'lucide-react';
 import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';

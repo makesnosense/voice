@@ -1,4 +1,4 @@
-import type { ObjectValues } from '../types';
+import type { ObjectValues } from '../types/core';
 
 export const PLATFORM = {
   WEB: 'web',

@@ -4,7 +4,7 @@ import { api } from '../../../../../api';
 import { useAuthStore } from '../../../../../stores/useAuthStore';
 import { ApiError } from '../../../../../../../shared/errors';
 import styles from './InviteModal.module.css';
-import type { RoomId } from '../../../../../../../shared/types';
+import type { RoomId } from '../../../../../../../shared/types/core';
 
 interface InviteModalProps {
   roomId: RoomId;

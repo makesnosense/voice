@@ -1,4 +1,4 @@
-import type { ObjectValues } from '../../../../shared/types';
+import type { ObjectValues } from '../../../../shared/types/core';
 
 export const APP_ERROR = {
   ROOM_NOT_FOUND: 'room-not-found',

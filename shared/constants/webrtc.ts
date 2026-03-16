@@ -1,4 +1,4 @@
-import type { ObjectValues } from '../types';
+import type { ObjectValues } from '../types/core';
 export const WEBRTC_CONNECTION_STATE = {
   WAITING_FOR_OTHER_PEER: 'waiting-for-other-peer',
   CONNECTING: 'connecting',

@@ -1,4 +1,4 @@
-import type { SocketId } from '../../../shared/types';
+import type { SocketId } from '../../../shared/types/core';
 
 interface RateLimitEntry {
   count: number;
@@ -9,14 +9,17 @@ class SocketRateLimiter {
   private limits = new Map<string, RateLimitEntry>();
 
   // clean up old entries every 5 minutes
-  private cleanupInterval = setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of this.limits.entries()) {
-      if (now > entry.resetTime) {
-        this.limits.delete(key);
+  private cleanupInterval = setInterval(
+    () => {
+      const now = Date.now();
+      for (const [key, entry] of this.limits.entries()) {
+        if (now > entry.resetTime) {
+          this.limits.delete(key);
+        }
       }
-    }
-  }, 5 * 60 * 1000);
+    },
+    5 * 60 * 1000
+  );
 
   private getKey(socketId: SocketId, event: string): string {
     return `${socketId}:${event}`;

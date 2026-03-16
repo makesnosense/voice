@@ -1,4 +1,4 @@
-import type { ObjectValues } from '../../../shared/types';
+import type { ObjectValues } from '../../../shared/types/core';
 
 export const PERMISSION_STATUS = {
   CHECKING: 'checking',

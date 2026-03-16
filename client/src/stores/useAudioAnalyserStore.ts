@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import AudioAnalyser from '../pages/room/AudioAnalyser';
-import type { AudioFrequencyData } from '../../../shared/types';
+import type { AudioFrequencyData } from '../../../shared/types/core';
 
 const EMPTY_AUDIO_DATA: AudioFrequencyData = { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
 

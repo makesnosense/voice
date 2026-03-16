@@ -4,7 +4,7 @@ import { useAuthStore } from '../../../../stores/useAuthStore';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import buttonStyles from '../../../../styles/Buttons.module.css';
 import loginDropdownStyles from './LoginDropdown.module.css';
-import type { ObjectValues } from '../../../../../../shared/types';
+import type { ObjectValues } from '../../../../../../shared/types/core';
 
 const LOGIN_STEP = {
   EMAIL_INPUT: 'email-input',

@@ -5,7 +5,7 @@ import { useAudioAnalyserStore } from '../../stores/useAudioAnalyserStore';
 import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useRoomSocket } from '../../../../shared/hooks/useRoomSocket';
 
-import type { RoomId } from '../../../../shared/types';
+import type { RoomId } from '../../../../shared/types/core';
 
 const handleDisconnect = () => {
   useWebRTCStore.getState().cleanup();

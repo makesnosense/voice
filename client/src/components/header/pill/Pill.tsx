@@ -6,7 +6,7 @@ import pillStyles from './Pill.module.css';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import LoginDropdown from './login-dropdown/LoginDropdown';
 import UserMenu from './user-menu/UserMenu';
-import type { ObjectValues } from '../../../../../shared/types';
+import type { ObjectValues } from '../../../../../shared/types/core';
 
 const OPEN_DROPDOWN = {
   THEME: 'theme',

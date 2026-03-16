@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import type { CreateRoomResponse, RoomId } from '../types';
+import type { CreateRoomResponse, RoomId } from '../types/core';
 
 export class RoomsApi extends ApiBase {
   createRoom(): Promise<CreateRoomResponse> {

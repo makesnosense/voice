@@ -1,25 +1,53 @@
 import crypto from 'crypto';
-import type { RoomId } from '../../../shared/types'
+import type { RoomId } from '../../../shared/types/core';
 
 export function generateRoomId(): RoomId {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const id = Array.from({ length: 12 }, () =>
-    chars[Math.floor(Math.random() * chars.length)]
-  ).join('');
+  const id = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join(
+    ''
+  );
 
-  // format like Google Meet: xxx-xxxx-xxx  
+  // format like Google Meet: xxx-xxxx-xxx
   return `${id.slice(0, 3)}-${id.slice(3, 7)}-${id.slice(7)}` as RoomId;
 }
 
 export function generateUserName() {
   const adjectives = [
-    'Swift', 'Bright', 'Clever', 'Bold', 'Calm', 'Brave', 'Quick', 'Wise',
-    'Silent', 'Fierce', 'Gentle', 'Sharp', 'Cool', 'Warm', 'Fresh', 'Strong'
+    'Swift',
+    'Bright',
+    'Clever',
+    'Bold',
+    'Calm',
+    'Brave',
+    'Quick',
+    'Wise',
+    'Silent',
+    'Fierce',
+    'Gentle',
+    'Sharp',
+    'Cool',
+    'Warm',
+    'Fresh',
+    'Strong',
   ];
 
   const animals = [
-    'Tiger', 'Eagle', 'Wolf', 'Fox', 'Bear', 'Lion', 'Hawk', 'Owl',
-    'Shark', 'Whale', 'Falcon', 'Raven', 'Lynx', 'Puma', 'Viper', 'Cobra'
+    'Tiger',
+    'Eagle',
+    'Wolf',
+    'Fox',
+    'Bear',
+    'Lion',
+    'Hawk',
+    'Owl',
+    'Shark',
+    'Whale',
+    'Falcon',
+    'Raven',
+    'Lynx',
+    'Puma',
+    'Viper',
+    'Cobra',
   ];
 
   const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
@@ -34,14 +62,10 @@ export function generateTurnCredentials(secret: string): { username: string; cre
   const username = `${timestamp}:voiceuser`;
 
   // credential is HMAC of username using shared secret
-  const credential = crypto
-    .createHmac('sha1', secret)
-    .update(username)
-    .digest('base64');
+  const credential = crypto.createHmac('sha1', secret).update(username).digest('base64');
 
   return { username, credential };
 }
-
 
 // export function generateChatName() {
 //   const adjectives = [

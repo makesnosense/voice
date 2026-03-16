@@ -5,7 +5,7 @@ import { useAuthStore } from './stores/useAuthStore';
 import Auth from './components/Auth';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
-import { RoomId } from '../../shared/types';
+import { RoomId } from '../../shared/types/core';
 import { useAppPermissions } from './hooks/useAppPermissions.android';
 import RoomScreen from './screens/RoomScreen';
 import PermissionsScreen from './screens/PermissionsScreen';

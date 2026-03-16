@@ -6,7 +6,7 @@ import {
   hasPermission,
   AuthorizationStatus,
 } from '@react-native-firebase/messaging';
-import type { ObjectValues } from '../../../shared/types';
+import type { ObjectValues } from '../../../shared/types/core';
 
 export const NOTIFICATION_PERMISSION_STATUS = {
   AUTHORIZED: 'authorized',

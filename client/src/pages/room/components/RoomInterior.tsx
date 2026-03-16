@@ -8,7 +8,7 @@ import { useWebRTCStore } from './../../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../../../shared/constants/microphone';
 
-import type { TypedClientSocket, SocketId } from '../../../../../shared/types';
+import type { TypedClientSocket, SocketId } from '../../../../../shared/types/core';
 
 interface RoomInteriorProps {
   socketRef: React.RefObject<TypedClientSocket | null>;

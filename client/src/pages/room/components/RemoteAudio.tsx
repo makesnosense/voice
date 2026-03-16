@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { SocketId } from '../../../../../shared/types';
+import type { SocketId } from '../../../../../shared/types/core';
 
 interface RemoteAudioProps {
   userId: SocketId;
@@ -59,12 +59,6 @@ export default function RemoteAudio({ userId, stream, onAutoplayBlocked }: Remot
   }, [stream, userId, onAutoplayBlocked]);
 
   return (
-    <audio
-      ref={audioRef}
-      autoPlay
-      playsInline
-      style={{ display: 'none' }}
-      data-user-id={userId}
-    />
+    <audio ref={audioRef} autoPlay playsInline style={{ display: 'none' }} data-user-id={userId} />
   );
 }
