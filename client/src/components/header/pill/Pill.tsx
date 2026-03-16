@@ -16,18 +16,22 @@ const OPEN_DROPDOWN = {
 type OpenDropdown = ObjectValues<typeof OPEN_DROPDOWN> | null;
 
 export default function Pill() {
-  const { isAuthenticated, authSuccessDelay, setAuthSuccessDelay } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
+
+  const [isAuthSuccessDelayActive, setIsAuthSuccessDelayActive] = useState(false);
+
   const pillRef = useRef<HTMLDivElement>(null);
 
-  // any change in dropdowns resets delay
-  useEffect(() => {
-    setAuthSuccessDelay(false);
-  }, [openDropdown]);
+  const handleLoginSuccessTimeout = () => {
+    setIsAuthSuccessDelayActive(false);
+    setOpenDropdown(null);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (pillRef.current && !pillRef.current.contains(event.target as Node)) {
+        setIsAuthSuccessDelayActive(false);
         setOpenDropdown(null);
       }
     };
@@ -57,10 +61,14 @@ export default function Pill() {
 
         {openDropdown === OPEN_DROPDOWN.USER && (
           <>
-            {isAuthenticated && !authSuccessDelay ? (
+            {isAuthenticated && !isAuthSuccessDelayActive ? (
               <UserMenu onClose={() => setOpenDropdown(null)} />
             ) : (
-              <LoginDropdown onClose={() => setOpenDropdown(null)} />
+              <LoginDropdown
+                onLoginSuccess={() => setIsAuthSuccessDelayActive(true)}
+                onLoginError={() => setIsAuthSuccessDelayActive(false)}
+                onLoginSuccessTimeout={handleLoginSuccessTimeout}
+              />
             )}
           </>
         )}

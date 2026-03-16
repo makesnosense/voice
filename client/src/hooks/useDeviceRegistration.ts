@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { api } from '../api';
-import { REFRESH_TOKEN_LOCAL_STORAGE_KEY } from '../stores/useAuthStore';
+import { REFRESH_TOKEN_LOCAL_STORAGE_KEY } from '../utils/auth-storage';
 import { PLATFORM } from '../../../shared/constants/platform';
 
 const getDeviceName = () =>

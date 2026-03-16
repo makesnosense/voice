@@ -1,3 +1,9 @@
+export interface TokenStorage {
+  getRefreshToken: () => string | null | Promise<string | null>;
+  setRefreshToken: (token: string) => void | Promise<void>;
+  clearRefreshToken: () => void | Promise<void>;
+}
+
 // JWT auth
 
 export interface User {

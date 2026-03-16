@@ -15,14 +15,20 @@ const LOGIN_STEP = {
 type LoginStep = ObjectValues<typeof LOGIN_STEP>;
 
 const PENDING_EMAIL_KEY = 'pending_auth_email';
-const SUCCESS_DISPLAY_DURATION = 2000; // 2 seconds
+const SUCCESS_DISPLAY_DURATION = 2250; // 2.25 seconds
 
 interface LoginDropdownProps {
-  onClose: () => void;
+  onLoginSuccess: () => void;
+  onLoginError: () => void;
+  onLoginSuccessTimeout: () => void;
 }
 
-export default function LoginDropdown({ onClose }: LoginDropdownProps) {
-  const { requestOtp, verifyOtp, isLoading, setAuthSuccessDelay } = useAuthStore();
+export default function LoginDropdown({
+  onLoginSuccess,
+  onLoginError,
+  onLoginSuccessTimeout,
+}: LoginDropdownProps) {
+  const { requestOtp, verifyOtp, isLoading } = useAuthStore();
 
   const [loginStep, setLoginStep] = useState<LoginStep>(LOGIN_STEP.EMAIL_INPUT);
   const [email, setEmail] = useState('');
@@ -58,6 +64,7 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
       localStorage.setItem(PENDING_EMAIL_KEY, email);
       setLoginStep(LOGIN_STEP.CODE_INPUT);
     } catch (err) {
+      console.error('❌ failed to send code:', err);
       setError('failed to send code. please try again.');
     }
   };
@@ -66,19 +73,19 @@ export default function LoginDropdown({ onClose }: LoginDropdownProps) {
     event.preventDefault();
     setError(null);
 
+    onLoginSuccess(); // explicitly before the await, otherwise it will be too late
     try {
-      setAuthSuccessDelay(true);
       await verifyOtp(email, code);
       localStorage.removeItem(PENDING_EMAIL_KEY);
-
+      onLoginSuccess();
       setLoginStep(LOGIN_STEP.SUCCESS);
 
       successTimeoutRef.current = setTimeout(() => {
-        setAuthSuccessDelay(false);
-        onClose();
+        onLoginSuccessTimeout();
       }, SUCCESS_DISPLAY_DURATION);
     } catch (err) {
-      setAuthSuccessDelay(false);
+      onLoginError(); // reset delay on failure
+      console.error('❌ failed to verify code:', err);
       setError('Invalid code. Please try again.');
       setCode('');
     }
