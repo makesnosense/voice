@@ -4,8 +4,8 @@ import { useContactsStore } from '../../../stores/useContactsStore';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
-import ContactSearch from './contact-search/ContactSearch';
-import AddContact from './add-contact/AddContact';
+
+import InputBar from './input-bar/InputBar';
 
 export default function ContactsCard() {
   const { contacts, isLoading, error } = useContactsStore();
@@ -29,11 +29,7 @@ export default function ContactsCard() {
       </div>
 
       <div className={contactsCardStyles.searchRow}>
-        {isAdding ? (
-          <AddContact onCancel={() => setIsAdding(false)} onSuccess={() => setIsAdding(false)} />
-        ) : (
-          <ContactSearch />
-        )}
+        <InputBar isAdding={isAdding} onAddDismiss={() => setIsAdding(false)} />
       </div>
 
       {isLoading && <p className={contactsCardStyles.state}>loading...</p>}

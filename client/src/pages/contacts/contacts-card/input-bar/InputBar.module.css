@@ -1,0 +1,139 @@
+/* container for Input bar and error message */
+.wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  /* gap between email input and buttons */
+  gap: 6px;
+}
+
+.inputPill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 10px 8px;
+  gap: 8px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition:
+    box-shadow 0.2s ease,
+    gap 0.35s ease;
+  min-width: 0;
+}
+
+.inputPillAdding {
+  gap: 0;
+}
+
+.inputPill:focus-within {
+  box-shadow: inset 0 0 0 1px var(--border-secondary);
+}
+
+.inputPill.inputPillError,
+.inputPill.inputPillError:focus-within {
+  box-shadow: inset 0 0 0 1px var(--accent-red-border);
+}
+
+.icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 14px;
+  opacity: 1;
+  transition:
+    width 0.22s ease,
+    opacity 0.15s ease;
+}
+
+.iconHidden {
+  width: 0;
+  opacity: 0;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+  padding-left: 4px;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* buttons start at zero width and grow — they're the ones being revealed */
+.buttons {
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  transition:
+    max-width 0.35s ease,
+    opacity 0.25s ease;
+}
+
+.buttonsVisible {
+  max-width: 160px;
+  opacity: 1;
+}
+
+.addButton,
+.cancelButton {
+  padding: 9px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.addButton {
+  background: var(--accent-blue);
+  color: var(--bg-primary);
+}
+
+.addButton:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.addButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.cancelButton:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-tertiary, var(--bg-primary));
+}
+
+.error {
+  font-size: 0.75rem;
+  color: var(--accent-red);
+  padding: 0 2px;
+}
