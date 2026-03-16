@@ -4,7 +4,7 @@ import { useContactsStore } from '../../../stores/useContactsStore';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
-import { type Contact } from '../../../../../shared/contacts-types';
+import { type Contact } from '../../../../../shared/types/contacts';
 
 import InputBar from './input-bar/InputBar';
 

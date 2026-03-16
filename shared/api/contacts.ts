@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import type { Contact } from '../contacts-types';
+import type { Contact } from '../types/contacts';
 
 export class ContactsApi extends ApiBase {
   getContacts(accessToken: string): Promise<Contact[]> {

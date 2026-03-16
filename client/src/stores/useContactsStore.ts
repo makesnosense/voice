@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { api } from '../api';
 import { useAuthStore } from './useAuthStore';
-import type { Contact } from '../../../shared/contacts-types';
+import type { Contact } from '../../../shared/types/contacts';
 
 interface ContactsStore {
   contacts: Contact[];

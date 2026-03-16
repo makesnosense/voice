@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { useContactsStore } from '../../../../stores/useContactsStore';
 import contactRowStyles from './ContactRow.module.css';
-import type { Contact } from '../../../../../../shared/contacts-types';
+import type { Contact } from '../../../../../../shared/types/contacts';
 
 interface ContactRowProps {
   contact: Contact;
