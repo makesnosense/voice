@@ -1,7 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
 import config from '../config';
-import type { CallNotificationPayload } from '../../../shared/call-types';
+import type { CallNotificationPayload } from '../../../shared/types/call';
 
 const { FCM_PROJECT_ID, FCM_PRIVATE_KEY, FCM_CLIENT_EMAIL } = process.env;
 
