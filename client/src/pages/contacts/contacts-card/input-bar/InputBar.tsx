@@ -7,9 +7,10 @@ import inputBarStyles from './InputBar.module.css';
 interface InputBarProps {
   isAdding: boolean;
   onAddDismiss: () => void;
+  onSearchQueryChange: (query: string) => void;
 }
 
-export default function InputBar({ isAdding, onAddDismiss }: InputBarProps) {
+export default function InputBar({ isAdding, onAddDismiss, onSearchQueryChange }: InputBarProps) {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,10 +18,14 @@ export default function InputBar({ isAdding, onAddDismiss }: InputBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isAdding) inputRef.current?.focus();
+    if (isAdding) {
+      onSearchQueryChange('');
+      inputRef.current?.focus();
+    }
+
     setInputValue('');
     setError(null);
-  }, [isAdding]);
+  }, [isAdding, onSearchQueryChange]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -64,7 +69,11 @@ export default function InputBar({ isAdding, onAddDismiss }: InputBarProps) {
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
-              if (isAdding) setError(null);
+              if (isAdding) {
+                setError(null);
+              } else {
+                onSearchQueryChange(e.target.value);
+              }
             }}
             onKeyDown={(e) => isAdding && e.key === 'Enter' && handleSubmit()}
             className={inputBarStyles.input}
