@@ -16,7 +16,11 @@ const getFilteredContacts = (contacts: Contact[], query: string) => {
   );
 };
 
-export default function ContactsCard() {
+interface ContactsCardProps {
+  title: string;
+}
+
+export default function ContactsCard({ title }: ContactsCardProps) {
   const { contacts, isLoading, error } = useContactsStore();
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,7 +32,7 @@ export default function ContactsCard() {
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${contactsCardStyles.container}`}>
       <div className={contactsCardStyles.headerRow}>
-        <span className={baseStyles.title}>Contacts</span>
+        <span className={baseStyles.title}>{title}</span>
         <button
           className={contactsCardStyles.addButton}
           onClick={() => setIsAdding((prev) => !prev)}

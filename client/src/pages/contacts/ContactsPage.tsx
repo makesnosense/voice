@@ -26,7 +26,7 @@ export default function ContactsPage() {
       <Header leftSlot={backButton} />
       {isAuthenticated ? (
         <main className={contactsStyles.content}>
-          <ContactsCard />
+          <ContactsCard title={'Contacts'} />
         </main>
       ) : (
         <AppError error={APP_ERROR.UNAUTHORIZED} />
