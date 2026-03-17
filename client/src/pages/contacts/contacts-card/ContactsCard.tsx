@@ -5,7 +5,6 @@ import baseStyles from '../../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
 import { type Contact } from '../../../../../shared/types/contacts';
-// import RemoveButton from './contact-row/remove-button/RemoveButton';
 
 import InputBar from './input-bar/InputBar';
 
