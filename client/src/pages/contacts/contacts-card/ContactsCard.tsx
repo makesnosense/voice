@@ -5,6 +5,7 @@ import baseStyles from '../../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
 import { type Contact } from '../../../../../shared/types/contacts';
+import RemoveButton from './contact-row/remove-button/RemoveButton';
 
 import InputBar from './input-bar/InputBar';
 
@@ -62,7 +63,11 @@ export default function ContactsCard() {
       )}
       {!isLoading &&
         !error &&
-        filteredContacts.map((contact) => <ContactRow key={contact.id} contact={contact} />)}
+        filteredContacts.map((contact) => (
+          <ContactRow key={contact.id} contact={contact}>
+            <RemoveButton contactId={contact.id} />
+          </ContactRow>
+        ))}
     </div>
   );
 }

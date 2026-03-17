@@ -34,28 +34,9 @@
   white-space: nowrap;
 }
 
-.removeButton {
+.buttons {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 6px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--text-muted);
+  gap: 4px;
   flex-shrink: 0;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
-}
-
-.removeButton:hover:not(:disabled) {
-  color: var(--accent-red);
-  background: var(--accent-red-hover);
-}
-
-.removeButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
 }
