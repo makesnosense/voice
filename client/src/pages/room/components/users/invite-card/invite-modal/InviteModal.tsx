@@ -64,11 +64,11 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
           close
         </button>
         <ContactsCard
-          title="add user to room"
+          title="Add user to room"
           rowButtons={(contact) => (
             <button
               className={contactsCardStyles.callButton}
-              title="call"
+              title="Call"
               disabled={callingId === contact.id}
               onClick={() => handleCall(contact)}
             >

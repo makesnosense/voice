@@ -18,10 +18,10 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
       <button
         className={`${baseStyles.card} ${styles.inviteCard}`}
         onClick={() => setIsModalOpen(true)}
-        title="add user to room"
+        title="Add user to room"
       >
         <PhoneCall size={18} className={styles.icon} />
-        <span className={styles.label}>add user</span>
+        <span className={styles.label}>Add user</span>
       </button>
 
       {isModalOpen && (
