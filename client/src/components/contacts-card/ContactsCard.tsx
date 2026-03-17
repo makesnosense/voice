@@ -15,12 +15,18 @@ const getFilteredContacts = (contacts: Contact[], query: string) => {
   );
 };
 
+interface AddAction {
+  onSubmit: (email: string) => Promise<void>;
+  label: string;
+}
+
 interface ContactsCardProps {
   title?: string;
   rowButtons?: (contact: Contact) => React.ReactNode;
+  addAction: AddAction;
 }
 
-export default function ContactsCard({ title, rowButtons }: ContactsCardProps) {
+export default function ContactsCard({ title, rowButtons, addAction }: ContactsCardProps) {
   const { contacts, isLoading, error } = useContactsStore();
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +57,8 @@ export default function ContactsCard({ title, rowButtons }: ContactsCardProps) {
           isAdding={isAdding}
           onAddDismiss={() => setIsAdding(false)}
           onSearchQueryChange={setSearchQuery}
+          onSubmit={addAction.onSubmit}
+          submitLabel={addAction.label}
         />
       </div>
 

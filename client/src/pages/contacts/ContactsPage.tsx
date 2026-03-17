@@ -15,8 +15,10 @@ import ContactsCard from '../../components/contacts-card/ContactsCard';
 const backButton = <BackButton label="Back" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
 
 export default function ContactsPage() {
-  const { fetchContacts } = useContactsStore();
+  const { fetchContacts, addContact } = useContactsStore();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const addAction = { label: 'Add', onSubmit: addContact };
 
   useEffect(() => {
     if (isAuthenticated) fetchContacts();
@@ -34,6 +36,7 @@ export default function ContactsPage() {
                 <RemoveButton contactId={contact.id} />
               </>
             )}
+            addAction={addAction}
           />
         </main>
       ) : (

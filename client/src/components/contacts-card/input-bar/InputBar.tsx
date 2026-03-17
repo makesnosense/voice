@@ -1,20 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { ApiError } from '../../../../../shared/errors';
-import { useContactsStore } from '../../../stores/useContactsStore';
 import inputBarStyles from './InputBar.module.css';
 
 interface InputBarProps {
   isAdding: boolean;
   onAddDismiss: () => void;
   onSearchQueryChange: (query: string) => void;
+  onSubmit: (email: string) => Promise<void>;
+  submitLabel: string;
 }
 
-export default function InputBar({ isAdding, onAddDismiss, onSearchQueryChange }: InputBarProps) {
+export default function InputBar({
+  isAdding,
+  onAddDismiss,
+  onSearchQueryChange,
+  onSubmit,
+  submitLabel,
+}: InputBarProps) {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { addContact } = useContactsStore();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,7 +48,7 @@ export default function InputBar({ isAdding, onAddDismiss, onSearchQueryChange }
     setIsSubmitting(true);
     setError(null);
     try {
-      await addContact(trimmed);
+      await onSubmit(trimmed);
       onAddDismiss();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'something went wrong');
@@ -89,7 +95,7 @@ export default function InputBar({ isAdding, onAddDismiss, onSearchQueryChange }
             disabled={isSubmitting || !inputValue.trim()}
             className={inputBarStyles.addButton}
           >
-            Add
+            {submitLabel}
           </button>
 
           <button

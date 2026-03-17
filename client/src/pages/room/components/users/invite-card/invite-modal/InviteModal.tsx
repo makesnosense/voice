@@ -48,6 +48,15 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
     }
   };
 
+  const addAction = {
+    label: 'Call',
+    onSubmit: async (email: string) => {
+      const token = await getValidAccessToken();
+      await api.rooms.inviteToRoom(roomId, email, token);
+      onInviteSent(email);
+    },
+  };
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -67,6 +76,7 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
               <PhonePlus />
             </button>
           )}
+          addAction={addAction}
         />
       </div>
     </div>
