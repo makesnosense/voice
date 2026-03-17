@@ -44,7 +44,7 @@ export default function ContactsCard({ title, rowButtons, addAction }: ContactsC
           onClick={() => setIsAdding((prev) => !prev)}
           aria-expanded={isAdding}
         >
-          <UserPlus size={18} />
+          <UserPlus size={22} />
           <ChevronDown
             size={14}
             className={`${contactsCardStyles.chevron} ${isAdding ? contactsCardStyles.chevronOpen : ''}`}
