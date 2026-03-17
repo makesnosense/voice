@@ -30,13 +30,13 @@
   cursor: pointer;
   color: var(--text-primary);
   transition:
+    opacity 0.3s ease,
     color 0.2s ease,
     background 0.2s ease;
 }
 
 .addButton:hover {
-  color: var(--text-primary);
-  background: var(--bg-secondary);
+  opacity: 0.7;
 }
 
 .divider {
