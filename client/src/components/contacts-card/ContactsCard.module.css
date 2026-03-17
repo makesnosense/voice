@@ -65,3 +65,29 @@
 .chevronOpen {
   transform: rotate(180deg);
 }
+
+.callButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.callButton:hover:not(:disabled) svg {
+  color: var(--accent-green);
+  filter: drop-shadow(0 0 4px var(--accent-green-border));
+}
+
+.callButton:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}

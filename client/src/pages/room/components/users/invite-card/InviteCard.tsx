@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PhoneCall } from 'lucide-react';
 import baseStyles from '../../../../../styles/BaseCard.module.css';
 import styles from './InviteCard.module.css';
-import InviteModal from './InviteModal';
+import InviteModal from './invite-modal/InviteModal';
 import type { RoomId } from '../../../../../../../shared/types/core';
 
 interface InviteCardProps {
