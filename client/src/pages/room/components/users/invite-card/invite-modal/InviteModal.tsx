@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
-import { X } from 'lucide-react';
 import PhonePlus from './PhonePlus';
 import { useContactsStore } from '../../../../../../stores/useContactsStore';
 import ContactsCard from '../../../../../../components/contacts-card/ContactsCard';
@@ -61,7 +60,7 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeButton} onClick={onClose}>
-          <X size={15} />
+          <span className={styles.closeIcon}>×</span>
           close
         </button>
         <ContactsCard

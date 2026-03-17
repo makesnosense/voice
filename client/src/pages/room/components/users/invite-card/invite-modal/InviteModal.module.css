@@ -30,6 +30,10 @@
   transition: color 0.2s ease;
 }
 
+.closeIcon {
+  font-size: 1rem;
+}
+
 .closeButton:hover {
   color: var(--text-primary);
 }
