@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { ApiError } from '../../../../../../shared/errors';
-import { useContactsStore } from '../../../../stores/useContactsStore';
+import { ApiError } from '../../../../../shared/errors';
+import { useContactsStore } from '../../../stores/useContactsStore';
 import inputBarStyles from './InputBar.module.css';
 
 interface InputBarProps {

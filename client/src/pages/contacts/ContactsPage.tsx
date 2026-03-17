@@ -10,7 +10,7 @@ import layoutStyles from '../../styles/Layout.module.css';
 import contactsStyles from './ContactsPage.module.css';
 import RemoveButton from './remove-button/RemoveButton';
 
-import ContactsCard from './contacts-card/ContactsCard';
+import ContactsCard from '../../components/contacts-card/ContactsCard';
 
 const backButton = <BackButton label="Back" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
 

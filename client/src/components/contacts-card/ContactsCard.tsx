@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { UserPlus, ChevronDown } from 'lucide-react';
-import { useContactsStore } from '../../../stores/useContactsStore';
-import baseStyles from '../../../styles/BaseCard.module.css';
+import { useContactsStore } from '../../stores/useContactsStore';
+import baseStyles from '../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
-import { type Contact } from '../../../../../shared/types/contacts';
+import { type Contact } from '../../../../shared/types/contacts';
 
 import InputBar from './input-bar/InputBar';
 

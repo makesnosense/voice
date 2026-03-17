@@ -1,5 +1,5 @@
 import contactRowStyles from './ContactRow.module.css';
-import type { Contact } from '../../../../../../shared/types/contacts';
+import type { Contact } from '../../../../../shared/types/contacts';
 
 interface ContactRowProps {
   contact: Contact;
