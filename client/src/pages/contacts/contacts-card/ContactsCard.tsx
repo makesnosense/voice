@@ -17,7 +17,7 @@ const getFilteredContacts = (contacts: Contact[], query: string) => {
 };
 
 interface ContactsCardProps {
-  title: string;
+  title?: string;
 }
 
 export default function ContactsCard({ title }: ContactsCardProps) {
@@ -32,7 +32,7 @@ export default function ContactsCard({ title }: ContactsCardProps) {
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${contactsCardStyles.container}`}>
       <div className={contactsCardStyles.headerRow}>
-        <span className={baseStyles.title}>{title}</span>
+        {title && <span className={baseStyles.title}>{title}</span>}
         <button
           className={contactsCardStyles.addButton}
           onClick={() => setIsAdding((prev) => !prev)}
