@@ -8,6 +8,7 @@ import usersStyles from './Users.module.css';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import useRoomId from '../../useRoomId';
+import CallingCard from './calling-card/CallingCard';
 
 interface UsersProps {
   currentUserId: SocketId | undefined;
@@ -65,8 +66,12 @@ export default function Users({ currentUserId }: UsersProps) {
         );
       })}
 
-      {isAlone && isAuthenticated && (
+      {isAlone && isAuthenticated && !emailToInvite && (
         <InviteCard roomId={roomId!} onUserInvited={(email) => setEmailToInvite(email)} />
+      )}
+
+      {isAlone && emailToInvite && (
+        <CallingCard email={emailToInvite} onCancel={() => setEmailToInvite(null)} />
       )}
     </div>
   );
