@@ -8,6 +8,7 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import layoutStyles from '../../styles/Layout.module.css';
 import contactsStyles from './ContactsPage.module.css';
+import RemoveButton from './remove-button/RemoveButton';
 
 import ContactsCard from './contacts-card/ContactsCard';
 
@@ -26,7 +27,14 @@ export default function ContactsPage() {
       <Header leftSlot={backButton} />
       {isAuthenticated ? (
         <main className={contactsStyles.content}>
-          <ContactsCard title={'Contacts'} />
+          <ContactsCard
+            title={'Contacts'}
+            rowButtons={(contact) => (
+              <>
+                <RemoveButton contactId={contact.id} />
+              </>
+            )}
+          />
         </main>
       ) : (
         <AppError error={APP_ERROR.UNAUTHORIZED} />

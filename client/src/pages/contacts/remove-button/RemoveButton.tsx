@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useContactsStore } from '../../../../../stores/useContactsStore';
+import { useContactsStore } from '../../../stores/useContactsStore';
 import removeButtonStyles from './RemoveButton.module.css';
 
 interface RemoveButtonProps {

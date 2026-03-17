@@ -5,7 +5,7 @@ import baseStyles from '../../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
 import { type Contact } from '../../../../../shared/types/contacts';
-import RemoveButton from './contact-row/remove-button/RemoveButton';
+// import RemoveButton from './contact-row/remove-button/RemoveButton';
 
 import InputBar from './input-bar/InputBar';
 
@@ -18,9 +18,10 @@ const getFilteredContacts = (contacts: Contact[], query: string) => {
 
 interface ContactsCardProps {
   title?: string;
+  rowButtons?: (contact: Contact) => React.ReactNode;
 }
 
-export default function ContactsCard({ title }: ContactsCardProps) {
+export default function ContactsCard({ title, rowButtons }: ContactsCardProps) {
   const { contacts, isLoading, error } = useContactsStore();
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,7 +70,7 @@ export default function ContactsCard({ title }: ContactsCardProps) {
         !error &&
         filteredContacts.map((contact) => (
           <ContactRow key={contact.id} contact={contact}>
-            <RemoveButton contactId={contact.id} />
+            {rowButtons?.(contact)}
           </ContactRow>
         ))}
     </div>
