@@ -3,5 +3,5 @@ import { api } from '../api';
 import { useAuthStore } from './useAuthStore';
 
 export const useContactsStore = createContactsStore(api.contacts, () =>
-  useAuthStore.getState().getValidAccessToken()
+  useAuthStore.getState().getValidAccessToken(),
 );
