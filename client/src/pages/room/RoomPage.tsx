@@ -12,7 +12,7 @@ import BackButton from '../../components/header/back-button/BackButton';
 import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackButton.constants';
 import { APP_ERROR } from '../../components/app-error/AppError.constants';
 
-const exitButton = <BackButton label="Exit" variant={BACK_BUTTON_VARIANT.RED} />;
+const exitButton = <BackButton label="Exit" variant={BACK_BUTTON_VARIANT.RED} to="/" />;
 
 export default function RoomPage() {
   const roomId = useRoomId(); // returns RoomId | null
