@@ -1,89 +1,41 @@
-import RNBootSplash from 'react-native-bootsplash';
 import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
-import Auth from './components/Auth';
+import { useAppPermissions } from './hooks/useAppPermissions.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
-import { RoomId } from '../../shared/types/core';
-import { useAppPermissions } from './hooks/useAppPermissions.android';
-import RoomScreen from './screens/RoomScreen';
 import PermissionsScreen from './screens/PermissionsScreen';
+import AuthScreen from './screens/AuthScreen';
+import HomeScreen from './screens/HomeScreen';
+import RoomScreen from './screens/RoomScreen';
+import type { RoomId } from '../../shared/types/core';
 
 export default function App() {
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const [activeRoomId, setActiveRoomId] = useState<RoomId | null>(null);
 
   const permissions = useAppPermissions();
 
   useEffect(() => {
-    RNBootSplash.hide({ fade: true });
-  }, []);
-
-  useEffect(() => {
-    useAuthStore.getState().initialize();
+    useAuthStore
+      .getState()
+      .initialize()
+      .finally(() => {
+        RNBootSplash.hide({ fade: true });
+      });
   }, []);
 
   useDeviceRegistration();
-
   useIncomingCall(roomId => setActiveRoomId(roomId as RoomId));
 
   if (permissions.isChecking) return null;
   if (!permissions.allGranted)
     return <PermissionsScreen permissions={permissions} />;
-
-  if (activeRoomId) {
+  if (activeRoomId)
     return (
       <RoomScreen roomId={activeRoomId} onLeave={() => setActiveRoomId(null)} />
     );
-  }
+  if (!isAuthenticated) return <AuthScreen />;
 
-  return (
-    <>
-      <View style={styles.container}>
-        <Text style={styles.title}>Voice</Text>
-
-        {isAuthenticated ? (
-          <>
-            <Text style={styles.info}>logged in as {user?.email}</Text>
-            <TouchableOpacity style={styles.button} onPress={logout}>
-              <Text style={styles.buttonText}>log out</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <Auth />
-        )}
-      </View>
-    </>
-  );
+  return <HomeScreen />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '600',
-    color: '#f1f5f9',
-  },
-  info: {
-    fontSize: 14,
-    color: '#cbd5e1',
-  },
-  button: {
-    width: '100%',
-    backgroundColor: '#1e40af',
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#f1f5f9',
-    fontSize: 16,
-  },
-});
