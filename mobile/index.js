@@ -4,11 +4,11 @@ import {
   RTCSessionDescription,
   RTCIceCandidate,
 } from 'react-native-webrtc';
-
 global.RTCPeerConnection = RTCPeerConnection;
 global.RTCSessionDescription = RTCSessionDescription;
 global.RTCIceCandidate = RTCIceCandidate;
 import { AppRegistry } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import App from './src/App';
 import { name as appName } from './app.json';
 import {
@@ -17,5 +17,10 @@ import {
 } from '@react-native-firebase/messaging';
 
 setBackgroundMessageHandler(getMessaging(), async () => {});
+const Root = () => (
+  <SafeAreaProvider>
+    <App />
+  </SafeAreaProvider>
+);
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => Root);
