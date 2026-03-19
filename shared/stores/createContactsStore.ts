@@ -11,6 +11,7 @@ interface ContactsStore {
   fetchContacts: () => Promise<void>;
   addContact: (email: string) => Promise<void>;
   removeContact: (contactId: string) => Promise<void>;
+  reset: () => void;
 }
 
 export function createContactsStore(
@@ -63,5 +64,6 @@ export function createContactsStore(
         throw error;
       }
     },
+    reset: () => set({ contacts: [], isLoading: false, error: null, cacheExists: false }),
   }));
 }
