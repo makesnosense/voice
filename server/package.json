@@ -8,7 +8,8 @@
     "start": "bun --env-file=../.env.production ./dist/server.js",
     "db:generate": "bun --env-file=../.env.development drizzle-kit generate --config=drizzle.config.ts",
     "db:migrate": "bun --env-file=../.env.development drizzle-kit migrate --config=drizzle.config.ts",
-    "db:studio": "bun --env-file=../.env.development drizzle-kit studio --config=drizzle.config.ts --verbose"
+    "db:studio": "bun --env-file=../.env.development drizzle-kit studio --config=drizzle.config.ts --verbose",
+    "db:seed": "bun --env-file=../.env.development run src/db/seed.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.1",
