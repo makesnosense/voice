@@ -2,8 +2,7 @@ import { create } from 'zustand';
 import { getUserFromJwt, isTokenExpired } from '../jwt-decode';
 import { ApiError } from '../errors';
 import type { Api } from '../api';
-import type { User } from '../auth-types';
-import type { TokenStorage } from '../types/auth';
+import type { TokenStorage, User } from '../types/auth';
 
 export interface AuthStore {
   accessToken: string | null;
