@@ -15,6 +15,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.zoontek.rnbootsplash.RNBootSplash
+import org.voicepopuli.voice.incomingcall.VoiceFirebaseMessagingService
 
 class MainActivity : ReactActivity() {
 

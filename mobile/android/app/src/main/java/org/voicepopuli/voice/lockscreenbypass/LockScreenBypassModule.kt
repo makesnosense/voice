@@ -1,9 +1,10 @@
-package org.voicepopuli.voice
+package org.voicepopuli.voice.lockscreenbypass
 
 import android.os.Build
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import org.voicepopuli.voice.MainActivity
 
 class LockScreenBypassModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {

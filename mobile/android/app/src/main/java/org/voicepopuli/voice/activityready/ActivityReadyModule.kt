@@ -1,4 +1,4 @@
-package org.voicepopuli.voice
+package org.voicepopuli.voice.activityready
 
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.Promise

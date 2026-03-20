@@ -1,10 +1,11 @@
-package org.voicepopuli.voice
+package org.voicepopuli.voice.incomingcall
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import org.voicepopuli.voice.MainActivity
 
 class AcceptCallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

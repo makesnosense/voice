@@ -1,13 +1,12 @@
-package org.voicepopuli.voice
+package org.voicepopuli.voice.activityready
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
-class LockScreenBypassPackage : ReactPackage {
+class ActivityReadyPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext) =
-        listOf(LockScreenBypassModule(reactContext))
-
+        listOf(ActivityReadyModule(reactContext))
     override fun createViewManagers(reactContext: ReactApplicationContext) =
         emptyList<ViewManager<*, *>>()
 }

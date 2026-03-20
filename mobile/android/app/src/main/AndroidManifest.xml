@@ -50,7 +50,7 @@
     </activity>
 
     <activity
-      android:name=".IncomingCallFullScreenActivity"
+      android:name=".incomingcall.IncomingCallFullScreenActivity"
       android:exported="false"
       android:showOnLockScreen="true"
       android:turnScreenOn="true"
@@ -60,7 +60,7 @@
       android:taskAffinity="" />
 
     <service
-      android:name=".VoiceFirebaseMessagingService"
+      android:name=".incomingcall.VoiceFirebaseMessagingService"
       android:exported="false">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -68,10 +68,10 @@
     </service>
 
     <receiver
-      android:name=".AcceptCallReceiver"
+      android:name=".incomingcall.AcceptCallReceiver"
       android:exported="false" />
     <receiver
-      android:name=".DeclineCallReceiver"
+      android:name=".incomingcall.DeclineCallReceiver"
       android:exported="false" />
   </application>
 </manifest>

@@ -1,4 +1,4 @@
-package org.voicepopuli.voice
+package org.voicepopuli.voice.incomingcall
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver

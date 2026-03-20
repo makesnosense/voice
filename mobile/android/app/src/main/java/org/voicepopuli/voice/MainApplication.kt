@@ -6,6 +6,9 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+import org.voicepopuli.voice.lockscreenbypass.LockScreenBypassPackage
+import org.voicepopuli.voice.activityready.ActivityReadyPackage
+
 
 class MainApplication : Application(), ReactApplication {
 

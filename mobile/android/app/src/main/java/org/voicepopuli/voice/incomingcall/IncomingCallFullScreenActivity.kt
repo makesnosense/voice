@@ -1,4 +1,4 @@
-package org.voicepopuli.voice
+package org.voicepopuli.voice.incomingcall
 
 import android.app.KeyguardManager
 import android.app.NotificationManager
@@ -9,6 +9,8 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import org.voicepopuli.voice.MainActivity
+import org.voicepopuli.voice.R
 
 class IncomingCallFullScreenActivity : AppCompatActivity() {
 
