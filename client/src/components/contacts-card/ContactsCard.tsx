@@ -5,8 +5,9 @@ import baseStyles from '../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
 import { type Contact } from '../../../../shared/types/contacts';
-
 import InputBar from './input-bar/InputBar';
+
+const DISPLAY_LIMIT = 50;
 
 const getFilteredContacts = (contacts: Contact[], query: string) => {
   const q = query.toLowerCase();
@@ -34,6 +35,8 @@ export default function ContactsCard({ title, rowButtons, addAction }: ContactsC
   const filteredContacts = searchQuery.trim()
     ? getFilteredContacts(contacts, searchQuery)
     : contacts;
+
+  const displayedContacts = filteredContacts.slice(0, DISPLAY_LIMIT);
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${contactsCardStyles.container}`}>
@@ -73,13 +76,22 @@ export default function ContactsCard({ title, rowButtons, addAction }: ContactsC
           {searchQuery.trim() ? 'no matches' : 'no contacts yet'}
         </p>
       )}
-      {!isLoading &&
-        !error &&
-        filteredContacts.map((contact) => (
-          <ContactRow key={contact.id} contact={contact}>
-            {rowButtons?.(contact)}
-          </ContactRow>
-        ))}
+
+      {!isLoading && !error && filteredContacts.length > 0 && (
+        <div className={contactsCardStyles.list}>
+          {displayedContacts.map((contact) => (
+            <ContactRow key={contact.id} contact={contact}>
+              {rowButtons?.(contact)}
+            </ContactRow>
+          ))}
+          {filteredContacts.length > DISPLAY_LIMIT && (
+            <p className={contactsCardStyles.overflow}>
+              showing {DISPLAY_LIMIT} of {filteredContacts.length} — refine search to narrow
+              results.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
