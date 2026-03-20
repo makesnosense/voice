@@ -88,3 +88,5 @@ mobile/buck-out/
 # Google Services
 mobile/android/app/google-services.json
 mobile/ios/GoogleService-Info.plist
+
+TODO.md
