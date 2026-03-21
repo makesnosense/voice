@@ -7,6 +7,11 @@ import { useWebRTCStore } from '../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../stores/useMicrophoneStore';
 import useWebRTCInit from '../hooks/useWebRTCInit';
 import { BASE_URL } from '../config';
+
+import {
+  startCallForegroundService,
+  stopCallForegroundService,
+} from '../native/call-foreground-service';
 import type { RoomId } from '../../../shared/types/core';
 
 interface RoomScreenProps {
@@ -44,6 +49,13 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   );
 
   useWebRTCInit(socketRef);
+
+  useEffect(() => {
+    startCallForegroundService();
+    return () => {
+      stopCallForegroundService();
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
