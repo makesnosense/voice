@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { revokeLockScreenBypass } from '../../native/lock-screen-bypass';
+import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { useRoomSocket } from '../../../../shared/hooks/useRoomSocket';
 import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
@@ -13,6 +14,8 @@ import {
   stopCallForegroundService,
 } from '../../native/call-foreground-service';
 import SelfCard from '../room/SelfCard';
+import CopyCard from './CopyCard';
+import RemoteUserCard from './RemoteUserCard';
 import type { RoomId } from '../../../../shared/types/core';
 
 interface RoomScreenProps {
@@ -30,6 +33,9 @@ const handleCleanup = () => {
 };
 
 export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
+  const roomUsers = useRoomStore(state => state.roomUsers);
+  const isAlone = roomUsers.length === 1;
+
   const requestMicrophone = useMicrophoneStore(
     state => state.requestMicrophone,
   );
@@ -63,7 +69,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.topSlot}>
-        {/* RemoteUserCard / CopyCard goes here */}
+        {isAlone ? <CopyCard roomId={roomId} /> : <RemoteUserCard />}
       </View>
 
       <SelfCard onLeave={onLeave} />
