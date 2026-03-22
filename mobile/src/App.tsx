@@ -5,7 +5,7 @@ import { useAppPermissions } from './hooks/useAppPermissions.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
 import PermissionsScreen from './screens/PermissionsScreen';
-import AuthScreen from './screens/AuthScreen';
+import AuthScreen from './screens/auth/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
 import RoomScreen from './screens/RoomScreen';
 import type { RoomId } from '../../shared/types/core';
