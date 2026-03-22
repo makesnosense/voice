@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// import WaveformBars from '../../components/WaveformBars';
+import WaveformBars from '../../components/WaveformBars';
 import EmailStep from './EmailStep';
 import OtpStep from './OtpStep';
 
@@ -21,7 +21,7 @@ export default function AuthScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.titleRow}>
-        {/* <WaveformBars /> */}
+        <WaveformBars />
         <Text style={styles.title}>Voice</Text>
       </View>
 
