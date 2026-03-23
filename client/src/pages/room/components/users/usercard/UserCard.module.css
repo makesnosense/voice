@@ -17,6 +17,10 @@
 
 .displayName {
   font-size: 16px;
+  max-width: calc(var(--user-card-width) - 48px); /* subtract horizontal padding */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .audioWavesContainer {
