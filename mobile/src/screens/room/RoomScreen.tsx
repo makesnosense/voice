@@ -1,7 +1,7 @@
-// mobile/src/screens/RoomScreen.tsx
 import { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import InCallManager from 'react-native-incall-manager';
 import { revokeLockScreenBypass } from '../../native/lock-screen-bypass';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { useRoomSocket } from '../../../../shared/hooks/useRoomSocket';
@@ -55,8 +55,11 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
 
   useEffect(() => {
     startCallForegroundService();
+    InCallManager.start({ media: 'audio' });
+    InCallManager.setForceSpeakerphoneOn(false); // start on earpiece by default
     return () => {
       stopCallForegroundService();
+      InCallManager.stop();
     };
   }, []);
 

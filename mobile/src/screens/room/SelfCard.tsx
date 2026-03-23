@@ -1,6 +1,8 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Mic, MicOff, PhoneOff } from 'lucide-react-native';
+import { Mic, MicOff, PhoneOff, Volume2 } from 'lucide-react-native';
 import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
+import InCallManager from 'react-native-incall-manager';
+import { useState } from 'react';
 
 interface SelfCardProps {
   onLeave: () => void;
@@ -11,11 +13,29 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
   const isMutedLocal = useWebRTCStore(state => state.isMutedLocal);
   const toggleMute = useWebRTCStore(state => state.toggleMute);
 
+  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+
+  const toggleSpeaker = () => {
+    const next = !isSpeakerOn;
+    InCallManager.setForceSpeakerphoneOn(next);
+    setIsSpeakerOn(next);
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.name}>You</Text>
 
       <View style={styles.controls}>
+        <Pressable
+          style={[
+            styles.button,
+            isSpeakerOn ? styles.buttonActive : styles.buttonNeutral,
+          ]}
+          onPress={toggleSpeaker}
+        >
+          <Volume2 size={18} color={isSpeakerOn ? '#1e293b' : '#cbd5e1'} />
+        </Pressable>
+
         {isMicActive ? (
           <Pressable
             style={[
@@ -67,6 +87,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 14,
     borderWidth: 1,
+  },
+  buttonActive: {
+    borderColor: '#1e293b',
   },
   buttonNeutral: {
     borderColor: 'rgba(226, 232, 240, 0.8)',
