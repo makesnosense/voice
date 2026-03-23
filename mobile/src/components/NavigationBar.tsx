@@ -98,15 +98,15 @@ const navBarStyles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     width: INDICATOR_WIDTH,
-    height: 52,
-    borderRadius: 22,
+    height: 58,
+    borderRadius: 28,
     backgroundColor: '#f1f5f9',
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     gap: 4,
-    paddingTop: 4,
+    paddingTop: 7,
     zIndex: 1,
   },
   label: {
