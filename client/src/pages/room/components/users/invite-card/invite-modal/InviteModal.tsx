@@ -19,7 +19,7 @@ interface InviteModalProps {
 export default function InviteModal({ roomId, onClose, onInviteSent }: InviteModalProps) {
   const { fetchContacts } = useContactsStore();
   const getValidAccessToken = useAuthStore((state) => state.getValidAccessToken);
-  const [callingId, setCallingId] = useState<string | null>(null);
+  const [callingId, setCallingId] = useState<string | null>(null); // used only to disable respective row's button
 
   useEffect(() => {
     fetchContacts();
@@ -33,13 +33,17 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
+  const inviteByEmail = async (email: string) => {
+    const token = await getValidAccessToken();
+    await api.rooms.inviteToRoom(roomId, email, token);
+    onInviteSent(email);
+  };
+
   const handleCall = async (contact: Contact) => {
     if (callingId) return;
     setCallingId(contact.id);
     try {
-      const token = await getValidAccessToken();
-      await api.rooms.inviteToRoom(roomId, contact.email, token);
-      onInviteSent(contact.email);
+      await inviteByEmail(contact.email);
     } catch (error) {
       // TODO: surface error in UI
       console.error('Failed to invite contact:', error);
@@ -49,11 +53,7 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
 
   const addAction = {
     label: 'Call',
-    onSubmit: async (email: string) => {
-      const token = await getValidAccessToken();
-      await api.rooms.inviteToRoom(roomId, email, token);
-      onInviteSent(email);
-    },
+    onSubmit: inviteByEmail,
   };
 
   return (
