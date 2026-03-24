@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
-import PhonePlus from './PhonePlus';
+import PhonePlus from '../../../../../../icons/PhonePlus';
 import { useContactsStore } from '../../../../../../stores/useContactsStore';
 import ContactsCard from '../../../../../../components/contacts-card/ContactsCard';
 import contactsCardStyles from '../../../../../../components/contacts-card/ContactsCard.module.css';
