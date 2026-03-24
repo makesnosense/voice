@@ -9,11 +9,19 @@ import InputBar from './input-bar/InputBar';
 
 const DISPLAY_LIMIT = 50;
 
-const getFilteredContacts = (contacts: Contact[], query: string) => {
-  const q = query.toLowerCase();
-  return contacts.filter(
-    (c) => c.email.toLowerCase().includes(q) || c.name?.toLowerCase().includes(q)
-  );
+const getFilteredContacts = (
+  contacts: Contact[],
+  query: string,
+  includeContactsWithoutMobile: boolean
+) => {
+  const queryLowerCase = query.toLowerCase();
+  return contacts.filter((contact) => {
+    if (!includeContactsWithoutMobile && !contact.hasMobileDevice) return false;
+    return (
+      contact.email.toLowerCase().includes(queryLowerCase) ||
+      contact.name?.toLowerCase().includes(queryLowerCase)
+    );
+  });
 };
 
 interface AddAction {
@@ -25,16 +33,23 @@ interface ContactsCardProps {
   title?: string;
   rowButtons?: (contact: Contact) => React.ReactNode;
   addAction: AddAction;
+  includeContactsWithoutMobile: boolean;
 }
 
-export default function ContactsCard({ title, rowButtons, addAction }: ContactsCardProps) {
+export default function ContactsCard({
+  title,
+  rowButtons,
+  addAction,
+  includeContactsWithoutMobile,
+}: ContactsCardProps) {
   const { contacts, isLoading, error } = useContactsStore();
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredContacts = searchQuery.trim()
-    ? getFilteredContacts(contacts, searchQuery)
-    : contacts;
+  const filteredContacts =
+    searchQuery.trim() || !includeContactsWithoutMobile
+      ? getFilteredContacts(contacts, searchQuery, includeContactsWithoutMobile)
+      : contacts;
 
   const displayedContacts = filteredContacts.slice(0, DISPLAY_LIMIT);
 

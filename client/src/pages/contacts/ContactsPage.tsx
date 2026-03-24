@@ -31,6 +31,7 @@ export default function ContactsPage() {
         <main className={contactsStyles.content}>
           <ContactsCard
             title={'Contacts'}
+            includeContactsWithoutMobile={true}
             rowButtons={(contact) => (
               <>
                 <RemoveButton contactId={contact.id} />
