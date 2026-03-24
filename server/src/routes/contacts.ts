@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
 import { findUserByEmail } from '../services/users';
-import { getContacts, addContact, removeContact } from '../services/contacts';
+import { getContacts, getContact, addContact, removeContact } from '../services/contacts';
 import { addContactSchema, contactIdSchema } from '../schemas/contacts';
 
 const router = Router();
@@ -42,7 +42,8 @@ router.post('/', requireAccessToken, async (req, res) => {
       return res.status(409).json({ error: 'already a contact' });
     }
 
-    res.status(201).json({ id: target.id, email: target.email, name: target.name });
+    const contactWithDetails = await getContact(userId, target.id);
+    res.status(201).json(contactWithDetails);
   } catch (error) {
     console.error('failed to add contact:', error);
     res.status(500).json({ error: 'failed to add contact' });

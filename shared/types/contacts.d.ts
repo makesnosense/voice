@@ -3,4 +3,5 @@ export interface Contact {
   email: string;
   name: string | null;
   addedAt: string;
+  hasMobileDevice: boolean;
 }
