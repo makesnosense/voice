@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { UserPlus, ChevronDown } from 'lucide-react';
+import { UserMinus, UserPlus, ChevronDown } from 'lucide-react';
 import { useContactsStore } from '../../stores/useContactsStore';
 import baseStyles from '../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
 import { type Contact } from '../../../../shared/types/contacts';
 import InputBar from './input-bar/InputBar';
+import RemoveButton from './remove-button/RemoveButton';
 
 const DISPLAY_LIMIT = 50;
 
@@ -34,6 +35,7 @@ interface ContactsCardProps {
   rowButtons?: (contact: Contact) => React.ReactNode;
   addAction: AddAction;
   includeContactsWithoutMobile: boolean;
+  showRemoveToggle: boolean;
 }
 
 export default function ContactsCard({
@@ -41,9 +43,11 @@ export default function ContactsCard({
   rowButtons,
   addAction,
   includeContactsWithoutMobile,
+  showRemoveToggle,
 }: ContactsCardProps) {
   const { contacts, isLoading, error } = useContactsStore();
   const [isAdding, setIsAdding] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredContacts =
@@ -57,17 +61,29 @@ export default function ContactsCard({
     <div className={`${baseStyles.card} ${baseStyles.column} ${contactsCardStyles.container}`}>
       <div className={contactsCardStyles.headerRow}>
         {title && <span className={baseStyles.title}>{title}</span>}
-        <button
-          className={contactsCardStyles.addButton}
-          onClick={() => setIsAdding((prev) => !prev)}
-          aria-expanded={isAdding}
-        >
-          <UserPlus size={22} />
-          <ChevronDown
-            size={14}
-            className={`${contactsCardStyles.chevron} ${isAdding ? contactsCardStyles.chevronOpen : ''}`}
-          />
-        </button>
+        <div className={contactsCardStyles.headerButtons}>
+          {showRemoveToggle && (
+            <button
+              className={`${contactsCardStyles.addButton} ${isRemoving ? contactsCardStyles.active : ''}`}
+              onClick={() => setIsRemoving((prev) => !prev)}
+              aria-pressed={isRemoving}
+              title="Remove contacts"
+            >
+              <UserMinus size={22} />
+            </button>
+          )}
+          <button
+            className={contactsCardStyles.addButton}
+            onClick={() => setIsAdding((prev) => !prev)}
+            aria-expanded={isAdding}
+          >
+            <UserPlus size={22} />
+            <ChevronDown
+              size={14}
+              className={`${contactsCardStyles.chevron} ${isAdding ? contactsCardStyles.chevronOpen : ''}`}
+            />
+          </button>
+        </div>
       </div>
 
       <div className={contactsCardStyles.searchRow}>
@@ -96,7 +112,7 @@ export default function ContactsCard({
         <div className={contactsCardStyles.list}>
           {displayedContacts.map((contact) => (
             <ContactRow key={contact.id} contact={contact}>
-              {rowButtons?.(contact)}
+              {isRemoving ? <RemoveButton contactId={contact.id} /> : rowButtons?.(contact)}
             </ContactRow>
           ))}
           {filteredContacts.length > DISPLAY_LIMIT && (

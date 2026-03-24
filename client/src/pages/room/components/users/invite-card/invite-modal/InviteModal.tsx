@@ -66,6 +66,7 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
         <ContactsCard
           title="Add user to room"
           includeContactsWithoutMobile={false}
+          showRemoveToggle={false}
           rowButtons={(contact) => (
             <button
               className={contactsCardStyles.callButton}

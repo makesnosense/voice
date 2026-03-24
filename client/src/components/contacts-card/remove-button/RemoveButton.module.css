@@ -7,18 +7,29 @@
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-primary);
   flex-shrink: 0;
+  animation: fade-in 0.2s ease;
   transition:
     color 0.2s ease,
     background 0.2s ease;
 }
 
-.button:hover:not(:disabled) {
+.button:hover:not(:disabled) svg {
   color: var(--accent-red);
+  filter: drop-shadow(0 0 4px var(--accent-red-border));
 }
 
 .button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

@@ -27,7 +27,7 @@ export default function RemoveButton({ contactId }: RemoveButtonProps) {
       className={removeButtonStyles.button}
       title="remove contact"
     >
-      <Trash2 size={14} />
+      <Trash2 size={18} />
     </button>
   );
 }

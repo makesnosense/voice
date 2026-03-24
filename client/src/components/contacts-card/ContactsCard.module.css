@@ -77,6 +77,7 @@
   cursor: pointer;
   color: var(--text-primary);
   flex-shrink: 0;
+  animation: fade-in 0.2s ease;
   transition:
     background 0.2s ease,
     box-shadow 0.2s ease;
@@ -106,4 +107,23 @@
   padding: 10px 0 6px;
   margin: 0;
   border-top: 1px solid var(--border-primary);
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.active {
+  color: var(--accent-red);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

@@ -8,7 +8,7 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import layoutStyles from '../../styles/Layout.module.css';
 import contactsStyles from './ContactsPage.module.css';
-import RemoveButton from './remove-button/RemoveButton';
+// import RemoveButton from './remove-button/RemoveButton';
 import CallButton from './CallButton';
 import ContactsCard from '../../components/contacts-card/ContactsCard';
 
@@ -32,9 +32,10 @@ export default function ContactsPage() {
           <ContactsCard
             title={'Contacts'}
             includeContactsWithoutMobile={true}
+            showRemoveToggle={true}
             rowButtons={(contact) => (
               <>
-                <RemoveButton contactId={contact.id} />
+                {/* <RemoveButton contactId={contact.id} /> */}
                 {contact.hasMobileDevice && <CallButton contact={contact} />}
               </>
             )}
