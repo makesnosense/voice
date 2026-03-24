@@ -9,7 +9,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import layoutStyles from '../../styles/Layout.module.css';
 import contactsStyles from './ContactsPage.module.css';
 import RemoveButton from './remove-button/RemoveButton';
-
+import CallButton from './CallButton';
 import ContactsCard from '../../components/contacts-card/ContactsCard';
 
 const backButton = <BackButton label="Back" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
@@ -35,6 +35,7 @@ export default function ContactsPage() {
             rowButtons={(contact) => (
               <>
                 <RemoveButton contactId={contact.id} />
+                {contact.hasMobileDevice && <CallButton contact={contact} />}
               </>
             )}
             addAction={addAction}
