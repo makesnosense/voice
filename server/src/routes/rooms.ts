@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import { createRoom } from '../services/rooms';
-import { findUserByEmail } from '../services/users';
-import { getUserMobileDevices } from '../services/devices';
-import { notifyDevicesOfCall } from '../services/call';
+import { notifyDevicesOfCall, getMobileDevicesForTarget, isSelfTarget } from '../services/call';
 import { requireAccessToken } from '../middleware/auth';
 import { callSchema } from '../schemas/call';
 import type { Room, RoomId } from '../../../shared/types/core';
@@ -23,28 +21,23 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
       return res.status(400).json({ error: 'invalid request', details: result.error.issues });
     }
 
-    const { targetEmail } = req.body;
-
-    if (!targetEmail) {
-      return res.status(400).json({ error: 'targetEmail required' });
-    }
-
     if (!rooms.has(roomId)) {
       return res.status(404).json({ error: 'room not found' });
     }
 
     const caller = req.user!;
 
-    try {
-      const targetUser = await findUserByEmail(targetEmail);
-      const mobileDevices = targetUser ? await getUserMobileDevices(targetUser.id) : [];
+    if (isSelfTarget(result.data, caller)) {
+      return res.status(400).json({ error: 'cannot call yourself' });
+    }
 
-      if (!targetUser || mobileDevices.length === 0) {
+    try {
+      const mobileDevices = await getMobileDevicesForTarget(result.data);
+      if (mobileDevices.length === 0) {
         return res.status(404).json({ error: 'user not reachable' });
       }
 
       await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
-
       res.status(204).end();
     } catch (error) {
       console.error('failed to send invite:', error);

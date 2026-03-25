@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
-import { findUserByEmail } from '../services/users';
-import { getUserMobileDevices } from '../services/devices';
-import { notifyDevicesOfCall } from '../services/call';
+import { notifyDevicesOfCall, getMobileDevicesForTarget, isSelfTarget } from '../services/call';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/call';
 import type { Room, RoomId } from '../../../shared/types/core';
@@ -16,22 +14,16 @@ export default function createCallRouter(rooms: Map<RoomId, Room>) {
       return res.status(400).json({ error: 'invalid request', details: result.error.issues });
     }
 
-    const { targetEmail } = result.data;
     const caller = req.user!;
 
-    if (targetEmail === caller.email) {
+    if (isSelfTarget(result.data, caller)) {
       return res.status(400).json({ error: 'cannot call yourself' });
     }
 
     try {
-      const targetUser = await findUserByEmail(targetEmail);
-      if (!targetUser) {
-        return res.status(404).json({ error: 'user not found' });
-      }
-
-      const mobileDevices = await getUserMobileDevices(targetUser.id);
+      const mobileDevices = await getMobileDevicesForTarget(result.data);
       if (mobileDevices.length === 0) {
-        return res.status(404).json({ error: 'target has no reachable devices' });
+        return res.status(404).json({ error: 'user not reachable' });
       }
 
       const roomId = createRoom(rooms);
