@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
-import { notifyDevicesOfCall, getMobileDevicesForTarget, isSelfTarget } from '../services/call';
+import { notifyDevicesOfCall, getMobileDevicesForTarget, isSelfTarget } from '../services/calls';
 import { createRoom } from '../services/rooms';
-import { callSchema } from '../schemas/call';
+import { callSchema } from '../schemas/calls';
 import type { Room, RoomId } from '../../../shared/types/core';
 
-export default function createCallRouter(rooms: Map<RoomId, Room>) {
+export default function createCallsRouter(rooms: Map<RoomId, Room>) {
   const router = Router();
 
-  router.post('/call', requireAccessToken, async (req, res) => {
+  router.post('/', requireAccessToken, async (req, res) => {
     const result = callSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: 'invalid request', details: result.error.issues });

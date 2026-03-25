@@ -1,7 +1,7 @@
 import { sendCallNotification } from '../utils/fcm';
 import { findUserByEmail } from './users';
-import { getUserMobileDevices } from '../services/devices';
-import type { CallTarget } from '../schemas/call';
+import { getUserMobileDevices } from './devices';
+import type { CallTarget } from '../schemas/calls';
 import type { RoomId } from '../../../shared/types/core';
 
 export async function getMobileDevicesForTarget(data: CallTarget) {

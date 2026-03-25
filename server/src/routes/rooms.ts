@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { createRoom } from '../services/rooms';
-import { notifyDevicesOfCall, getMobileDevicesForTarget, isSelfTarget } from '../services/call';
+import { notifyDevicesOfCall, getMobileDevicesForTarget, isSelfTarget } from '../services/calls';
 import { requireAccessToken } from '../middleware/auth';
-import { callSchema } from '../schemas/call';
+import { callSchema } from '../schemas/calls';
 import type { Room, RoomId } from '../../../shared/types/core';
 
 export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
