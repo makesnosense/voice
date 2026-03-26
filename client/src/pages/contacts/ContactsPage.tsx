@@ -34,10 +34,7 @@ export default function ContactsPage() {
             includeContactsWithoutMobile={true}
             showRemoveToggle={true}
             rowButtons={(contact) => (
-              <>
-                {/* <RemoveButton contactId={contact.id} /> */}
-                {contact.hasMobileDevice && <CallButton contact={contact} />}
-              </>
+              <>{contact.hasMobileDevice && <CallButton toContact={contact} />}</>
             )}
             addAction={addAction}
           />

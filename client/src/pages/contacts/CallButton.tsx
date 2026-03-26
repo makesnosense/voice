@@ -7,10 +7,10 @@ import contactsCardStyles from '../../components/contacts-card/ContactsCard.modu
 import type { Contact } from '../../../../shared/types/contacts';
 
 interface CallButtonProps {
-  contact: Contact;
+  toContact: Contact;
 }
 
-export default function CallButton({ contact }: CallButtonProps) {
+export default function CallButton({ toContact }: CallButtonProps) {
   const [isCalling, setIsCalling] = useState(false);
   const getValidAccessToken = useAuthStore((state) => state.getValidAccessToken);
   const navigate = useNavigate();
@@ -19,9 +19,8 @@ export default function CallButton({ contact }: CallButtonProps) {
     if (isCalling) return;
     setIsCalling(true);
     try {
-      const { roomId } = await api.rooms.createRoom();
       const token = await getValidAccessToken();
-      await api.rooms.inviteToRoom(roomId, contact.email, token);
+      const { roomId } = await api.calls.create(toContact.id, token);
       navigate(`/${roomId}`);
     } catch (error) {
       console.error('Failed to call contact:', error);

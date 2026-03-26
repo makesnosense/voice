@@ -35,7 +35,7 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
 
   const inviteByEmail = async (email: string) => {
     const token = await getValidAccessToken();
-    await api.rooms.inviteToRoom(roomId, email, token);
+    await api.rooms.inviteToRoom(roomId, { targetEmail: email }, token);
     onInviteSent(email);
   };
 
@@ -43,9 +43,10 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
     if (callingId) return;
     setCallingId(contact.id);
     try {
-      await inviteByEmail(contact.email);
+      const token = await getValidAccessToken();
+      await api.rooms.inviteToRoom(roomId, { targetUserId: contact.id }, token);
+      onInviteSent(contact.email);
     } catch (error) {
-      // TODO: surface error in UI
       console.error('Failed to invite contact:', error);
       setCallingId(null);
     }
