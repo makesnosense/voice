@@ -1,0 +1,24 @@
+meta {
+  name: get-user-by-email
+  type: http
+  seq: 4
+}
+
+get {
+  url: https://localhost:3003/api/users/by-email?email=noldya@gmail.com
+  body: json
+  auth: bearer
+}
+
+params:query {
+  email: noldya@gmail.com
+}
+
+auth:bearer {
+  token: {{voiceAccessToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
