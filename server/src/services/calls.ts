@@ -4,6 +4,7 @@ import { calls } from '../db/schema';
 import { sql } from 'drizzle-orm';
 
 import type { RoomId } from '../../../shared/types/core';
+import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
   callerEmail: string,
@@ -26,7 +27,7 @@ export async function createCallsLogEntry(fromUserId: string, toUserId: string) 
 }
 
 export async function getCallHistory(userId: string) {
-  const result = await db.execute(sql`
+  const rows = await db.execute(sql`
     WITH outgoing_calls_for_user AS (
       SELECT
         calls.id,
@@ -58,5 +59,16 @@ export async function getCallHistory(userId: string) {
     LIMIT 10
   `);
 
-  return result;
+  return rows.map(mapCallHistoryRow);
+}
+
+function mapCallHistoryRow(row: Record<string, unknown>): CallHistoryEntry {
+  return {
+    id: row.id as string,
+    createdAt: row.created_at as string,
+    direction: row.direction as 'outgoing' | 'incoming',
+    contactId: row.contact_id as string,
+    contactEmail: row.contact_email as string,
+    contactName: row.contact_name as string | null,
+  };
 }
