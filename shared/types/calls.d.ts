@@ -1,3 +1,5 @@
+import type { CallDirection } from '../constants/calls';
+
 export interface CallNotificationPayload {
   callerEmail: string;
   callerName: string | null;
@@ -7,7 +9,7 @@ export interface CallNotificationPayload {
 export interface CallHistoryEntry {
   id: string;
   createdAt: string;
-  direction: 'outgoing' | 'incoming';
+  direction: CallDirection;
   contactId: string;
   contactEmail: string;
   contactName: string | null;

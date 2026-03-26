@@ -4,6 +4,7 @@ import { calls } from '../db/schema';
 import { sql } from 'drizzle-orm';
 
 import type { RoomId } from '../../../shared/types/core';
+import type { CallDirection } from '../../../shared/constants/calls';
 import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
@@ -66,7 +67,7 @@ function mapCallHistoryRow(row: Record<string, unknown>): CallHistoryEntry {
   return {
     id: row.id as string,
     createdAt: row.created_at as string,
-    direction: row.direction as 'outgoing' | 'incoming',
+    direction: row.direction as CallDirection,
     contactId: row.contact_id as string,
     contactEmail: row.contact_email as string,
     contactName: row.contact_name as string | null,
