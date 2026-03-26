@@ -35,7 +35,8 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
 
   const inviteByEmail = async (email: string) => {
     const token = await getValidAccessToken();
-    await api.rooms.inviteToRoom(roomId, { targetEmail: email }, token);
+    const { id } = await api.users.getUserByEmail(email, token);
+    await api.rooms.inviteToRoom(roomId, { targetUserId: id }, token);
     onInviteSent(email);
   };
 

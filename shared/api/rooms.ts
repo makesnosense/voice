@@ -8,7 +8,7 @@ export class RoomsApi extends ApiBase {
 
   inviteToRoom(
     roomId: RoomId,
-    target: { targetEmail: string } | { targetUserId: string },
+    target: { targetUserId: string },
     accessToken: string
   ): Promise<void> {
     return this.apiFetch(`/rooms/${roomId}/invite`, {
