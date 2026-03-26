@@ -4,6 +4,7 @@ import { notifyDevicesOfCall } from '../services/calls';
 import { getUserMobileDevices } from '../services/devices';
 import { requireAccessToken } from '../middleware/auth';
 import { callSchema } from '../schemas/calls';
+import { createCallsLogEntry } from '../services/calls';
 import type { Room, RoomId } from '../../../shared/types/core';
 
 export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
@@ -40,6 +41,8 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
       }
 
       await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
+      await createCallsLogEntry(caller.userId, targetUserId);
+
       res.status(204).end();
     } catch (error) {
       console.error('failed to send invite:', error);

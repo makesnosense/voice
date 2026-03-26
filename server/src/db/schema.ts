@@ -70,3 +70,14 @@ export const contacts = pgTable(
   },
   (t) => [primaryKey({ columns: [t.ownerId, t.contactId] })]
 );
+
+export const calls = pgTable('calls', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  fromUserId: uuid('from_user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  toUserId: uuid('to_user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});

@@ -22,6 +22,13 @@
       "when": 1773417809387,
       "tag": "0002_lowly_lucky_pierre",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774524024862,
+      "tag": "0003_typical_midnight",
+      "breakpoints": true
     }
   ]
 }

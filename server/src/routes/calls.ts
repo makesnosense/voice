@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
-import { notifyDevicesOfCall } from '../services/calls';
+import { createCallsLogEntry, notifyDevicesOfCall } from '../services/calls';
 import { getUserMobileDevices } from '../services/devices';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/calls';
@@ -30,6 +30,7 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
 
       const roomId = createRoom(rooms);
       await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
+      await createCallsLogEntry(caller.userId, targetUserId);
 
       res.json({ roomId });
     } catch (error) {
