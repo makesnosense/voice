@@ -37,5 +37,5 @@ export default function App() {
     );
   if (!isAuthenticated) return <AuthScreen />;
 
-  return <HomeScreen />;
+  return <HomeScreen onCall={roomId => setActiveRoomId(roomId as RoomId)} />;
 }
