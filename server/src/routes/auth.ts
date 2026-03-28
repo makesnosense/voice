@@ -63,6 +63,7 @@ router.post('/verify-otp', async (req, res) => {
   const accessToken = generateAccessToken({
     userId: user.id,
     email: user.email,
+    name: user.name,
   });
 
   const { token: refreshToken, jti } = generateRefreshToken(user.id);
@@ -103,6 +104,7 @@ router.post('/refresh', requireRefreshToken, async (req, res) => {
   const newAccessToken = generateAccessToken({
     userId: user.id,
     email: user.email,
+    name: user.name,
   });
 
   res.json({ accessToken: newAccessToken });

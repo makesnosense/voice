@@ -26,7 +26,7 @@ export function requireAccessToken(req: Request, res: Response, next: NextFuncti
 
   try {
     const payload = verifyAccessToken(token);
-    req.user = { userId: payload.userId, email: payload.email };
+    req.user = { userId: payload.userId, email: payload.email, name: payload.name };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired access token' });

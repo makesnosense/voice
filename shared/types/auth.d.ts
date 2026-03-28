@@ -5,15 +5,16 @@ export interface TokenStorage {
 }
 
 // JWT auth
-
 export interface User {
   userId: string;
   email: string;
+  name: string | null;
 }
 
 export interface AccessTokenPayload {
   userId: string;
   email: string;
+  name: string | null;
   exp: number;
   iat: number;
 }

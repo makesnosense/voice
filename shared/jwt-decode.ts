@@ -16,7 +16,7 @@ export const getUserFromJwt = (token: string): User | null => {
   if (!payload) return null;
 
   if (payload.userId && payload.email) {
-    return { userId: payload.userId, email: payload.email };
+    return { userId: payload.userId, email: payload.email, name: payload.name ?? null };
   }
   return null;
 };
