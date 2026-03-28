@@ -26,7 +26,8 @@ export default function App() {
   }, []);
 
   useDeviceRegistration();
-  useIncomingCall(roomId => setActiveRoomId(roomId as RoomId));
+
+  useIncomingCall(({ roomId }) => setActiveRoomId(roomId as RoomId));
 
   if (permissions.isChecking) return null;
   if (!permissions.allGranted)

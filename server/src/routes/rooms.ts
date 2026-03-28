@@ -40,7 +40,7 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
         return res.status(404).json({ error: 'User not reachable' });
       }
 
-      await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
+      await notifyDevicesOfCall(caller, mobileDevices, roomId);
       await createCallsLogEntry(caller.userId, targetUserId);
 
       res.status(204).end();

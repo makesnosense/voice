@@ -8,15 +8,16 @@ import type { CallDirection } from '../../../shared/constants/calls';
 import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
-  callerEmail: string,
+  caller: { userId: string; email: string; name: string | null },
   devices: { fcmToken: string | null }[],
   roomId: RoomId
 ): Promise<void> {
   await Promise.allSettled(
     devices.map((device) =>
       sendCallNotification(device.fcmToken!, {
-        callerEmail,
-        callerName: null,
+        callerUserId: caller.userId,
+        callerEmail: caller.email,
+        callerName: caller.name,
         roomId,
       })
     )

@@ -1,6 +1,7 @@
 import type { CallDirection } from '../constants/calls';
 
 export interface CallNotificationPayload {
+  callerUserId: string;
   callerEmail: string;
   callerName: string | null;
   roomId: string;

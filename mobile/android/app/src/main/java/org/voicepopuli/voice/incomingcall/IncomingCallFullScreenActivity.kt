@@ -13,6 +13,9 @@ import org.voicepopuli.voice.MainActivity
 import org.voicepopuli.voice.R
 
 class IncomingCallFullScreenActivity : AppCompatActivity() {
+    private var callerUserId: String? = null
+    private var callerEmail: String? = null
+    private var callerName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,9 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         // handle action extras (from notification action buttons)
         val action = intent.getStringExtra("action")
         val roomId = intent.getStringExtra("roomId")
-        val callerName = intent.getStringExtra("callerName") ?: "unknown"
+        callerUserId = intent.getStringExtra("callerUserId")
+        callerEmail = intent.getStringExtra("callerEmail")
+        callerName = intent.getStringExtra("callerName") ?: intent.getStringExtra("callerEmail") ?: "unknown"
 
         when (action) {
             "accept" -> {
@@ -73,15 +78,16 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun acceptCall(roomId: String?) {
         cancelNotification()
+        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName)
         val intent = Intent(this, MainActivity::class.java).apply {
             action = Intent.ACTION_VIEW
-            data = android.net.Uri.parse("voice://call?roomId=$roomId")
+            data = uri
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val options = android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
         startActivity(intent, options.toBundle())
         finish()
-        overridePendingTransition(0, 0) 
+        overridePendingTransition(0, 0)
     }
 
     private fun declineCall() {

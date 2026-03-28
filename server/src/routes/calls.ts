@@ -39,7 +39,7 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
       }
 
       const roomId = createRoom(rooms);
-      await notifyDevicesOfCall(caller.email, mobileDevices, roomId);
+      await notifyDevicesOfCall(caller, mobileDevices, roomId);
       await createCallsLogEntry(caller.userId, targetUserId);
 
       res.json({ roomId });

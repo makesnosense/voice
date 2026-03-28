@@ -14,8 +14,13 @@ class AcceptCallReceiver : BroadcastReceiver() {
             .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
 
         val roomId = intent.getStringExtra("roomId")
+        val callerUserId = intent.getStringExtra("callerUserId")
+        val callerEmail = intent.getStringExtra("callerEmail")
+        val callerName = intent.getStringExtra("callerName")
+
+        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName)
         context.startActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("voice://call?roomId=$roomId")).apply {
+            Intent(Intent.ACTION_VIEW, uri).apply {
                 setClass(context, MainActivity::class.java)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_CLEAR_TOP or

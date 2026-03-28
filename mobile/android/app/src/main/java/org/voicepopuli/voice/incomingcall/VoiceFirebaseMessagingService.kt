@@ -35,10 +35,11 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
         val callerEmail = data["callerEmail"] ?: "unknown"
         val callerName = data["callerName"]?.takeIf { it.isNotEmpty() } ?: callerEmail
+        val callerUserId = data["callerUserId"] ?: return
         val roomId = data["roomId"] ?: return
 
         ensureNotificationChannel()
-        showIncomingCallNotification(callerName, roomId)
+        showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId)
         startVibration()
     }
 
@@ -96,11 +97,18 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    private fun showIncomingCallNotification(callerName: String, roomId: String) {
+    private fun showIncomingCallNotification(
+        callerName: String,
+        callerUserId: String,
+        callerEmail: String,
+        roomId: String,
+    ) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
         val incomingCallFullscreenIntent = Intent(this, IncomingCallFullScreenActivity::class.java).apply {
             putExtra("callerName", callerName)
+            putExtra("callerUserId", callerUserId)
+            putExtra("callerEmail", callerEmail)
             putExtra("roomId", roomId)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
@@ -117,6 +125,9 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
         val notificationBarAcceptIntent = Intent(this, AcceptCallReceiver::class.java).apply {
             putExtra("roomId", roomId)
+            putExtra("callerUserId", callerUserId)
+            putExtra("callerEmail", callerEmail)
+            putExtra("callerName", callerName)
         }
         val notificationBarAcceptPendingIntent = PendingIntent.getBroadcast(
             this, 2, notificationBarAcceptIntent,

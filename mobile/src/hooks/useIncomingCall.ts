@@ -1,33 +1,48 @@
 import { useEffect, useRef } from 'react';
 import { Linking } from 'react-native';
 
-function extractRoomId(url: string): string | null {
-  const match = url.match(/voice:\/\/call\?roomId=([^&]+)/);
-  return match ? match[1] : null;
+export interface IncomingCallParams {
+  roomId: string;
+  callerUserId: string;
+  callerEmail: string;
+  callerName: string | null;
 }
 
-export function useIncomingCall(onRoomId: (roomId: string) => void) {
-  const onRoomIdRef = useRef(onRoomId);
-  onRoomIdRef.current = onRoomId;
+function extractCallParams(url: string): IncomingCallParams | null {
+  const [, query] = url.split('?');
+  if (!query) return null;
+  const params = new URLSearchParams(query);
+
+  const roomId = params.get('roomId');
+  const callerUserId = params.get('callerUserId');
+  const callerEmail = params.get('callerEmail');
+  if (!roomId || !callerUserId || !callerEmail) return null;
+
+  return {
+    roomId,
+    callerUserId,
+    callerEmail,
+    callerName: params.get('callerName'),
+  };
+}
+
+export function useIncomingCall(onCall: (params: IncomingCallParams) => void) {
+  const onCallRef = useRef(onCall);
+  onCallRef.current = onCall;
 
   useEffect(() => {
-    console.log('useIncomingCall effect mounted');
+    const handleUrl = (url: string) => {
+      const params = extractCallParams(url);
+      if (params) onCallRef.current(params);
+    };
 
     Linking.getInitialURL().then(url => {
-      console.log('getInitialURL:', url);
-      if (!url) return;
-      const roomId = extractRoomId(url);
-      console.log('extracted roomId from initial url:', roomId);
-      if (roomId) onRoomIdRef.current(roomId);
+      if (url) handleUrl(url);
     });
 
-    const sub = Linking.addEventListener('url', ({ url }) => {
-      console.log('url event fired:', url);
-      const roomId = extractRoomId(url);
-      console.log('extracted roomId from url event:', roomId);
-      if (roomId) onRoomIdRef.current(roomId);
-    });
-
-    return () => sub.remove();
+    const urlListener = Linking.addEventListener('url', ({ url }) =>
+      handleUrl(url),
+    );
+    return () => urlListener.remove();
   }, []);
 }
