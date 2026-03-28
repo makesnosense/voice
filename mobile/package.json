@@ -23,6 +23,8 @@
     "react-native-bootsplash": "^7.1.0",
     "react-native-incall-manager": "^4.2.1",
     "react-native-keychain": "^10.0.0",
+    "react-native-mmkv": "^4.3.0",
+    "react-native-nitro-modules": "^0.35.2",
     "react-native-permissions": "^5.5.1",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-svg": "^15.15.4",
