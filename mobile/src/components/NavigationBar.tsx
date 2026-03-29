@@ -49,12 +49,10 @@ export default function NavigationBar({
   });
 
   return (
-    <View
-      style={[navBarStyles.container, { paddingBottom: insets.bottom || 16 }]}
-    >
+    <View style={[styles.container, { paddingBottom: insets.bottom || 16 }]}>
       <Animated.View
         style={[
-          navBarStyles.indicator,
+          styles.indicator,
           { transform: [{ translateX: selectionIndicatorX }] },
         ]}
       />
@@ -64,7 +62,7 @@ export default function NavigationBar({
         return (
           <Pressable
             key={key}
-            style={navBarStyles.tab}
+            style={styles.tab}
             onPress={() => onTabPress(key, index)}
           >
             <Icon
@@ -72,9 +70,7 @@ export default function NavigationBar({
               color={isActive ? '#0f172a' : '#94a3b8'}
               strokeWidth={isActive ? 2 : 1.75}
             />
-            <Text
-              style={[navBarStyles.label, isActive && navBarStyles.labelActive]}
-            >
+            <Text style={[styles.label, isActive && styles.labelActive]}>
               {label}
             </Text>
           </Pressable>
@@ -83,7 +79,7 @@ export default function NavigationBar({
     </View>
   );
 }
-const navBarStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingTop: 10,
