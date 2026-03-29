@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import uuid from 'react-native-uuid';
 import { mmkvStorage } from '../utils/mmkv';
 import { useAuthStore } from './useAuthStore';
 import { api } from '../api';
@@ -41,7 +42,7 @@ export const useCallHistoryStore = create<CallHistoryStore>()(
       prependEntry: entry => {
         const newEntry: CallHistoryEntry = {
           ...entry,
-          id: crypto.randomUUID(),
+          id: uuid.v4() as string,
           createdAt: new Date().toISOString(),
         };
         set(state => ({
