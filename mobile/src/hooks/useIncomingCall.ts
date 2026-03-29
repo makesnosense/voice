@@ -26,14 +26,16 @@ function extractCallParams(url: string): IncomingCallParams | null {
   };
 }
 
-export function useIncomingCall(onCall: (params: IncomingCallParams) => void) {
+export function useIncomingCall(
+  onCall: (incomingCallParams: IncomingCallParams) => void,
+) {
   const onCallRef = useRef(onCall);
   onCallRef.current = onCall;
 
   useEffect(() => {
     const handleUrl = (url: string) => {
-      const params = extractCallParams(url);
-      if (params) onCallRef.current(params);
+      const incomingCallParams = extractCallParams(url);
+      if (incomingCallParams) onCallRef.current(incomingCallParams);
     };
 
     Linking.getInitialURL().then(url => {

@@ -8,6 +8,8 @@ import PermissionsScreen from './screens/PermissionsScreen';
 import AuthScreen from './screens/auth/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
 import RoomScreen from './screens/room/RoomScreen';
+import { CALL_DIRECTION } from '../../shared/constants/calls';
+import { useCallHistoryStore } from './stores/useCallHistoryStore';
 import type { RoomId } from '../../shared/types/core';
 
 export default function App() {
@@ -27,7 +29,15 @@ export default function App() {
 
   useDeviceRegistration();
 
-  useIncomingCall(({ roomId }) => setActiveRoomId(roomId as RoomId));
+  useIncomingCall(incomingCallParams => {
+    useCallHistoryStore.getState().prependEntry({
+      direction: CALL_DIRECTION.INCOMING,
+      contactId: incomingCallParams.callerUserId,
+      contactEmail: incomingCallParams.callerEmail,
+      contactName: incomingCallParams.callerName,
+    });
+    setActiveRoomId(incomingCallParams.roomId as RoomId);
+  });
 
   if (permissions.isChecking) return null;
   if (!permissions.allGranted)

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,13 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { useAuthStore } from '../../stores/useAuthStore';
 import { api } from '../../api';
 import CallRow from './CallRow';
-
+import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
+import { CALL_DIRECTION } from '../../../../shared/constants/calls';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 import type { RoomId } from '../../../../shared/types/core';
 
@@ -26,28 +27,31 @@ interface CallsScreenProps {
 export default function CallsScreen({ onCall }: CallsScreenProps) {
   const insets = useSafeAreaInsets();
   const getValidAccessToken = useAuthStore(state => state.getValidAccessToken);
-  const [history, setHistory] = useState<CallHistoryEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const { history, isLoading, fetchHistory, prependEntry } =
+    useCallHistoryStore(
+      useShallow(state => ({
+        history: state.history,
+        isLoading: state.isLoading,
+        fetchHistory: state.fetchHistory,
+        prependEntry: state.prependEntry,
+      })),
+    );
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const token = await getValidAccessToken();
-        const entries = await api.calls.getHistory(token);
-        setHistory(entries);
-      } catch (error) {
-        console.error('❌ Failed to fetch call history:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetch();
-  }, [getValidAccessToken]);
+    fetchHistory();
+  }, [fetchHistory]);
 
   const handleCall = async (entry: CallHistoryEntry) => {
     try {
       const token = await getValidAccessToken();
       const { roomId } = await api.calls.create(entry.contactId, token);
+      prependEntry({
+        direction: CALL_DIRECTION.OUTGOING,
+        contactId: entry.contactId,
+        contactEmail: entry.contactEmail,
+        contactName: entry.contactName,
+      });
       onCall(roomId);
     } catch (error) {
       console.error('❌ Failed to initiate call:', error);
@@ -60,10 +64,12 @@ export default function CallsScreen({ onCall }: CallsScreenProps) {
         <Text style={styles.headerTitle}>Calls</Text>
       </View>
 
-      {isLoading && <ActivityIndicator style={styles.loader} color="#94a3b8" />}
+      {isLoading && history.length === 0 && (
+        <ActivityIndicator style={styles.loader} color="#94a3b8" />
+      )}
 
       {!isLoading && history.length === 0 && (
-        <Text style={styles.empty}>no past calls</Text>
+        <Text style={styles.empty}>No past calls</Text>
       )}
 
       <FlatList
