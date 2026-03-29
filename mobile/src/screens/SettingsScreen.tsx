@@ -1,8 +1,9 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { memo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../stores/useAuthStore';
 
-export default function SettingsScreen() {
+function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuthStore();
 
@@ -59,3 +60,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+export default memo(SettingsScreen);

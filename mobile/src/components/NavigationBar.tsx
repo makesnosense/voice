@@ -52,7 +52,6 @@ export default function NavigationBar({
     <View
       style={[navBarStyles.container, { paddingBottom: insets.bottom || 16 }]}
     >
-      {/* sliding indicator */}
       <Animated.View
         style={[
           navBarStyles.indicator,
@@ -84,7 +83,6 @@ export default function NavigationBar({
     </View>
   );
 }
-
 const navBarStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import ContactsScreen from './contacts-screen/ContactsScreen';
 import CallsScreen from './calls/CallsScreen';
@@ -15,24 +15,35 @@ interface HomeScreenProps {
 
 export default function HomeScreen({ onCall }: HomeScreenProps) {
   const [activeTab, setActiveTab] = useState<HomeTab>(HOME_TAB.CONTACTS);
+
   const tabSelectionAnimationValueRef = useRef(new Animated.Value(0));
 
-  const handleTabPress = (pressedTab: HomeTab, pressedTabIndex: number) => {
-    setActiveTab(pressedTab);
-    Animated.spring(tabSelectionAnimationValueRef.current, {
-      toValue: pressedTabIndex,
-      useNativeDriver: true,
-      tension: 60,
-      friction: 10,
-    }).start();
-  };
+  const handleTabPress = useCallback(
+    (pressedTab: HomeTab, pressedTabIndex: number) => {
+      setActiveTab(pressedTab);
+      Animated.spring(tabSelectionAnimationValueRef.current, {
+        toValue: pressedTabIndex,
+        useNativeDriver: true,
+        tension: 60,
+        friction: 10,
+      }).start();
+    },
+    [],
+  );
+
+  const tabStyle = (tab: HomeTab) =>
+    activeTab === tab ? styles.content : styles.hidden;
 
   return (
-    <View style={homeScreenStyles.container}>
-      <View style={homeScreenStyles.content}>
-        {activeTab === HOME_TAB.CALLS && <CallsScreen onCall={onCall} />}
-        {activeTab === HOME_TAB.CONTACTS && <ContactsScreen />}
-        {activeTab === HOME_TAB.SETTINGS && <SettingsScreen />}
+    <View style={styles.container}>
+      <View style={tabStyle(HOME_TAB.CALLS)}>
+        <CallsScreen onCall={onCall} />
+      </View>
+      <View style={tabStyle(HOME_TAB.CONTACTS)}>
+        <ContactsScreen />
+      </View>
+      <View style={tabStyle(HOME_TAB.SETTINGS)}>
+        <SettingsScreen />
       </View>
       <NavigationBar
         activeTab={activeTab}
@@ -43,12 +54,8 @@ export default function HomeScreen({ onCall }: HomeScreenProps) {
   );
 }
 
-const homeScreenStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  content: {
-    flex: 1,
-  },
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#ffffff' },
+  content: { flex: 1 },
+  hidden: { display: 'none' },
 });

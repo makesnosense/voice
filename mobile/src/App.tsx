@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
 import { useAppPermissions } from './hooks/useAppPermissions.android';
@@ -39,6 +39,10 @@ export default function App() {
     setActiveRoomId(incomingCallParams.roomId as RoomId);
   });
 
+  const handleCall = useCallback((roomId: RoomId) => {
+    setActiveRoomId(roomId as RoomId);
+  }, []);
+
   if (permissions.isChecking) return null;
   if (!permissions.allGranted)
     return <PermissionsScreen permissions={permissions} />;
@@ -48,5 +52,5 @@ export default function App() {
     );
   if (!isAuthenticated) return <AuthScreen />;
 
-  return <HomeScreen onCall={roomId => setActiveRoomId(roomId as RoomId)} />;
+  return <HomeScreen onCall={handleCall} />;
 }

@@ -12,6 +12,8 @@ import { UserPlus } from 'lucide-react-native';
 import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import AddContactScreen from './AddContactScreen';
+import { memo } from 'react';
+
 import type { Contact } from '../../../../shared/types/contacts';
 import type { ObjectValues } from '../../../../shared/types/core';
 
@@ -23,7 +25,7 @@ const CONTACTS_VIEW = {
 type ContactsView = ObjectValues<typeof CONTACTS_VIEW>;
 const ContactSeparator = () => <View style={contactsScreenStyles.separator} />;
 
-export default function ContactsScreen() {
+function ContactsScreen() {
   const insets = useSafeAreaInsets();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -164,3 +166,5 @@ const contactsScreenStyles = StyleSheet.create({
     marginLeft: 20, // aligns with text, not the avatar
   },
 });
+
+export default memo(ContactsScreen);

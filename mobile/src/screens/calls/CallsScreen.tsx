@@ -13,6 +13,7 @@ import { api } from '../../api';
 import CallRow from './CallRow';
 import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
 import { CALL_DIRECTION } from '../../../../shared/constants/calls';
+import { memo } from 'react';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 import type { RoomId } from '../../../../shared/types/core';
 
@@ -24,7 +25,7 @@ interface CallsScreenProps {
   onCall: (roomId: RoomId) => void;
 }
 
-export default function CallsScreen({ onCall }: CallsScreenProps) {
+function CallsScreen({ onCall }: CallsScreenProps) {
   const insets = useSafeAreaInsets();
   const getValidAccessToken = useAuthStore(state => state.getValidAccessToken);
 
@@ -120,3 +121,5 @@ const styles = StyleSheet.create({
     marginLeft: 58,
   },
 });
+
+export default memo(CallsScreen);
