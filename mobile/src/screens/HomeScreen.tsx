@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import { useState, useCallback } from 'react';
+import { View, StyleSheet } from 'react-native';
 import ContactsScreen from './contacts-screen/ContactsScreen';
 import CallsScreen from './calls/CallsScreen';
 import SettingsScreen from './SettingsScreen';
@@ -16,20 +16,9 @@ interface HomeScreenProps {
 export default function HomeScreen({ onCall }: HomeScreenProps) {
   const [activeTab, setActiveTab] = useState<HomeTab>(HOME_TAB.CALLS);
 
-  const tabSelectionAnimationValueRef = useRef(new Animated.Value(1));
-
-  const handleTabPress = useCallback(
-    (pressedTab: HomeTab, pressedTabIndex: number) => {
-      setActiveTab(pressedTab);
-      Animated.spring(tabSelectionAnimationValueRef.current, {
-        toValue: pressedTabIndex,
-        useNativeDriver: true,
-        tension: 60,
-        friction: 10,
-      }).start();
-    },
-    [],
-  );
+  const handleTabPress = useCallback((pressedTab: HomeTab) => {
+    setActiveTab(pressedTab);
+  }, []);
 
   const tabStyle = (tab: HomeTab) =>
     activeTab === tab ? styles.content : styles.hidden;
@@ -45,11 +34,7 @@ export default function HomeScreen({ onCall }: HomeScreenProps) {
       <View style={tabStyle(HOME_TAB.SETTINGS)}>
         <SettingsScreen />
       </View>
-      <NavigationBar
-        activeTab={activeTab}
-        tabSelectionAnimationValue={tabSelectionAnimationValueRef.current}
-        onTabPress={handleTabPress}
-      />
+      <NavigationBar activeTab={activeTab} onTabPress={handleTabPress} />
     </View>
   );
 }
