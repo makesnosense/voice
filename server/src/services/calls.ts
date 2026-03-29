@@ -58,7 +58,7 @@ export async function getCallHistory(userId: string) {
     UNION ALL
     SELECT * FROM incoming_calls_for_user
     ORDER BY created_at DESC
-    LIMIT 10
+    LIMIT 20
   `);
 
   return rows.map(mapCallHistoryRow);
