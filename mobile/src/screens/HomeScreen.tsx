@@ -14,9 +14,9 @@ interface HomeScreenProps {
 }
 
 export default function HomeScreen({ onCall }: HomeScreenProps) {
-  const [activeTab, setActiveTab] = useState<HomeTab>(HOME_TAB.CONTACTS);
+  const [activeTab, setActiveTab] = useState<HomeTab>(HOME_TAB.CALLS);
 
-  const tabSelectionAnimationValueRef = useRef(new Animated.Value(0));
+  const tabSelectionAnimationValueRef = useRef(new Animated.Value(1));
 
   const handleTabPress = useCallback(
     (pressedTab: HomeTab, pressedTabIndex: number) => {
