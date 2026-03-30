@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import RejoinCard from './RejoinCard';
 import { useShallow } from 'zustand/react/shallow';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -13,6 +14,7 @@ import { api } from '../../api';
 import CallRow from './CallRow';
 import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
 import { CALL_DIRECTION } from '../../../../shared/constants/calls';
+import { useRejoinStore } from '../../stores/useRejoinStore';
 import { memo } from 'react';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 import type { RoomId } from '../../../../shared/types/core';
@@ -28,6 +30,7 @@ interface CallsScreenProps {
 function CallsScreen({ onCall }: CallsScreenProps) {
   const insets = useSafeAreaInsets();
   const getValidAccessToken = useAuthStore(state => state.getValidAccessToken);
+  const lastRoomId = useRejoinStore(state => state.lastRoomId);
 
   const { history, isLoading, fetchHistory, prependEntry } =
     useCallHistoryStore(
@@ -42,6 +45,13 @@ function CallsScreen({ onCall }: CallsScreenProps) {
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
+
+  useEffect(() => {
+    if (!lastRoomId) return;
+    api.rooms.checkAlive(lastRoomId).then(({ alive }) => {
+      if (!alive) useRejoinStore.setState({ lastRoomId: null });
+    });
+  }, [lastRoomId]);
 
   const handleCall = async (entry: CallHistoryEntry) => {
     try {
@@ -64,6 +74,8 @@ function CallsScreen({ onCall }: CallsScreenProps) {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Calls</Text>
       </View>
+
+      {lastRoomId && <RejoinCard roomId={lastRoomId} onPress={onCall} />}
 
       {isLoading && history.length === 0 && (
         <ActivityIndicator style={styles.loader} color="#94a3b8" />
