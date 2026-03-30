@@ -7,6 +7,7 @@ import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import { useRoomSocket } from '../../../../shared/hooks/useRoomSocket';
 import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
+import { useRejoinStore } from '../../stores/useRejoinStore';
 import useWebRTCInit from '../../hooks/useWebRTCInit';
 import { BASE_URL } from '../../config';
 import {
@@ -32,6 +33,10 @@ const handleCleanup = () => {
   useMicrophoneStore.getState().cleanup();
 };
 
+const handleJoinSuccess = (roomId: RoomId) => {
+  useRejoinStore.setState({ lastRoomId: roomId });
+};
+
 export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   const roomUsers = useRoomStore(state => state.roomUsers);
   const isAlone = roomUsers.length === 1;
@@ -48,6 +53,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
     roomId,
     handleDisconnect,
     handleCleanup,
+    handleJoinSuccess,
     BASE_URL,
   );
 

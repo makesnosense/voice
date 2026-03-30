@@ -15,6 +15,7 @@ export function useRoomSocket(
   roomId: RoomId,
   onDisconnect: () => void,
   onCleanup: () => void,
+  onJoinSuccess?: (roomId: RoomId) => void,
   url?: string
 ) {
   const socketRef = useRef<TypedClientSocket | null>(null);
@@ -31,6 +32,7 @@ export function useRoomSocket(
     socket.on('room-join-success', ({ roomId: joinedId }) => {
       console.log('✅ Successfully joined room:', joinedId);
       useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.JOINED);
+      onJoinSuccess?.(joinedId);
     });
 
     socket.on('room-users-update', (users) => {
