@@ -13,19 +13,19 @@ export default function RejoinCard({ onPress }: RejoinCardProps) {
 
   if (!lastRoomId || userCount === null) return null;
 
-  const sublabel =
-    userCount === 0
-      ? 'Empty — tap to rejoin'
-      : `${userCount} person in call · tap to rejoin`;
-
   return (
     <Pressable style={styles.card} onPress={() => onPress(lastRoomId)}>
       <View style={styles.iconSlot}>
         <PhoneCall size={18} color="#16a34a" strokeWidth={1.75} />
       </View>
       <View style={styles.info}>
-        <Text style={styles.label}>Ongoing call</Text>
-        <Text style={styles.sublabel}>{sublabel}</Text>
+        <Text style={styles.label}>
+          Active room:{' '}
+          {userCount === 0
+            ? 'empty'
+            : `${userCount} ${userCount === 1 ? 'person' : 'people'} inside`}
+        </Text>
+        <Text style={styles.sublabel}>Tap to rejoin</Text>
       </View>
     </Pressable>
   );
