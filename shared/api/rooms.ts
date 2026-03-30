@@ -17,4 +17,10 @@ export class RoomsApi extends ApiBase {
       body: JSON.stringify(target),
     });
   }
+
+  checkAlive(roomId: RoomId): Promise<{ alive: boolean }> {
+    return this.apiFetch<{ alive: boolean }>(`/rooms/${roomId}/alive`, {
+      method: 'GET',
+    });
+  }
 }
