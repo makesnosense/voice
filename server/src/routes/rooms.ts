@@ -52,7 +52,9 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
 
   router.get('/:roomId/alive', (req, res) => {
     const roomId = req.params.roomId as RoomId;
-    res.json({ alive: rooms.has(roomId) });
+    const room = rooms.get(roomId);
+    if (!room) return res.json({ alive: false, userCount: 0 });
+    res.json({ alive: true, userCount: room.users.size });
   });
 
   return router;

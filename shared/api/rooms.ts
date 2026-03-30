@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import type { CreateRoomResponse, RoomId } from '../types/core';
+import type { CreateRoomResponse, RoomAliveResponse, RoomId } from '../types/core';
 
 export class RoomsApi extends ApiBase {
   createRoom(): Promise<CreateRoomResponse> {
@@ -18,9 +18,7 @@ export class RoomsApi extends ApiBase {
     });
   }
 
-  checkAlive(roomId: RoomId): Promise<{ alive: boolean }> {
-    return this.apiFetch<{ alive: boolean }>(`/rooms/${roomId}/alive`, {
-      method: 'GET',
-    });
+  checkAlive(roomId: RoomId): Promise<RoomAliveResponse> {
+    return this.apiFetch<RoomAliveResponse>(`/rooms/${roomId}/alive`, { method: 'GET' });
   }
 }

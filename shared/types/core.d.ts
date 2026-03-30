@@ -30,6 +30,11 @@ export interface CreateRoomResponse {
   roomId: RoomId;
 }
 
+export interface RoomAliveResponse {
+  alive: boolean;
+  userCount: number;
+}
+
 // Socket.IO event types
 export interface ServerToClientEvents {
   'room-users-update': (users: UserDataClientSide[]) => void;
