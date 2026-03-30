@@ -85,15 +85,14 @@ function CallsScreen({ onCall }: CallsScreenProps) {
         <Text style={styles.empty}>No past calls</Text>
       )}
 
-      <FlatList
-        data={history}
-        keyExtractor={entry => entry.id}
-        renderItem={({ item }) => (
-          <CallRow entry={item} onPress={() => handleCall(item)} />
-        )}
-        contentContainerStyle={styles.list}
-        ItemSeparatorComponent={CallSeparator}
-      />
+      <ScrollView contentContainerStyle={styles.list}>
+        {history.map((entry, index) => (
+          <View key={entry.id}>
+            {index > 0 && <View style={styles.separator} />}
+            <CallRow entry={entry} onPress={() => handleCall(entry)} />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
