@@ -6,17 +6,19 @@ import type { RoomId } from '../../../shared/types/core';
 
 interface RejoinStore {
   lastRoomId: RoomId | null;
+  userCount: number | null;
 }
 
 export const useRejoinStore = create<RejoinStore>()(
-  persist((): RejoinStore => ({ lastRoomId: null }), {
+  persist((): RejoinStore => ({ lastRoomId: null, userCount: null }), {
     name: 'rejoin',
     storage: createJSONStorage(() => mmkvStorage),
+    partialize: state => ({ lastRoomId: state.lastRoomId }),
   }),
 );
 
 useAuthStore.subscribe((state, prevState) => {
   if (prevState.isAuthenticated && !state.isAuthenticated) {
-    useRejoinStore.setState({ lastRoomId: null });
+    useRejoinStore.setState({ lastRoomId: null, userCount: null });
   }
 });

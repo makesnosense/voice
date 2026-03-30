@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { api } from '../api';
+import { useRejoinStore } from '../stores/useRejoinStore';
 import { View, StyleSheet } from 'react-native';
 import ContactsScreen from './contacts-screen/ContactsScreen';
 import CallsScreen from './calls/CallsScreen';
@@ -19,6 +21,19 @@ export default function HomeScreen({ onCall }: HomeScreenProps) {
   const handleTabPress = useCallback((pressedTab: HomeTab) => {
     setActiveTab(pressedTab);
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== HOME_TAB.CALLS) return;
+    const { lastRoomId } = useRejoinStore.getState();
+    if (!lastRoomId) return;
+    api.rooms.checkAlive(lastRoomId).then(({ alive, userCount }) => {
+      if (!alive) {
+        useRejoinStore.setState({ lastRoomId: null, userCount: null });
+      } else {
+        useRejoinStore.setState({ userCount });
+      }
+    });
+  }, [activeTab]);
 
   const tabStyle = (tab: HomeTab) =>
     activeTab === tab ? styles.content : styles.hidden;
