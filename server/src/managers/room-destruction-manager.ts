@@ -7,7 +7,7 @@ interface DestructionEntry {
 
 export default class RoomDestructionManager {
   private destructionQueue = new Map<RoomId, DestructionEntry>();
-  private destructionDelayMs: number = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+  private destructionDelayMs: number = 30 * 60 * 1000; // 30 minutes in milliseconds
   private checkIntervalMs = 60 * 1000; // check every minute
   private intervalId: NodeJS.Timeout | null = null;
   private rooms: Map<RoomId, Room>;
