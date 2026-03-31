@@ -14,6 +14,7 @@ import { api } from '../../api';
 import CallRow from './CallRow';
 import RejoinCard from './RejoinCard';
 import { CALL_DIRECTION } from '../../../../shared/constants/calls';
+import Header from '../../components/Header';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 import type { RoomId } from '../../../../shared/types/core';
 
@@ -57,9 +58,7 @@ function CallsScreen({ onCall }: CallsScreenProps) {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Calls</Text>
-      </View>
+      <Header title="Calls" />
 
       <RejoinCard onPress={onCall} />
 

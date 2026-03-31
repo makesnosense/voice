@@ -2,6 +2,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { memo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../stores/useAuthStore';
+import Header from '../components/Header';
 
 function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -9,9 +10,7 @@ function SettingsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Settings</Text>
-      </View>
+      <Header title="Settings" />
       <View style={styles.section}>
         <Text style={styles.email}>{user?.email}</Text>
         <Pressable style={styles.logoutButton} onPress={logout}>
