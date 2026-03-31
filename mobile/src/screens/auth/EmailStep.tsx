@@ -47,7 +47,7 @@ export default function EmailStep({
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
-          placeholder="email"
+          placeholder="Enter your email"
           placeholderTextColor="#57534e"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -100,17 +100,17 @@ const styles = StyleSheet.create({
     paddingRight: 44,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#e2e8f0',
-    backgroundColor: '#f8fafc',
+    borderColor: '#d4d4d8',
+    backgroundColor: '#f4f4f5',
     color: '#0f172a',
     fontSize: 15,
   },
   inputAction: {
     position: 'absolute',
     right: 8,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#e4e4e7',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#e2e8f0',
+    borderColor: '#d4d4d8',
     borderRadius: 7,
     padding: 6,
   },
