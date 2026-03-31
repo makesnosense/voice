@@ -21,7 +21,7 @@ export default function CallButton({ toContact }: CallButtonProps) {
     try {
       const token = await getValidAccessToken();
       const { roomId } = await api.calls.create(toContact.id, token);
-      navigate(`/${roomId}`);
+      navigate(`/${roomId}`, { state: { calledContactEmail: toContact.email } });
     } catch (error) {
       console.error('Failed to call contact:', error);
       setIsCalling(false);

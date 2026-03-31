@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
@@ -10,14 +11,22 @@ import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
 
+type LocationState = { calledContactEmail?: string } | null;
+
 interface UsersProps {
   currentUserId: SocketId | undefined;
 }
 
+const getCalledContactEmail = (state: unknown): string | null =>
+  (state as LocationState)?.calledContactEmail ?? null;
+
 export default function Users({ currentUserId }: UsersProps) {
   const roomId = useRoomId();
+  const location = useLocation();
 
-  const [emailToInvite, setEmailToInvite] = useState<string | null>(null);
+  const [emailToInvite, calledContactEmail] = useState<string | null>(() =>
+    getCalledContactEmail(location.state)
+  );
 
   const roomUsers = useRoomStore((state) => state.roomUsers);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -28,7 +37,7 @@ export default function Users({ currentUserId }: UsersProps) {
 
   useEffect(() => {
     if (roomUsers.length >= 2) {
-      setEmailToInvite(null);
+      calledContactEmail(null);
     }
   }, [roomUsers.length]);
 
@@ -67,11 +76,11 @@ export default function Users({ currentUserId }: UsersProps) {
       })}
 
       {isAlone && isAuthenticated && !emailToInvite && (
-        <InviteCard roomId={roomId!} onUserInvited={(email) => setEmailToInvite(email)} />
+        <InviteCard roomId={roomId!} onUserInvited={(email) => calledContactEmail(email)} />
       )}
 
       {isAlone && emailToInvite && (
-        <CallingCard email={emailToInvite} onCancel={() => setEmailToInvite(null)} />
+        <CallingCard email={emailToInvite} onCancel={() => calledContactEmail(null)} />
       )}
     </div>
   );
