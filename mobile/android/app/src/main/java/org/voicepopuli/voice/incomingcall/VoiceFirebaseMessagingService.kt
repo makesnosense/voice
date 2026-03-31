@@ -11,6 +11,7 @@ import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -32,6 +33,9 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         val data = message.data
         if (data["type"] != "incoming_call") return
+
+        // acquire before anything else — wakes screen so full-screen intent fires reliably
+        acquireScreenWakeLock()
 
         val callerEmail = data["callerEmail"] ?: "unknown"
         val callerName = data["callerName"]?.takeIf { it.isNotEmpty() } ?: callerEmail
@@ -95,6 +99,21 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 .build()
             vibrator?.vibrate(effect, attrs)
         }
+    }
+
+
+    private fun acquireScreenWakeLock() {
+        val powerManager = getSystemService(PowerManager::class.java)
+        @Suppress("DEPRECATION")
+        val wakeLock = powerManager.newWakeLock(
+            // SCREEN_BRIGHT_WAKE_LOCK is deprecated but ACQUIRE_CAUSES_WAKEUP
+            // has no modern equivalent — this is the only way to wake the screen
+            // from a non-activity context. 
+            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "voice:incoming_call_wake"
+        )
+        // 30s is generous — the activity will take over screen management once shown
+        wakeLock.acquire(30_000L)
     }
 
     private fun showIncomingCallNotification(
