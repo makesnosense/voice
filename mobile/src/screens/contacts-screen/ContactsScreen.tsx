@@ -48,7 +48,11 @@ function ContactsScreen({ onCall }: ContactsScreenProps) {
 
   const renderContact = ({ item }: { item: Contact }) => (
     <Pressable
-      style={styles.contactRow}
+      style={[
+        styles.contactRow,
+        !item.hasMobileDevice && styles.contactRowDisabled,
+      ]}
+      disabled={!item.hasMobileDevice}
       onPress={() =>
         startCall(
           {
@@ -61,7 +65,14 @@ function ContactsScreen({ onCall }: ContactsScreenProps) {
       }
     >
       <View style={styles.contactInfo}>
-        <Text style={styles.contactName}>{item.name ?? item.email}</Text>
+        <Text
+          style={[
+            styles.contactName,
+            !item.hasMobileDevice && styles.contactTextDisabled,
+          ]}
+        >
+          {item.name ?? item.email}
+        </Text>
         {item.name && <Text style={styles.contactEmail}>{item.email}</Text>}
       </View>
     </Pressable>
@@ -137,7 +148,13 @@ const styles = StyleSheet.create({
   separator: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#e2e8f0',
-    marginLeft: 20, // aligns with text, not the avatar
+    marginLeft: 20,
+  },
+  contactRowDisabled: {
+    opacity: 0.38,
+  },
+  contactTextDisabled: {
+    color: '#94a3b8',
   },
 });
 
