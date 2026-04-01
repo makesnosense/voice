@@ -22,6 +22,7 @@ export async function startCall(
       contactId: target.contactId,
       contactEmail: target.contactEmail,
       contactName: target.contactName,
+      contactHasMobileDevice: true,
     });
     onCall(roomId);
   } catch (error) {

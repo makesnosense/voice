@@ -10,6 +10,7 @@ import HomeScreen from './screens/HomeScreen';
 import RoomScreen from './screens/room/RoomScreen';
 import { CALL_DIRECTION } from '../../shared/constants/calls';
 import { useCallHistoryStore } from './stores/useCallHistoryStore';
+import { useContactsStore } from './stores/useContactsStore';
 import type { RoomId } from '../../shared/types/core';
 
 export default function App() {
@@ -30,11 +31,15 @@ export default function App() {
   useDeviceRegistration();
 
   useIncomingCall(incomingCallParams => {
+    const contactInStore = useContactsStore
+      .getState()
+      .contacts.find(contact => contact.id === incomingCallParams.callerUserId);
     useCallHistoryStore.getState().prependEntry({
       direction: CALL_DIRECTION.INCOMING,
       contactId: incomingCallParams.callerUserId,
       contactEmail: incomingCallParams.callerEmail,
       contactName: incomingCallParams.callerName,
+      contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
     });
     setActiveRoomId(incomingCallParams.roomId as RoomId);
   });
