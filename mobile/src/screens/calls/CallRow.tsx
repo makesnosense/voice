@@ -30,7 +30,11 @@ export default function CallRow({ entry, onPress }: CallRowProps) {
 
   return (
     <Pressable
-      style={[styles.row, !isCallable && styles.rowDisabled]}
+      style={({ pressed }) => [
+        styles.row,
+        pressed && styles.rowPressed,
+        !isCallable && styles.rowDisabled,
+      ]}
       disabled={!isCallable}
       onPress={() => onPress(entry)}
     >
@@ -90,5 +94,8 @@ const styles = StyleSheet.create({
   },
   rowDisabled: {
     opacity: 0.38,
+  },
+  rowPressed: {
+    backgroundColor: '#f1f5f9',
   },
 });

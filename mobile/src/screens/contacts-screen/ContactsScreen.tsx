@@ -48,8 +48,9 @@ function ContactsScreen({ onCall }: ContactsScreenProps) {
 
   const renderContact = ({ item }: { item: Contact }) => (
     <Pressable
-      style={[
+      style={({ pressed }) => [
         styles.contactRow,
+        pressed && styles.contactRowPressed,
         !item.hasMobileDevice && styles.contactRowDisabled,
       ]}
       disabled={!item.hasMobileDevice}
@@ -131,6 +132,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     gap: 14,
+  },
+  contactRowPressed: {
+    backgroundColor: '#f1f5f9',
   },
   contactInfo: {
     flex: 1,
