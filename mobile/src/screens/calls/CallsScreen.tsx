@@ -8,13 +8,11 @@ import {
 } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '../../stores/useAuthStore';
 import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
-import { api } from '../../api';
 import CallRow from './CallRow';
 import RejoinCard from './RejoinCard';
-import { CALL_DIRECTION } from '../../../../shared/constants/calls';
 import Header from '../../components/Header';
+import { startCall } from '../../utils/start-call';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 import type { RoomId } from '../../../../shared/types/core';
 
@@ -24,37 +22,28 @@ interface CallsScreenProps {
 
 function CallsScreen({ onCall }: CallsScreenProps) {
   const insets = useSafeAreaInsets();
-  const getValidAccessToken = useAuthStore(state => state.getValidAccessToken);
 
-  const { history, isLoading, fetchHistory, prependEntry } =
-    useCallHistoryStore(
-      useShallow(state => ({
-        history: state.history,
-        isLoading: state.isLoading,
-        fetchHistory: state.fetchHistory,
-        prependEntry: state.prependEntry,
-      })),
-    );
+  const { history, isLoading, fetchHistory } = useCallHistoryStore(
+    useShallow(state => ({
+      history: state.history,
+      isLoading: state.isLoading,
+      fetchHistory: state.fetchHistory,
+    })),
+  );
 
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
 
-  const handleCall = async (entry: CallHistoryEntry) => {
-    try {
-      const token = await getValidAccessToken();
-      const { roomId } = await api.calls.create(entry.contactId, token);
-      prependEntry({
-        direction: CALL_DIRECTION.OUTGOING,
+  const handleCall = (entry: CallHistoryEntry) =>
+    startCall(
+      {
         contactId: entry.contactId,
         contactEmail: entry.contactEmail,
         contactName: entry.contactName,
-      });
-      onCall(roomId);
-    } catch (error) {
-      console.error('❌ Failed to initiate call:', error);
-    }
-  };
+      },
+      onCall,
+    );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>

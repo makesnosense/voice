@@ -32,7 +32,7 @@ export default function HomeScreen({ onCall }: HomeScreenProps) {
         <CallsScreen onCall={onCall} />
       </View>
       <View style={tabStyle(HOME_TAB.CONTACTS)}>
-        <ContactsScreen />
+        <ContactsScreen onCall={onCall} />
       </View>
       <View style={tabStyle(HOME_TAB.SETTINGS)}>
         <SettingsScreen />
