@@ -19,45 +19,51 @@ interface CallHistoryStore {
   reset: () => void;
 }
 
-export const useCallHistoryStore = create<CallHistoryStore>()(
-  persist(
-    (set, get) => ({
-      history: [],
-      isLoading: false,
-      cacheExists: false,
+function createCallHistoryStore(getValidAccessToken: () => Promise<string>) {
+  return create<CallHistoryStore>()(
+    persist(
+      (set, get) => ({
+        history: [],
+        isLoading: false,
+        cacheExists: false,
 
-      fetchHistory: async () => {
-        if (get().cacheExists || get().isLoading) return;
-        set({ isLoading: true });
-        try {
-          const token = await useAuthStore.getState().getValidAccessToken();
-          const history = await api.calls.getHistory(token);
-          set({ history, cacheExists: true, isLoading: false });
-        } catch (error) {
-          console.error('❌ Failed to fetch call history:', error);
-          set({ isLoading: false });
-        }
+        fetchHistory: async () => {
+          if (get().cacheExists || get().isLoading) return;
+          set({ isLoading: true });
+          try {
+            const token = await getValidAccessToken();
+            const history = await api.calls.getHistory(token);
+            set({ history, cacheExists: true, isLoading: false });
+          } catch (error) {
+            console.error('❌ Failed to fetch call history:', error);
+            set({ isLoading: false });
+          }
+        },
+
+        prependEntry: entry => {
+          const newEntry: CallHistoryEntry = {
+            ...entry,
+            id: uuid.v4() as string,
+            createdAt: new Date().toISOString(),
+          };
+          set(state => ({
+            history: [newEntry, ...state.history].slice(0, HISTORY_CAP),
+          }));
+        },
+
+        reset: () => set({ history: [], isLoading: false, cacheExists: false }),
+      }),
+      {
+        name: 'call_history',
+        storage: createJSONStorage(() => mmkvStorage),
+        partialize: state => ({ history: state.history }),
       },
+    ),
+  );
+}
 
-      prependEntry: entry => {
-        const newEntry: CallHistoryEntry = {
-          ...entry,
-          id: uuid.v4() as string,
-          createdAt: new Date().toISOString(),
-        };
-        set(state => ({
-          history: [newEntry, ...state.history].slice(0, HISTORY_CAP),
-        }));
-      },
-
-      reset: () => set({ history: [], isLoading: false, cacheExists: false }),
-    }),
-    {
-      name: 'call_history',
-      storage: createJSONStorage(() => mmkvStorage),
-      partialize: state => ({ history: state.history }),
-    },
-  ),
+export const useCallHistoryStore = createCallHistoryStore(() =>
+  useAuthStore.getState().getValidAccessToken(),
 );
 
 useAuthStore.subscribe((state, prevState) => {
