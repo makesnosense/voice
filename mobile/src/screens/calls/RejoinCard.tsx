@@ -1,20 +1,19 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneCall } from 'lucide-react-native';
 import { useRejoinStore } from '../../stores/useRejoinStore';
-import type { RoomId } from '../../../../shared/types/core';
+import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
 
-interface RejoinCardProps {
-  onPress: (roomId: RoomId) => void;
-}
-
-export default function RejoinCard({ onPress }: RejoinCardProps) {
+export default function RejoinCard() {
   const lastRoomId = useRejoinStore(state => state.lastRoomId);
   const userCount = useRejoinStore(state => state.userCount);
 
   if (!lastRoomId || userCount === null) return null;
 
   return (
-    <Pressable style={styles.card} onPress={() => onPress(lastRoomId)}>
+    <Pressable
+      style={styles.card}
+      onPress={() => useActiveRoomStore.setState({ activeRoomId: lastRoomId })}
+    >
       <View style={styles.iconSlot}>
         <PhoneCall size={18} color="#16a34a" strokeWidth={1.75} />
       </View>

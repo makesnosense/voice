@@ -2,7 +2,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { useCallHistoryStore } from '../stores/useCallHistoryStore';
 import { api } from '../api';
 import { CALL_DIRECTION } from '../../../shared/constants/calls';
-import type { RoomId } from '../../../shared/types/core';
+import { useActiveRoomStore } from '../stores/useActiveRoomStore';
 
 interface CallTarget {
   contactId: string;
@@ -10,10 +10,7 @@ interface CallTarget {
   contactName: string | null;
 }
 
-export async function startCall(
-  target: CallTarget,
-  onCall: (roomId: RoomId) => void,
-) {
+export async function startCall(target: CallTarget) {
   try {
     const token = await useAuthStore.getState().getValidAccessToken();
     const { roomId } = await api.calls.create(target.contactId, token);
@@ -24,7 +21,7 @@ export async function startCall(
       contactName: target.contactName,
       contactHasMobileDevice: true,
     });
-    onCall(roomId);
+    useActiveRoomStore.setState({ activeRoomId: roomId });
   } catch (error) {
     console.error('❌ Failed to start call:', error);
   }

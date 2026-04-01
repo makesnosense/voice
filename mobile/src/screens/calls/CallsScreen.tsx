@@ -13,14 +13,8 @@ import CallRow from './CallRow';
 import RejoinCard from './RejoinCard';
 import Header from '../../components/Header';
 import { startCall } from '../../utils/start-call';
-import type { CallHistoryEntry } from '../../../../shared/types/calls';
-import type { RoomId } from '../../../../shared/types/core';
 
-interface CallsScreenProps {
-  onCall: (roomId: RoomId) => void;
-}
-
-function CallsScreen({ onCall }: CallsScreenProps) {
+function CallsScreen() {
   const insets = useSafeAreaInsets();
 
   const { history, isLoading, fetchHistory } = useCallHistoryStore(
@@ -35,21 +29,11 @@ function CallsScreen({ onCall }: CallsScreenProps) {
     fetchHistory();
   }, [fetchHistory]);
 
-  const handleCall = (entry: CallHistoryEntry) =>
-    startCall(
-      {
-        contactId: entry.contactId,
-        contactEmail: entry.contactEmail,
-        contactName: entry.contactName,
-      },
-      onCall,
-    );
-
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header title="Calls" />
 
-      <RejoinCard onPress={onCall} />
+      <RejoinCard />
 
       {isLoading && history.length === 0 && (
         <ActivityIndicator style={styles.loader} color="#94a3b8" />
@@ -63,7 +47,16 @@ function CallsScreen({ onCall }: CallsScreenProps) {
         {history.map((entry, index) => (
           <View key={entry.id}>
             {index > 0 && <View style={styles.separator} />}
-            <CallRow entry={entry} onPress={() => handleCall(entry)} />
+            <CallRow
+              entry={entry}
+              onPress={() =>
+                startCall({
+                  contactId: entry.contactId,
+                  contactEmail: entry.contactEmail,
+                  contactName: entry.contactName,
+                })
+              }
+            />
           </View>
         ))}
       </ScrollView>

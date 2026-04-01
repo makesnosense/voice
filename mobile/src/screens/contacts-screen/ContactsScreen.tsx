@@ -16,7 +16,7 @@ import Header from '../../components/Header';
 import { memo } from 'react';
 import { startCall } from '../../utils/start-call';
 import type { Contact } from '../../../../shared/types/contacts';
-import type { ObjectValues, RoomId } from '../../../../shared/types/core';
+import type { ObjectValues } from '../../../../shared/types/core';
 
 const CONTACTS_VIEW = {
   CONTACTS_LIST: 'contacts-list',
@@ -26,11 +26,7 @@ const CONTACTS_VIEW = {
 type ContactsView = ObjectValues<typeof CONTACTS_VIEW>;
 const ContactSeparator = () => <View style={styles.separator} />;
 
-interface ContactsScreenProps {
-  onCall: (roomId: RoomId) => void;
-}
-
-function ContactsScreen({ onCall }: ContactsScreenProps) {
+function ContactsScreen() {
   const insets = useSafeAreaInsets();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -55,14 +51,11 @@ function ContactsScreen({ onCall }: ContactsScreenProps) {
       ]}
       disabled={!item.hasMobileDevice}
       onPress={() =>
-        startCall(
-          {
-            contactId: item.id,
-            contactEmail: item.email,
-            contactName: item.name,
-          },
-          onCall,
-        )
+        startCall({
+          contactId: item.id,
+          contactEmail: item.email,
+          contactName: item.name,
+        })
       }
     >
       <View style={styles.contactInfo}>

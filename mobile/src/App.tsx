@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect } from 'react';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
 import { useAppPermissions } from './hooks/useAppPermissions.android';
@@ -11,11 +11,12 @@ import RoomScreen from './screens/room/RoomScreen';
 import { CALL_DIRECTION } from '../../shared/constants/calls';
 import { useCallHistoryStore } from './stores/useCallHistoryStore';
 import { useContactsStore } from './stores/useContactsStore';
+import { useActiveRoomStore } from './stores/useActiveRoomStore';
 import type { RoomId } from '../../shared/types/core';
 
 export default function App() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const [activeRoomId, setActiveRoomId] = useState<RoomId | null>(null);
+  const activeRoomId = useActiveRoomStore(state => state.activeRoomId);
 
   const permissions = useAppPermissions();
 
@@ -34,6 +35,7 @@ export default function App() {
     const contactInStore = useContactsStore
       .getState()
       .contacts.find(contact => contact.id === incomingCallParams.callerUserId);
+
     useCallHistoryStore.getState().prependEntry({
       direction: CALL_DIRECTION.INCOMING,
       contactId: incomingCallParams.callerUserId,
@@ -41,21 +43,23 @@ export default function App() {
       contactName: incomingCallParams.callerName,
       contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
     });
-    setActiveRoomId(incomingCallParams.roomId as RoomId);
-  });
 
-  const handleCall = useCallback((roomId: RoomId) => {
-    setActiveRoomId(roomId as RoomId);
-  }, []);
+    useActiveRoomStore.setState({
+      activeRoomId: incomingCallParams.roomId as RoomId,
+    });
+  });
 
   if (permissions.isChecking) return null;
   if (!permissions.allGranted)
     return <PermissionsScreen permissions={permissions} />;
   if (activeRoomId)
     return (
-      <RoomScreen roomId={activeRoomId} onLeave={() => setActiveRoomId(null)} />
+      <RoomScreen
+        roomId={activeRoomId}
+        onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
+      />
     );
   if (!isAuthenticated) return <AuthScreen />;
 
-  return <HomeScreen onCall={handleCall} />;
+  return <HomeScreen />;
 }

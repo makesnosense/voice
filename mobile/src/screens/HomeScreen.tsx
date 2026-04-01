@@ -8,13 +8,8 @@ import NavigationBar, {
   HOME_TAB,
   type HomeTab,
 } from '../components/NavigationBar';
-import type { RoomId } from '../../../shared/types/core';
 
-interface HomeScreenProps {
-  onCall: (roomId: RoomId) => void;
-}
-
-export default function HomeScreen({ onCall }: HomeScreenProps) {
+export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<HomeTab>(HOME_TAB.CALLS);
 
   const handleTabPress = useCallback((pressedTab: HomeTab) => {
@@ -29,10 +24,10 @@ export default function HomeScreen({ onCall }: HomeScreenProps) {
   return (
     <View style={styles.container}>
       <View style={tabStyle(HOME_TAB.CALLS)}>
-        <CallsScreen onCall={onCall} />
+        <CallsScreen />
       </View>
       <View style={tabStyle(HOME_TAB.CONTACTS)}>
-        <ContactsScreen onCall={onCall} />
+        <ContactsScreen />
       </View>
       <View style={tabStyle(HOME_TAB.SETTINGS)}>
         <SettingsScreen />
