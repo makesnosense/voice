@@ -26,9 +26,14 @@ interface CallRowProps {
 export default function CallRow({ entry, onPress }: CallRowProps) {
   const isOutgoing = entry.direction === CALL_DIRECTION.OUTGOING;
   const displayName = entry.contactName ?? entry.contactEmail;
+  const isCallable = entry.contactHasMobileDevice ?? true;
 
   return (
-    <Pressable style={styles.row} onPress={() => onPress(entry)}>
+    <Pressable
+      style={[styles.row, !isCallable && styles.rowDisabled]}
+      disabled={!isCallable}
+      onPress={() => onPress(entry)}
+    >
       <View style={styles.iconSlot}>
         {isOutgoing ? (
           <PhoneOutgoing size={18} color="#64748b" strokeWidth={1.75} />
@@ -82,5 +87,8 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#e2e8f0',
     marginLeft: 58,
+  },
+  rowDisabled: {
+    opacity: 0.38,
   },
 });
