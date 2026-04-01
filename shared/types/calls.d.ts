@@ -14,4 +14,5 @@ export interface CallHistoryEntry {
   contactId: string;
   contactEmail: string;
   contactName: string | null;
+  contactHasMobileDevice: boolean;
 }
