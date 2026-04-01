@@ -2,10 +2,10 @@ import { db } from '../db';
 import { contacts, users } from '../db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
-const hasMobileDevice = sql<boolean>`exists (
-  select 1 from devices
-  where devices.user_id = ${users.id}
-  and devices.platform in ('android', 'ios')
+const hasMobileDevice = sql<boolean>`EXISTS(
+  SELECT 1 FROM devices
+   WHERE devices.user_id = ${users.id}
+     AND devices.platform in ('android', 'ios')
 )`;
 
 export async function getContacts(ownerId: string) {
