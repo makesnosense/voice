@@ -56,11 +56,9 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
             editable={!isLoading}
           />
           {isLoading && (
-            <ActivityIndicator
-              size="small"
-              color="#0f172a"
-              style={styles.spinner}
-            />
+            <View style={styles.spinnerWrapper}>
+              <ActivityIndicator size="small" color="#0f172a" />
+            </View>
           )}
         </View>
       </View>
@@ -128,9 +126,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-  spinner: {
+  spinnerWrapper: {
     position: 'absolute',
     right: 12,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
   },
   changeEmail: {
     width: '100%',
