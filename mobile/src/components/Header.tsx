@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#0f172a',
     letterSpacing: -0.3,
+    includeFontPadding: false,
   },
   slot: {
     width: 36,
