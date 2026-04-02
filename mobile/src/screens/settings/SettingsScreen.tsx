@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LogOut, Smartphone, ChevronRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
 import Header from '../../components/Header';
-import DevicesScreen from './DevicesScreen';
+import DevicesScreen from './devices/DevicesScreen';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const SETTINGS_VIEW = {
