@@ -28,3 +28,8 @@ export const isTokenExpired = (token: string): boolean => {
   // consider expired if less than 1 minute remaining
   return Date.now() >= payload.exp * 1000 - 60000;
 };
+
+export const getJtiFromRefreshToken = (token: string): string | null => {
+  const payload = getJwtPayload(token);
+  return payload?.jti ?? null;
+};

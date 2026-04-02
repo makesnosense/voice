@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getUserFromJwt, isTokenExpired } from '../jwt-decode';
+import { getUserFromJwt, isTokenExpired, getJtiFromRefreshToken } from '../jwt-decode';
 import { ApiError } from '../errors';
 import type { Api } from '../api';
 import type { TokenStorage, User } from '../types/auth';
@@ -7,6 +7,7 @@ import type { TokenStorage, User } from '../types/auth';
 export interface AuthStore {
   accessToken: string | null;
   user: User | null;
+  currentDeviceJti: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 
@@ -27,7 +28,12 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
         const user = getUserFromJwt(accessToken);
         if (!user) throw new Error('invalid token payload');
 
-        set({ accessToken, user, isAuthenticated: true });
+        set({
+          accessToken,
+          user,
+          currentDeviceJti: getJtiFromRefreshToken(refreshToken),
+          isAuthenticated: true,
+        });
         console.log('✅ access token refreshed');
         return accessToken;
       } finally {
@@ -38,6 +44,7 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
     return {
       accessToken: null,
       user: null,
+      currentDeviceJti: null,
       isAuthenticated: false,
       isLoading: false,
 
@@ -85,7 +92,12 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
           if (!user) throw new Error('invalid token payload');
 
           await storage.setRefreshToken(refreshToken);
-          set({ accessToken, user, isAuthenticated: true });
+          set({
+            accessToken,
+            user,
+            currentDeviceJti: getJtiFromRefreshToken(refreshToken),
+            isAuthenticated: true,
+          });
           console.log('✅ authenticated as', user.email);
         } catch (error) {
           console.error('❌ failed to verify OTP:', error);
@@ -107,7 +119,7 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
         }
 
         await storage.clearRefreshToken();
-        set({ accessToken: null, user: null, isAuthenticated: false });
+        set({ accessToken: null, user: null, currentDeviceJti: null, isAuthenticated: false });
         console.log('👋 logged out');
       },
 
