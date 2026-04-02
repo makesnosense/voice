@@ -3,7 +3,7 @@ import { useRejoinStoreRefresh } from '../hooks/useRejoinStoreRefresh';
 import { View, StyleSheet } from 'react-native';
 import ContactsScreen from './contacts-screen/ContactsScreen';
 import CallsScreen from './calls/CallsScreen';
-import SettingsScreen from './SettingsScreen';
+import SettingsScreen from './settings/SettingsScreen';
 import NavigationBar, {
   HOME_TAB,
   type HomeTab,

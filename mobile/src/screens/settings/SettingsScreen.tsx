@@ -1,8 +1,8 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { memo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuthStore } from '../stores/useAuthStore';
-import Header from '../components/Header';
+import { useAuthStore } from '../../stores/useAuthStore';
+import Header from '../../components/Header';
 
 function SettingsScreen() {
   const insets = useSafeAreaInsets();
