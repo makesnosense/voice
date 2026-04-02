@@ -99,7 +99,7 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
         const refreshToken = await storage.getRefreshToken();
         if (refreshToken) {
           try {
-            await api.auth.deleteSession(refreshToken);
+            await api.auth.terminateCurrentSession(refreshToken);
             console.log('✅ session deleted on server');
           } catch {
             console.warn('⚠️ failed to delete session on server');
