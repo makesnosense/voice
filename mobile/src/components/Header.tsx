@@ -3,14 +3,16 @@ import type { ReactNode } from 'react';
 
 interface HeaderProps {
   title: string;
+  leftSlot?: ReactNode;
   rightSlot?: ReactNode;
 }
 
-export default function Header({ title, rightSlot }: HeaderProps) {
+export default function Header({ title, leftSlot, rightSlot }: HeaderProps) {
   return (
     <View style={styles.header}>
+      <View style={styles.slot}>{leftSlot}</View>
       <Text style={styles.title}>{title}</Text>
-      {rightSlot}
+      <View style={styles.slot}>{rightSlot}</View>
     </View>
   );
 }
@@ -30,5 +32,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#0f172a',
     letterSpacing: -0.3,
+  },
+  slot: {
+    width: 36,
+    alignItems: 'center',
   },
 });
