@@ -14,6 +14,7 @@ export interface AuthStore {
   initialize: () => Promise<void>;
   requestOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, code: string) => Promise<void>;
+  getRefreshToken: () => Promise<string | null>;
   logout: () => Promise<void>;
   getValidAccessToken: () => Promise<string>;
 }
@@ -106,6 +107,8 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
           set({ isLoading: false });
         }
       },
+
+      getRefreshToken: async () => storage.getRefreshToken(),
 
       logout: async () => {
         const refreshToken = await storage.getRefreshToken();
