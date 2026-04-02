@@ -20,6 +20,13 @@ export class AuthApi extends ApiBase {
     });
   }
 
+  terminateSession(jti: string, refreshToken: string): Promise<void> {
+    return this.apiFetch(`/auth/sessions/${jti}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ refreshToken }),
+    });
+  }
+
   terminateCurrentSession(refreshToken: string): Promise<void> {
     return this.apiFetch('/auth/sessions/current', {
       method: 'DELETE',
