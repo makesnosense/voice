@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireRefreshToken } from '../middleware/auth';
+import { requireAccessToken, requireRefreshToken } from '../middleware/auth';
 import { registerDeviceSchema } from '../schemas/devices';
 import {
   findDeviceByRefreshJti,
@@ -53,8 +53,8 @@ router.post('/', requireRefreshToken, async (req, res) => {
   }
 });
 
-router.get('/', requireRefreshToken, async (req, res) => {
-  const { userId } = req.refreshPayload!;
+router.get('/', requireAccessToken, async (req, res) => {
+  const { userId } = req.user!;
 
   try {
     const userDevices = await getUserDevices(userId);
