@@ -3,12 +3,12 @@ import type { RoomId } from '../../../shared/types/core';
 
 export function generateRoomId(): RoomId {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const id = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join(
+  const id = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join(
     ''
   );
 
-  // format like Google Meet: xxx-xxxx-xxx
-  return `${id.slice(0, 3)}-${id.slice(3, 7)}-${id.slice(7)}` as RoomId;
+  // format: xxx-xxx
+  return `${id.slice(0, 3)}-${id.slice(3, 6)}` as RoomId;
 }
 
 export function generateUserName() {
