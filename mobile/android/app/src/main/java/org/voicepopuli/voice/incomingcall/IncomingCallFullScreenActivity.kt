@@ -9,6 +9,9 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import android.util.Log
+import kotlin.concurrent.thread
+
 import org.voicepopuli.voice.MainActivity
 import org.voicepopuli.voice.R
 
@@ -92,6 +95,16 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun declineCall() {
         cancelNotification()
+        val roomId = intent.getStringExtra("roomId")
+        if (roomId != null) {
+            thread {
+                try {
+                    postCallDeclined(roomId)
+                } catch (exception: Exception) {
+                    Log.e("DeclineCallReceiver", "failed to notify server of decline", exception)
+                }
+            }
+        }
         finish()
     }
 

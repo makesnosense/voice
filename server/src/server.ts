@@ -1,6 +1,7 @@
 import { createApp } from './create-app';
 import { createServer } from './create-server';
 import { createSocketIO } from './create-socketio';
+import createRoomsRouter from './routes/rooms';
 import { runMigrations } from './db';
 import RoomDestructionManager from './managers/room-destruction-manager';
 import config, { getProtocol } from './config';
@@ -20,6 +21,8 @@ authCleanupManager.start();
 const app = createApp(rooms);
 const server = createServer(app);
 const io = createSocketIO(server, rooms, roomDestructionManager);
+
+app.use('/api/rooms', createRoomsRouter(rooms, io));
 
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${getProtocol(server)}://${config.host}:${config.port}`);

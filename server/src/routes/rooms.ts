@@ -5,9 +5,9 @@ import { getUserMobileDevices } from '../services/devices';
 import { requireAccessToken } from '../middleware/auth';
 import { callSchema } from '../schemas/calls';
 import { createCallsLogEntry } from '../services/calls';
-import type { Room, RoomId } from '../../../shared/types/core';
+import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 
-export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
+export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedServer) {
   const router = Router();
 
   router.post('/', (req, res) => {
@@ -48,6 +48,18 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>) {
       console.error('failed to send invite:', error);
       res.status(500).json({ error: 'failed to send invite' });
     }
+  });
+
+  router.post('/:roomId/decline', (req, res) => {
+    const roomId = req.params.roomId as RoomId;
+
+    if (!rooms.has(roomId)) {
+      return res.status(404).json({ error: 'room not found' });
+    }
+
+    io.to(roomId).emit('call-declined');
+    console.log(`📵 [Rooms] call declined for room ${roomId}`);
+    res.status(204).end();
   });
 
   router.get('/:roomId/alive', (req, res) => {

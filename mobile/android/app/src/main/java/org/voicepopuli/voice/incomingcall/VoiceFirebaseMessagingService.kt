@@ -136,7 +136,10 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notificationBarDeclineIntent = Intent(this, DeclineCallReceiver::class.java)
+        val notificationBarDeclineIntent = Intent(this, DeclineCallReceiver::class.java).apply {
+            putExtra("roomId", roomId)
+        }
+
         val notificationBarDeclinePendingIntent = PendingIntent.getBroadcast(
             this, 1, notificationBarDeclineIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

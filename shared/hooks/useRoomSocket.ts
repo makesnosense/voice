@@ -54,6 +54,11 @@ export function useRoomSocket(
       useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.ROOM_FULL);
     });
 
+    socket.on('call-declined', () => {
+      console.log('📵 [Socket] call declined by remote');
+      useRoomStore.setState({ callDeclined: true });
+    });
+
     socket.on('connect_error', (error) => {
       console.error('❌ [Socket] Connection error:', error.message);
     });

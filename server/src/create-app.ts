@@ -3,7 +3,7 @@ import authRoutes from './routes/auth';
 import devicesRoutes from './routes/devices';
 import turnRoutes from './routes/turn';
 import createCallsRouter from './routes/calls';
-import createRoomsRouter from './routes/rooms';
+
 import contactsRoutes from './routes/contacts';
 import usersRoutes from './routes/users';
 import { generalApiLimiter } from './middleware/api-rate-limiters';
@@ -24,7 +24,6 @@ export function createApp(rooms: Map<RoomId, Room>) {
     console.log('🛡️  Rate limiting enabled for API endpoints');
   }
 
-  app.use('/api/rooms', createRoomsRouter(rooms));
   app.use('/api/calls', createCallsRouter(rooms));
   app.use('/api/turn-credentials', turnRoutes);
   app.use('/api/auth', authRoutes);
