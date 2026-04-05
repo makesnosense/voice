@@ -29,6 +29,8 @@ export default function Users({ currentUserId }: UsersProps) {
   );
 
   const roomUsers = useRoomStore((state) => state.roomUsers);
+  const isCallDeclined = useRoomStore((state) => state.isCallDeclined);
+
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isMicActive = useWebRTCStore((state) => state.isMicActive);
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
@@ -42,6 +44,16 @@ export default function Users({ currentUserId }: UsersProps) {
   }, [roomUsers.length]);
 
   const isAlone = roomUsers.length === 1;
+
+  useEffect(() => {
+    if (!isCallDeclined) return;
+    window.history.replaceState({}, '');
+    const timeout = setTimeout(() => {
+      calledContactEmail(null);
+      useRoomStore.setState({ isCallDeclined: false });
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [isCallDeclined]);
 
   return (
     <div className={usersStyles.usersContainer}>
@@ -80,7 +92,11 @@ export default function Users({ currentUserId }: UsersProps) {
       )}
 
       {isAlone && emailToInvite && (
-        <CallingCard email={emailToInvite} onCancel={() => calledContactEmail(null)} />
+        <CallingCard
+          email={emailToInvite}
+          onCancel={() => calledContactEmail(null)}
+          declined={isCallDeclined}
+        />
       )}
     </div>
   );

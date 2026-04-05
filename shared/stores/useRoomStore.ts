@@ -6,7 +6,7 @@ interface RoomStore {
   roomUsers: UserDataClientSide[];
   messages: Message[];
   roomConnectionStatus: RoomConnectionStatus;
-  callDeclined: boolean;
+  isCallDeclined: boolean;
 
   setRoomUsers: (users: UserDataClientSide[]) => void;
   addMessage: (message: Message) => void;
@@ -18,7 +18,7 @@ export const useRoomStore = create<RoomStore>((set) => ({
   roomUsers: [],
   messages: [],
   roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
-  callDeclined: false,
+  isCallDeclined: false,
 
   setRoomUsers: (users) => set({ roomUsers: users }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
@@ -28,6 +28,6 @@ export const useRoomStore = create<RoomStore>((set) => ({
       roomUsers: [],
       messages: [],
       roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
-      callDeclined: false,
+      isCallDeclined: false,
     }),
 }));

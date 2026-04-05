@@ -1,3 +1,13 @@
+.declinedLabel {
+  font-size: 0.75rem;
+  color: var(--accent-red);
+}
+
+.hidden {
+  visibility: hidden;
+  transition: none;
+}
+
 .dots {
   display: flex;
   align-items: center;

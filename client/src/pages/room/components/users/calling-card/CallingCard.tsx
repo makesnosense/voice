@@ -7,9 +7,10 @@ import callingCardStyles from './CallingCard.module.css';
 interface CallingCardProps {
   email: string;
   onCancel: () => void;
+  declined?: boolean;
 }
 
-export default function CallingCard({ email, onCancel }: CallingCardProps) {
+export default function CallingCard({ email, onCancel, declined = false }: CallingCardProps) {
   const displayName = email.split('@')[0];
 
   return (
@@ -18,15 +19,19 @@ export default function CallingCard({ email, onCancel }: CallingCardProps) {
         <span className={`${baseStyles.title} ${userCardStyles.displayName}`}>{displayName}</span>
 
         <div className={userCardStyles.audioWavesContainer}>
-          <div className={callingCardStyles.dots}>
-            <span />
-            <span />
-            <span />
-          </div>
+          {declined ? (
+            <span className={callingCardStyles.declinedLabel}>declined</span>
+          ) : (
+            <div className={callingCardStyles.dots}>
+              <span />
+              <span />
+              <span />
+            </div>
+          )}
         </div>
 
         <button
-          className={`${buttonStyles.iconButton} ${buttonStyles.button} ${buttonStyles.lightRed}`}
+          className={`${buttonStyles.iconButton} ${buttonStyles.button} ${buttonStyles.lightRed} ${declined ? callingCardStyles.hidden : ''}`}
           onClick={onCancel}
           title="dismiss"
         >

@@ -56,7 +56,7 @@ export function useRoomSocket(
 
     socket.on('call-declined', () => {
       console.log('📵 [Socket] call declined by remote');
-      useRoomStore.setState({ callDeclined: true });
+      useRoomStore.setState({ isCallDeclined: true });
     });
 
     socket.on('connect_error', (error) => {
