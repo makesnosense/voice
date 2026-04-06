@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { api } from '../../../../api';
 import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
@@ -23,6 +23,7 @@ const getCalledContactEmail = (state: unknown): string | null =>
 
 export default function Users({ currentUserId }: UsersProps) {
   const roomId = useRoomId();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const [calledContactEmail, setCalledContactEmail] = useState<string | null>(() =>
@@ -40,7 +41,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
 
   const handleCancelInvite = async () => {
-    window.history.replaceState({}, '');
+    navigate('.', { replace: true, state: {} });
     setCalledContactEmail(null);
     try {
       const token = await getValidAccessToken();
@@ -60,13 +61,13 @@ export default function Users({ currentUserId }: UsersProps) {
 
   useEffect(() => {
     if (!isCallDeclined) return;
-    window.history.replaceState({}, '');
+    navigate('.', { replace: true, state: {} });
     const timeout = setTimeout(() => {
       setCalledContactEmail(null);
       useRoomStore.setState({ isCallDeclined: false });
     }, 3000);
     return () => clearTimeout(timeout);
-  }, [isCallDeclined]);
+  }, [isCallDeclined, navigate]);
 
   return (
     <div className={usersStyles.usersContainer}>
@@ -104,7 +105,7 @@ export default function Users({ currentUserId }: UsersProps) {
         <InviteCard
           roomId={roomId!}
           onUserInvited={(email) => {
-            window.history.replaceState({ calledContactEmail: email }, '');
+            navigate('.', { replace: true, state: { calledContactEmail: email } });
             setCalledContactEmail(email);
           }}
         />
