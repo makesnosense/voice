@@ -18,8 +18,11 @@ export class RoomsApi extends ApiBase {
     });
   }
 
-  cancelCall(roomId: RoomId): Promise<void> {
-    return this.apiFetch(`/rooms/${roomId}/cancel`, { method: 'POST' });
+  cancelInviteToRoom(roomId: RoomId, accessToken: string): Promise<void> {
+    return this.apiFetch(`/rooms/${roomId}/cancel-invite`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
   }
 
   checkAlive(roomId: RoomId): Promise<RoomAliveResponse> {
