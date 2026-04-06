@@ -40,6 +40,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
 
   const handleCancelInvite = async () => {
+    window.history.replaceState({}, '');
     setCalledContactEmail(null);
     try {
       const token = await getValidAccessToken();
@@ -100,7 +101,13 @@ export default function Users({ currentUserId }: UsersProps) {
       })}
 
       {isAlone && isAuthenticated && !calledContactEmail && (
-        <InviteCard roomId={roomId!} onUserInvited={(email) => setCalledContactEmail(email)} />
+        <InviteCard
+          roomId={roomId!}
+          onUserInvited={(email) => {
+            window.history.replaceState({ calledContactEmail: email }, '');
+            setCalledContactEmail(email);
+          }}
+        />
       )}
 
       {isAlone && calledContactEmail && (
