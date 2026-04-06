@@ -25,7 +25,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const roomId = useRoomId();
   const location = useLocation();
 
-  const [emailToInvite, calledContactEmail] = useState<string | null>(() =>
+  const [calledContactEmail, setCalledContactEmail] = useState<string | null>(() =>
     getCalledContactEmail(location.state)
   );
 
@@ -40,7 +40,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
 
   const handleCancelInvite = async () => {
-    calledContactEmail(null);
+    setCalledContactEmail(null);
     try {
       const token = await getValidAccessToken();
       await api.rooms.cancelInviteToRoom(roomId!, token);
@@ -51,7 +51,7 @@ export default function Users({ currentUserId }: UsersProps) {
 
   useEffect(() => {
     if (roomUsers.length >= 2) {
-      calledContactEmail(null);
+      setCalledContactEmail(null);
     }
   }, [roomUsers.length]);
 
@@ -61,7 +61,7 @@ export default function Users({ currentUserId }: UsersProps) {
     if (!isCallDeclined) return;
     window.history.replaceState({}, '');
     const timeout = setTimeout(() => {
-      calledContactEmail(null);
+      setCalledContactEmail(null);
       useRoomStore.setState({ isCallDeclined: false });
     }, 3000);
     return () => clearTimeout(timeout);
@@ -99,13 +99,13 @@ export default function Users({ currentUserId }: UsersProps) {
         );
       })}
 
-      {isAlone && isAuthenticated && !emailToInvite && (
-        <InviteCard roomId={roomId!} onUserInvited={(email) => calledContactEmail(email)} />
+      {isAlone && isAuthenticated && !calledContactEmail && (
+        <InviteCard roomId={roomId!} onUserInvited={(email) => setCalledContactEmail(email)} />
       )}
 
-      {isAlone && emailToInvite && (
+      {isAlone && calledContactEmail && (
         <CallingCard
-          email={emailToInvite}
+          email={calledContactEmail}
           onCancel={handleCancelInvite}
           declined={isCallDeclined}
         />
