@@ -38,3 +38,11 @@ export async function sendCallNotification(
     },
   });
 }
+
+export async function sendCallCancelledNotification(fcmToken: string): Promise<void> {
+  await getMessaging().send({
+    token: fcmToken,
+    data: { type: 'call_cancelled' },
+    android: { priority: 'high' },
+  });
+}

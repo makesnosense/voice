@@ -1,7 +1,7 @@
 meta {
   name: invite-to-room
   type: http
-  seq: 7
+  seq: 3
 }
 
 post {
@@ -17,7 +17,7 @@ auth:bearer {
 body:json {
   
   {
-    "targetEmail": "noldya@gmail.com"
+    "targetUserId": "{{voiceUserId}}"
   } 
 }
 

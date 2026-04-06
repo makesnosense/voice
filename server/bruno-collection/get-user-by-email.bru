@@ -18,6 +18,13 @@ auth:bearer {
   token: {{voiceAccessToken}}
 }
 
+script:post-response {
+  const response = res.getBody();
+  if (response && response.id) {
+    bru.setVar("voiceUserId", response.id);
+  }
+}
+
 settings {
   encodeUrl: true
   timeout: 0

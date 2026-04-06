@@ -14,7 +14,7 @@ export function createRoom(rooms: Map<RoomId, Room>): RoomId {
     }
   } while (rooms.has(roomId));
 
-  rooms.set(roomId, { users: new Map() });
+  rooms.set(roomId, { users: new Map(), pendingInviteFcmTokens: [] });
   console.log(`📱 created room: ${roomId}`);
   return roomId;
 }

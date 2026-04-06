@@ -18,6 +18,10 @@ export class RoomsApi extends ApiBase {
     });
   }
 
+  cancelCall(roomId: RoomId): Promise<void> {
+    return this.apiFetch(`/rooms/${roomId}/cancel`, { method: 'POST' });
+  }
+
   checkAlive(roomId: RoomId): Promise<RoomAliveResponse> {
     return this.apiFetch<RoomAliveResponse>(`/rooms/${roomId}/alive`, { method: 'GET' });
   }

@@ -18,6 +18,7 @@ export interface UserDataClientSide {
 
 export interface Room {
   users: Map<SocketId, UserDataServerSide>;
+  pendingInviteFcmTokens: string[];
 }
 
 export interface Message {
