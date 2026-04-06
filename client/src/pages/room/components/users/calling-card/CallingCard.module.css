@@ -1,6 +1,20 @@
 .declinedLabel {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--accent-red);
+}
+
+.declinedCard {
+  background: transparent;
+  border-color: var(--accent-red-border);
+}
+
+.displayName {
+  font-size: 0.875rem;
+  line-height: 1.2rem;
+  max-width: calc(var(--user-card-width) - 48px); /* subtract horizontal padding */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hidden {
@@ -39,4 +53,11 @@
   40% {
     opacity: 1;
   }
+}
+
+.declinedContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
