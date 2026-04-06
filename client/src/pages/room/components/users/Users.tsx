@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
+import { api } from '../../../../api';
 import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
@@ -32,10 +33,21 @@ export default function Users({ currentUserId }: UsersProps) {
   const isCallDeclined = useRoomStore((state) => state.isCallDeclined);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const getValidAccessToken = useAuthStore((state) => state.getValidAccessToken);
   const isMicActive = useWebRTCStore((state) => state.isMicActive);
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
   const toggleMute = useWebRTCStore((state) => state.toggleMute);
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
+
+  const handleCancelInvite = async () => {
+    calledContactEmail(null);
+    try {
+      const token = await getValidAccessToken();
+      await api.rooms.cancelInviteToRoom(roomId!, token);
+    } catch (error) {
+      console.error('failed to cancel invite:', error);
+    }
+  };
 
   useEffect(() => {
     if (roomUsers.length >= 2) {
@@ -94,7 +106,7 @@ export default function Users({ currentUserId }: UsersProps) {
       {isAlone && emailToInvite && (
         <CallingCard
           email={emailToInvite}
-          onCancel={() => calledContactEmail(null)}
+          onCancel={handleCancelInvite}
           declined={isCallDeclined}
         />
       )}
