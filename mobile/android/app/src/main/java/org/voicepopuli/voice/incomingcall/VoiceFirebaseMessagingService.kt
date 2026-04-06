@@ -21,6 +21,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     companion object {
         const val CHANNEL_ID = "incoming_calls"
         const val NOTIFICATION_ID = 3333
+        const val ACTION_CALL_CANCELLED = "org.voicepopuli.voice.CALL_CANCELLED"
 
         private var vibrator: Vibrator? = null
 
@@ -31,9 +32,14 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        val data = message.data
-        if (data["type"] != "incoming_call") return
+        when (message.data["type"]) {
+            "incoming_call" -> handleIncomingCall(message.data)
+            "call_cancelled" -> handleCallCancelled()
+        }
+    }
 
+
+    private fun handleIncomingCall(data: Map<String, String>) {
         // acquire before anything else — wakes screen so full-screen intent fires reliably
         acquireScreenWakeLock()
 
@@ -45,6 +51,12 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         ensureNotificationChannel()
         showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId)
         startVibration()
+    }
+
+    private fun handleCallCancelled() {
+        cancelVibration()
+        getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
+        sendBroadcast(Intent(ACTION_CALL_CANCELLED)) // we need this to close fullscreen activity
     }
 
     private fun ensureNotificationChannel() {

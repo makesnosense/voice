@@ -3,6 +3,10 @@ package org.voicepopuli.voice.incomingcall
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Intent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -19,6 +23,25 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private var callerUserId: String? = null
     private var callerEmail: String? = null
     private var callerName: String? = null
+
+    private val callCancelledReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) = finish()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ContextCompat.registerReceiver(
+            this,
+            callCancelledReceiver,
+            IntentFilter(VoiceFirebaseMessagingService.ACTION_CALL_CANCELLED),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(callCancelledReceiver)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
