@@ -119,6 +119,26 @@
   color: var(--accent-red);
 }
 
+.callButtonActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.callButtonErrorIcon {
+  color: var(--accent-red);
+}
+
+.callButtonSpinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone } from 'lucide-react';
+import { Phone, AlertCircle, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { api } from '../../api';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -12,30 +12,41 @@ interface CallButtonProps {
 
 export default function CallButton({ toContact }: CallButtonProps) {
   const [isCalling, setIsCalling] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const getValidAccessToken = useAuthStore((state) => state.getValidAccessToken);
   const navigate = useNavigate();
 
   const handleCall = async () => {
     if (isCalling) return;
     setIsCalling(true);
+    setHasError(false);
     try {
       const token = await getValidAccessToken();
       const { roomId } = await api.calls.create(toContact.id, token);
       navigate(`/${roomId}`, { state: { calledContactEmail: toContact.email } });
     } catch (error) {
       console.error('Failed to call contact:', error);
+      setHasError(true);
+    } finally {
       setIsCalling(false);
     }
   };
 
   return (
-    <button
-      className={contactsCardStyles.callButton}
-      title="Call"
-      disabled={isCalling}
-      onClick={handleCall}
-    >
-      <Phone size={18} />
-    </button>
+    <div className={contactsCardStyles.callButtonActions}>
+      {hasError && <AlertCircle size={14} className={contactsCardStyles.callButtonErrorIcon} />}
+      <button
+        className={contactsCardStyles.callButton}
+        title="Call"
+        disabled={isCalling}
+        onClick={handleCall}
+      >
+        {isCalling ? (
+          <Loader size={18} className={contactsCardStyles.callButtonSpinner} />
+        ) : (
+          <Phone size={18} />
+        )}
+      </button>
+    </div>
   );
 }

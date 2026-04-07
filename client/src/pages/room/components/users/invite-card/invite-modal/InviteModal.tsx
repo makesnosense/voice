@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AlertCircle, Loader } from 'lucide-react';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
 import PhonePlus from './PhonePlus';
 import { useContactsStore } from '../../../../../../stores/useContactsStore';
@@ -6,7 +7,6 @@ import ContactsCard from '../../../../../../components/contacts-card/ContactsCar
 import contactsCardStyles from '../../../../../../components/contacts-card/ContactsCard.module.css';
 import styles from './InviteModal.module.css';
 import { api } from '../../../../../../api';
-
 import type { RoomId } from '../../../../../../../../shared/types/core';
 import type { Contact } from '../../../../../../../../shared/types/contacts';
 
@@ -20,6 +20,7 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
   const { fetchContacts } = useContactsStore();
   const getValidAccessToken = useAuthStore((state) => state.getValidAccessToken);
   const [callingId, setCallingId] = useState<string | null>(null); // used only to disable respective row's button
+  const [errorId, setErrorId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchContacts();
@@ -43,19 +44,17 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
   const handleCall = async (contact: Contact) => {
     if (callingId) return;
     setCallingId(contact.id);
+    setErrorId(null);
     try {
       const token = await getValidAccessToken();
       await api.rooms.inviteToRoom(roomId, { targetUserId: contact.id }, token);
       onInviteSent(contact.email);
     } catch (error) {
       console.error('Failed to invite contact:', error);
+      setErrorId(contact.id);
+    } finally {
       setCallingId(null);
     }
-  };
-
-  const addAction = {
-    label: 'Call',
-    onSubmit: inviteByEmail,
   };
 
   return (
@@ -70,16 +69,25 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
           includeContactsWithoutMobile={false}
           showRemoveToggle={false}
           rowButtons={(contact) => (
-            <button
-              className={contactsCardStyles.callButton}
-              title="Call"
-              disabled={callingId === contact.id}
-              onClick={() => handleCall(contact)}
-            >
-              <PhonePlus />
-            </button>
+            <div className={contactsCardStyles.callButtonActions}>
+              {errorId === contact.id && (
+                <AlertCircle size={14} className={contactsCardStyles.callButtonErrorIcon} />
+              )}
+              <button
+                className={contactsCardStyles.callButton}
+                title="Add to call"
+                disabled={callingId !== null}
+                onClick={() => handleCall(contact)}
+              >
+                {callingId === contact.id ? (
+                  <Loader size={18} className={contactsCardStyles.callButtonSpinner} />
+                ) : (
+                  <PhonePlus size={18} />
+                )}
+              </button>
+            </div>
           )}
-          addAction={addAction}
+          addAction={{ label: 'Call', onSubmit: inviteByEmail }}
         />
       </div>
     </div>
