@@ -9,6 +9,23 @@ import { PLATFORM } from '../../../shared/constants/platform';
 const getNativePlatform = () =>
   RNPlatform.OS === 'ios' ? PLATFORM.IOS : PLATFORM.ANDROID;
 
+const getDeviceName = (): string | undefined => {
+  if (RNPlatform.OS === 'android') {
+    const { Brand, Model } = RNPlatform.constants as {
+      Brand?: string;
+      Model?: string;
+    };
+    if (Brand && Model) {
+      const brand = Brand.charAt(0).toUpperCase() + Brand.slice(1);
+      return `${brand} ${Model}`;
+    }
+    return Model ?? Brand;
+  }
+  // iOS: Platform.constants doesn't expose model — undefined for now,
+  // will be filled in when iOS support is added via react-native-device-info
+  return undefined;
+};
+
 export const useDeviceRegistration = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
@@ -27,10 +44,11 @@ export const useDeviceRegistration = () => {
       try {
         await api.devices.syncDevice(refreshToken, getNativePlatform(), {
           fcmToken,
+          deviceName: getDeviceName(),
         });
-        console.log('✅ device synced');
+        console.log('✅ Device synced');
       } catch (err) {
-        console.warn('⚠️ device sync failed:', err);
+        console.warn('⚠️ Device sync failed:', err);
       }
     };
 
