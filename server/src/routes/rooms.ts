@@ -69,7 +69,7 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
     res.status(204).end();
   });
 
-  router.get('/:roomId/alive', (req, res) => {
+  router.get('/:roomId/alive', requireAccessToken, (req, res) => {
     const roomId = req.params.roomId as RoomId;
     const room = rooms.get(roomId);
     if (!room) return res.json({ alive: false, userCount: 0 });

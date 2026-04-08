@@ -25,7 +25,10 @@ export class RoomsApi extends ApiBase {
     });
   }
 
-  checkAlive(roomId: RoomId): Promise<RoomAliveResponse> {
-    return this.apiFetch<RoomAliveResponse>(`/rooms/${roomId}/alive`, { method: 'GET' });
+  checkAlive(roomId: RoomId, accessToken: string): Promise<RoomAliveResponse> {
+    return this.apiFetch<RoomAliveResponse>(`/rooms/${roomId}/alive`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
   }
 }
