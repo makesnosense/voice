@@ -3,9 +3,7 @@ import { Mic, MicOff, PhoneOff, VolumeOff, Volume2 } from 'lucide-react-native';
 import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import InCallManager from 'react-native-incall-manager';
 import { useState } from 'react';
-
-const ACTIVE_COLOR = '#52525b';
-const NEUTRAL_COLOR = '#d4d4d8';
+import { ACTIVE_COLOR, NEUTRAL_COLOR } from '../../styles/colors';
 
 interface SelfCardProps {
   onLeave: () => void;
