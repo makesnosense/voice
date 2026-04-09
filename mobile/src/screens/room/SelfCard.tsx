@@ -56,7 +56,14 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
           </View>
         )}
 
-        <Pressable style={[styles.button, styles.buttonRed]} onPress={onLeave}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.buttonRed,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={onLeave}
+        >
           <PhoneOff size={18} color="#ef4444" />
         </Pressable>
       </View>
@@ -100,5 +107,8 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     borderColor: 'rgba(226, 232, 240, 0.8)',
     opacity: 0.4,
+  },
+  buttonPressed: {
+    opacity: 0.5,
   },
 });
