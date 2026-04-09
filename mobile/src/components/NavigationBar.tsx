@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Users, Phone, Settings } from 'lucide-react-native';
+import { pressedStyle } from '../styles/common';
 import type { ObjectValues } from '../../../shared/types/core';
 
 export const HOME_TAB = {
@@ -50,7 +51,7 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
         return (
           <Pressable
             key={key}
-            style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
+            style={({ pressed }) => [styles.tab, pressed && pressedStyle]}
             onPress={() => onTabPress(key)}
           >
             <Animated.View
@@ -88,9 +89,6 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingTop: 7,
     zIndex: 1,
-  },
-  tabPressed: {
-    opacity: 0.6,
   },
   indicator: {
     position: 'absolute',

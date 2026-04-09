@@ -2,6 +2,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneCall } from 'lucide-react-native';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
+import { pressedStyle } from '../../styles/common';
 
 export default function RejoinCard() {
   const lastRoomId = useRejoinStore(state => state.lastRoomId);
@@ -11,7 +12,7 @@ export default function RejoinCard() {
 
   return (
     <Pressable
-      style={styles.card}
+      style={({ pressed }) => [styles.card, pressed && pressedStyle]}
       onPress={() => useActiveRoomStore.setState({ activeRoomId: lastRoomId })}
     >
       <View style={styles.iconSlot}>

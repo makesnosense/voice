@@ -15,9 +15,10 @@ import AddContactScreen from './AddContactScreen';
 import Header from '../../components/Header';
 import { memo } from 'react';
 import { startCall } from '../../utils/start-call';
+import { TEXT_PRIMARY } from '../../styles/colors';
+import { pressedStyle } from '../../styles/common';
 import type { Contact } from '../../../../shared/types/contacts';
 import type { ObjectValues } from '../../../../shared/types/core';
-import { TEXT_PRIMARY } from '../../styles/colors';
 
 const CONTACTS_VIEW = {
   CONTACTS_LIST: 'contacts-list',
@@ -79,6 +80,7 @@ function ContactsScreen() {
         title="Contacts"
         rightSlot={
           <Pressable
+            style={({ pressed }) => pressed && pressedStyle}
             onPress={() => setView(CONTACTS_VIEW.ADD_CONTACT)}
             hitSlop={8}
           >

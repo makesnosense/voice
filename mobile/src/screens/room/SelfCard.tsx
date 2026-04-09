@@ -4,6 +4,7 @@ import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import InCallManager from 'react-native-incall-manager';
 import { useState } from 'react';
 import { ACTIVE_COLOR, NEUTRAL_COLOR } from '../../styles/colors';
+import { pressedStyle } from '../../styles/common';
 
 interface SelfCardProps {
   onLeave: () => void;
@@ -65,7 +66,7 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
           style={({ pressed }) => [
             styles.button,
             styles.buttonRed,
-            pressed && styles.buttonPressed,
+            pressed && pressedStyle,
           ]}
           onPress={onLeave}
         >
@@ -112,8 +113,5 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     borderColor: 'rgba(226, 232, 240, 0.8)',
     opacity: 0.4,
-  },
-  buttonPressed: {
-    opacity: 0.5,
   },
 });

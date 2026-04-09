@@ -5,6 +5,7 @@ import { LogOut, Smartphone, ChevronRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
 import Header from '../../components/Header';
 import DevicesScreen from './devices/DevicesScreen';
+import { pressedStyle } from '../../styles/common';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const SETTINGS_VIEW = {
@@ -37,7 +38,7 @@ function SettingsScreen() {
             <Pressable
               style={({ pressed }) => [
                 styles.logoutButton,
-                pressed && styles.logoutButtonPressed,
+                pressed && pressedStyle,
               ]}
               onPress={logout}
               hitSlop={8}
@@ -103,9 +104,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
     opacity: 0.7,
-  },
-  logoutButtonPressed: {
-    opacity: 0.4,
   },
   logoutLabel: {
     fontSize: 11,

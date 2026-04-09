@@ -15,6 +15,7 @@ import Header from '../../../components/Header';
 import DeviceRow from './DeviceRow';
 import HeaderBackButton from '../../../components/HeaderBackButton';
 import { TEXT_PRIMARY } from '../../../styles/colors';
+import { pressedStyle } from '../../../styles/common';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DevicesScreenProps {
@@ -78,6 +79,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
             onPress={() => setIsEditing(prev => !prev)}
             hitSlop={12}
             disabled={otherDevices.length === 0}
+            style={({ pressed }) => pressed && pressedStyle}
           >
             <Text
               style={[

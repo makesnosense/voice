@@ -85,7 +85,7 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
             style={({ pressed }) => [
               styles.button,
               isSubmitDisabled && styles.buttonDisabled,
-              pressed && !isSubmitDisabled && styles.buttonPressed,
+              pressed && !isSubmitDisabled && styles.pressedStyle,
             ]}
             onPress={handleSubmit}
             disabled={isSubmitDisabled}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.3,
   },
-  buttonPressed: {
+  pressedStyle: {
     opacity: 0.75,
   },
   buttonText: {

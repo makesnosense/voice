@@ -6,6 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Smartphone, Monitor, Trash2 } from 'lucide-react-native';
+import { pressedStyle } from '../../../styles/common';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DeviceRowProps {
@@ -65,7 +66,7 @@ export default function DeviceRow({
           <Pressable
             style={({ pressed }) => [
               styles.trashButton,
-              pressed && { opacity: 0.5 },
+              pressed && pressedStyle,
             ]}
             onPress={onRemove}
             hitSlop={8}
