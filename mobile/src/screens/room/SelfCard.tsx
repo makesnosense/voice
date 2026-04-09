@@ -33,7 +33,7 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
           ]}
           onPress={toggleSpeaker}
         >
-          <Volume2 size={18} color={isSpeakerOn ? '#1e293b' : '#cbd5e1'} />
+          <Volume2 size={18} color={isSpeakerOn ? '#1e293b' : '#d4d4d8'} />
         </Pressable>
 
         {isMicActive ? (
@@ -47,7 +47,7 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
             {isMutedLocal ? (
               <MicOff size={18} color="#ef4444" />
             ) : (
-              <Mic size={18} color="#475569" />
+              <Mic size={18} color="#52525b" />
             )}
           </Pressable>
         ) : (
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderColor: '#1e293b',
   },
   buttonNeutral: {
-    borderColor: 'rgba(226, 232, 240, 0.8)',
+    borderColor: '#d4d4d8',
   },
   buttonRed: {
     borderColor: 'rgba(239, 68, 68, 0.3)',
