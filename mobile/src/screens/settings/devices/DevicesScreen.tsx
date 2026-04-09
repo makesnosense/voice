@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   editButton: {
-    fontSize: 18,
+    fontSize: 17,
     color: TEXT_PRIMARY,
     textAlign: 'right',
   },
