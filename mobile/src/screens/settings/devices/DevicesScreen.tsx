@@ -14,6 +14,7 @@ import { api } from '../../../api';
 import Header from '../../../components/Header';
 import DeviceRow from './DeviceRow';
 import HeaderBackButton from '../../../components/HeaderBackButton';
+import { TEXT_PRIMARY } from '../../../styles/colors';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DevicesScreenProps {
@@ -75,7 +76,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
         rightSlot={
           <Pressable
             onPress={() => setIsEditing(prev => !prev)}
-            hitSlop={8}
+            hitSlop={12}
             disabled={otherDevices.length === 0}
           >
             <Text
@@ -141,8 +142,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   editButton: {
-    fontSize: 15,
-    color: '#0f172a',
+    fontSize: 18,
+    color: TEXT_PRIMARY,
     textAlign: 'right',
   },
   editButtonDisabled: {

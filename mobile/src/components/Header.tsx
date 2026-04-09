@@ -10,9 +10,9 @@ interface HeaderProps {
 export default function Header({ title, leftSlot, rightSlot }: HeaderProps) {
   return (
     <View style={styles.header}>
-      <View style={styles.slot}>{leftSlot}</View>
+      <View style={styles.leftSlot}>{leftSlot}</View>
       <Text style={styles.title}>{title}</Text>
-      <View style={styles.slot}>{rightSlot}</View>
+      <View style={styles.rightSlot}>{rightSlot}</View>
     </View>
   );
 }
@@ -34,8 +34,12 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     includeFontPadding: false,
   },
-  slot: {
-    width: 36,
-    alignItems: 'center',
+  leftSlot: {
+    width: 44,
+    alignItems: 'flex-start',
+  },
+  rightSlot: {
+    width: 44,
+    alignItems: 'flex-end',
   },
 });
