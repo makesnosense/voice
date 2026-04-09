@@ -10,10 +10,10 @@ export default function HeaderBackButton({ onPress }: HeaderBackButtonProps) {
   return (
     <Pressable
       onPress={onPress}
-      hitSlop={8}
+      hitSlop={16}
       style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}
     >
-      <ArrowLeft size={22} color={TEXT_PRIMARY} strokeWidth={1.75} />
+      <ArrowLeft size={24} color={TEXT_PRIMARY} strokeWidth={1.75} />
     </Pressable>
   );
 }
