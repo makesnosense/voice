@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import { memo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import { api } from '../../../api';
 import Header from '../../../components/Header';
 import DeviceRow from './DeviceRow';
+import HeaderBackButton from '../../../components/HeaderBackButton';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DevicesScreenProps {
@@ -71,15 +71,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header
         title="Devices"
-        leftSlot={
-          <Pressable
-            onPress={onBack}
-            hitSlop={8}
-            style={({ pressed }) => ({ opacity: pressed ? 0.4 : 1 })}
-          >
-            <ArrowLeft size={22} color="#0f172a" strokeWidth={1.75} />
-          </Pressable>
-        }
+        leftSlot={<HeaderBackButton onPress={onBack} />}
         rightSlot={
           <Pressable
             onPress={() => setIsEditing(prev => !prev)}
