@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Bell, Mic } from 'lucide-react-native';
 import type { AppPermissions } from '../hooks/useAppPermissions.types';
 import { PERMISSION_STATUS } from '../hooks/useAppPermissions.types';
+import { pressedStyle } from '../styles/common';
+import { TEXT_PRIMARY } from '../styles/colors';
 
 interface PermissionsScreenProps {
   permissions: AppPermissions;
@@ -10,6 +14,7 @@ interface PermissionsScreenProps {
 export default function PermissionsScreen({
   permissions,
 }: PermissionsScreenProps) {
+  const insets = useSafeAreaInsets();
   const { notificationsPermission, microphonePermission, requestAll } =
     permissions;
 
@@ -20,46 +25,69 @@ export default function PermissionsScreen({
   const items = [
     {
       key: 'notifications',
-      label: 'notifications — required to receive incoming calls',
+      icon: <Bell size={18} color="#64748b" strokeWidth={1.75} />,
+      label: 'Notifications',
+      description: 'required to receive incoming calls',
       status: notificationsPermission.status,
     },
     {
       key: 'microphone',
-      label: 'microphone — required for voice calls',
+      icon: <Mic size={18} color="#64748b" strokeWidth={1.75} />,
+      label: 'Microphone',
+      description: 'required for voice calls',
       status: microphonePermission.status,
     },
   ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Voice needs access</Text>
-      <Text style={styles.subtitle}>
-        both permissions are required to use the app
-      </Text>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.content}>
+        <View style={styles.heading}>
+          <Text style={styles.title}>Voice needs access</Text>
+          <Text style={styles.subtitle}>
+            both permissions are required to use the app
+          </Text>
+        </View>
 
-      <View style={styles.list}>
-        {items.map(({ key, label, status }) => (
-          <View key={key} style={styles.row}>
-            <Text
-              style={[
-                styles.dot,
-                status === PERMISSION_STATUS.DENIED && styles.dotDenied,
-              ]}
-            >
-              {status === PERMISSION_STATUS.GRANTED ? '●' : '○'}
-            </Text>
-            <Text style={styles.label}>{label}</Text>
+        <View>
+          <Text style={styles.sectionLabel}>required permissions</Text>
+          <View style={styles.card}>
+            {items.map(({ key, icon, label, description, status }, index) => (
+              <View key={key}>
+                {index > 0 && <View style={styles.separator} />}
+                <View style={styles.row}>
+                  {icon}
+                  <View style={styles.rowText}>
+                    <Text style={styles.rowLabel}>{label}</Text>
+                    <Text style={styles.rowDescription}>{description}</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      status === PERMISSION_STATUS.GRANTED
+                        ? styles.statusGranted
+                        : status === PERMISSION_STATUS.DENIED
+                        ? styles.statusDenied
+                        : styles.statusChecking,
+                    ]}
+                  />
+                </View>
+              </View>
+            ))}
           </View>
-        ))}
+        </View>
+
+        <Pressable
+          style={({ pressed }) => [styles.button, pressed && pressedStyle]}
+          onPress={requestAll}
+        >
+          <Text style={styles.buttonText}>Grant permissions</Text>
+        </Pressable>
+
+        <Text style={styles.hint}>
+          if the system dialog doesn't appear, open settings and grant manually
+        </Text>
       </View>
-
-      <Pressable style={styles.button} onPress={requestAll}>
-        <Text style={styles.buttonText}>grant permissions</Text>
-      </Pressable>
-
-      <Text style={styles.hint}>
-        if the system dialog doesn't appear, open settings and grant manually
-      </Text>
     </View>
   );
 }
@@ -67,61 +95,96 @@ export default function PermissionsScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
-    alignItems: 'center',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    gap: 16,
+  },
+  content: {
+    padding: 20,
+    gap: 12,
+  },
+  heading: {
+    gap: 4,
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#f1f5f9',
+    color: TEXT_PRIMARY,
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
+    color: '#57534e',
   },
-  list: {
-    width: '100%',
-    gap: 10,
-    marginVertical: 8,
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#a1a1aa',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    paddingBottom: 6,
+  },
+  card: {
+    backgroundColor: '#f4f4f5',
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#d4d4d8',
+    overflow: 'hidden',
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#e4e4e7',
+    marginLeft: 46,
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
-  dot: {
-    color: '#22c55e',
-    fontSize: 16,
-    lineHeight: 20,
-  },
-  dotDenied: {
-    color: '#ef4444',
-  },
-  label: {
+  rowText: {
     flex: 1,
-    fontSize: 14,
-    color: '#cbd5e1',
-    lineHeight: 20,
+    gap: 2,
+  },
+  rowLabel: {
+    fontSize: 15,
+    color: TEXT_PRIMARY,
+    includeFontPadding: false,
+  },
+  rowDescription: {
+    fontSize: 12,
+    color: '#71717a',
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusGranted: {
+    backgroundColor: '#22c55e',
+  },
+  statusDenied: {
+    backgroundColor: '#ef4444',
+  },
+  statusChecking: {
+    backgroundColor: '#d4d4d8',
   },
   button: {
-    width: '100%',
-    backgroundColor: '#1e40af',
-    borderRadius: 8,
+    backgroundColor: '#18181b',
+    borderRadius: 10,
     padding: 14,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
   buttonText: {
-    color: '#f1f5f9',
+    color: '#ffffff',
     fontSize: 16,
+    fontWeight: '500',
   },
   hint: {
     fontSize: 12,
-    color: '#475569',
+    color: '#a1a1aa',
     textAlign: 'center',
     lineHeight: 18,
   },
