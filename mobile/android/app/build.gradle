@@ -98,6 +98,7 @@ android {
         debug {
             signingConfig signingConfigs.debug
             buildConfigField "String", "SERVER_URL", '"https://localhost:3003"'
+            manifestPlaceholders = [voiceHost: "voice.k.vu"]
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -106,6 +107,7 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             buildConfigField "String", "SERVER_URL", '"https://voice.k.vu"'
+            manifestPlaceholders = [voiceHost: "voice.k.vu"]
         }
     }
 }

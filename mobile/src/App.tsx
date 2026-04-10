@@ -12,6 +12,8 @@ import { CALL_DIRECTION } from '../../shared/constants/calls';
 import { useCallHistoryStore } from './stores/useCallHistoryStore';
 import { useContactsStore } from './stores/useContactsStore';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
+import { useRoomLink } from './hooks/useRoomLink';
+
 import type { RoomId } from '../../shared/types/core';
 
 export default function App() {
@@ -47,6 +49,10 @@ export default function App() {
     useActiveRoomStore.setState({
       activeRoomId: incomingCallParams.roomId as RoomId,
     });
+  });
+
+  useRoomLink(roomId => {
+    useActiveRoomStore.setState({ activeRoomId: roomId });
   });
 
   if (permissions.isChecking) return null;
