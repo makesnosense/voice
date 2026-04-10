@@ -42,7 +42,13 @@ export default function AuthScreen() {
         <OtpStep email={email} onBack={() => setStep('email')} />
       )}
 
-      {step === 'email' && <CreateRoomButton />}
+      {step === 'email' && (
+        <View
+          style={[styles.createCallContainer, { bottom: insets.bottom + 32 }]}
+        >
+          <CreateRoomButton mutedColor />
+        </View>
+      )}
     </View>
   );
 }
@@ -67,5 +73,8 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     letterSpacing: -0.5,
     includeFontPadding: false,
+  },
+  createCallContainer: {
+    position: 'absolute',
   },
 });
