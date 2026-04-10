@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { TEXT_PRIMARY } from '../styles/colors';
 import type { ReactNode } from 'react';
 
 interface HeaderProps {
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     letterSpacing: -0.3,
     includeFontPadding: false,
   },

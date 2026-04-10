@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { TEXT_PRIMARY } from '../../styles/colors';
 
 interface OtpStepProps {
   email: string;
@@ -57,7 +58,7 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
           />
           {isLoading && (
             <View style={styles.spinnerWrapper}>
-              <ActivityIndicator size="small" color="#0f172a" />
+              <ActivityIndicator size="small" color={TEXT_PRIMARY} />
             </View>
           )}
         </View>
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#a1a1aa',
     backgroundColor: '#e4e4e7',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     fontSize: 16,
     textAlign: 'center',
   },

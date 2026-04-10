@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { TEXT_PRIMARY } from '../../styles/colors';
 
 interface EmailStepProps {
   email: string;
@@ -67,9 +68,9 @@ export default function EmailStep({
             disabled={isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#0f172a" />
+              <ActivityIndicator size="small" color={TEXT_PRIMARY} />
             ) : (
-              <ArrowRight size={16} color="#0f172a" />
+              <ArrowRight size={16} color={TEXT_PRIMARY} />
             )}
           </Pressable>
         )}
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#d4d4d8',
     backgroundColor: '#f4f4f5',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     fontSize: 15,
   },
   inputAction: {

@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { Smartphone, Monitor, Trash2 } from 'lucide-react-native';
 import { pressedStyle } from '../../../styles/common';
+import { TEXT_PRIMARY } from '../../../styles/colors';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DeviceRowProps {
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     includeFontPadding: false,
   },
   meta: {

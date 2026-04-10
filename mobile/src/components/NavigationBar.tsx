@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Users, Phone, Settings } from 'lucide-react-native';
 import { pressedStyle } from '../styles/common';
+import { TEXT_PRIMARY } from '../styles/colors';
 import type { ObjectValues } from '../../../shared/types/core';
 
 export const HOME_TAB = {
@@ -62,7 +63,7 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
             />
             <Icon
               size={24}
-              color={isActive ? '#0f172a' : '#94a3b8'}
+              color={isActive ? TEXT_PRIMARY : '#94a3b8'}
               strokeWidth={isActive ? 2 : 1.75}
             />
             <Text style={[styles.label, isActive && styles.labelActive]}>
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
   },
   labelActive: {
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     fontWeight: '500',
   },
 });

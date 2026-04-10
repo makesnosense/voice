@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   contactName: {
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     fontSize: 16,
     fontWeight: '500',
   },

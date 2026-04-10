@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import Header from '../../components/Header';
 import DevicesScreen from './devices/DevicesScreen';
 import { pressedStyle } from '../../styles/common';
+import { TEXT_PRIMARY } from '../../styles/colors';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const SETTINGS_VIEW = {
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
   },
   hint: {
     fontSize: 12,
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   menuLabel: {
     flex: 1,
     fontSize: 15,
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     includeFontPadding: false,
   },
 });

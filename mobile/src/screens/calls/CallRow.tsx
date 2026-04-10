@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneIncoming, PhoneOutgoing } from 'lucide-react-native';
 import { CALL_DIRECTION } from '../../../../shared/constants/calls';
+import { TEXT_PRIMARY } from '../../styles/colors';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 
 const formatDate = (createdAtIso: string) => {
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
   },
   direction: {
     fontSize: 13,

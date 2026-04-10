@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet } from 'react-native';
+import { TEXT_PRIMARY } from '../styles/colors';
 
 // mirrors the web HeaderAnimation bar geometry
 const BARS: { height: number; delay: number }[] = [
@@ -68,6 +69,6 @@ const styles = StyleSheet.create({
   bar: {
     width: 4,
     borderRadius: 2,
-    backgroundColor: '#0f172a',
+    backgroundColor: TEXT_PRIMARY,
   },
 });

@@ -14,6 +14,7 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import { PLATFORM } from '../../../../shared/constants/platform';
 import Header from '../../components/Header';
 import HeaderBackButton from '../../components/HeaderBackButton';
+import { TEXT_PRIMARY } from '../../styles/colors';
 
 interface AddContactScreenProps {
   onBack: () => void;
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
   },
   inputError: {
     borderBottomWidth: 1,

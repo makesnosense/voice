@@ -5,6 +5,7 @@ import WaveformBars from '../../components/WaveformBars';
 import EmailStep from './EmailStep';
 import OtpStep from './OtpStep';
 import CreateRoomButton from '../../components/CreateRoomButton';
+import { TEXT_PRIMARY } from '../../styles/colors';
 
 type AuthStep = 'email' | 'otp';
 
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#0f172a',
+    color: TEXT_PRIMARY,
     letterSpacing: -0.5,
     includeFontPadding: false,
   },
