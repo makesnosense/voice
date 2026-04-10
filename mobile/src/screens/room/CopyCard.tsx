@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Copy, Check } from 'lucide-react-native';
+import { WEB_URL } from '../../config';
 import type { RoomId } from '../../../../shared/types/core';
 
 interface CopyCardProps {
@@ -11,7 +12,7 @@ interface CopyCardProps {
 export default function CopyCard({ roomId }: CopyCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const url = `https://voice.k.vu/${roomId}`;
+  const url = `${WEB_URL}/${roomId}`;
 
   const handleCopy = () => {
     Clipboard.setString(url);

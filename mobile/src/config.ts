@@ -6,5 +6,9 @@ export const BASE_URL = __DEV__
   ? `https://${DEV_HOST}:3003`
   : `https://${PROD_HOST}`;
 
+export const WEB_URL = __DEV__
+  ? `https://${DEV_HOST}:5173`
+  : `https://${PROD_HOST}`;
+
 export const TURN_HOST = PROD_HOST;
 export const TURN_PORT = '3478';
