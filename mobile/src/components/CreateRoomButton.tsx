@@ -2,14 +2,22 @@ import { Pressable, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useState } from 'react';
 import { createRoom } from '../utils/create-room';
 import { pressedStyle } from '../styles/common';
-import { TEXT_MUTED, BORDER_MUTED } from '../styles/colors';
+import {
+  ACTIVE_COLOR,
+  TEXT_PRIMARY,
+  BORDER_PRIMARY,
+  NEUTRAL_COLOR,
+} from '../styles/colors';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 interface CreateRoomButtonProps {
-  mutedColor: boolean;
+  mutedColor?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function CreateRoomButton({
   mutedColor = false,
+  style,
 }: CreateRoomButtonProps) {
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const handleCreateRoom = async () => {
@@ -30,7 +38,8 @@ export default function CreateRoomButton({
       disabled={isCreatingRoom}
       style={({ pressed }) => [
         styles.button,
-        mutedColor ? styles.mutedColor : styles.normal,
+        mutedColor ? styles.mutedBorder : styles.normalBorder,
+        style,
         pressed && pressedStyle,
       ]}
     >
@@ -61,19 +70,19 @@ const styles = StyleSheet.create({
     minWidth: 44,
     minHeight: 44,
   },
-  normal: {
-    borderColor: '#bfdbfe',
+  normalBorder: {
+    borderColor: BORDER_PRIMARY,
   },
-  mutedColor: {
-    borderColor: BORDER_MUTED,
+  mutedBorder: {
+    borderColor: NEUTRAL_COLOR,
   },
   label: {
     fontSize: 14,
   },
   labelNormal: {
-    color: '#3b82f6',
+    color: TEXT_PRIMARY,
   },
   labelMutedColor: {
-    color: TEXT_MUTED,
+    color: ACTIVE_COLOR,
   },
 });

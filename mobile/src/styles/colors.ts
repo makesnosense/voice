@@ -1,4 +1,6 @@
 export const TEXT_PRIMARY = '#18181b'; // zinc-900
+export const BORDER_PRIMARY = '#71717a'; // zinc-500
+
 export const ACTIVE_COLOR = '#52525b'; // zinc-600
 export const NEUTRAL_COLOR = '#d4d4d8'; // zinc-300
 
