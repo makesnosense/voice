@@ -78,7 +78,7 @@
     </service>
 
     <service
-      android:name=".callservice.CallForegroundService"
+      android:name=".callforegroundservice.CallForegroundService"
       android:foregroundServiceType="microphone"
       android:exported="false" />
 
