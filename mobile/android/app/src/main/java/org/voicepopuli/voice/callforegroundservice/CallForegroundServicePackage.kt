@@ -6,7 +6,7 @@ import com.facebook.react.uimanager.ViewManager
 
 class CallForegroundServicePackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext) =
-        listOf(CallServiceModule(reactContext))
+        listOf(CallForegroundServiceModule(reactContext))
 
     override fun createViewManagers(reactContext: ReactApplicationContext) =
         emptyList<ViewManager<*, *>>()

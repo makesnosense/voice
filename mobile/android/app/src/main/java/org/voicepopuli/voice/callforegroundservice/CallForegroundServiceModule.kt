@@ -6,10 +6,10 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 
-class CallServiceModule(private val reactContext: ReactApplicationContext) :
+class CallForegroundServiceModule(private val reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
-    override fun getName() = "CallService"
+    override fun getName() = "CallForegroundService"
 
     @ReactMethod
     fun start() {
