@@ -37,9 +37,10 @@ export class WebRTCManager {
   private onConnectionStateChange: (state: WebRTCConnectionState) => void;
 
   private turnServerConfig: {
-    credentialsUrl: string;
     host: string;
     port: string;
+    username: string;
+    credential: string;
   };
 
   // only on web
@@ -84,9 +85,10 @@ export class WebRTCManager {
     onStreamRemoved: (reason: DisconnectReason) => void,
     onConnectionStateChange: (state: WebRTCConnectionState) => void,
     turnServerConfig: {
-      credentialsUrl: string;
       host: string;
       port: string;
+      username: string;
+      credential: string;
     },
     analyserCallbacks?: {
       onLocalStream: (stream: MediaStream) => void;
@@ -109,8 +111,19 @@ export class WebRTCManager {
 
   private async createPeerConnection(remoteUserId: SocketId): Promise<RTCPeerConnection> {
     console.log(`🔗 [WebRTC] Creating peer connection to ${remoteUserId}`);
+
     this.currentRemoteUserId = remoteUserId;
-    const iceServers = await this.getIceServers();
+
+    const { host, port, username, credential } = this.turnServerConfig;
+
+    const iceServers: RTCIceServer[] = [
+      {
+        urls: [`turn:${host}:${port}?transport=tcp`, `turn:${host}:${port}?transport=udp`],
+        username,
+        credential,
+      },
+    ];
+
     const peerConnection = new RTCPeerConnection({
       iceServers,
       iceTransportPolicy: 'relay',
@@ -203,33 +216,6 @@ export class WebRTCManager {
 
     this.peerConnection = peerConnection;
     return peerConnection;
-  }
-
-  private async getIceServers(): Promise<RTCIceServer[]> {
-    // const iceServers = [...BASE_ICE_SERVERS];
-    const iceServers = [];
-
-    try {
-      const response = await fetch(this.turnServerConfig.credentialsUrl);
-      const turn_credentials = await response.json();
-
-      iceServers.push({
-        urls: [
-          `turn:${this.turnServerConfig.host}:${this.turnServerConfig.port}?transport=tcp`,
-          `turn:${this.turnServerConfig.host}:${this.turnServerConfig.port}?transport=udp`,
-        ],
-        username: turn_credentials.username,
-        credential: turn_credentials.credential,
-      });
-
-      console.log('✅ [WebRTC] TURN credentials obtained');
-    } catch (error) {
-      console.error('❌ [WebRTC] failed to get TURN credentials:', error);
-      // console.log('⚠️ [WebRTC] using STUN only (may not work behind strict NAT)');
-      throw new Error('TURN credentials unavailable — cannot establish relay connection');
-    }
-
-    return iceServers;
   }
 
   private setupSocketListeners() {

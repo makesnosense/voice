@@ -3,6 +3,20 @@ import { WebRTCManager } from '../webrtc/WebRTCManager';
 import type { WebRTCConnectionState, DisconnectReason } from '../constants/webrtc';
 import type { TypedClientSocket, SocketId } from '../types/core';
 
+export interface TurnCredentials {
+  username: string;
+  credential: string;
+}
+
+export async function fetchTurnCredentials(credentialsUrl: string): Promise<TurnCredentials> {
+  const response = await fetch(credentialsUrl);
+  if (!response.ok)
+    throw new Error('TURN credentials unavailable — cannot establish relay connection');
+  const credentials = await response.json();
+  console.log('✅ [WebRTC] TURN credentials obtained');
+  return credentials;
+}
+
 interface WebRTCStore {
   manager: WebRTCManager | null;
   remoteStream: MediaStream | null;
@@ -47,13 +61,16 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
 
     console.log('🎬 [Store] initializing WebRTC manager');
 
+    const { credentialsUrl, host, port } = turnServerConfig;
+    const { username, credential } = await fetchTurnCredentials(credentialsUrl);
+
     const newManager = new WebRTCManager(
       socket,
       localStream,
       (userId, stream) => get().setRemoteStream(userId, stream),
       (reason) => get().clearRemoteStream(reason),
       (state) => set({ webRTCConnectionState: state }),
-      turnServerConfig,
+      { host, port, username, credential },
       analyserCallbacks
     );
 
