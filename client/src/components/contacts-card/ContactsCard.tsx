@@ -7,7 +7,7 @@ import ContactRow from './contact-row/ContactRow';
 import { type Contact } from '../../../../shared/types/contacts';
 import InputBar from './input-bar/InputBar';
 import RemoveButton from './remove-button/RemoveButton';
-
+import { sortContactsWithMobileFirst } from '../../../../shared/utils/sort-contacts';
 const DISPLAY_LIMIT = 50;
 
 const getFilteredContacts = (
@@ -50,10 +50,11 @@ export default function ContactsCard({
   const [isRemoving, setIsRemoving] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredContacts =
+  const filteredContacts = sortContactsWithMobileFirst(
     searchQuery.trim() || !includeContactsWithoutMobile
       ? getFilteredContacts(contacts, searchQuery, includeContactsWithoutMobile)
-      : contacts;
+      : contacts
+  );
 
   const displayedContacts = filteredContacts.slice(0, DISPLAY_LIMIT);
 
