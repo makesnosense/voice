@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, useMemo, memo } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import Header from '../../components/Header';
 import ContactRow from './ContactRow';
 import { TEXT_PRIMARY } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
+import { sortContactsWithMobileFirst } from '../../../../shared/utils/sort-contacts';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const CONTACTS_VIEW = {
@@ -35,25 +36,26 @@ function ContactsScreen() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const { contacts, isLoading, fetchContacts, refresh } = useContactsStore();
 
-  useEffect(() => {
-    if (isAuthenticated) fetchContacts();
-  }, [isAuthenticated, fetchContacts]);
-
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await refresh();
     setIsRefreshing(false);
   };
 
+  const sortedContacts = useMemo(
+    () => sortContactsWithMobileFirst(contacts),
+    [contacts],
+  );
+
+  useEffect(() => {
+    if (isAuthenticated) fetchContacts();
+  }, [isAuthenticated, fetchContacts]);
+
   if (view === CONTACTS_VIEW.ADD_CONTACT) {
     return (
       <AddContactScreen onBack={() => setView(CONTACTS_VIEW.CONTACTS_LIST)} />
     );
   }
-
-  const sortedContacts = [...contacts].sort(
-    (a, b) => Number(b.hasMobileDevice) - Number(a.hasMobileDevice),
-  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
