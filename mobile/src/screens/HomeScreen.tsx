@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useRejoinStoreRefresh } from '../hooks/useRejoinStoreRefresh';
 import { View, StyleSheet } from 'react-native';
-import ContactsScreen from './contacts-screen/ContactsScreen';
+import ContactsScreen from './contacts/ContactsScreen';
 import CallsScreen from './calls/CallsScreen';
 import SettingsScreen from './settings/SettingsScreen';
 import NavigationBar, {
