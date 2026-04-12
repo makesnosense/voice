@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  Animated,
 } from 'react-native';
 import { X, AlertCircle } from 'lucide-react-native';
 import { useContactsStore } from '../../stores/useContactsStore';
@@ -26,6 +27,10 @@ interface InviteModalProps {
   onUserInvited: (contact: InvitedContact) => void;
 }
 
+const SHEET_SLIDE_DURATION = 320;
+const BACKDROP_FADE_DURATION = 280;
+const SHEET_TRANSLATE_Y = 500;
+
 const ContactSeparator = () => <View style={styles.separator} />;
 
 export default function InviteModal({
@@ -37,9 +42,42 @@ export default function InviteModal({
   const [invitedUserId, setInvitedUserId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
 
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const sheetTranslateY = useRef(new Animated.Value(SHEET_TRANSLATE_Y)).current;
+
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: BACKDROP_FADE_DURATION,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetTranslateY, {
+        toValue: 0,
+        duration: SHEET_SLIDE_DURATION,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [backdropOpacity, sheetTranslateY]);
+
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: BACKDROP_FADE_DURATION,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetTranslateY, {
+        toValue: SHEET_TRANSLATE_Y,
+        duration: SHEET_SLIDE_DURATION,
+        useNativeDriver: true,
+      }),
+    ]).start(onClose);
+  };
 
   const mobileContacts = contacts.filter(contact => contact.hasMobileDevice);
 
@@ -87,11 +125,21 @@ export default function InviteModal({
   );
 
   return (
-    <Modal transparent animationType="slide" onRequestClose={onClose}>
+    <Modal transparent animationType="none" onRequestClose={handleClose}>
       <View style={styles.container}>
-        <Pressable style={styles.backdrop} onPress={onClose} />
+        <Animated.View
+          style={[styles.backdrop, { opacity: backdropOpacity }]}
+          pointerEvents="box-none"
+        >
+          <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
+        </Animated.View>
 
-        <View style={styles.sheet}>
+        <Animated.View
+          style={[
+            styles.sheet,
+            { transform: [{ translateY: sheetTranslateY }] },
+          ]}
+        >
           <View style={styles.sheetHeader}>
             <Text style={styles.sheetTitle}>Add to call</Text>
             <Pressable
@@ -99,7 +147,7 @@ export default function InviteModal({
                 styles.closeButton,
                 pressed && pressedStyle,
               ]}
-              onPress={onClose}
+              onPress={handleClose}
               hitSlop={8}
             >
               <X size={20} color="#64748b" />
@@ -119,7 +167,7 @@ export default function InviteModal({
               contentContainerStyle={styles.list}
             />
           )}
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -129,18 +177,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   backdrop: {
     ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
-
   sheet: {
     backgroundColor: '#ffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '60%',
-    elevation: 4,
   },
   sheetHeader: {
     flexDirection: 'row',
