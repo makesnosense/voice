@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Pressable,
   ActivityIndicator,
+  RefreshControl,
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,10 +14,9 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import AddContactScreen from './AddContactScreen';
 import Header from '../../components/Header';
-import { memo } from 'react';
+import ContactRow from './ContactRow';
 import { TEXT_PRIMARY } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
-import ContactRow from './ContactRow';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const CONTACTS_VIEW = {
@@ -25,17 +25,25 @@ const CONTACTS_VIEW = {
 } as const;
 
 type ContactsView = ObjectValues<typeof CONTACTS_VIEW>;
+
 const ContactSeparator = () => <View style={styles.separator} />;
 
 function ContactsScreen() {
   const insets = useSafeAreaInsets();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const { contacts, isLoading, fetchContacts } = useContactsStore();
+  const { contacts, isLoading, fetchContacts, refresh } = useContactsStore();
 
   useEffect(() => {
     if (isAuthenticated) fetchContacts();
   }, [isAuthenticated, fetchContacts]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refresh();
+    setIsRefreshing(false);
+  };
 
   if (view === CONTACTS_VIEW.ADD_CONTACT) {
     return (
@@ -57,13 +65,19 @@ function ContactsScreen() {
           </Pressable>
         }
       />
+
       {isLoading && <ActivityIndicator style={styles.loader} color="#94a3b8" />}
 
       {!isLoading && contacts.length === 0 && (
         <Text style={styles.empty}>No contacts yet</Text>
       )}
 
-      <ScrollView contentContainerStyle={styles.list}>
+      <ScrollView
+        contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+        }
+      >
         {contacts.map((contact, index) => (
           <View key={contact.id}>
             {index > 0 && <ContactSeparator />}

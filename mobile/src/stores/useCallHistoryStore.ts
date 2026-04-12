@@ -16,6 +16,7 @@ interface CallHistoryStore {
 
   fetchHistory: () => Promise<void>;
   prependEntry: (entry: Omit<CallHistoryEntry, 'id' | 'createdAt'>) => void;
+  refresh: () => Promise<void>;
   reset: () => void;
 }
 
@@ -49,6 +50,11 @@ function createCallHistoryStore(getValidAccessToken: () => Promise<string>) {
           set(state => ({
             history: [newEntry, ...state.history].slice(0, HISTORY_CAP),
           }));
+        },
+
+        refresh: async () => {
+          set({ cacheExists: false });
+          await get().fetchHistory();
         },
 
         reset: () => set({ history: [], isLoading: false, cacheExists: false }),

@@ -14,6 +14,7 @@ interface ContactsStore {
   fetchContacts: () => Promise<void>;
   addContact: (email: string) => Promise<void>;
   removeContact: (contactId: string) => Promise<void>;
+  refresh: () => Promise<void>;
   reset: () => void;
 }
 
@@ -76,6 +77,12 @@ export function createContactsStore(
             throw error;
           }
         },
+
+        refresh: async () => {
+          set({ cacheExists: false });
+          await get().fetchContacts();
+        },
+
         reset: () => set({ contacts: [], isLoading: false, error: null, cacheExists: false }),
       }),
       {

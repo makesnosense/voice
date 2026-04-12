@@ -1,9 +1,10 @@
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   ActivityIndicator,
+  RefreshControl,
   StyleSheet,
 } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
@@ -18,18 +19,26 @@ import { TEXT_MUTED } from '../../styles/colors';
 
 function CallsScreen() {
   const insets = useSafeAreaInsets();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { history, isLoading, fetchHistory } = useCallHistoryStore(
+  const { history, isLoading, fetchHistory, refresh } = useCallHistoryStore(
     useShallow(state => ({
       history: state.history,
       isLoading: state.isLoading,
       fetchHistory: state.fetchHistory,
+      refresh: state.refresh,
     })),
   );
 
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refresh();
+    setIsRefreshing(false);
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -41,7 +50,12 @@ function CallsScreen() {
         <ActivityIndicator style={styles.loader} color="#94a3b8" />
       )}
 
-      <ScrollView contentContainerStyle={styles.list}>
+      <ScrollView
+        contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+        }
+      >
         <CreateRoomButton style={styles.createRoomButton} />
         {!isLoading && history.length === 0 && (
           <Text style={styles.empty}>No past calls</Text>
