@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  FlatList,
+  ScrollView,
   Pressable,
   ActivityIndicator,
   StyleSheet,
@@ -14,10 +14,9 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import AddContactScreen from './AddContactScreen';
 import Header from '../../components/Header';
 import { memo } from 'react';
-import { startCall } from '../../utils/start-call';
 import { TEXT_PRIMARY } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
-import type { Contact } from '../../../../shared/types/contacts';
+import ContactRow from './ContactRow';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const CONTACTS_VIEW = {
@@ -44,36 +43,6 @@ function ContactsScreen() {
     );
   }
 
-  const renderContact = ({ item }: { item: Contact }) => (
-    <Pressable
-      style={({ pressed }) => [
-        styles.contactRow,
-        pressed && styles.contactRowPressed,
-        !item.hasMobileDevice && styles.contactRowDisabled,
-      ]}
-      disabled={!item.hasMobileDevice}
-      onPress={() =>
-        startCall({
-          contactId: item.id,
-          contactEmail: item.email,
-          contactName: item.name,
-        })
-      }
-    >
-      <View style={styles.contactInfo}>
-        <Text
-          style={[
-            styles.contactName,
-            !item.hasMobileDevice && styles.contactTextDisabled,
-          ]}
-        >
-          {item.name ?? item.email}
-        </Text>
-        {item.name && <Text style={styles.contactEmail}>{item.email}</Text>}
-      </View>
-    </Pressable>
-  );
-
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header
@@ -91,16 +60,17 @@ function ContactsScreen() {
       {isLoading && <ActivityIndicator style={styles.loader} color="#94a3b8" />}
 
       {!isLoading && contacts.length === 0 && (
-        <Text style={styles.empty}>no contacts yet</Text>
+        <Text style={styles.empty}>No contacts yet</Text>
       )}
 
-      <FlatList
-        data={contacts}
-        keyExtractor={contact => contact.id}
-        renderItem={renderContact}
-        contentContainerStyle={styles.list}
-        ItemSeparatorComponent={ContactSeparator}
-      />
+      <ScrollView contentContainerStyle={styles.list}>
+        {contacts.map((contact, index) => (
+          <View key={contact.id}>
+            {index > 0 && <ContactSeparator />}
+            <ContactRow contact={contact} />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -122,39 +92,10 @@ const styles = StyleSheet.create({
   list: {
     paddingTop: 8,
   },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    gap: 14,
-  },
-  contactRowPressed: {
-    backgroundColor: '#f1f5f9',
-  },
-  contactInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  contactName: {
-    color: TEXT_PRIMARY,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  contactEmail: {
-    color: '#94a3b8',
-    fontSize: 13,
-  },
   separator: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#e2e8f0',
     marginLeft: 20,
-  },
-  contactRowDisabled: {
-    opacity: 0.38,
-  },
-  contactTextDisabled: {
-    color: '#94a3b8',
   },
 });
 
