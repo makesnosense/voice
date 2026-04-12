@@ -9,17 +9,18 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
-import { X, AlertCircle } from 'lucide-react-native';
-import { useContactsStore } from '../../../../stores/useContactsStore';
-import { useAuthStore } from '../../../../stores/useAuthStore';
-import { api } from '../../../../api';
-import { pressedStyle } from '../../../../styles/common';
-import { BORDER_MUTED, TEXT_MUTED } from '../../../../styles/colors';
-import type { RoomId } from '../../../../../../shared/types/core';
+import { X } from 'lucide-react-native';
+import { useContactsStore } from '../../../../../stores/useContactsStore';
+import { useAuthStore } from '../../../../../stores/useAuthStore';
+import { api } from '../../../../../api';
+import { pressedStyle } from '../../../../../styles/common';
+import { BORDER_MUTED, TEXT_MUTED } from '../../../../../styles/colors';
+import ContactRow from './ContactRow';
+import type { RoomId } from '../../../../../../../shared/types/core';
 import type {
   Contact,
   InvitedContact,
-} from '../../../../../../shared/types/contacts';
+} from '../../../../../../../shared/types/contacts';
 
 interface InviteModalProps {
   roomId: RoomId;
@@ -96,33 +97,6 @@ export default function InviteModal({
     }
   };
 
-  const renderContact = (contact: Contact) => (
-    <Pressable
-      style={({ pressed }) => [
-        styles.contactRow,
-        pressed && pressedStyle,
-        invitedUserId !== null && styles.contactRowDisabled,
-      ]}
-      onPress={() => handleInvite(contact)}
-      disabled={invitedUserId !== null}
-    >
-      <View style={styles.contactInfo}>
-        <Text style={styles.contactName} numberOfLines={1}>
-          {contact.name ?? contact.email}
-        </Text>
-        {contact.name && (
-          <Text style={styles.contactEmail} numberOfLines={1}>
-            {contact.email}
-          </Text>
-        )}
-      </View>
-      {invitedUserId === contact.id && (
-        <ActivityIndicator size="small" color="#94a3b8" />
-      )}
-      {errorId === contact.id && <AlertCircle size={16} color="#ef4444" />}
-    </Pressable>
-  );
-
   return (
     <Modal transparent animationType="none" onRequestClose={handleClose}>
       <View style={styles.container}>
@@ -162,7 +136,13 @@ export default function InviteModal({
               {mobileContacts.map((contact, index) => (
                 <View key={contact.id}>
                   {index > 0 && <ContactSeparator />}
-                  {renderContact(contact)}
+                  <ContactRow
+                    contact={contact}
+                    isInvited={invitedUserId === contact.id}
+                    hasError={errorId === contact.id}
+                    disabled={invitedUserId !== null}
+                    onInvite={handleInvite}
+                  />
                 </View>
               ))}
             </ScrollView>
@@ -216,29 +196,6 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingTop: 4,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    height: 56,
-    gap: 12,
-  },
-  contactRowDisabled: {
-    opacity: 0.5,
-  },
-  contactInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  contactName: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#1e293b',
-  },
-  contactEmail: {
-    fontSize: 12,
-    color: TEXT_MUTED,
   },
   separator: {
     height: StyleSheet.hairlineWidth,
