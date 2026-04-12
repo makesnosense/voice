@@ -5,3 +5,5 @@ export interface Contact {
   addedAt: string;
   hasMobileDevice: boolean;
 }
+
+export type InvitedContact = Pick<Contact, 'email' | 'name'>;
