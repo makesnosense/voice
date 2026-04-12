@@ -51,6 +51,10 @@ function ContactsScreen() {
     );
   }
 
+  const sortedContacts = [...contacts].sort(
+    (a, b) => Number(b.hasMobileDevice) - Number(a.hasMobileDevice),
+  );
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header
@@ -78,7 +82,7 @@ function ContactsScreen() {
           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
         }
       >
-        {contacts.map((contact, index) => (
+        {sortedContacts.map((contact, index) => (
           <View key={contact.id}>
             {index > 0 && <ContactSeparator />}
             <ContactRow contact={contact} />
