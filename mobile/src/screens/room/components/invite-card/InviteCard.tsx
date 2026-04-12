@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Text, Pressable, StyleSheet } from 'react-native';
-import { BORDER_MUTED, TEXT_MUTED } from '../../styles/colors';
-import { pressedStyle } from '../../styles/common';
+import { BORDER_MUTED, TEXT_MUTED } from '../../../../styles/colors';
+import { pressedStyle } from '../../../../styles/common';
 import InviteModal from './InviteModal';
 import PhonePlus from './PhonePlus';
-import type { InvitedContact } from '../../../../shared/types/contacts';
-import type { RoomId } from '../../../../shared/types/core';
+import type { InvitedContact } from '../../../../../../shared/types/contacts';
+import type { RoomId } from '../../../../../../shared/types/core';
 
 interface InviteCardProps {
   roomId: RoomId;

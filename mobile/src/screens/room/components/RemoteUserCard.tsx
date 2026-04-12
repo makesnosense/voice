@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { MicOff, Mic } from 'lucide-react-native';
-import { useRoomStore } from '../../../../shared/stores/useRoomStore';
-import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
-import { WEBRTC_CONNECTION_STATE } from '../../../../shared/constants/webrtc';
+import { useRoomStore } from '../../../../../shared/stores/useRoomStore';
+import { useWebRTCStore } from '../../../../../shared/stores/useWebRTCStore';
+import { WEBRTC_CONNECTION_STATE } from '../../../../../shared/constants/webrtc';
 
 const CONNECTION_DOT_COLOR: Record<string, string> = {
   [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: '#94a3b8',

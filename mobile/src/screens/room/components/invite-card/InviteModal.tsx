@@ -10,16 +10,16 @@ import {
   Animated,
 } from 'react-native';
 import { X, AlertCircle } from 'lucide-react-native';
-import { useContactsStore } from '../../stores/useContactsStore';
-import { useAuthStore } from '../../stores/useAuthStore';
-import { api } from '../../api';
-import { pressedStyle } from '../../styles/common';
-import { BORDER_MUTED, TEXT_MUTED } from '../../styles/colors';
-import type { RoomId } from '../../../../shared/types/core';
+import { useContactsStore } from '../../../../stores/useContactsStore';
+import { useAuthStore } from '../../../../stores/useAuthStore';
+import { api } from '../../../../api';
+import { pressedStyle } from '../../../../styles/common';
+import { BORDER_MUTED, TEXT_MUTED } from '../../../../styles/colors';
+import type { RoomId } from '../../../../../../shared/types/core';
 import type {
   Contact,
   InvitedContact,
-} from '../../../../shared/types/contacts';
+} from '../../../../../../shared/types/contacts';
 
 interface InviteModalProps {
   roomId: RoomId;

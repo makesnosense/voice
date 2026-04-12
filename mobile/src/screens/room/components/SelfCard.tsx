@@ -1,10 +1,10 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Mic, MicOff, PhoneOff, VolumeOff, Volume2 } from 'lucide-react-native';
-import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
+import { useWebRTCStore } from '../../../../../shared/stores/useWebRTCStore';
 import InCallManager from 'react-native-incall-manager';
 import { useState } from 'react';
-import { ACTIVE_COLOR, NEUTRAL_COLOR } from '../../styles/colors';
-import { pressedStyle } from '../../styles/common';
+import { ACTIVE_COLOR, NEUTRAL_COLOR } from '../../../styles/colors';
+import { pressedStyle } from '../../../styles/common';
 
 interface SelfCardProps {
   onLeave: () => void;

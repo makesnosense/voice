@@ -16,11 +16,11 @@ import {
   startCallForegroundService,
   stopCallForegroundService,
 } from '../../native/call-foreground-service';
-import SelfCard from './SelfCard';
-import CopyCard from './CopyCard';
-import RemoteUserCard from './RemoteUserCard';
-import CallingCard from './CallingCard';
-import InviteCard from './InviteCard';
+import SelfCard from './components/SelfCard';
+import CopyCard from './components/CopyCard';
+import RemoteUserCard from './components/RemoteUserCard';
+import CallingCard from './components/calling-card/CallingCard';
+import InviteCard from './components/invite-card/InviteCard';
 import type { InvitedContact } from '../../../../shared/types/contacts';
 import type { RoomId } from '../../../../shared/types/core';
 
