@@ -4,7 +4,7 @@ import {
   Text,
   Modal,
   Pressable,
-  FlatList,
+  ScrollView,
   ActivityIndicator,
   StyleSheet,
   Animated,
@@ -96,31 +96,30 @@ export default function InviteModal({
     }
   };
 
-  const renderContact = ({ item }: { item: Contact }) => (
+  const renderContact = (contact: Contact) => (
     <Pressable
       style={({ pressed }) => [
         styles.contactRow,
         pressed && pressedStyle,
         invitedUserId !== null && styles.contactRowDisabled,
       ]}
-      onPress={() => handleInvite(item)}
+      onPress={() => handleInvite(contact)}
       disabled={invitedUserId !== null}
     >
       <View style={styles.contactInfo}>
         <Text style={styles.contactName} numberOfLines={1}>
-          {item.name ?? item.email}
+          {contact.name ?? contact.email}
         </Text>
-        {item.name && (
+        {contact.name && (
           <Text style={styles.contactEmail} numberOfLines={1}>
-            {item.email}
+            {contact.email}
           </Text>
         )}
       </View>
-
-      {invitedUserId === item.id && (
+      {invitedUserId === contact.id && (
         <ActivityIndicator size="small" color="#94a3b8" />
       )}
-      {errorId === item.id && <AlertCircle size={16} color="#ef4444" />}
+      {errorId === contact.id && <AlertCircle size={16} color="#ef4444" />}
     </Pressable>
   );
 
@@ -159,13 +158,14 @@ export default function InviteModal({
           ) : mobileContacts.length === 0 ? (
             <Text style={styles.empty}>no contacts with the app installed</Text>
           ) : (
-            <FlatList
-              data={mobileContacts}
-              keyExtractor={contact => contact.id}
-              renderItem={renderContact}
-              ItemSeparatorComponent={ContactSeparator}
-              contentContainerStyle={styles.list}
-            />
+            <ScrollView contentContainerStyle={styles.list}>
+              {mobileContacts.map((contact, index) => (
+                <View key={contact.id}>
+                  {index > 0 && <ContactSeparator />}
+                  {renderContact(contact)}
+                </View>
+              ))}
+            </ScrollView>
           )}
         </Animated.View>
       </View>
