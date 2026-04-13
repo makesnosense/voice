@@ -1,12 +1,12 @@
 .container {
   width: min(100%, 420px);
   gap: 0;
-  padding: 4px 6px;
+  padding: 8px 8px 6px;
   overflow: hidden;
 }
 
 .headerRow {
-  padding: 12px 8px 8px;
+  padding: 2px 8px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
