@@ -8,10 +8,10 @@ SCOPE=("client" "shared")
 # join with | for grep
 SCOPE_PATTERN=$(IFS='+'; echo "${SCOPE[*]}")
 SCOPE_GREP=$(IFS='|'; echo "${SCOPE[*]}")
-OUTPUT_FILE="${SCOPE_PATTERN:+${SCOPE_PATTERN}_}context.txt"
+OUTPUT_FILENAME="${SCOPE_PATTERN:+${SCOPE_PATTERN}_}context.txt"
 
-SCRIPT_DIR="$(dirname "$0")"
-PROJECT_ROOT="$SCRIPT_DIR/.."
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_ROOT"
 
@@ -41,6 +41,6 @@ filtered_files() {
   filtered_files \
     | sort \
     | xargs -I{} sh -c 'echo "=== {} ===" && cat "{}"'
-} > "$OUTPUT_FILE"
+} > "${PROJECT_ROOT}/${OUTPUT_FILENAME}"
 
-echo "✅ Done: $OUTPUT_FILE ($(wc -l < "$OUTPUT_FILE" | tr -d ' ') lines)"
+echo "✅ Done: $OUTPUT_FILENAME ($(wc -l < "${PROJECT_ROOT}/${OUTPUT_FILENAME}" | tr -d ' ') lines)"
