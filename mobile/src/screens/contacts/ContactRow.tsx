@@ -1,5 +1,12 @@
-import { memo } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useState, memo } from 'react';
+import {
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
+import { Trash2 } from 'lucide-react-native';
 import { startCall } from '../../utils/start-call';
 import { TEXT_PRIMARY } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
@@ -7,17 +14,34 @@ import type { Contact } from '../../../../shared/types/contacts';
 
 interface ContactRowProps {
   contact: Contact;
+  onRemove?: () => Promise<void>;
 }
 
-function ContactRow({ contact }: ContactRowProps) {
+function ContactRow({ contact, onRemove }: ContactRowProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleRemove = async () => {
+    if (isDeleting || !onRemove) return;
+    setIsDeleting(true);
+    try {
+      await onRemove();
+    } catch {
+      setIsDeleting(false);
+    }
+  };
+
+  const isRemoveModeActive = onRemove !== undefined;
+
   return (
     <Pressable
       style={({ pressed }) => [
         styles.contactRow,
-        pressed && pressedStyle,
-        !contact.hasMobileDevice && styles.contactRowDisabled,
+        !isRemoveModeActive && pressed && pressedStyle,
+        !isRemoveModeActive &&
+          !contact.hasMobileDevice &&
+          styles.contactRowDisabled,
       ]}
-      disabled={!contact.hasMobileDevice}
+      disabled={isRemoveModeActive || !contact.hasMobileDevice}
       onPress={() =>
         startCall({
           contactId: contact.id,
@@ -30,15 +54,37 @@ function ContactRow({ contact }: ContactRowProps) {
         <Text
           style={[
             styles.contactName,
-            !contact.hasMobileDevice && styles.contactTextDisabled,
+            !isRemoveModeActive &&
+              !contact.hasMobileDevice &&
+              styles.contactTextDisabled,
           ]}
         >
           {contact.name ?? contact.email}
         </Text>
         {contact.name && (
-          <Text style={styles.contactEmail}>{contact.email}</Text>
+          <Text style={styles.contactEmail} numberOfLines={1}>
+            {contact.email}
+          </Text>
         )}
       </View>
+
+      {isRemoveModeActive && (
+        <Pressable
+          onPress={handleRemove}
+          disabled={isDeleting}
+          style={({ pressed }) => [
+            styles.removeButton,
+            pressed && pressedStyle,
+          ]}
+          hitSlop={8}
+        >
+          {isDeleting ? (
+            <ActivityIndicator size="small" color="#94a3b8" />
+          ) : (
+            <Trash2 size={20} color="#ef4444" strokeWidth={1.75} />
+          )}
+        </Pressable>
+      )}
     </Pressable>
   );
 }
@@ -69,6 +115,11 @@ const styles = StyleSheet.create({
   },
   contactTextDisabled: {
     color: '#94a3b8',
+  },
+  removeButton: {
+    width: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { UserPlus } from 'lucide-react-native';
+import { UserPlus, UserMinus } from 'lucide-react-native';
 import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import AddContactScreen from './AddContactScreen';
@@ -32,9 +32,11 @@ const ContactSeparator = () => <View style={styles.separator} />;
 function ContactsScreen() {
   const insets = useSafeAreaInsets();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
+  const [isRemoveModeActive, setRemoveModeActive] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const { contacts, isLoading, fetchContacts, refresh } = useContactsStore();
+  const { contacts, isLoading, fetchContacts, refresh, removeContact } =
+    useContactsStore();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -61,6 +63,19 @@ function ContactsScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header
         title="Contacts"
+        leftSlot={
+          <Pressable
+            style={({ pressed }) => pressed && pressedStyle}
+            onPress={() => setRemoveModeActive(prev => !prev)}
+            hitSlop={8}
+          >
+            <UserMinus
+              size={22}
+              color={isRemoveModeActive ? '#ef4444' : TEXT_PRIMARY}
+              strokeWidth={1.75}
+            />
+          </Pressable>
+        }
         rightSlot={
           <Pressable
             style={({ pressed }) => pressed && pressedStyle}
@@ -87,7 +102,12 @@ function ContactsScreen() {
         {sortedContacts.map((contact, index) => (
           <View key={contact.id}>
             {index > 0 && <ContactSeparator />}
-            <ContactRow contact={contact} />
+            <ContactRow
+              contact={contact}
+              onRemove={
+                isRemoveModeActive ? () => removeContact(contact.id) : undefined
+              }
+            />
           </View>
         ))}
       </ScrollView>
