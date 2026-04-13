@@ -43,6 +43,7 @@ export default function Pill() {
   }, [openDropdown]);
 
   const handleUserToggle = () => {
+    if (isAuthSuccessDelayActive) setIsAuthSuccessDelayActive(false);
     setOpenDropdown(openDropdown === OPEN_DROPDOWN.USER ? null : OPEN_DROPDOWN.USER);
   };
 
