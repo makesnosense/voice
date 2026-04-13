@@ -14,6 +14,7 @@ import {
   BORDER_MUTED,
   BACKGROUND_PRIMARY,
   BACKGROUND_CARD,
+  STATUS_RED,
 } from '../../styles/colors';
 import type { ObjectValues } from '../../../../shared/types/core';
 
@@ -42,7 +43,7 @@ function SettingsScreen() {
           <View style={styles.accountRow}>
             <View style={styles.accountInfo}>
               <Text style={styles.email}>{user?.email}</Text>
-              <Text style={styles.hint}>logged in</Text>
+              <Text style={styles.hint}>Logged in</Text>
             </View>
             <Pressable
               style={({ pressed }) => [
@@ -52,8 +53,8 @@ function SettingsScreen() {
               onPress={logout}
               hitSlop={8}
             >
-              <LogOut size={16} color="#ef4444" strokeWidth={1.75} />
-              <Text style={styles.logoutLabel}>log out</Text>
+              <LogOut size={16} color={STATUS_RED} strokeWidth={1.75} />
+              <Text style={styles.logoutLabel}>Log out</Text>
             </Pressable>
           </View>
         </View>
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   logoutLabel: {
     fontSize: 11,
-    color: '#ef4444',
+    color: STATUS_RED,
   },
   menuCard: {
     backgroundColor: BACKGROUND_CARD,

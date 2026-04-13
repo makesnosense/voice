@@ -13,3 +13,7 @@ export const BACKGROUND_PRIMARY = '#ffffff';
 export const BACKGROUND_SECONDARY = '#fafafa'; // zinc-50
 export const BACKGROUND_CARD = '#f4f4f5'; // zinc-100
 export const BACKGROUND_NAV = 'rgba(255, 255, 255, 0.88)';
+
+export const STATUS_GREEN = '#22c55e';
+export const STATUS_YELLOW = '#fbbf24';
+export const STATUS_RED = '#ef4444';

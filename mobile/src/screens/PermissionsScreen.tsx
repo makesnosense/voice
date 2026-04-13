@@ -10,6 +10,8 @@ import {
   BACKGROUND_PRIMARY,
   BORDER_MUTED,
   NEUTRAL_COLOR,
+  STATUS_GREEN,
+  STATUS_RED,
   TEXT_MUTED,
   TEXT_PRIMARY,
   TEXT_SECONDARY,
@@ -33,14 +35,14 @@ export default function PermissionsScreen({
   const items = [
     {
       key: 'notifications',
-      icon: <Bell size={18} color="#64748b" strokeWidth={1.75} />,
+      icon: <Bell size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
       label: 'Notifications',
       description: 'required to receive incoming calls',
       status: notificationsPermission.status,
     },
     {
       key: 'microphone',
-      icon: <Mic size={18} color="#64748b" strokeWidth={1.75} />,
+      icon: <Mic size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
       label: 'Microphone',
       description: 'required for voice calls',
       status: microphonePermission.status,
@@ -169,10 +171,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusGranted: {
-    backgroundColor: '#22c55e',
+    backgroundColor: STATUS_GREEN,
   },
   statusDenied: {
-    backgroundColor: '#ef4444',
+    backgroundColor: STATUS_RED,
   },
   statusChecking: {
     backgroundColor: NEUTRAL_COLOR,

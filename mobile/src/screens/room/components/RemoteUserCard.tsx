@@ -8,13 +8,16 @@ import {
   TEXT_MUTED,
   BACKGROUND_PRIMARY,
   BORDER_SUBTLE,
+  STATUS_GREEN,
+  STATUS_YELLOW,
+  STATUS_RED,
 } from '../../../styles/colors';
 
 const CONNECTION_DOT_COLOR: Record<string, string> = {
   [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: TEXT_MUTED,
-  [WEBRTC_CONNECTION_STATE.CONNECTING]: '#fbbf24',
-  [WEBRTC_CONNECTION_STATE.CONNECTED]: '#22c55e',
-  [WEBRTC_CONNECTION_STATE.FAILED]: '#ef4444',
+  [WEBRTC_CONNECTION_STATE.CONNECTING]: STATUS_YELLOW,
+  [WEBRTC_CONNECTION_STATE.CONNECTED]: STATUS_GREEN,
+  [WEBRTC_CONNECTION_STATE.FAILED]: STATUS_RED,
 };
 
 export default function RemoteUserCard() {
@@ -31,9 +34,9 @@ export default function RemoteUserCard() {
       <Text style={styles.name}>Other</Text>
 
       {remoteUser?.isMuted ? (
-        <MicOff size={22} color="#ef4444" />
+        <MicOff size={22} color={STATUS_RED} />
       ) : (
-        <Mic size={22} color="#22c55e" />
+        <Mic size={22} color={STATUS_GREEN} />
       )}
 
       {webRTCConnectionState && (
