@@ -24,7 +24,7 @@
   gap: 5px;
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
   padding: 4px 6px;
@@ -32,10 +32,18 @@
   transition: color 0.2s ease;
 }
 
-.closeIcon {
-  font-size: 1rem;
+.closeButton:hover {
+  color: var(--text-secondary);
 }
 
-.closeButton:hover {
+[data-theme='dark'] .closeButton {
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .closeButton:hover {
   color: var(--text-primary);
+}
+
+.closeIcon {
+  font-size: 1rem;
 }
