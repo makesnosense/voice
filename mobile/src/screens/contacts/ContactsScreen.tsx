@@ -87,7 +87,9 @@ function ContactsScreen() {
         }
       />
 
-      {isLoading && <ActivityIndicator style={styles.loader} color="#94a3b8" />}
+      {isLoading && !isRefreshing && (
+        <ActivityIndicator style={styles.loader} color="#94a3b8" />
+      )}
 
       {!isLoading && contacts.length === 0 && (
         <Text style={styles.empty}>No contacts yet</Text>
