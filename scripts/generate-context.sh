@@ -7,6 +7,7 @@ SCOPE=("client" "shared")
 
 # join with | for grep
 SCOPE_PATTERN=$(IFS='+'; echo "${SCOPE[*]}")
+SCOPE_GREP=$(IFS='|'; echo "${SCOPE[*]}")
 OUTPUT_FILE="${SCOPE_PATTERN:+${SCOPE_PATTERN}_}context.txt"
 
 SCRIPT_DIR="$(dirname "$0")"
@@ -19,7 +20,7 @@ filtered_files() {
   git ls-files \
     | grep -E '\.(ts|tsx|js|jsx|css|md|json|kt|xml|yml|sh|sql)$|^Dockerfile$|mobile/android/(build\.gradle|gradle\.properties|settings\.gradle|gradlew(\.bat)?|app/build\.gradle|gradle/wrapper/gradle-wrapper\.(jar|properties))$' \
     | grep -Ev '(package-lock\.json|bun\.lock|gradle-wrapper\.jar)$|drizzle/meta/' \
-    | { [ -n "$SCOPE_PATTERN" ] && grep -E "^(${SCOPE_PATTERN})/" || cat; } \
+    | { [ -n "$SCOPE_GREP" ] && grep -E "^(${SCOPE_GREP})/" || cat; }
 }
 
 {
