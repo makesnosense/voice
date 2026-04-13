@@ -6,7 +6,15 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import Header from '../../components/Header';
 import DevicesScreen from './devices/DevicesScreen';
 import { pressedStyle } from '../../styles/common';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_MUTED,
+  NEUTRAL_COLOR,
+  BORDER_MUTED,
+  BACKGROUND_PRIMARY,
+  BACKGROUND_CARD,
+} from '../../styles/colors';
 import type { ObjectValues } from '../../../../shared/types/core';
 
 const SETTINGS_VIEW = {
@@ -58,9 +66,9 @@ function SettingsScreen() {
             ]}
             onPress={() => setView(SETTINGS_VIEW.DEVICES)}
           >
-            <Smartphone size={18} color="#64748b" strokeWidth={1.75} />
+            <Smartphone size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
             <Text style={styles.menuLabel}>Devices</Text>
-            <ChevronRight size={16} color="#cbd5e1" strokeWidth={1.75} />
+            <ChevronRight size={16} color={NEUTRAL_COLOR} strokeWidth={1.75} />
           </Pressable>
         </View>
       </View>
@@ -71,17 +79,17 @@ function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
   },
   content: {
     padding: 20,
     gap: 8,
   },
   card: {
-    backgroundColor: '#f4f4f5',
+    backgroundColor: BACKGROUND_CARD,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     padding: 16,
   },
   accountRow: {
@@ -99,7 +107,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 12,
-    color: '#57534e',
+    color: TEXT_MUTED,
   },
   logoutButton: {
     alignItems: 'center',
@@ -111,10 +119,10 @@ const styles = StyleSheet.create({
     color: '#ef4444',
   },
   menuCard: {
-    backgroundColor: '#f4f4f5',
+    backgroundColor: BACKGROUND_CARD,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     overflow: 'hidden',
   },
   menuRow: {
@@ -125,7 +133,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   menuRowPressed: {
-    backgroundColor: '#e4e4e7',
+    backgroundColor: BORDER_MUTED,
   },
   menuLabel: {
     flex: 1,

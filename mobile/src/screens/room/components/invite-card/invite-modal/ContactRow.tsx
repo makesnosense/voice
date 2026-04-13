@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
 import { pressedStyle } from '../../../../../styles/common';
-import { TEXT_MUTED } from '../../../../../styles/colors';
+import { TEXT_PRIMARY, TEXT_MUTED } from '../../../../../styles/colors';
 import type { Contact } from '../../../../../../../shared/types/contacts';
 
 interface ContactRowProps {
@@ -45,7 +45,7 @@ export default function ContactRow({
           </Text>
         )}
       </View>
-      {isInvited && <ActivityIndicator size="small" color="#94a3b8" />}
+      {isInvited && <ActivityIndicator size="small" color={TEXT_MUTED} />}
       {hasError && <AlertCircle size={16} color="#ef4444" />}
     </Pressable>
   );
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#1e293b',
+    color: TEXT_PRIMARY,
   },
   email: {
     fontSize: 12,

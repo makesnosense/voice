@@ -14,7 +14,13 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import { PLATFORM } from '../../../../shared/constants/platform';
 import Header from '../../components/Header';
 import HeaderBackButton from '../../components/HeaderBackButton';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_MUTED,
+  NEUTRAL_COLOR,
+  BACKGROUND_PRIMARY,
+  BACKGROUND_CARD,
+} from '../../styles/colors';
 
 interface AddContactScreenProps {
   onBack: () => void;
@@ -64,7 +70,7 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
             <TextInput
               style={[styles.input, error ? styles.inputError : null]}
               placeholder="Email address"
-              placeholderTextColor="#a1a1aa"
+              placeholderTextColor={TEXT_MUTED}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -92,7 +98,7 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
             disabled={isSubmitDisabled}
           >
             {isSubmitting ? (
-              <ActivityIndicator size="small" color="#ffffff" />
+              <ActivityIndicator size="small" color={BACKGROUND_PRIMARY} />
             ) : (
               <Text style={styles.buttonText}>Add</Text>
             )}
@@ -106,7 +112,7 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
   },
   container: {
     flex: 1,
@@ -116,10 +122,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    backgroundColor: '#f4f4f5',
+    backgroundColor: BACKGROUND_CARD,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     overflow: 'hidden',
   },
   input: {
@@ -138,7 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   button: {
-    backgroundColor: '#18181b',
+    backgroundColor: TEXT_PRIMARY,
     borderRadius: 10,
     padding: 14,
     alignItems: 'center',
@@ -151,7 +157,7 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   buttonText: {
-    color: '#ffffff',
+    color: BACKGROUND_PRIMARY,
     fontSize: 16,
     fontWeight: '500',
   },

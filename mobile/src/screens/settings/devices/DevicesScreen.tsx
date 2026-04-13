@@ -14,7 +14,14 @@ import { api } from '../../../api';
 import Header from '../../../components/Header';
 import DeviceRow from './DeviceRow';
 import HeaderBackButton from '../../../components/HeaderBackButton';
-import { TEXT_PRIMARY } from '../../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_MUTED,
+  NEUTRAL_COLOR,
+  BORDER_MUTED,
+  BACKGROUND_PRIMARY,
+  BACKGROUND_CARD,
+} from '../../../styles/colors';
 import { pressedStyle } from '../../../styles/common';
 import type { Device } from '../../../../../shared/types/devices';
 
@@ -38,7 +45,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
       const result = await api.devices.getDevices(accessToken);
       setDevices(result);
     } catch (error) {
-      console.error('❌ failed to fetch devices:', error);
+      console.error('❌ Failed to load devices:', error);
     } finally {
       setIsLoading(false);
     }
@@ -76,10 +83,10 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
         leftSlot={<HeaderBackButton onPress={onBack} />}
         rightSlot={
           <Pressable
-            onPress={() => setIsEditing(prev => !prev)}
-            hitSlop={12}
-            disabled={otherDevices.length === 0}
             style={({ pressed }) => pressed && pressedStyle}
+            onPress={() => setIsEditing(prev => !prev)}
+            disabled={otherDevices.length === 0}
+            hitSlop={12}
           >
             <Text
               style={[
@@ -94,7 +101,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
       />
 
       {isLoading ? (
-        <ActivityIndicator style={styles.loader} color="#94a3b8" />
+        <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
           {currentDevice && (
@@ -141,7 +148,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
   },
   editButton: {
     fontSize: 17,
@@ -160,17 +167,17 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#a1a1aa',
+    color: TEXT_MUTED,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     paddingHorizontal: 4,
     paddingBottom: 6,
   },
   card: {
-    backgroundColor: '#f4f4f5',
+    backgroundColor: BACKGROUND_CARD,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     overflow: 'hidden',
   },
   sectionGap: {
@@ -178,7 +185,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e4e4e7',
+    backgroundColor: BORDER_MUTED,
   },
 });
 

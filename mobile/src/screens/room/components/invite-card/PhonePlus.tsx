@@ -1,11 +1,12 @@
 import Svg, { Path } from 'react-native-svg';
+import { TEXT_MUTED } from '../../../../styles/colors';
 
 interface Props {
   size?: number;
   color?: string;
 }
 
-export default function PhonePlus({ size = 18, color = '#3b82f6' }: Props) {
+export default function PhonePlus({ size = 18, color = TEXT_MUTED }: Props) {
   return (
     <Svg
       width={size}

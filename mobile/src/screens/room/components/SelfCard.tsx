@@ -3,7 +3,14 @@ import { Mic, MicOff, PhoneOff, VolumeOff, Volume2 } from 'lucide-react-native';
 import { useWebRTCStore } from '../../../../../shared/stores/useWebRTCStore';
 import InCallManager from 'react-native-incall-manager';
 import { useState } from 'react';
-import { ACTIVE_COLOR, NEUTRAL_COLOR } from '../../../styles/colors';
+import {
+  ACTIVE_COLOR,
+  NEUTRAL_COLOR,
+  TEXT_PRIMARY,
+  TEXT_MUTED,
+  BACKGROUND_PRIMARY,
+  BORDER_SUBTLE,
+} from '../../../styles/colors';
 import { pressedStyle } from '../../../styles/common';
 
 interface SelfCardProps {
@@ -53,12 +60,12 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
             {isMutedLocal ? (
               <MicOff size={18} color="#ef4444" />
             ) : (
-              <Mic size={18} color="#52525b" />
+              <Mic size={18} color={ACTIVE_COLOR} />
             )}
           </Pressable>
         ) : (
           <View style={[styles.button, styles.buttonDisabled]}>
-            <MicOff size={18} color="#94a3b8" />
+            <MicOff size={18} color={TEXT_MUTED} />
           </View>
         )}
 
@@ -79,10 +86,10 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(226, 232, 240, 0.8)',
+    borderColor: BORDER_SUBTLE,
     padding: 20,
     alignItems: 'center',
     gap: 22,
@@ -90,7 +97,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1e293b',
+    color: TEXT_PRIMARY,
   },
   controls: {
     flexDirection: 'row',
@@ -111,7 +118,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(239, 68, 68, 0.3)',
   },
   buttonDisabled: {
-    borderColor: 'rgba(226, 232, 240, 0.8)',
+    borderColor: BORDER_SUBTLE,
     opacity: 0.4,
   },
 });

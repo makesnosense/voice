@@ -8,6 +8,7 @@ import NavigationBar, {
   HOME_TAB,
   type HomeTab,
 } from '../components/NavigationBar';
+import { BACKGROUND_PRIMARY } from '../styles/colors';
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<HomeTab>(HOME_TAB.CALLS);
@@ -38,7 +39,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: { flex: 1, backgroundColor: BACKGROUND_PRIMARY },
   content: { flex: 1 },
   hidden: { display: 'none' },
 });

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import { TEXT_PRIMARY, TEXT_SECONDARY } from '../../styles/colors';
 
 interface EmailStepProps {
   email: string;
@@ -49,7 +49,7 @@ export default function EmailStep({
         <TextInput
           style={styles.input}
           placeholder="Enter your email"
-          placeholderTextColor="#57534e"
+          placeholderTextColor={TEXT_SECONDARY}
           keyboardType="email-address"
           autoCapitalize="none"
           returnKeyType="send"

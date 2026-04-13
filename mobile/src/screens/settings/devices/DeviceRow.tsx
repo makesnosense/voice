@@ -7,7 +7,13 @@ import {
 } from 'react-native';
 import { Smartphone, Monitor, Trash2 } from 'lucide-react-native';
 import { pressedStyle } from '../../../styles/common';
-import { TEXT_PRIMARY } from '../../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_MUTED,
+  NEUTRAL_COLOR,
+  BACKGROUND_PRIMARY,
+} from '../../../styles/colors';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DeviceRowProps {
@@ -38,9 +44,9 @@ export default function DeviceRow({
 }: DeviceRowProps) {
   const icon =
     device.platform === 'web' ? (
-      <Monitor size={18} color="#64748b" strokeWidth={1.75} />
+      <Monitor size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
     ) : (
-      <Smartphone size={18} color="#64748b" strokeWidth={1.75} />
+      <Smartphone size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
     );
 
   return (
@@ -91,9 +97,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 9,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -110,7 +116,7 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: 12,
-    color: '#71717a',
+    color: TEXT_MUTED,
   },
   badge: {
     backgroundColor: '#E6F1FB',

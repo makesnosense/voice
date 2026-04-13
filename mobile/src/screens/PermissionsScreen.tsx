@@ -5,7 +5,15 @@ import { Bell, Mic } from 'lucide-react-native';
 import type { AppPermissions } from '../hooks/useAppPermissions.types';
 import { PERMISSION_STATUS } from '../hooks/useAppPermissions.types';
 import { pressedStyle } from '../styles/common';
-import { TEXT_PRIMARY } from '../styles/colors';
+import {
+  BACKGROUND_CARD,
+  BACKGROUND_PRIMARY,
+  BORDER_MUTED,
+  NEUTRAL_COLOR,
+  TEXT_MUTED,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+} from '../styles/colors';
 
 interface PermissionsScreenProps {
   permissions: AppPermissions;
@@ -91,11 +99,10 @@ export default function PermissionsScreen({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
     justifyContent: 'center',
   },
   content: {
@@ -114,26 +121,26 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#57534e',
+    color: TEXT_SECONDARY,
   },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#a1a1aa',
+    color: TEXT_MUTED,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     paddingBottom: 6,
   },
   card: {
-    backgroundColor: '#f4f4f5',
+    backgroundColor: BACKGROUND_CARD,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     overflow: 'hidden',
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e4e4e7',
+    backgroundColor: BORDER_MUTED,
     marginLeft: 46,
   },
   row: {
@@ -154,7 +161,7 @@ const styles = StyleSheet.create({
   },
   rowDescription: {
     fontSize: 12,
-    color: '#71717a',
+    color: TEXT_SECONDARY,
   },
   statusDot: {
     width: 8,
@@ -168,23 +175,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#ef4444',
   },
   statusChecking: {
-    backgroundColor: '#d4d4d8',
+    backgroundColor: NEUTRAL_COLOR,
   },
   button: {
-    backgroundColor: '#18181b',
+    backgroundColor: TEXT_PRIMARY,
     borderRadius: 10,
     padding: 14,
     alignItems: 'center',
     marginTop: 4,
   },
   buttonText: {
-    color: '#ffffff',
+    color: BACKGROUND_PRIMARY,
     fontSize: 16,
     fontWeight: '500',
   },
   hint: {
     fontSize: 12,
-    color: '#a1a1aa',
+    color: TEXT_MUTED,
     textAlign: 'center',
     lineHeight: 18,
   },

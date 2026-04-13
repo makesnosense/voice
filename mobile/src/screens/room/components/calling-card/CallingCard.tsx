@@ -2,7 +2,11 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneOff } from 'lucide-react-native';
 import { pressedStyle } from '../../../../styles/common';
 import CallingDots from './CallingDots';
-import { BORDER_MUTED } from '../../../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  BORDER_MUTED,
+  BACKGROUND_PRIMARY,
+} from '../../../../styles/colors';
 
 interface CallingCardProps {
   contactName: string | null;
@@ -47,7 +51,7 @@ export default function CallingCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: BORDER_MUTED,
@@ -64,23 +68,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1e293b',
+    color: TEXT_PRIMARY,
   },
   declinedLabel: {
     fontSize: 16,
     color: '#ef4444',
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    gap: 5,
-    alignItems: 'center',
-    height: 20,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#94a3b8',
   },
   cancelButton: {
     padding: 18,

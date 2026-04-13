@@ -3,9 +3,15 @@ import { MicOff, Mic } from 'lucide-react-native';
 import { useRoomStore } from '../../../../../shared/stores/useRoomStore';
 import { useWebRTCStore } from '../../../../../shared/stores/useWebRTCStore';
 import { WEBRTC_CONNECTION_STATE } from '../../../../../shared/constants/webrtc';
+import {
+  TEXT_PRIMARY,
+  TEXT_MUTED,
+  BACKGROUND_PRIMARY,
+  BORDER_SUBTLE,
+} from '../../../styles/colors';
 
 const CONNECTION_DOT_COLOR: Record<string, string> = {
-  [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: '#94a3b8',
+  [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: TEXT_MUTED,
   [WEBRTC_CONNECTION_STATE.CONNECTING]: '#fbbf24',
   [WEBRTC_CONNECTION_STATE.CONNECTED]: '#22c55e',
   [WEBRTC_CONNECTION_STATE.FAILED]: '#ef4444',
@@ -47,10 +53,10 @@ export default function RemoteUserCard() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(226, 232, 240, 0.8)',
+    borderColor: BORDER_SUBTLE,
     padding: 28,
     alignItems: 'center',
     gap: 26,
@@ -58,7 +64,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1e293b',
+    color: TEXT_PRIMARY,
   },
   connectionStatus: {
     alignItems: 'center',
@@ -71,7 +77,7 @@ const styles = StyleSheet.create({
   },
   connectionLabel: {
     fontSize: 11,
-    color: '#94a3b8',
+    color: TEXT_MUTED,
     includeFontPadding: false,
   },
 });

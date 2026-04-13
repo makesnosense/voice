@@ -15,7 +15,12 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import AddContactScreen from './AddContactScreen';
 import Header from '../../components/Header';
 import ContactRow from './ContactRow';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_MUTED,
+  BORDER_MUTED,
+  BACKGROUND_PRIMARY,
+} from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
 import { sortContactsWithMobileFirst } from '../../../../shared/utils/sort-contacts';
 import type { ObjectValues } from '../../../../shared/types/core';
@@ -87,8 +92,8 @@ function ContactsScreen() {
         }
       />
 
-      {isLoading && !isRefreshing && (
-        <ActivityIndicator style={styles.loader} color="#94a3b8" />
+      {isLoading && (
+        <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       )}
 
       {!isLoading && contacts.length === 0 && (
@@ -120,7 +125,7 @@ function ContactsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
   },
   loader: {
     marginTop: 48,
@@ -128,7 +133,7 @@ const styles = StyleSheet.create({
   empty: {
     textAlign: 'center',
     marginTop: 80,
-    color: '#94a3b8',
+    color: TEXT_MUTED,
     fontSize: 15,
   },
   list: {
@@ -136,7 +141,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: BORDER_MUTED,
     marginLeft: 20,
   },
 });

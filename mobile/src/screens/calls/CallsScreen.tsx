@@ -15,7 +15,11 @@ import CallRow from './CallRow';
 import RejoinCard from './RejoinCard';
 import Header from '../../components/Header';
 import CreateRoomButton from '../../components/CreateRoomButton';
-import { TEXT_MUTED } from '../../styles/colors';
+import {
+  TEXT_MUTED,
+  BORDER_MUTED,
+  BACKGROUND_PRIMARY,
+} from '../../styles/colors';
 
 function CallsScreen() {
   const insets = useSafeAreaInsets();
@@ -47,7 +51,7 @@ function CallsScreen() {
       <RejoinCard />
 
       {isLoading && history.length === 0 && (
-        <ActivityIndicator style={styles.loader} color="#94a3b8" />
+        <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       )}
 
       <ScrollView
@@ -84,7 +88,7 @@ function CallsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: BACKGROUND_PRIMARY,
   },
   loader: {
     marginTop: 48,
@@ -98,7 +102,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: BORDER_MUTED,
     marginLeft: 58,
   },
   empty: {

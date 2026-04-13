@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
 import { startCall } from '../../utils/start-call';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import { TEXT_PRIMARY, TEXT_MUTED } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
 import type { Contact } from '../../../../shared/types/contacts';
 
@@ -79,7 +79,7 @@ function ContactRow({ contact, onRemove }: ContactRowProps) {
           hitSlop={8}
         >
           {isDeleting ? (
-            <ActivityIndicator size="small" color="#94a3b8" />
+            <ActivityIndicator size="small" color={TEXT_MUTED} />
           ) : (
             <Trash2 size={20} color="#ef4444" strokeWidth={1.75} />
           )}
@@ -107,14 +107,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   contactEmail: {
-    color: '#94a3b8',
+    color: TEXT_MUTED,
     fontSize: 13,
   },
   contactRowDisabled: {
     opacity: 0.38,
   },
   contactTextDisabled: {
-    color: '#94a3b8',
+    color: TEXT_MUTED,
   },
   removeButton: {
     width: 36,

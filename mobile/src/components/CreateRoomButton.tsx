@@ -7,6 +7,7 @@ import {
   TEXT_PRIMARY,
   BORDER_PRIMARY,
   NEUTRAL_COLOR,
+  TEXT_MUTED,
 } from '../styles/colors';
 import type { StyleProp, ViewStyle } from 'react-native';
 
@@ -20,6 +21,7 @@ export default function CreateRoomButton({
   style,
 }: CreateRoomButtonProps) {
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+
   const handleCreateRoom = async () => {
     if (isCreatingRoom) return;
     setIsCreatingRoom(true);
@@ -44,7 +46,7 @@ export default function CreateRoomButton({
       ]}
     >
       {isCreatingRoom ? (
-        <ActivityIndicator size="small" color="#94a3b8" />
+        <ActivityIndicator size="small" color={TEXT_MUTED} />
       ) : (
         <Text
           style={[

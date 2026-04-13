@@ -3,7 +3,13 @@ import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Users, Phone, Settings } from 'lucide-react-native';
 import { pressedStyle } from '../styles/common';
-import { TEXT_PRIMARY } from '../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_MUTED,
+  BORDER_MUTED,
+  BACKGROUND_NAV,
+  BACKGROUND_SECONDARY,
+} from '../styles/colors';
 import type { ObjectValues } from '../../../shared/types/core';
 
 export const HOME_TAB = {
@@ -48,7 +54,7 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom || 16 }]}>
       {TABS.map(({ key, label, icon: Icon }, i) => {
-        const isActive = activeTab === key;
+        const isActive = key === activeTab;
         return (
           <Pressable
             key={key}
@@ -63,7 +69,7 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
             />
             <Icon
               size={24}
-              color={isActive ? TEXT_PRIMARY : '#94a3b8'}
+              color={isActive ? TEXT_PRIMARY : TEXT_MUTED}
               strokeWidth={isActive ? 2 : 1.75}
             />
             <Text style={[styles.label, isActive && styles.labelActive]}>
@@ -81,8 +87,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: 10,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e2e8f0',
-    backgroundColor: 'rgba(255, 255, 255, 0.88)',
+    borderTopColor: BORDER_MUTED,
+    backgroundColor: BACKGROUND_NAV,
   },
   tab: {
     flex: 1,
@@ -98,11 +104,11 @@ const styles = StyleSheet.create({
     width: INDICATOR_WIDTH,
     height: 58,
     borderRadius: 28,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: BACKGROUND_SECONDARY,
   },
   label: {
     fontSize: 11,
-    color: '#94a3b8',
+    color: TEXT_MUTED,
   },
   labelActive: {
     color: TEXT_PRIMARY,

@@ -8,7 +8,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  BACKGROUND_CARD,
+  NEUTRAL_COLOR,
+  TEXT_SECONDARY,
+  TEXT_MUTED,
+  BORDER_MUTED,
+} from '../../styles/colors';
 
 interface OtpStepProps {
   email: string;
@@ -81,7 +88,6 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -90,10 +96,10 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     gap: 16,
-    backgroundColor: '#f4f4f5',
+    backgroundColor: BACKGROUND_CARD,
     borderRadius: 16,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
+    borderColor: NEUTRAL_COLOR,
     padding: 24,
     alignItems: 'center',
   },
@@ -103,12 +109,12 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 16,
-    color: '#57534e',
+    color: TEXT_SECONDARY,
     textAlign: 'center',
   },
   email: {
     fontSize: 16,
-    color: '#57534e',
+    color: TEXT_SECONDARY,
     textAlign: 'center',
     fontWeight: '500',
   },
@@ -121,8 +127,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#a1a1aa',
-    backgroundColor: '#e4e4e7',
+    borderColor: TEXT_MUTED,
+    backgroundColor: BORDER_MUTED,
     color: TEXT_PRIMARY,
     fontSize: 16,
     textAlign: 'center',
@@ -139,17 +145,16 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d4d4d8',
-    backgroundColor: '#f4f4f5',
+    borderColor: NEUTRAL_COLOR,
+    backgroundColor: BACKGROUND_CARD,
     alignItems: 'center',
   },
   changeEmailPressed: {
-    backgroundColor: '#e4e4e7',
+    backgroundColor: BORDER_MUTED,
   },
   changeEmailText: {
     fontSize: 15,
-    color: '#57534e',
-    fontWeight: '500',
+    color: TEXT_PRIMARY,
   },
   errorCard: {
     width: '100%',

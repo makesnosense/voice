@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
-import { TEXT_PRIMARY } from '../styles/colors';
+import { TEXT_PRIMARY, BORDER_MUTED } from '../styles/colors';
 import type { ReactNode } from 'react';
 
 interface HeaderProps {
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: BORDER_MUTED,
   },
   title: {
     fontSize: 20,

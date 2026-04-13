@@ -1,7 +1,12 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneIncoming, PhoneOutgoing } from 'lucide-react-native';
 import { CALL_DIRECTION } from '../../../../shared/constants/calls';
-import { TEXT_PRIMARY } from '../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_MUTED,
+  BACKGROUND_CARD,
+} from '../../styles/colors';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 
 const formatDate = (createdAtIso: string) => {
@@ -41,9 +46,9 @@ export default function CallRow({ entry, onPress }: CallRowProps) {
     >
       <View style={styles.iconSlot}>
         {isOutgoing ? (
-          <PhoneOutgoing size={18} color="#64748b" strokeWidth={1.75} />
+          <PhoneOutgoing size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
         ) : (
-          <PhoneIncoming size={18} color="#64748b" strokeWidth={1.75} />
+          <PhoneIncoming size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
         )}
       </View>
       <View style={styles.info}>
@@ -82,21 +87,16 @@ const styles = StyleSheet.create({
   },
   direction: {
     fontSize: 13,
-    color: '#94a3b8',
+    color: TEXT_MUTED,
   },
   date: {
     fontSize: 13,
-    color: '#94a3b8',
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e2e8f0',
-    marginLeft: 58,
+    color: TEXT_MUTED,
   },
   rowDisabled: {
     opacity: 0.38,
   },
   rowPressed: {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: BACKGROUND_CARD,
   },
 });

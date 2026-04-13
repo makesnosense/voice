@@ -14,7 +14,11 @@ import { useContactsStore } from '../../../../../stores/useContactsStore';
 import { useAuthStore } from '../../../../../stores/useAuthStore';
 import { api } from '../../../../../api';
 import { pressedStyle } from '../../../../../styles/common';
-import { BORDER_MUTED, TEXT_MUTED } from '../../../../../styles/colors';
+import {
+  BORDER_MUTED,
+  TEXT_MUTED,
+  TEXT_PRIMARY,
+} from '../../../../../styles/colors';
 import ContactRow from './ContactRow';
 import type { RoomId } from '../../../../../../../shared/types/core';
 import type {
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1e293b',
+    color: TEXT_PRIMARY,
   },
   closeButton: {
     padding: 4,
