@@ -1,8 +1,14 @@
+// mobile/src/screens/calls/RejoinCard.tsx
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { PhoneCall } from 'lucide-react-native';
+import { PhoneCall, X } from 'lucide-react-native';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
 import { pressedStyle } from '../../styles/common';
+import {
+  BACKGROUND_PRIMARY,
+  NEUTRAL_COLOR,
+  TEXT_SECONDARY,
+} from '../../styles/colors';
 
 const GREEN = {
   BG: '#f0fdf4',
@@ -11,6 +17,9 @@ const GREEN = {
   TEXT: '#15803d',
   MUTED: '#4ade80',
 } as const;
+
+const dismissRejoinCard = () =>
+  useRejoinStore.setState({ lastRoomId: null, userCount: null });
 
 export default function RejoinCard() {
   const lastRoomId = useRejoinStore(state => state.lastRoomId);
@@ -35,6 +44,13 @@ export default function RejoinCard() {
         </Text>
         <Text style={styles.sublabel}>Tap to rejoin</Text>
       </View>
+      <Pressable
+        style={({ pressed }) => [styles.dismissButton, pressed && pressedStyle]}
+        onPress={dismissRejoinCard}
+      >
+        <X size={18} color={TEXT_SECONDARY} strokeWidth={1.5} />
+        <Text style={styles.dismissLabel}>Dismiss</Text>
+      </Pressable>
     </Pressable>
   );
 }
@@ -70,5 +86,21 @@ const styles = StyleSheet.create({
   sublabel: {
     fontSize: 13,
     color: GREEN.MUTED,
+  },
+  dismissButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: NEUTRAL_COLOR,
+    backgroundColor: BACKGROUND_PRIMARY,
+  },
+
+  dismissLabel: {
+    fontSize: 14,
+    color: TEXT_SECONDARY,
   },
 });
