@@ -67,6 +67,13 @@ export const inviteDeclineLimiter = createRateLimiter({
   message: { error: 'Too many requests, please try again shortly.' },
 });
 
+// user lookup by email — manual form submission only, enumeration surface
+export const userLookupByEmailLimiter = createRateLimiter({
+  windowMs: 15 * minuteMs,
+  max: 20,
+  message: { error: 'Too many lookup attempts, please try again later.' },
+});
+
 // TURN credential requests
 export const turnCredentialsLimiter = createRateLimiter({
   windowMs: 1 * minuteMs,

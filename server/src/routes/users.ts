@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
 import { findUserByEmail } from '../services/users';
 import { byEmailSchema } from '../schemas/users';
+import { userLookupByEmailLimiter } from '../middleware/api-rate-limiters';
 
 const router = Router();
 
-router.get('/', requireAccessToken, async (req, res) => {
+router.get('/', requireAccessToken, userLookupByEmailLimiter, async (req, res) => {
   const result = byEmailSchema.safeParse(req.query);
   if (!result.success) {
     return res.status(400).json({ error: 'invalid request', details: result.error.issues });
