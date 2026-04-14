@@ -48,7 +48,12 @@ export default function RejoinCard() {
         style={({ pressed }) => [styles.dismissButton, pressed && pressedStyle]}
         onPress={dismissRejoinCard}
       >
-        <X size={18} color={TEXT_SECONDARY} strokeWidth={1.5} />
+        <X
+          size={14}
+          color={TEXT_SECONDARY}
+          strokeWidth={1.5}
+          style={{ transform: [{ translateY: 0.2 }] }}
+        />
         <Text style={styles.dismissLabel}>Dismiss</Text>
       </Pressable>
     </Pressable>
@@ -90,17 +95,18 @@ const styles = StyleSheet.create({
   dismissButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    height: 40,
+    width: 80,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: NEUTRAL_COLOR,
     backgroundColor: BACKGROUND_PRIMARY,
   },
-
   dismissLabel: {
-    fontSize: 14,
+    fontSize: 11,
     color: TEXT_SECONDARY,
+    // includeFontPadding: false,
   },
 });
