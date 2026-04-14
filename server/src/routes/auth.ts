@@ -8,7 +8,11 @@ import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/aut
 import { OTP_EXPIRY_MS } from '../utils/otp';
 import { OtpVerificationResponse } from '../../../shared/types/auth';
 import { requireRefreshToken } from '../middleware/auth';
-import { otpRequestLimiter, otpVerificationLimiter } from '../middleware/api-rate-limiters';
+import {
+  otpRequestLimiter,
+  otpVerificationLimiter,
+  refreshLimiter,
+} from '../middleware/api-rate-limiters';
 
 const router = Router();
 
@@ -78,7 +82,7 @@ router.post('/verify-otp', otpVerificationLimiter, async (req, res) => {
   res.json(response);
 });
 
-router.post('/refresh', requireRefreshToken, async (req, res) => {
+router.post('/refresh', refreshLimiter, requireRefreshToken, async (req, res) => {
   // check if jti exists in database (not revoked)
   const [tokenRecord] = await db
     .select()

@@ -29,6 +29,15 @@ export const otpVerificationLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// token refresh — hits db on every call, no auth required
+export const refreshLimiter = rateLimit({
+  windowMs: 15 * minuteMs,
+  max: 50,
+  message: { error: 'Too many refresh attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // anonymous room creation
 export const roomCreationLimiter = rateLimit({
   windowMs: 5 * minuteMs,
