@@ -1,5 +1,3 @@
-import type { SocketId } from '../../../shared/types/core';
-
 interface RateLimitEntry {
   count: number;
   resetTime: number;
@@ -21,18 +19,14 @@ class SocketRateLimiter {
     5 * 60 * 1000
   );
 
-  private getKey(socketId: SocketId, event: string): string {
-    return `${socketId}:${event}`;
-  }
-
-  checkLimit(socketId: SocketId, event: string, maxRequests: number, windowMs: number): boolean {
-    const key = this.getKey(socketId, event);
+  checkLimit(key: string, event: string, maxRequests: number, windowMs: number): boolean {
+    const fullKey = `${key}:${event}`;
     const now = Date.now();
-    const entry = this.limits.get(key);
+    const entry = this.limits.get(fullKey);
 
     if (!entry || now > entry.resetTime) {
       // first request or window expired
-      this.limits.set(key, {
+      this.limits.set(fullKey, {
         count: 1,
         resetTime: now + windowMs,
       });
@@ -67,3 +61,5 @@ export const SOCKET_RATE_LIMITS = {
   'mute-status-changed': { max: 60, windowMs: 60 * 1000 },
   'webrtc-ready': { max: 10, windowMs: 60 * 1000 },
 } as const;
+
+export const SOCKET_CONNECTION_RATE_LIMIT = { max: 100, windowMs: 60 * 1000 };
