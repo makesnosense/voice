@@ -4,6 +4,14 @@ import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
 import { pressedStyle } from '../../styles/common';
 
+const GREEN = {
+  BG: '#f0fdf4',
+  BORDER: '#bbf7d0',
+  ICON: '#16a34a',
+  TEXT: '#15803d',
+  MUTED: '#4ade80',
+} as const;
+
 export default function RejoinCard() {
   const lastRoomId = useRejoinStore(state => state.lastRoomId);
   const userCount = useRejoinStore(state => state.userCount);
@@ -16,7 +24,7 @@ export default function RejoinCard() {
       onPress={() => useActiveRoomStore.setState({ activeRoomId: lastRoomId })}
     >
       <View style={styles.iconSlot}>
-        <PhoneCall size={18} color="#16a34a" strokeWidth={1.75} />
+        <PhoneCall size={18} color={GREEN.ICON} strokeWidth={1.75} />
       </View>
       <View style={styles.info}>
         <Text style={styles.label}>
@@ -40,10 +48,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: GREEN.BG,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#bbf7d0',
+    borderColor: GREEN.BORDER,
     gap: 14,
   },
   iconSlot: {
@@ -57,10 +65,10 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#15803d',
+    color: GREEN.TEXT,
   },
   sublabel: {
     fontSize: 13,
-    color: '#4ade80',
+    color: GREEN.MUTED,
   },
 });
