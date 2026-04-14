@@ -8,6 +8,7 @@ import { createCallsLogEntry } from '../services/calls';
 import { sendCallCancelledNotification } from '../utils/fcm';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import {
+  cancelInviteLimiter,
   inviteDeclineLimiter,
   inviteLimiter,
   roomCreationLimiter,
@@ -81,19 +82,24 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
     res.json({ alive: true, userCount: room.users.size });
   });
 
-  router.post('/:roomId/cancel-invite', requireAccessToken, async (req, res) => {
-    const roomId = req.params.roomId as RoomId;
-    const room = rooms.get(roomId);
+  router.post(
+    '/:roomId/cancel-invite',
+    requireAccessToken,
+    cancelInviteLimiter,
+    async (req, res) => {
+      const roomId = req.params.roomId as RoomId;
+      const room = rooms.get(roomId);
 
-    if (!room) return res.status(404).json({ error: 'room not found' });
+      if (!room) return res.status(404).json({ error: 'room not found' });
 
-    await Promise.allSettled(
-      room.pendingInviteFcmTokens.map((token) => sendCallCancelledNotification(token))
-    );
+      await Promise.allSettled(
+        room.pendingInviteFcmTokens.map((token) => sendCallCancelledNotification(token))
+      );
 
-    console.log(`🚫 [Rooms] call cancelled for room ${roomId}`);
-    res.status(204).end();
-  });
+      console.log(`🚫 [Rooms] call cancelled for room ${roomId}`);
+      res.status(204).end();
+    }
+  );
 
   return router;
 }

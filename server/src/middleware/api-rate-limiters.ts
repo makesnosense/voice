@@ -67,6 +67,13 @@ export const inviteDeclineLimiter = createRateLimiter({
   message: { error: 'Too many requests, please try again shortly.' },
 });
 
+// cancel-invite — fires FCM notifications, must be tightly bounded
+export const cancelInviteLimiter = createRateLimiter({
+  windowMs: 10 * minuteMs,
+  max: 30,
+  message: { error: 'Too many cancel requests, please try again in a few minutes.' },
+});
+
 // user lookup by email — manual form submission only, enumeration surface
 export const userLookupByEmailLimiter = createRateLimiter({
   windowMs: 15 * minuteMs,
