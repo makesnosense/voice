@@ -4,19 +4,8 @@ import { useWebRTCStore } from '../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../shared/constants/microphone';
 import { ROOM_CONNECTION_STATUS } from '../../../shared/constants/room';
+import { TURN_SERVER_CONFIG } from '../config';
 import type { TypedClientSocket } from '../../../shared/types/core';
-
-const TURN_SERVER_CONFIG = __DEV__
-  ? {
-      credentialsUrl: 'https://localhost:3003/api/turn-credentials',
-      host: 'voice.k.vu',
-      port: '3478',
-    }
-  : {
-      credentialsUrl: 'https://voice.k.vu/api/turn-credentials',
-      host: 'voice.k.vu',
-      port: '3478',
-    };
 
 export default function useWebRTCInit(
   socketRef: React.RefObject<TypedClientSocket | null>,
