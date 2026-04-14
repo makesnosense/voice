@@ -8,10 +8,11 @@ import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/aut
 import { OTP_EXPIRY_MS } from '../utils/otp';
 import { OtpVerificationResponse } from '../../../shared/types/auth';
 import { requireRefreshToken } from '../middleware/auth';
+import { otpRequestLimiter, otpVerificationLimiter } from '../middleware/api-rate-limiters';
 
 const router = Router();
 
-router.post('/request-otp', async (req, res) => {
+router.post('/request-otp', otpRequestLimiter, async (req, res) => {
   const result = requestOtpSchema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({ error: 'Invalid email' });
@@ -28,7 +29,7 @@ router.post('/request-otp', async (req, res) => {
   res.json({ success: true });
 });
 
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', otpVerificationLimiter, async (req, res) => {
   const result = verifyOtpSchema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({ error: 'Invalid email or code' });

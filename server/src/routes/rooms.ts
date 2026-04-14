@@ -7,16 +7,21 @@ import { callSchema } from '../schemas/calls';
 import { createCallsLogEntry } from '../services/calls';
 import { sendCallCancelledNotification } from '../utils/fcm';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
+import {
+  inviteDeclineLimiter,
+  inviteLimiter,
+  roomCreationLimiter,
+} from '../middleware/api-rate-limiters';
 
 export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedServer) {
   const router = Router();
 
-  router.post('/', (req, res) => {
+  router.post('/', roomCreationLimiter, (req, res) => {
     const roomId = createRoom(rooms);
     res.json({ roomId });
   });
 
-  router.post('/:roomId/invite', requireAccessToken, async (req, res) => {
+  router.post('/:roomId/invite', requireAccessToken, inviteLimiter, async (req, res) => {
     const roomId = req.params.roomId as RoomId;
 
     const result = callSchema.safeParse(req.body);
@@ -57,7 +62,7 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
     }
   });
 
-  router.post('/:roomId/decline', (req, res) => {
+  router.post('/:roomId/decline', inviteDeclineLimiter, (req, res) => {
     const roomId = req.params.roomId as RoomId;
 
     if (!rooms.has(roomId)) {

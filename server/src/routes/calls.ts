@@ -5,6 +5,7 @@ import { getUserMobileDevices } from '../services/devices';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/calls';
 import type { Room, RoomId } from '../../../shared/types/core';
+import { callInitiationLimiter } from '../middleware/api-rate-limiters';
 
 export default function createCallsRouter(rooms: Map<RoomId, Room>) {
   const router = Router();
@@ -19,7 +20,7 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
     }
   });
 
-  router.post('/', requireAccessToken, async (req, res) => {
+  router.post('/', requireAccessToken, callInitiationLimiter, async (req, res) => {
     const result = callSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: 'invalid request', details: result.error.issues });

@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { generateTurnCredentials } from '../utils/generators';
 import config from '../config';
+import { turnCredentialsLimiter } from '../middleware/api-rate-limiters';
 
 const router = Router();
 
-router.get('/', (req, res) => {
+router.get('/', turnCredentialsLimiter, (req, res) => {
   if (!config.turnSecret) {
     return res.status(500).json({ error: 'TURN server not configured' });
   }
