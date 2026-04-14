@@ -1,84 +1,75 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { type Options } from 'express-rate-limit';
+import config from '../config';
 
 const minuteMs = 60 * 1000;
 
+const createRateLimiter = (options: Partial<Options>) =>
+  rateLimit({
+    standardHeaders: true,
+    legacyHeaders: false,
+    ...options,
+    skip: () => !config.rateLimiting.enabled,
+  });
+
 // general fallback for all /api/ routes
-export const generalApiLimiter = rateLimit({
+export const generalApiLimiter = createRateLimiter({
   windowMs: 15 * minuteMs,
   max: 200,
   message: { error: 'Too many requests from this IP, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // otp email dispatch — primary spam vector
-export const otpRequestLimiter = rateLimit({
+export const otpRequestLimiter = createRateLimiter({
   windowMs: 60 * minuteMs,
   max: 20,
   message: { error: 'Too many code requests, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // otp verification — brute force surface
-export const otpVerificationLimiter = rateLimit({
+export const otpVerificationLimiter = createRateLimiter({
   windowMs: 30 * minuteMs,
   max: 20,
   message: { error: 'Too many verification attempts, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // token refresh — hits db on every call, no auth required
-export const refreshLimiter = rateLimit({
+export const refreshLimiter = createRateLimiter({
   windowMs: 15 * minuteMs,
   max: 50,
   message: { error: 'Too many refresh attempts, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // anonymous room creation
-export const roomCreationLimiter = rateLimit({
+export const roomCreationLimiter = createRateLimiter({
   windowMs: 5 * minuteMs,
   max: 20,
   message: { error: 'Too many room creation attempts, please try again in a few minutes.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // authenticated call initiation — creates room + fires FCM notification
-export const callInitiationLimiter = rateLimit({
+export const callInitiationLimiter = createRateLimiter({
   windowMs: 5 * minuteMs,
   max: 15,
   message: { error: 'Too many call attempts, please try again in a few minutes.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // invite to existing room — fires FCM notification
-export const inviteLimiter = rateLimit({
+export const inviteLimiter = createRateLimiter({
   windowMs: 5 * minuteMs,
   max: 20,
   message: { error: 'Too many invite attempts, please try again in a few minutes.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // unauthenticated call decline — prevents griefing via room id
-export const inviteDeclineLimiter = rateLimit({
+export const inviteDeclineLimiter = createRateLimiter({
   windowMs: 10 * minuteMs,
   max: 100,
   message: { error: 'Too many requests, please try again shortly.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // TURN credential requests
-export const turnCredentialsLimiter = rateLimit({
+export const turnCredentialsLimiter = createRateLimiter({
   windowMs: 1 * minuteMs,
   max: 30, // limit each IP to 30 requests per minute
   message: { error: 'Too many TURN credential requests, please try again shortly.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
