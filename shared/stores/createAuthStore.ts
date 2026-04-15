@@ -17,6 +17,7 @@ export interface AuthStore {
   getRefreshToken: () => Promise<string | null>;
   logout: () => Promise<void>;
   getValidAccessToken: () => Promise<string>;
+  updateName: (name: string | null) => Promise<void>;
 }
 
 export function createAuthStore(storage: TokenStorage, api: Api) {
@@ -137,6 +138,14 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
 
         renewalPromise = renewAccessToken(refreshToken);
         return renewalPromise;
+      },
+
+      updateName: async (name: string | null) => {
+        const accessToken = await get().getValidAccessToken();
+        const { accessToken: newAccessToken } = await api.users.updateName(name, accessToken);
+        const user = getUserFromJwt(newAccessToken);
+        if (!user) throw new Error('Invalid token payload');
+        set({ accessToken: newAccessToken, user });
       },
     };
   });
