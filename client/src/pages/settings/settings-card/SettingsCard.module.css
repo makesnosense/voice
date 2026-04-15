@@ -1,0 +1,50 @@
+.container {
+  width: min(100%, 420px);
+  gap: 0;
+  padding: 8px 8px 10px;
+}
+
+.header {
+  padding: 4px 8px 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.tab {
+  font-size: 14px;
+  padding: 6px 0;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text-secondary);
+}
+
+.tabActive {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0px;
+  height: 1.5px;
+  background: var(--text-primary);
+  border-radius: 1px;
+}
+
+.content {
+  padding: 14px 8px 4px;
+}

@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { LogOut, Users } from 'lucide-react';
+import { Settings, LogOut, Users } from 'lucide-react';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import userMenuStyles from './UserMenu.module.css';
@@ -9,17 +9,13 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ onClose }: UserMenuProps) {
-  const { user, logout } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   const handleLogout = () => {
     logout();
     onClose();
   };
-
-  // const handlePreferences = () => {
-  //   // TODO: implement user preferences modal
-  //   console.log('user preferences clicked');
-  // };
 
   return (
     <div className={`${userMenuStyles.dropdown} ${baseStyles.card}`}>
@@ -30,10 +26,14 @@ export default function UserMenu({ onClose }: UserMenuProps) {
       <div className={userMenuStyles.divider} />
 
       <div className={userMenuStyles.actions}>
-        {/* <button className={userMenuStyles.menuButton} onClick={handlePreferences}>
+        <Link
+          to="/settings"
+          className={`${userMenuStyles.menuButton} ${userMenuStyles.menuLink}`}
+          onClick={onClose}
+        >
           <Settings size={16} />
           <span>Settings</span>
-        </button> */}
+        </Link>
 
         <Link
           to="/contacts"
