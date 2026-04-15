@@ -1,8 +1,8 @@
 import { db } from '../db';
-import { otpCodes, refreshTokens } from '../db/schema';
+import { otpCodes } from '../db/schema';
 import { lt, sql } from 'drizzle-orm';
 
-export default class AuthCleanupManager {
+export default class CleanupManager {
   private intervalId: NodeJS.Timeout | null = null;
   private checkIntervalMs = 60 * 60 * 1000; // 1 hour
 
@@ -11,7 +11,7 @@ export default class AuthCleanupManager {
       this.performCleanup();
     }, this.checkIntervalMs);
 
-    console.log('🧹 Auth cleanup manager started');
+    console.log('🧹 Cleanup manager started');
   }
 
   private async performCleanup(): Promise<void> {
@@ -25,6 +25,12 @@ export default class AuthCleanupManager {
       await this.cleanOldRefreshTokens();
     } catch (error) {
       console.error('❌ Failed to clean old refresh tokens:', error);
+    }
+
+    try {
+      await this.cleanOldCalls();
+    } catch (error) {
+      console.error('❌ Failed to clean old calls:', error);
     }
   }
 
@@ -65,6 +71,37 @@ export default class AuthCleanupManager {
 
     if (deletedJtis.length > 0) {
       console.log(`🧹 Cleaned ${deletedJtis.length} old refresh tokens`);
+    }
+  }
+
+  private async cleanOldCalls(): Promise<void> {
+    const deleted = await db.execute(sql`
+               WITH users_with_excess AS (
+             SELECT from_user_id AS user_id
+               FROM calls
+           GROUP BY from_user_id
+             HAVING COUNT(*) > 20
+            ),
+                    ranked_calls AS (
+             SELECT id,
+                    ROW_NUMBER() OVER (PARTITION BY from_user_id
+                                           ORDER BY created_at DESC) 
+                                                 AS row_num
+               FROM calls
+              WHERE from_user_id IN (SELECT user_id FROM users_with_excess)
+            )
+
+        DELETE FROM calls
+              WHERE id 
+                 IN (SELECT id
+                       FROM ranked_calls
+                      WHERE row_num > 20
+                )
+      RETURNING id
+  `);
+
+    if (deleted.length > 0) {
+      console.log(`🧹 Cleaned ${deleted.length} old call records`);
     }
   }
 

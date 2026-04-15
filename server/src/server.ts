@@ -6,17 +6,17 @@ import { runMigrations } from './db';
 import RoomDestructionManager from './managers/room-destruction-manager';
 import config, { getProtocol } from './config';
 import type { Room, RoomId } from '../../shared/types/core';
-import AuthCleanupManager from './managers/auth-cleanup-manager';
+import CleanupManager from './managers/cleanup-manager';
 
 await runMigrations();
 console.log('🗄️  DB schema up to date');
 
 const rooms = new Map<RoomId, Room>();
 const roomDestructionManager = new RoomDestructionManager(rooms);
-const authCleanupManager = new AuthCleanupManager();
+const cleanupManager = new CleanupManager();
 
 roomDestructionManager.start();
-authCleanupManager.start();
+cleanupManager.start();
 
 const app = createApp(rooms);
 const server = createServer(app);
@@ -32,7 +32,7 @@ server.listen(config.port, config.host, () => {
 process.on('SIGTERM', () => {
   console.log('📴 SIGTERM received, shutting down gracefully');
   roomDestructionManager.stop();
-  authCleanupManager.stop();
+  cleanupManager.stop();
   server.close(() => {
     console.log('✅ Server closed');
     process.exit(0);
