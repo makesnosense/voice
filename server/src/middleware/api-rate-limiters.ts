@@ -81,6 +81,13 @@ export const userLookupByEmailLimiter = createRateLimiter({
   message: { error: 'Too many lookup attempts, please try again later.' },
 });
 
+// name update — db write, low risk
+export const updateNameLimiter = createRateLimiter({
+  windowMs: 60 * minuteMs,
+  max: 20,
+  message: { error: 'Too many update attempts, please try again later.' },
+});
+
 // TURN credential requests
 export const turnCredentialsLimiter = createRateLimiter({
   windowMs: 1 * minuteMs,

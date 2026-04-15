@@ -18,6 +18,17 @@ export function generateRefreshToken(userId: string): { token: string; jti: stri
   return { token, jti };
 }
 
+export function reissueAccessTokenWithUpdatedName(
+  originalToken: string,
+  newName: string | null
+): string {
+  const original = verifyAccessToken(originalToken);
+  return jwt.sign(
+    { userId: original.userId, email: original.email, name: newName, exp: original.exp },
+    JWT_SECRET
+  );
+}
+
 export function verifyAccessToken(token: string): AccessTokenPayload {
   return jwt.verify(token, JWT_SECRET) as AccessTokenPayload;
 }
