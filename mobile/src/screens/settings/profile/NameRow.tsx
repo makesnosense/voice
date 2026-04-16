@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { memo } from 'react';
-import { Check, X } from 'lucide-react-native';
+import { Check, X, SquarePen } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import { pressedStyle } from '../../../styles/common';
 import {
@@ -121,6 +121,7 @@ function NameRow({ cancelRef, onEditingChange }: NameRowProps) {
           >
             {user?.name ?? 'Your name'}
           </Text>
+          <SquarePen size={22} color={TEXT_MUTED} strokeWidth={1.75} />
         </Pressable>
       )}
 
@@ -160,7 +161,9 @@ const styles = StyleSheet.create({
   },
   displayRow: {
     flex: 1,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   nameDisplay: {
     fontSize: 18,
