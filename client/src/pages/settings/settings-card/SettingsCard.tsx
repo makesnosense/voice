@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import styles from './SettingsCard.module.css';
-// import GeneralTab from './general/GeneralTab';
-// import SessionsTab from './sessions/SessionsTab';
+import GeneralTab from './general-tab/GeneralTab';
+import SessionsTab from './sessions-tab/SessionsTab';
 import type { ObjectValues } from '../../../../../shared/types/core';
 
 const SETTINGS_TAB = {
@@ -36,7 +36,7 @@ export default function SettingsCard() {
       </div>
 
       <div className={styles.content}>
-        {/* {activeTab === SETTINGS_TAB.GENERAL ? <GeneralTab /> : <SessionsTab />} */}
+        {activeTab === SETTINGS_TAB.GENERAL ? <GeneralTab /> : <SessionsTab />}
       </div>
     </div>
   );

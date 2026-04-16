@@ -1,7 +1,7 @@
 .container {
   width: min(100%, 420px);
   gap: 0;
-  padding: 13px 8px 6px;
+  padding: 13px 8px 12px;
 }
 
 .header {
