@@ -4,10 +4,11 @@ import { useContactsStore } from '../../stores/useContactsStore';
 import baseStyles from '../../styles/BaseCard.module.css';
 import contactsCardStyles from './ContactsCard.module.css';
 import ContactRow from './contact-row/ContactRow';
-import { type Contact } from '../../../../shared/types/contacts';
+import RemoveButton from '../remove-button/RemoveButton';
 import InputBar from './input-bar/InputBar';
-import RemoveButton from './remove-button/RemoveButton';
 import { sortContactsWithMobileFirst } from '../../../../shared/utils/sort-contacts';
+import type { Contact } from '../../../../shared/types/contacts';
+
 const DISPLAY_LIMIT = 50;
 
 const getFilteredContacts = (
@@ -45,9 +46,10 @@ export default function ContactsCard({
   includeContactsWithoutMobile,
   showRemoveToggle,
 }: ContactsCardProps) {
-  const { contacts, isLoading, error } = useContactsStore();
+  const { contacts, isLoading, error, removeContact } = useContactsStore();
   const [isAdding, setIsAdding] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredContacts = sortContactsWithMobileFirst(
@@ -57,6 +59,15 @@ export default function ContactsCard({
   );
 
   const displayedContacts = filteredContacts.slice(0, DISPLAY_LIMIT);
+
+  const handleRemove = async (contactId: string) => {
+    setRemovingId(contactId);
+    try {
+      await removeContact(contactId);
+    } finally {
+      setRemovingId(null);
+    }
+  };
 
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${contactsCardStyles.container}`}>
@@ -113,7 +124,15 @@ export default function ContactsCard({
         <div className={contactsCardStyles.list}>
           {displayedContacts.map((contact) => (
             <ContactRow key={contact.id} contact={contact}>
-              {isRemoving ? <RemoveButton contactId={contact.id} /> : rowButtons?.(contact)}
+              {isRemoving ? (
+                <RemoveButton
+                  onClick={() => handleRemove(contact.id)}
+                  isRemoving={removingId === contact.id}
+                  title="Remove contact"
+                />
+              ) : (
+                rowButtons?.(contact)
+              )}
             </ContactRow>
           ))}
           {filteredContacts.length > DISPLAY_LIMIT && (
