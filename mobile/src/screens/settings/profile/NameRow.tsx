@@ -113,7 +113,12 @@ function NameRow({ cancelRef, onEditingChange }: NameRowProps) {
     <View style={styles.nameRow}>
       {mode === NAME_FIELD_MODE.IDLE && (
         <Pressable style={styles.displayRow} onPress={startEditing}>
-          <Text style={user?.name ? styles.nameText : styles.namePlaceholder}>
+          <Text
+            style={[
+              styles.nameDisplay,
+              { color: user?.name ? TEXT_PRIMARY : TEXT_MUTED },
+            ]}
+          >
             {user?.name ?? 'Your name'}
           </Text>
         </Pressable>
@@ -157,14 +162,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  nameText: {
+  nameDisplay: {
     fontSize: 18,
-    color: TEXT_PRIMARY,
-    includeFontPadding: false,
-  },
-  namePlaceholder: {
-    fontSize: 18,
-    color: TEXT_MUTED,
     includeFontPadding: false,
   },
   editRow: {
