@@ -1,11 +1,11 @@
 .container {
   width: min(100%, 420px);
   gap: 0;
-  padding: 8px 8px 10px;
+  padding: 13px 8px 6px;
 }
 
 .header {
-  padding: 4px 8px 0;
+  padding: 2px 8px 8px;
 }
 
 .tabs {
