@@ -1,10 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { memo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LogOut, Smartphone, ChevronRight } from 'lucide-react-native';
+import { LogOut, Smartphone, ChevronRight, User } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
 import Header from '../../components/Header';
 import DevicesScreen from './devices/DevicesScreen';
+import ProfileScreen from './profile/ProfileScreen';
 import { pressedStyle } from '../../styles/common';
 import {
   TEXT_PRIMARY,
@@ -20,6 +21,7 @@ import type { ObjectValues } from '../../../../shared/types/core';
 
 const SETTINGS_VIEW = {
   MAIN: 'main',
+  PROFILE: 'profile',
   DEVICES: 'devices',
 } as const;
 
@@ -29,6 +31,10 @@ function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuthStore();
   const [view, setView] = useState<SettingsView>(SETTINGS_VIEW.MAIN);
+
+  if (view === SETTINGS_VIEW.PROFILE) {
+    return <ProfileScreen onBack={() => setView(SETTINGS_VIEW.MAIN)} />;
+  }
 
   if (view === SETTINGS_VIEW.DEVICES) {
     return <DevicesScreen onBack={() => setView(SETTINGS_VIEW.MAIN)} />;
@@ -60,6 +66,18 @@ function SettingsScreen() {
         </View>
 
         <View style={styles.menuCard}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.menuRow,
+              pressed && styles.menuRowPressed,
+            ]}
+            onPress={() => setView(SETTINGS_VIEW.PROFILE)}
+          >
+            <User size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
+            <Text style={styles.menuLabel}>Profile</Text>
+            <ChevronRight size={16} color={NEUTRAL_COLOR} strokeWidth={1.75} />
+          </Pressable>
+          <View style={styles.separator} />
           <Pressable
             style={({ pressed }) => [
               styles.menuRow,
@@ -141,6 +159,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: TEXT_PRIMARY,
     includeFontPadding: false,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: BORDER_MUTED,
+    marginLeft: 46, // aligns with text, clears the icon
   },
 });
 
