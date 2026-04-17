@@ -11,13 +11,14 @@ import {
   BACKGROUND_PRIMARY,
   BORDER_SUBTLE,
 } from '../../../styles/colors';
-import { pressedStyle } from '../../../styles/common';
+import { pressedStyle, disabledStyle } from '../../../styles/common';
 
 interface SelfCardProps {
   onLeave: () => void;
+  isLoading: boolean;
 }
 
-export default function SelfCard({ onLeave }: SelfCardProps) {
+export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
   const isMicActive = useWebRTCStore(state => state.isMicActive);
   const isMutedLocal = useWebRTCStore(state => state.isMutedLocal);
   const toggleMute = useWebRTCStore(state => state.toggleMute);
@@ -39,8 +40,10 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
           style={[
             styles.button,
             isSpeakerOn ? styles.buttonActive : styles.buttonNeutral,
+            isLoading && disabledStyle,
           ]}
           onPress={toggleSpeaker}
+          disabled={isLoading}
         >
           {isSpeakerOn ? (
             <Volume2 size={18} color={ACTIVE_COLOR} />
@@ -54,8 +57,10 @@ export default function SelfCard({ onLeave }: SelfCardProps) {
             style={[
               styles.button,
               isMutedLocal ? styles.buttonRed : styles.buttonNeutral,
+              isLoading && disabledStyle,
             ]}
             onPress={toggleMute}
+            disabled={isLoading}
           >
             {isMutedLocal ? (
               <MicOff size={18} color="#ef4444" />

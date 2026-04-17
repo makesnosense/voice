@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import InCallManager from 'react-native-incall-manager';
 import { revokeLockScreenBypass } from '../../native/lock-screen-bypass';
@@ -21,6 +21,7 @@ import CopyCard from './components/CopyCard';
 import RemoteUserCard from './components/RemoteUserCard';
 import CallingCard from './components/calling-card/CallingCard';
 import InviteCard from './components/invite-card/InviteCard';
+import { TEXT_MUTED } from '../../styles/colors';
 import type { InvitedContact } from '../../../../shared/types/contacts';
 import type { RoomId } from '../../../../shared/types/core';
 
@@ -46,6 +47,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   const roomUsers = useRoomStore(state => state.roomUsers);
   const isCallDeclined = useRoomStore(state => state.isCallDeclined);
   const isAlone = roomUsers.length === 1;
+  const isLoading = roomUsers.length === 0;
 
   const [invitedContact, setInvitedContact] = useState<InvitedContact | null>(
     null,
@@ -130,9 +132,11 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.topSlot}>{renderTopSlot()}</View>
+      <View style={styles.topSlot}>
+        {isLoading ? <ActivityIndicator color={TEXT_MUTED} /> : renderTopSlot()}
+      </View>
 
-      <SelfCard onLeave={onLeave} />
+      <SelfCard onLeave={onLeave} isLoading={isLoading} />
     </SafeAreaView>
   );
 }
