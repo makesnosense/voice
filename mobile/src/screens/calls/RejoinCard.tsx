@@ -1,14 +1,9 @@
-// mobile/src/screens/calls/RejoinCard.tsx
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneCall, X } from 'lucide-react-native';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
 import { pressedStyle } from '../../styles/common';
-import {
-  BACKGROUND_PRIMARY,
-  NEUTRAL_COLOR,
-  TEXT_SECONDARY,
-} from '../../styles/colors';
+import { BACKGROUND_PRIMARY } from '../../styles/colors';
 
 const GREEN = {
   BG: '#f0fdf4',
@@ -16,6 +11,11 @@ const GREEN = {
   ICON: '#16a34a',
   TEXT: '#15803d',
   MUTED: '#4ade80',
+} as const;
+
+const RED = {
+  BORDER: '#ef4444',
+  TEXT: '#ef4444',
 } as const;
 
 const dismissRejoinCard = () =>
@@ -48,12 +48,7 @@ export default function RejoinCard() {
         style={({ pressed }) => [styles.dismissButton, pressed && pressedStyle]}
         onPress={dismissRejoinCard}
       >
-        <X
-          size={14}
-          color={TEXT_SECONDARY}
-          strokeWidth={1.5}
-          style={{ transform: [{ translateY: 0.2 }] }}
-        />
+        <X size={14} color={RED.TEXT} strokeWidth={1.5} />
         <Text style={styles.dismissLabel}>Dismiss</Text>
       </Pressable>
     </Pressable>
@@ -101,12 +96,11 @@ const styles = StyleSheet.create({
     width: 80,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: NEUTRAL_COLOR,
+    borderColor: RED.BORDER,
     backgroundColor: BACKGROUND_PRIMARY,
   },
   dismissLabel: {
     fontSize: 11,
-    color: TEXT_SECONDARY,
-    // includeFontPadding: false,
+    color: RED.TEXT,
   },
 });
