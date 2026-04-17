@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import HeaderAnimation from './header-animation/HeaderAnimation';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import headerStyles from '../Header.module.css';
@@ -25,9 +26,9 @@ export default function TitleHeader() {
   };
 
   return (
-    <div className={`${baseStyles.card} ${headerStyles.titleCard}`}>
+    <Link to="/" className={`${baseStyles.card} ${headerStyles.titleCard}`}>
       <HeaderAnimation animationState={getAnimationState()} />
       <h1 className={baseStyles.title}>Voice</h1>
-    </div>
+    </Link>
   );
 }

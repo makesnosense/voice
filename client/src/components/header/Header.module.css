@@ -20,8 +20,9 @@
   gap: 12px;
   padding: 16px 24px;
   justify-self: center;
+  text-decoration: none;
+  cursor: pointer;
 }
-
 @media (max-width: 370px) {
   .titleCard {
     padding: 16px 20px;
