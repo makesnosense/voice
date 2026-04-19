@@ -43,7 +43,7 @@ export default function InviteModal({
   onClose,
   onUserInvited,
 }: InviteModalProps) {
-  const { contacts, isLoading, fetchContacts } = useContactsStore();
+  const { contacts, isLoading, refresh } = useContactsStore();
   const [invitedUserId, setInvitedUserId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
 
@@ -51,8 +51,8 @@ export default function InviteModal({
   const sheetTranslateY = useRef(new Animated.Value(SHEET_TRANSLATE_Y)).current;
 
   useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     Animated.parallel([
