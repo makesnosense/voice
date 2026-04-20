@@ -88,14 +88,16 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <View style={styles.infoBlock}>
-          <Text style={styles.info}>Code sent to</Text>
-          <Text style={styles.email}>{email}</Text>
+        <View style={styles.cardInfoBlock}>
+          <Text style={styles.textSecondary}>Code sent to</Text>
+          <Text style={[styles.textSecondary, styles.textSecondaryBold]}>
+            {email}
+          </Text>
         </View>
 
-        <View style={styles.inputWrapper}>
+        <View style={styles.cardInputWrapper}>
           <TextInput
-            style={styles.input}
+            style={styles.cardInput}
             placeholder="Code"
             placeholderTextColor="#57534e"
             keyboardType="number-pad"
@@ -105,13 +107,13 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
             editable={!isLoading}
           />
           {isLoading && (
-            <View style={styles.spinnerWrapper}>
+            <View style={styles.cardSpinner}>
               <ActivityIndicator size="small" color={TEXT_PRIMARY} />
             </View>
           )}
         </View>
 
-        <View style={styles.divider} />
+        <View style={styles.cardDivider} />
 
         <Pressable
           onPress={handleResend}
@@ -120,7 +122,7 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
             pressed && canResend ? pressedStyle : undefined
           }
         >
-          <Text style={[styles.resend, canResend && styles.resendActive]}>
+          <Text style={canResend ? styles.textPrimary : styles.textMuted}>
             {canResend ? 'Resend code' : `Resend code in ${secondsLeft}s`}
           </Text>
         </Pressable>
@@ -129,16 +131,16 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
       <Pressable
         onPress={onBack}
         style={({ pressed }) => [
-          styles.changeEmail,
-          pressed && styles.changeEmailPressed,
+          styles.button,
+          pressed && styles.buttonPressed,
         ]}
       >
-        <Text style={styles.changeEmailText}>Change email address</Text>
+        <Text style={styles.textPrimary}>Change email address</Text>
       </Pressable>
 
       {error && (
         <View style={styles.errorCard}>
-          <Text style={styles.error}>{error}</Text>
+          <Text style={styles.textError}>{error}</Text>
         </View>
       )}
     </View>
@@ -160,26 +162,15 @@ const styles = StyleSheet.create({
     padding: 18,
     alignItems: 'center',
   },
-  infoBlock: {
+  cardInfoBlock: {
     alignItems: 'center',
     gap: 2,
   },
-  info: {
-    fontSize: 16,
-    color: TEXT_SECONDARY,
-    textAlign: 'center',
-  },
-  email: {
-    fontSize: 16,
-    color: TEXT_SECONDARY,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  inputWrapper: {
+  cardInputWrapper: {
     alignSelf: 'center',
     width: '50%',
   },
-  input: {
+  cardInput: {
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 10,
@@ -190,26 +181,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-  spinnerWrapper: {
+  cardSpinner: {
     position: 'absolute',
     right: 12,
     top: 0,
     bottom: 0,
     justifyContent: 'center',
   },
-  divider: {
+  cardDivider: {
     width: '100%',
     height: StyleSheet.hairlineWidth,
     backgroundColor: NEUTRAL_COLOR,
   },
-  resend: {
-    fontSize: 15,
-    color: TEXT_MUTED,
-  },
-  resendActive: {
-    color: TEXT_PRIMARY,
-  },
-  changeEmail: {
+
+  button: {
     width: '100%',
     paddingVertical: 14,
     borderRadius: 16,
@@ -218,13 +203,27 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_CARD,
     alignItems: 'center',
   },
-  changeEmailPressed: {
+  buttonPressed: {
     backgroundColor: BORDER_MUTED,
   },
-  changeEmailText: {
+
+  textSecondary: {
+    fontSize: 16,
+    color: TEXT_SECONDARY,
+    textAlign: 'center',
+  },
+  textSecondaryBold: {
+    fontWeight: '500',
+  },
+  textPrimary: {
     fontSize: 15,
     color: TEXT_PRIMARY,
   },
+  textMuted: {
+    fontSize: 15,
+    color: TEXT_MUTED,
+  },
+
   errorCard: {
     width: '100%',
     paddingVertical: 14,
@@ -235,7 +234,7 @@ const styles = StyleSheet.create({
     borderColor: '#fecaca',
     alignItems: 'center',
   },
-  error: {
+  textError: {
     fontSize: 15,
     color: '#ef4444',
     fontWeight: '500',
