@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,9 @@ import {
   TEXT_MUTED,
   BORDER_MUTED,
 } from '../../styles/colors';
+import { pressedStyle } from '../../styles/common';
+
+const RESEND_COOLDOWN_SECONDS = 30;
 
 interface OtpStepProps {
   email: string;
@@ -23,16 +26,39 @@ interface OtpStepProps {
 }
 
 export default function OtpStep({ email, onBack }: OtpStepProps) {
-  const { isLoading, verifyOtp } = useAuthStore();
+  const { isLoading, verifyOtp, requestOtp } = useAuthStore();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(RESEND_COOLDOWN_SECONDS);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startCooldown = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setSecondsLeft(RESEND_COOLDOWN_SECONDS);
+    intervalRef.current = setInterval(() => {
+      setSecondsLeft(s => {
+        if (s <= 1) {
+          clearInterval(intervalRef.current!);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => {
+    startCooldown();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   const handleSubmit = async (code: string) => {
     setError(null);
     try {
       await verifyOtp(email, code.trim());
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       console.error('❌ verifyOtp failed:', message);
       setError(message);
     }
@@ -43,6 +69,21 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
     setError(null);
     if (value.length === 6) handleSubmit(value);
   };
+
+  const handleResend = async () => {
+    setError(null);
+    setOtp('');
+    try {
+      await requestOtp(email);
+      startCooldown();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('❌ requestOtp failed:', message);
+      setError(message);
+    }
+  };
+
+  const canResend = secondsLeft === 0;
 
   return (
     <View style={styles.container}>
@@ -69,7 +110,22 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
             </View>
           )}
         </View>
+
+        <View style={styles.divider} />
+
+        <Pressable
+          onPress={handleResend}
+          disabled={!canResend}
+          style={({ pressed }) =>
+            pressed && canResend ? pressedStyle : undefined
+          }
+        >
+          <Text style={[styles.resend, canResend && styles.resendActive]}>
+            {canResend ? 'Resend code' : `Resend code in ${secondsLeft}s`}
+          </Text>
+        </Pressable>
       </View>
+
       <Pressable
         onPress={onBack}
         style={({ pressed }) => [
@@ -88,6 +144,7 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -100,7 +157,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: NEUTRAL_COLOR,
-    padding: 24,
+    padding: 18,
     alignItems: 'center',
   },
   infoBlock: {
@@ -139,6 +196,18 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     justifyContent: 'center',
+  },
+  divider: {
+    width: '100%',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: NEUTRAL_COLOR,
+  },
+  resend: {
+    fontSize: 15,
+    color: TEXT_MUTED,
+  },
+  resendActive: {
+    color: TEXT_PRIMARY,
   },
   changeEmail: {
     width: '100%',
