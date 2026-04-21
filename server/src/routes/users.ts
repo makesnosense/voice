@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { requireAccessToken } from '../middleware/auth';
 import { findUserByEmail } from '../services/users';
-import { byEmailSchema, updateNameSchema, updateUserName } from '../schemas/users';
+import { byEmailSchema, updateNameSchema } from '../schemas/users';
+import { updateUserName } from '../services/users';
 import { updateNameLimiter, userLookupByEmailLimiter } from '../middleware/api-rate-limiters';
 import { reissueAccessTokenWithUpdatedName } from '../utils/jwt';
 
