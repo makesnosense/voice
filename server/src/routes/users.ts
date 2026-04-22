@@ -1,9 +1,13 @@
 import { Router } from 'express';
-import { requireAccessToken } from '../middleware/auth';
-import { findUserByEmail } from '../services/users';
+import { requireAccessToken, requireRefreshToken } from '../middleware/auth';
+import { findUserByEmail, deleteUser } from '../services/users';
 import { byEmailSchema, updateNameSchema } from '../schemas/users';
 import { updateUserName } from '../services/users';
-import { updateNameLimiter, userLookupByEmailLimiter } from '../middleware/api-rate-limiters';
+import {
+  updateNameLimiter,
+  userLookupByEmailLimiter,
+  deleteAccountLimiter,
+} from '../middleware/api-rate-limiters';
 import { reissueAccessTokenWithUpdatedName } from '../utils/jwt';
 
 const router = Router();
@@ -52,6 +56,23 @@ router.patch('/me', requireAccessToken, updateNameLimiter, async (req, res) => {
   } catch (error) {
     console.error('Failed to update name:', error);
     res.status(500).json({ error: 'Failed to update name' });
+  }
+});
+
+router.delete('/me', requireRefreshToken, deleteAccountLimiter, async (req, res) => {
+  const { userId } = req.refreshPayload!;
+
+  try {
+    const deleted = await deleteUser(userId);
+    if (!deleted) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log(`🗑️  deleted account: ${userId}`);
+    res.status(204).end();
+  } catch (error) {
+    console.error('failed to delete account:', error);
+    res.status(500).json({ error: 'failed to delete account' });
   }
 });
 

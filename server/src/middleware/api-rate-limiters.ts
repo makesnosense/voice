@@ -81,6 +81,13 @@ export const userLookupByEmailLimiter = createRateLimiter({
   message: { error: 'Too many lookup attempts, please try again later.' },
 });
 
+// account deletion — irreversible, tight bound even though access token is required
+export const deleteAccountLimiter = createRateLimiter({
+  windowMs: 60 * minuteMs,
+  max: 5,
+  message: { error: 'Too many requests, please try again later.' },
+});
+
 // name update — db write, low risk
 export const updateNameLimiter = createRateLimiter({
   windowMs: 60 * minuteMs,
