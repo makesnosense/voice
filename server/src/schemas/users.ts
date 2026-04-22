@@ -12,8 +12,3 @@ export const updateNameSchema = z.object({
     .trim()
     .transform((val) => (val.length > 0 ? val : null)),
 });
-
-export async function updateUserName(userId: string, name: string | null) {
-  const [updated] = await db.update(users).set({ name }).where(eq(users.id, userId)).returning();
-  return updated ?? null;
-}
