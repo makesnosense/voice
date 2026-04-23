@@ -16,4 +16,11 @@ export class UsersApi extends ApiBase {
       body: JSON.stringify({ name }),
     });
   }
+
+  deleteAccount(refreshToken: string): Promise<void> {
+    return this.apiFetch('/users/me', {
+      method: 'DELETE',
+      body: JSON.stringify({ refreshToken }),
+    });
+  }
 }
