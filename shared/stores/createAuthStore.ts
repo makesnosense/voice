@@ -18,6 +18,7 @@ export interface AuthStore {
   logout: () => Promise<void>;
   getValidAccessToken: () => Promise<string>;
   updateName: (name: string | null) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 export function createAuthStore(storage: TokenStorage, api: Api) {
@@ -146,6 +147,15 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
         const user = getUserFromJwt(newAccessToken);
         if (!user) throw new Error('Invalid token payload');
         set({ accessToken: newAccessToken, user });
+      },
+
+      deleteAccount: async () => {
+        const refreshToken = await storage.getRefreshToken();
+        if (!refreshToken) throw new Error('no refresh token available');
+        await api.users.deleteAccount(refreshToken);
+        await storage.clearRefreshToken();
+        set({ accessToken: null, user: null, currentDeviceJti: null, isAuthenticated: false });
+        console.log('🗑️ account deleted');
       },
     };
   });
