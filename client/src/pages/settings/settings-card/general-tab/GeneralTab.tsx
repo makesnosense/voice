@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Pencil, Check, X } from 'lucide-react';
+import { SquarePen, Check, X } from 'lucide-react';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import styles from './GeneralTab.module.css';
 
@@ -83,7 +83,7 @@ export default function GeneralTab() {
           <span className={user?.name ? styles.nameText : styles.namePlaceholder}>
             {user?.name ?? 'Add a name'}
           </span>
-          <Pencil size={13} className={styles.pencilIcon} />
+          <SquarePen size={17} className={styles.pencilIcon} />
         </button>
       )}
     </div>
