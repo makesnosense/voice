@@ -1,0 +1,98 @@
+.displayRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.displayRow:hover {
+  border-color: var(--border-secondary);
+  background: var(--bg-tertiary);
+}
+
+.nameText {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.namePlaceholder {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.pencilIcon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+
+.displayRow:hover .pencilIcon {
+  opacity: 1;
+}
+
+.editRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input {
+  flex: 1;
+  font-size: 0.875rem;
+  padding: 9px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 10px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus {
+  border-color: var(--text-muted);
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.iconButton.confirm:hover:not(:disabled) {
+  background: var(--accent-green-hover);
+  color: var(--accent-green);
+  border-color: var(--accent-green-border);
+}
+
+.iconButton.cancel:hover:not(:disabled) {
+  background: var(--accent-red-hover);
+  color: var(--accent-red);
+  border-color: var(--accent-red-border);
+}
+
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
