@@ -22,6 +22,7 @@
   --accent-red: #ef4444; /* red-500 */
   --accent-red-hover: rgba(239, 68, 68, 0.05); /* red-500 */
   --accent-red-border: rgba(239, 68, 68, 0.3); /* red-500 */
+  --accent-red-subtle: rgba(239, 68, 68, 0.03); /* red-500, slightly more opaque than hover */
 
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -52,6 +53,7 @@
   --accent-red: #f87171; /* red-400 */
   --accent-red-hover: rgba(248, 113, 113, 0.1); /* red-400 */
   --accent-red-border: rgba(248, 113, 113, 0.3); /* red-400 */
+  --accent-red-subtle: rgba(248, 113, 113, 0.03);
 
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 8px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);

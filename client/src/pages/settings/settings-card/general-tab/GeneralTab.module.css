@@ -11,3 +11,9 @@
   text-transform: uppercase;
   padding: 0 2px;
 }
+
+.divider {
+  height: 1px;
+  background: var(--border-primary);
+  margin: 6px 0;
+}
