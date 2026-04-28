@@ -81,8 +81,8 @@
 }
 
 .cancelButton {
-  border: 1px solid var(--accent-green-border);
-  color: var(--accent-green);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
 }
 
 .cancelButton:hover:not(:disabled) {
