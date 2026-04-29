@@ -74,10 +74,7 @@
   cursor: pointer;
   white-space: nowrap;
   text-align: center;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    opacity 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .cancelButton {
@@ -86,7 +83,8 @@
 }
 
 .cancelButton:hover:not(:disabled) {
-  opacity: 0.7;
+  border-color: var(--border-secondary);
+  box-shadow: var(--shadow-lg);
 }
 
 .cancelButton:disabled {
