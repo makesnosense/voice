@@ -5,9 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
 import NameRow from './NameRow';
+import DeleteAccount from './DeleteAccount';
 import {
   TEXT_MUTED,
   NEUTRAL_COLOR,
+  BORDER_MUTED,
   BACKGROUND_PRIMARY,
   BACKGROUND_CARD,
 } from '../../../styles/colors';
@@ -38,6 +40,11 @@ function ProfileScreen({ onBack }: ProfileScreenProps) {
             onEditingChange={setIsEditing}
           />
         </View>
+
+        <Text style={[styles.sectionLabel, styles.dangerLabel]}>
+          danger zone
+        </Text>
+        <DeleteAccount />
       </View>
     </Pressable>
   );
@@ -59,6 +66,12 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     paddingHorizontal: 4,
     paddingBottom: 6,
+  },
+  dangerLabel: {
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: BORDER_MUTED,
   },
   card: {
     backgroundColor: BACKGROUND_CARD,
