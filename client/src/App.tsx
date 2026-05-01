@@ -6,6 +6,7 @@ import ContactsPage from './pages/contacts/ContactsPage';
 import LandingPage from './pages/LandingPage';
 import SettingsPage from './pages/settings/SettingsPage';
 import RoomPage from './pages/room/RoomPage';
+import PrivacyPage from './pages/privacy/PrivacyPage';
 
 export default function App() {
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/contacts" element={<ContactsPage />} />
       <Route path="/:roomId" element={<RoomPage />} />
