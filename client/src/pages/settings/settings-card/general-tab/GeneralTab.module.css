@@ -17,3 +17,14 @@
   background: var(--border-primary);
   margin: 6px 0;
 }
+.privacyLink {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 2px;
+  width: fit-content;
+  transition: color 0.15s ease;
+}
+
+.privacyLink:hover {
+  color: var(--text-secondary);
+}
