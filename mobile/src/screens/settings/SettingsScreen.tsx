@@ -1,11 +1,18 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { memo, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LogOut, Smartphone, ChevronRight, User } from 'lucide-react-native';
+import {
+  LogOut,
+  Smartphone,
+  ChevronRight,
+  User,
+  Info,
+} from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
 import Header from '../../components/Header';
 import DevicesScreen from './devices/DevicesScreen';
 import ProfileScreen from './profile/ProfileScreen';
+import AboutScreen from './about/AboutScreen';
 import { pressedStyle } from '../../styles/common';
 import {
   TEXT_PRIMARY,
@@ -23,6 +30,7 @@ const SETTINGS_VIEW = {
   MAIN: 'main',
   PROFILE: 'profile',
   DEVICES: 'devices',
+  ABOUT: 'about',
 } as const;
 
 type SettingsView = ObjectValues<typeof SETTINGS_VIEW>;
@@ -40,27 +48,67 @@ function SettingsScreen() {
     return <DevicesScreen onBack={() => setView(SETTINGS_VIEW.MAIN)} />;
   }
 
+  if (view === SETTINGS_VIEW.ABOUT) {
+    return <AboutScreen onBack={() => setView(SETTINGS_VIEW.MAIN)} />;
+  }
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header title="Settings" />
 
       <View style={styles.content}>
-        <View style={styles.card}>
-          <View style={styles.accountRow}>
-            <View style={styles.accountInfo}>
-              <Text style={styles.email}>{user?.email}</Text>
-              <Text style={styles.hint}>Logged in</Text>
+        <View style={styles.topGroup}>
+          <View style={styles.card}>
+            <View style={styles.accountRow}>
+              <View style={styles.accountInfo}>
+                <Text style={styles.email}>{user?.email}</Text>
+                <Text style={styles.hint}>Logged in</Text>
+              </View>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.logoutButton,
+                  pressed && pressedStyle,
+                ]}
+                onPress={logout}
+                hitSlop={8}
+              >
+                <LogOut size={16} color={STATUS_RED} strokeWidth={1.75} />
+                <Text style={styles.logoutLabel}>Log out</Text>
+              </Pressable>
             </View>
+          </View>
+
+          <View style={styles.menuCard}>
             <Pressable
               style={({ pressed }) => [
-                styles.logoutButton,
-                pressed && pressedStyle,
+                styles.menuRow,
+                pressed && styles.menuRowPressed,
               ]}
-              onPress={logout}
-              hitSlop={8}
+              onPress={() => setView(SETTINGS_VIEW.PROFILE)}
             >
-              <LogOut size={16} color={STATUS_RED} strokeWidth={1.75} />
-              <Text style={styles.logoutLabel}>Log out</Text>
+              <User size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
+              <Text style={styles.menuLabel}>Profile</Text>
+              <ChevronRight
+                size={16}
+                color={NEUTRAL_COLOR}
+                strokeWidth={1.75}
+              />
+            </Pressable>
+            <View style={styles.separator} />
+            <Pressable
+              style={({ pressed }) => [
+                styles.menuRow,
+                pressed && styles.menuRowPressed,
+              ]}
+              onPress={() => setView(SETTINGS_VIEW.DEVICES)}
+            >
+              <Smartphone size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
+              <Text style={styles.menuLabel}>Devices</Text>
+              <ChevronRight
+                size={16}
+                color={NEUTRAL_COLOR}
+                strokeWidth={1.75}
+              />
             </Pressable>
           </View>
         </View>
@@ -71,22 +119,10 @@ function SettingsScreen() {
               styles.menuRow,
               pressed && styles.menuRowPressed,
             ]}
-            onPress={() => setView(SETTINGS_VIEW.PROFILE)}
+            onPress={() => setView(SETTINGS_VIEW.ABOUT)}
           >
-            <User size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-            <Text style={styles.menuLabel}>Profile</Text>
-            <ChevronRight size={16} color={NEUTRAL_COLOR} strokeWidth={1.75} />
-          </Pressable>
-          <View style={styles.separator} />
-          <Pressable
-            style={({ pressed }) => [
-              styles.menuRow,
-              pressed && styles.menuRowPressed,
-            ]}
-            onPress={() => setView(SETTINGS_VIEW.DEVICES)}
-          >
-            <Smartphone size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-            <Text style={styles.menuLabel}>Devices</Text>
+            <Info size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
+            <Text style={styles.menuLabel}>About</Text>
             <ChevronRight size={16} color={NEUTRAL_COLOR} strokeWidth={1.75} />
           </Pressable>
         </View>
@@ -101,7 +137,11 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_PRIMARY,
   },
   content: {
+    flex: 1,
     padding: 20,
+    justifyContent: 'space-between',
+  },
+  topGroup: {
     gap: 8,
   },
   card: {
@@ -163,7 +203,7 @@ const styles = StyleSheet.create({
   separator: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: BORDER_MUTED,
-    marginLeft: 46, // aligns with text, clears the icon
+    marginLeft: 46,
   },
 });
 
