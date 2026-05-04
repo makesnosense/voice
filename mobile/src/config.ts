@@ -16,3 +16,5 @@ export const TURN_SERVER_CONFIG = {
   host: PROD_HOST,
   port: TURN_PORT,
 };
+
+export const PRIVACY_POLICY_URL = `https://${PROD_HOST}/privacy`;
