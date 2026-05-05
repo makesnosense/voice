@@ -5,7 +5,7 @@ import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackBut
 import layoutStyles from '../../styles/Layout.module.css';
 import styles from './PrivacyPage.module.css';
 
-const backButton = <BackButton label="Back" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
+const backButton = <BackButton label="" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
 
 export default function PrivacyPage() {
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
   }, []);
 
   return (
-    <div className={layoutStyles.page}>
+    <div className={`${layoutStyles.page} ${styles.page}`}>
       <Header leftSlot={backButton} />
       <main className={styles.content}>
         <h1 className={styles.title}>Privacy Policy</h1>
