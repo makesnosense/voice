@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         </p>
 
         <section className={styles.section}>
-          <h2 className={styles.heading}>What is stored</h2>
+          <h2 className={styles.heading}>What is stored and processed</h2>
           <ul className={styles.list}>
             <li>
               <strong>Email address</strong> — used to identify the account and send login codes.
@@ -48,6 +48,10 @@ export default function PrivacyPage() {
             <li>
               <strong>Session tokens</strong> — authentication tokens are stored locally on the
               device or browser to keep you signed in.
+            </li>
+            <li>
+              <strong>IP addresses</strong> — processed transiently for rate limiting and call
+              routing. Not stored.
             </li>
           </ul>
         </section>
