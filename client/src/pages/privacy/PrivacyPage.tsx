@@ -19,7 +19,7 @@ export default function PrivacyPage() {
         <h1 className={styles.title}>Privacy Policy</h1>
         <p className={styles.meta}>Effective May 1, 2026</p>
 
-        <p className={styles.intro}>
+        <p className={`${styles.intro} ${styles.paragraph}`}>
           Voice is a voice calling app. This policy describes what data is stored, why, and how it
           can be removed.
         </p>
@@ -59,7 +59,7 @@ export default function PrivacyPage() {
 
         <section className={styles.section}>
           <h2 className={styles.heading}>Audio</h2>
-          <p>
+          <p className={styles.paragraph}>
             Voice audio is relayed through Voice's TURN server to establish connectivity across
             networks. Audio is never recorded or stored.
           </p>
@@ -98,7 +98,7 @@ export default function PrivacyPage() {
 
         <section className={styles.section}>
           <h2 className={styles.heading}>Data retention</h2>
-          <p>
+          <p className={styles.paragraph}>
             Data is retained until account deletion. Deleting an account permanently removes the
             associated email, name, contacts, device tokens, and call history from Voice's server.
             This includes any call history entries that appear in other users' history involving the
@@ -108,7 +108,7 @@ export default function PrivacyPage() {
 
         <section className={styles.section}>
           <h2 className={styles.heading}>Contact</h2>
-          <p>
+          <p className={styles.paragraph}>
             For privacy-related questions:{' '}
             <a className={styles.link} href="mailto:voicevoice@proton.me">
               voicevoice@proton.me

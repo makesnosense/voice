@@ -71,7 +71,7 @@
   top: calc((1.5em - 4px) / 2);
 }
 
-p {
+.paragraph {
   font-size: 1rem;
   color: var(--text-secondary);
   line-height: 1.6;
