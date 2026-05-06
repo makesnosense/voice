@@ -17,4 +17,6 @@ export const TURN_SERVER_CONFIG = {
   port: TURN_PORT,
 };
 
+export const HEALTH_URL = `${BASE_URL}/health`;
+
 export const PRIVACY_POLICY_URL = `https://${PROD_HOST}/privacy`;

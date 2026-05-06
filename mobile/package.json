@@ -1,6 +1,6 @@
 {
   "name": "voice",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "scripts": {
     "android": "adb reverse tcp:3003 tcp:3003 && react-native run-android",

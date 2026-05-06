@@ -13,6 +13,8 @@ import { useCallHistoryStore } from './stores/useCallHistoryStore';
 import { useContactsStore } from './stores/useContactsStore';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
 import { useRoomLink } from './hooks/useRoomLink';
+import { useServerConnectivity } from './hooks/useServerConnectivity';
+import NoConnectionScreen from './screens/NoConnectionScreen';
 
 import type { RoomId } from '../../shared/types/core';
 
@@ -21,15 +23,21 @@ export default function App() {
   const activeRoomId = useActiveRoomStore(state => state.activeRoomId);
 
   const permissions = useAppPermissions();
+  const serverConnectivity = useServerConnectivity();
 
   useEffect(() => {
+    if (serverConnectivity.isChecking) return;
+    if (serverConnectivity.isUnreachable) {
+      RNBootSplash.hide({ fade: true });
+      return;
+    }
     useAuthStore
       .getState()
       .initialize()
       .finally(() => {
         RNBootSplash.hide({ fade: true });
       });
-  }, []);
+  }, [serverConnectivity.isChecking, serverConnectivity.isUnreachable]);
 
   useDeviceRegistration();
 
@@ -55,9 +63,16 @@ export default function App() {
     useActiveRoomStore.setState({ activeRoomId: roomId });
   });
 
-  if (permissions.isChecking) return null;
+  if (permissions.isChecking || serverConnectivity.isChecking) return null;
   if (!permissions.allGranted)
     return <PermissionsScreen permissions={permissions} />;
+  if (serverConnectivity.isUnreachable)
+    return (
+      <NoConnectionScreen
+        onRetry={serverConnectivity.retry}
+        isRetrying={serverConnectivity.isRetrying}
+      />
+    );
   if (activeRoomId)
     return (
       <RoomScreen
@@ -65,6 +80,7 @@ export default function App() {
         onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
       />
     );
+
   if (!isAuthenticated) return <AuthScreen />;
 
   return <HomeScreen />;
