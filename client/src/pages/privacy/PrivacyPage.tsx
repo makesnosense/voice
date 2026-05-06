@@ -41,7 +41,23 @@ export default function PrivacyPage() {
               <strong>Device tokens</strong> — FCM tokens stored on Voice's server to deliver
               incoming call notifications to the user's device.
             </li>
+            <li>
+              <strong>Contacts</strong> — the list of users you have added as contacts is stored on
+              Voice's server.
+            </li>
+            <li>
+              <strong>Session tokens</strong> — authentication tokens are stored locally on the
+              device or browser to keep you signed in.
+            </li>
           </ul>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.heading}>Audio</h2>
+          <p>
+            Voice audio is relayed through Voice's TURN server to establish connectivity across
+            networks. Audio is never recorded or stored.
+          </p>
         </section>
 
         <section className={styles.section}>
@@ -79,7 +95,19 @@ export default function PrivacyPage() {
           <h2 className={styles.heading}>Data retention</h2>
           <p>
             Data is retained until account deletion. Deleting an account permanently removes the
-            associated email, name, device tokens, and call history from Voice's server.
+            associated email, name, contacts, device tokens, and call history from Voice's server.
+            This includes any call history entries that appear in other users' history involving the
+            deleted account.
+          </p>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.heading}>Contact</h2>
+          <p>
+            For privacy-related questions:{' '}
+            <a className={styles.link} href="mailto:voicevoice@proton.me">
+              voicevoice@proton.me
+            </a>
           </p>
         </section>
       </main>
