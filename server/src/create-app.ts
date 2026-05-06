@@ -19,6 +19,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
     app.set('trust proxy', 1);
   }
 
+  app.get('/health', generalApiLimiter, (_req, res) => res.status(200).end());
   app.use('/api/', generalApiLimiter);
 
   app.use('/api/calls', createCallsRouter(rooms));
