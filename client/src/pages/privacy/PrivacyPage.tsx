@@ -46,8 +46,9 @@ export default function PrivacyPage() {
               Voice's server.
             </li>
             <li>
-              <strong>Session tokens</strong> — authentication tokens are stored locally on the
-              device or browser to keep you signed in.
+              <strong>Session tokens</strong> — authentication tokens are stored in{' '}
+              <code>localStorage</code> on the browser, or in the system keychain on Android, to
+              keep you signed in.
             </li>
             <li>
               <strong>IP addresses</strong> — processed transiently for rate limiting and call
