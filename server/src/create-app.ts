@@ -19,10 +19,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
     app.set('trust proxy', 1);
   }
 
-  if (config.rateLimiting.enabled) {
-    app.use('/api/', generalApiLimiter);
-    console.log('🛡️  Rate limiting enabled for API endpoints');
-  }
+  app.use('/api/', generalApiLimiter);
 
   app.use('/api/calls', createCallsRouter(rooms));
   app.use('/api/turn-credentials', turnRoutes);
