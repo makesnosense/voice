@@ -30,8 +30,11 @@ export async function checkServerReachable(): Promise<boolean> {
     setTimeout(() => reject(new Error('timeout')), HEALTH_CHECK_TIMEOUT_MS),
   );
   try {
-    await Promise.race([fetch(HEALTH_URL), timeout]);
-    return true;
+    const response = await Promise.race([
+      fetch(`${HEALTH_URL}?t=${Date.now()}`),
+      timeout,
+    ]);
+    return response.ok;
   } catch {
     return false;
   }
