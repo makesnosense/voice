@@ -25,6 +25,19 @@ export default function PrivacyPage() {
         </p>
 
         <section className={styles.section}>
+          <h2 className={styles.heading}>Hosted version</h2>
+          <p className={styles.paragraph}>
+            This policy applies to the hosted version of Voice at{' '}
+            <a className={styles.link} href={window.location.origin}>
+              {window.location.host}
+            </a>
+            , operated from the Netherlands. Users in the EU may exercise their rights under GDPR —
+            including access, erasure, and portability — by deleting their account in-app.
+            Self-hosted deployments are governed by their respective operators.
+          </p>
+        </section>
+
+        <section className={styles.section}>
           <h2 className={styles.heading}>What is stored and processed</h2>
           <ul className={styles.list}>
             <li>
