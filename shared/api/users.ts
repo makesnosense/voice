@@ -1,5 +1,6 @@
 import { ApiBase } from './base';
 import type { RenewAccessTokenResponse } from '../types/auth';
+import { DataExport } from '../types/core';
 
 export class UsersApi extends ApiBase {
   getUserByEmail(email: string, accessToken: string): Promise<{ id: string }> {
@@ -21,6 +22,12 @@ export class UsersApi extends ApiBase {
     return this.apiFetch('/users/me', {
       method: 'DELETE',
       body: JSON.stringify({ refreshToken }),
+    });
+  }
+
+  exportData(accessToken: string): Promise<DataExport> {
+    return this.apiFetch('/users/me/export', {
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
   }
 }

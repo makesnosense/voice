@@ -1,5 +1,7 @@
 import type { Server, Socket as ConnectedSocket } from 'socket.io';
 import type { Socket as ClientSocket } from 'socket.io-client';
+import type { Contact } from '../types/contacts';
+import type { CallHistoryEntry } from '../types/calls';
 
 export type ObjectValues<T> = T[keyof T];
 
@@ -98,4 +100,16 @@ export interface IceCandidate {
 export interface AudioFrequencyData {
   bands: number[]; // array of frequency band levels
   overallLevel: number; // keep the existing single level for compatibility
+}
+
+export interface DataExport {
+  exportedAt: string;
+  profile: {
+    id: string;
+    email: string;
+    name: string | null;
+    createdAt: string;
+  };
+  contacts: Contact[];
+  callHistory: CallHistoryEntry[];
 }
