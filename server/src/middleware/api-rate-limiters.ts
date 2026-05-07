@@ -101,3 +101,10 @@ export const turnCredentialsLimiter = createRateLimiter({
   max: 30, // limit each IP to 30 requests per minute
   message: { error: 'Too many TURN credential requests, please try again shortly.' },
 });
+
+// data export — full db scan, gdpr compliance endpoint
+export const dataExportLimiter = createRateLimiter({
+  windowMs: 60 * minuteMs,
+  max: 5,
+  message: { error: 'Too many export requests, please try again later.' },
+});

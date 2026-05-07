@@ -2,8 +2,9 @@ import { Router } from 'express';
 import { requireAccessToken, requireRefreshToken } from '../middleware/auth';
 import { findUserByEmail, deleteUser } from '../services/users';
 import { byEmailSchema, updateNameSchema } from '../schemas/users';
-import { updateUserName } from '../services/users';
+import { updateUserName, exportUserData } from '../services/users';
 import {
+  dataExportLimiter,
   updateNameLimiter,
   userLookupByEmailLimiter,
   deleteAccountLimiter,
@@ -73,6 +74,22 @@ router.delete('/me', requireRefreshToken, deleteAccountLimiter, async (req, res)
   } catch (error) {
     console.error('failed to delete account:', error);
     res.status(500).json({ error: 'failed to delete account' });
+  }
+});
+
+router.get('/me/export', requireAccessToken, dataExportLimiter, async (req, res) => {
+  const { userId } = req.user!;
+
+  try {
+    const data = await exportUserData(userId);
+    if (!data) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('failed to export user data:', error);
+    res.status(500).json({ error: 'failed to export user data' });
   }
 });
 
