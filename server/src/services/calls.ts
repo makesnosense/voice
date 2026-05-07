@@ -60,7 +60,6 @@ export async function getCallHistory(userId: string) {
           SELECT * 
             FROM incoming_calls_for_user
         ORDER BY created_at DESC
-           LIMIT 20
                  )
           SELECT *, 
                  EXISTS (SELECT 1 
