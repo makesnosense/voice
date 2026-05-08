@@ -105,6 +105,6 @@ export const turnCredentialsLimiter = createRateLimiter({
 // data export — full db scan, gdpr compliance endpoint
 export const dataExportLimiter = createRateLimiter({
   windowMs: 60 * minuteMs,
-  max: 5,
+  max: 10,
   message: { error: 'Too many export requests, please try again later.' },
 });
