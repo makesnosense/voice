@@ -41,9 +41,9 @@ function ProfileScreen({ onBack }: ProfileScreenProps) {
           />
         </View>
 
-        <Text style={[styles.sectionLabel, styles.dangerLabel]}>
-          danger zone
-        </Text>
+        <View style={styles.divider} />
+
+        <Text style={styles.sectionLabel}>danger zone</Text>
         <DeleteAccount />
       </View>
     </Pressable>
@@ -67,18 +67,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingBottom: 6,
   },
-  dangerLabel: {
-    marginTop: 14,
-    paddingTop: 14,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: BORDER_MUTED,
-  },
+
   card: {
     backgroundColor: BACKGROUND_CARD,
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: NEUTRAL_COLOR,
     overflow: 'hidden',
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: BORDER_MUTED,
+    marginVertical: 14,
   },
 });
 
