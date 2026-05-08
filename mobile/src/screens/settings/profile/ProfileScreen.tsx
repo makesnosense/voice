@@ -13,6 +13,7 @@ import {
   BACKGROUND_PRIMARY,
   BACKGROUND_CARD,
 } from '../../../styles/colors';
+import ExportData from './ExportData';
 
 interface ProfileScreenProps {
   onBack: () => void;
@@ -41,6 +42,10 @@ function ProfileScreen({ onBack }: ProfileScreenProps) {
           />
         </View>
 
+        <View style={styles.divider} />
+
+        <Text style={styles.sectionLabel}>your data</Text>
+        <ExportData />
         <View style={styles.divider} />
 
         <Text style={styles.sectionLabel}>danger zone</Text>
