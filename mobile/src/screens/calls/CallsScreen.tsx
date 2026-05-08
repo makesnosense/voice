@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import { useShallow } from 'zustand/react/shallow';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
+import { useContactsStore } from '../../stores/useContactsStore';
 import { startCall } from '../../utils/start-call';
 import CallRow from './CallRow';
 import RejoinCard from './RejoinCard';
@@ -34,9 +35,19 @@ function CallsScreen() {
     })),
   );
 
+  const contacts = useContactsStore(state => state.contacts);
+  const fetchContacts = useContactsStore(state => state.fetchContacts);
+  const addContact = useContactsStore(state => state.addContact);
+
+  const contactIdSet = useMemo(
+    () => new Set(contacts.map(contact => contact.id)),
+    [contacts],
+  );
+
   useEffect(() => {
     fetchHistory();
-  }, [fetchHistory]);
+    fetchContacts();
+  }, [fetchHistory, fetchContacts]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -65,21 +76,28 @@ function CallsScreen() {
           <Text style={styles.empty}>No past calls</Text>
         )}
 
-        {history.map(entry => (
-          <View key={entry.id}>
-            <View style={styles.separator} />
-            <CallRow
-              entry={entry}
-              onPress={() =>
-                startCall({
-                  contactId: entry.contactId,
-                  contactEmail: entry.contactEmail,
-                  contactName: entry.contactName,
-                })
-              }
-            />
-          </View>
-        ))}
+        {history.map(entry => {
+          return (
+            <View key={entry.id}>
+              <View style={styles.separator} />
+              <CallRow
+                entry={entry}
+                onPress={() =>
+                  startCall({
+                    contactId: entry.contactId,
+                    contactEmail: entry.contactEmail,
+                    contactName: entry.contactName,
+                  })
+                }
+                onAddToContacts={
+                  contactIdSet.has(entry.contactId)
+                    ? undefined
+                    : () => addContact(entry.contactEmail)
+                }
+              />
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );
