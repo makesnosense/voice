@@ -5,7 +5,12 @@ import { ExternalLink } from 'lucide-react-native';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
 import { PRIVACY_POLICY_URL } from '../../../config';
-import { TEXT_SECONDARY, BACKGROUND_PRIMARY } from '../../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  BACKGROUND_PRIMARY,
+} from '../../../styles/colors';
+import { version } from '../../../../package.json';
 
 interface AboutScreenProps {
   onBack: () => void;
@@ -18,12 +23,19 @@ function AboutScreen({ onBack }: AboutScreenProps) {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header title="About" leftSlot={<HeaderBackButton onPress={onBack} />} />
       <View style={styles.content}>
+        <View style={styles.brandingBlock}>
+          <Text style={styles.appName}>Voice</Text>
+          <Text style={styles.appVersion}>{version}</Text>
+        </View>
         <Pressable
-          style={({ pressed }) => [styles.link, pressed && styles.linkPressed]}
+          style={({ pressed }) => [
+            styles.privacyLink,
+            pressed && styles.privacyLinkPressed,
+          ]}
           onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
         >
-          <Text style={styles.linkText}>Privacy Policy</Text>
-          <ExternalLink size={14} color={TEXT_SECONDARY} strokeWidth={1.75} />
+          <Text style={styles.privacyLinkText}>Privacy Policy</Text>
+          <ExternalLink size={12} color={TEXT_SECONDARY} strokeWidth={1.75} />
         </Pressable>
       </View>
     </View>
@@ -36,22 +48,41 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_PRIMARY,
   },
   content: {
-    padding: 20,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 28,
   },
-  link: {
+  brandingBlock: {
+    alignItems: 'center',
+    gap: 6,
+    paddingTop: 28,
+    paddingBottom: 28,
+  },
+  appName: {
+    fontSize: 32,
+    fontWeight: '600',
+    color: TEXT_PRIMARY,
+    letterSpacing: -0.8, // -0.025em × 32px
+    includeFontPadding: false,
+  },
+  appVersion: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+  },
+  privacyLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
     gap: 5,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: TEXT_SECONDARY,
   },
-  linkPressed: {
+  privacyLinkPressed: {
     opacity: 0.5,
   },
-  linkText: {
-    fontSize: 15,
+  privacyLinkText: {
+    fontSize: 13,
     color: TEXT_SECONDARY,
+    textDecorationLine: 'underline',
+    textDecorationColor: TEXT_SECONDARY,
   },
 });
 
