@@ -7,14 +7,15 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.PowerManager
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.voicepopuli.voice.R
 
 class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -169,7 +170,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_call)
+            .setSmallIcon(R.drawable.ic_notification_call)
             .setContentTitle("incoming call")
             .setContentText(callerName)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -177,8 +178,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             .setFullScreenIntent(incomingCallFullscreenPendingIntent, true)
             .setOngoing(true)
             .setAutoCancel(false)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "decline", notificationBarDeclinePendingIntent)
-            .addAction(android.R.drawable.ic_menu_call, "accept", notificationBarAcceptPendingIntent)
+            .addAction(R.drawable.ic_notification_call, "decline", notificationBarDeclinePendingIntent)
+            .addAction(R.drawable.ic_notification_call, "accept", notificationBarAcceptPendingIntent)
             .build()
 
         notificationManager.notify(NOTIFICATION_ID, notification)
