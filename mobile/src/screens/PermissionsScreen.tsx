@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Mic } from 'lucide-react-native';
@@ -25,12 +25,22 @@ export default function PermissionsScreen({
   permissions,
 }: PermissionsScreenProps) {
   const insets = useSafeAreaInsets();
-  const { notificationsPermission, microphonePermission, requestAll } =
-    permissions;
+  const {
+    notificationsPermission,
+    microphonePermission,
+    requestAll,
+    openAppSettings,
+  } = permissions;
+  const [hasAttempted, setHasAttempted] = useState(false);
 
   useEffect(() => {
-    requestAll();
+    requestAll().then(() => setHasAttempted(true));
   }, [requestAll]);
+
+  const anyDenied =
+    hasAttempted &&
+    (notificationsPermission.status === PERMISSION_STATUS.DENIED ||
+      microphonePermission.status === PERMISSION_STATUS.DENIED);
 
   const items = [
     {
@@ -87,12 +97,21 @@ export default function PermissionsScreen({
           </View>
         </View>
 
-        <Pressable
-          style={({ pressed }) => [styles.button, pressed && pressedStyle]}
-          onPress={requestAll}
-        >
-          <Text style={styles.buttonText}>Grant permissions</Text>
-        </Pressable>
+        {anyDenied ? (
+          <Pressable
+            style={({ pressed }) => [styles.button, pressed && pressedStyle]}
+            onPress={openAppSettings}
+          >
+            <Text style={styles.buttonText}>Open settings</Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={({ pressed }) => [styles.button, pressed && pressedStyle]}
+            onPress={requestAll}
+          >
+            <Text style={styles.buttonText}>Grant permissions</Text>
+          </Pressable>
+        )}
 
         <Text style={styles.hint}>
           if the system dialog doesn't appear, open settings and grant manually
@@ -101,6 +120,7 @@ export default function PermissionsScreen({
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

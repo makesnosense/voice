@@ -18,4 +18,5 @@ export interface AppPermissions {
   isChecking: boolean;
   allGranted: boolean;
   requestAll: () => Promise<void>;
+  openAppSettings: () => void;
 }

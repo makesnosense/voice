@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AppState, Linking } from 'react-native';
 import {
   checkMultiple,
   requestMultiple,
@@ -41,7 +42,6 @@ function requestAll() {
 export function useAppPermissions(): AppPermissions {
   const [notificationsStatus, setNotificationsStatus] =
     useState<PermissionStatus>(PERMISSION_STATUS.CHECKING);
-
   const [microphoneStatus, setMicrophoneStatus] = useState<PermissionStatus>(
     PERMISSION_STATUS.CHECKING,
   );
@@ -61,10 +61,25 @@ export function useAppPermissions(): AppPermissions {
       .catch(() => {});
   }, [applyStatuses]);
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active') {
+        checkAll()
+          .then(applyStatuses)
+          .catch(() => {});
+      }
+    });
+    return () => subscription.remove();
+  }, [applyStatuses]);
+
   const handleRequestAll = useCallback(async () => {
     await waitForActivity();
     applyStatuses(await requestAll());
   }, [applyStatuses]);
+
+  const handleOpenAppSettings = useCallback(() => {
+    Linking.openSettings();
+  }, []);
 
   const allGranted =
     notificationsStatus === PERMISSION_STATUS.GRANTED &&
@@ -80,5 +95,6 @@ export function useAppPermissions(): AppPermissions {
     isChecking,
     allGranted,
     requestAll: handleRequestAll,
+    openAppSettings: handleOpenAppSettings,
   };
 }
