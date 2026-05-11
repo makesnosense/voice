@@ -1,6 +1,6 @@
 import { ApiBase } from './base';
 import type { RenewAccessTokenResponse } from '../types/auth';
-import { DataExport } from '../types/core';
+import type { DataExport } from '../types/core';
 
 export class UsersApi extends ApiBase {
   getUserByEmail(email: string, accessToken: string): Promise<{ id: string }> {
