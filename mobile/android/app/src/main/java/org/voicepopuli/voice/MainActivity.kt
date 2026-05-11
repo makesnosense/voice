@@ -72,15 +72,27 @@ class MainActivity : ReactActivity() {
         )
     }
 
-    private fun ensureBatteryOptimizationExemption() {
-        val powerManager = getSystemService(PowerManager::class.java)
-        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
+private fun ensureBatteryOptimizationExemption() {
+    val powerManager = getSystemService(PowerManager::class.java)
+    if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
 
-        startActivity(
-            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                .setData(Uri.parse("package:$packageName"))
-        )
-    }
+    val message = if (isMiui())
+        "Voice needs to run in the background to receive incoming calls. Select \"No restrictions\" for background settings."
+    else
+        "Voice needs to run in the background to receive incoming calls. On the next screen, tap \"Allow\"."
+
+    AlertDialog.Builder(this)
+        .setTitle("Allow background activity")
+        .setMessage(message)
+        .setPositiveButton("Open settings") { _, _ ->
+            startActivity(
+                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    .setData(Uri.parse("package:$packageName"))
+            )
+        }
+        .setNegativeButton("Later", null)
+        .show()
+}
 
   private fun cancelCallNotificationIfNeeded(intent: Intent) {
       val data = intent.data
