@@ -42,13 +42,32 @@ class MainActivity : ReactActivity() {
         cancelCallNotificationIfNeeded(intent)
     }
 
+    // list of permission/setup steps run sequentially across onResume cycles.
+    // each step returns true if the requirement is already satisfied (advance to next),
+    // false if it prompted the user (halt; next onResume continues the flow).
+    private val nativePermissionsSteps: List<() -> Boolean> = listOf(
+        { ensureFullScreenIntentPermission() },
+        { ensureBatteryOptimizationExemption() },
+        { ensureMiuiAutostart() },
+        { ensureMiuiAppPermissions() },
+    )
+
+
   override fun onResume() {
         super.onResume()
-        ensureFullScreenIntentPermission()
-        ensureBatteryOptimizationExemption()
-        ensureMiuiAutostart()
-        ensureMiuiAppPermissions()
+        // ensureFullScreenIntentPermission()
+        // ensureBatteryOptimizationExemption()
+        // ensureMiuiAutostart()
+        // ensureMiuiAppPermissions()
+        runNativePermissionsFlow()
   }
+
+    private fun runNativePermissionsFlow() {
+        for (step in nativePermissionsSteps) {
+            if (!step()) return // step prompted; halt until next onResume resumes the flow
+        }
+    }
+
 
   override fun onNewIntent(intent: Intent) {
     // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
@@ -60,39 +79,43 @@ class MainActivity : ReactActivity() {
   }
 
 
-    private fun ensureFullScreenIntentPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return // api 34+
+    private fun ensureFullScreenIntentPermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return true // api 34+
 
         val notificationManager = getSystemService(NotificationManager::class.java)
-        if (notificationManager.canUseFullScreenIntent()) return
+        if (notificationManager.canUseFullScreenIntent()) return true
 
         startActivity(
             Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
                 .setData(Uri.parse("package:$packageName"))
         )
+        return false
     }
 
-private fun ensureBatteryOptimizationExemption() {
-    val powerManager = getSystemService(PowerManager::class.java)
-    if (powerManager.isIgnoringBatteryOptimizations(packageName)) return
 
-    val message = if (isMiui())
-        "Voice needs to run in the background to receive incoming calls. Select \"No restrictions\" for background settings."
-    else
-        "Voice needs to run in the background to receive incoming calls. On the next screen, tap \"Allow\"."
 
-    AlertDialog.Builder(this)
-        .setTitle("Allow background activity")
-        .setMessage(message)
-        .setPositiveButton("Open settings") { _, _ ->
-            startActivity(
-                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                    .setData(Uri.parse("package:$packageName"))
-            )
-        }
-        .setNegativeButton("Later", null)
-        .show()
-}
+    private fun ensureBatteryOptimizationExemption(): Boolean {
+        val powerManager = getSystemService(PowerManager::class.java)
+        if (powerManager.isIgnoringBatteryOptimizations(packageName)) return true
+
+        val message = if (isMiui())
+            "Voice needs to run in the background to receive incoming calls. Select \"No restrictions\" for background settings."
+        else
+            "Voice needs to run in the background to receive incoming calls. On the next screen, tap \"Allow\"."
+
+        AlertDialog.Builder(this)
+            .setTitle("Allow background activity")
+            .setMessage(message)
+            .setPositiveButton("Open settings") { _, _ ->
+                startActivity(
+                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                        .setData(Uri.parse("package:$packageName"))
+                )
+            }
+            .setNegativeButton("Later", null)
+            .show()
+        return false
+    }
 
   private fun cancelCallNotificationIfNeeded(intent: Intent) {
       val data = intent.data

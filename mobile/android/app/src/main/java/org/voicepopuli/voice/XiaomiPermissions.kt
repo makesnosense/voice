@@ -12,8 +12,9 @@ private const val OP_SHOW_WHEN_LOCKED = 10020
 private const val OP_BACKGROUND_START_ACTIVITY = 10021
 private const val OP_SERVICE_FOREGROUND = 10023
 
-fun Activity.ensureMiuiAppPermissions() {
-    if (!isMiui()) return
+
+fun Activity.ensureMiuiAppPermissions(): Boolean {
+    if (!isMiui()) return true
 
     val denied = buildList {
         if (!isMiuiPermissionGranted(OP_SHOW_WHEN_LOCKED)) add("Show on Lock screen")
@@ -21,7 +22,7 @@ fun Activity.ensureMiuiAppPermissions() {
         if (!isMiuiPermissionGranted(OP_SERVICE_FOREGROUND)) add("Permanent notification")
     }
 
-    if (denied.isEmpty()) return
+    if (denied.isEmpty()) return true
 
     val permissionList = denied.joinToString("\n") { "• $it" }
 
@@ -33,6 +34,7 @@ fun Activity.ensureMiuiAppPermissions() {
         }
         .setNegativeButton("Later", null)
         .show()
+    return false
 }
 
 private fun Activity.isMiuiPermissionGranted(op: Int): Boolean {
@@ -54,9 +56,9 @@ private fun Activity.miuiPermissionManagerIntent() = Intent("miui.intent.action.
     putExtra("extra_pkgname", packageName)
 }
 
-fun Activity.ensureMiuiAutostart() {
-    if (!isMiui()) return
-    if (isMiuiAutostartGranted()) return
+fun Activity.ensureMiuiAutostart(): Boolean {
+    if (!isMiui()) return true
+    if (isMiuiAutostartGranted()) return true
 
     AlertDialog.Builder(this)
         .setTitle("Enable autostart")
@@ -66,6 +68,7 @@ fun Activity.ensureMiuiAutostart() {
         }
         .setNegativeButton("Later", null)
         .show()
+    return false
 }
 
 fun isMiui(): Boolean = getSystemProperty("ro.miui.ui.version.name").isNotEmpty()
