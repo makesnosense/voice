@@ -4,9 +4,55 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.AppOpsManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 
 private const val OP_AUTO_START = 10008
+private const val OP_SHOW_WHEN_LOCKED = 10020
+private const val OP_BACKGROUND_START_ACTIVITY = 10021
+private const val OP_SERVICE_FOREGROUND = 10023
+
+fun Activity.ensureMiuiAppPermissions() {
+    if (!isMiui()) return
+
+    val denied = buildList {
+        if (!isMiuiPermissionGranted(OP_SHOW_WHEN_LOCKED)) add("Show on Lock screen")
+        if (!isMiuiPermissionGranted(OP_BACKGROUND_START_ACTIVITY)) add("Display pop-up windows while running in the background")
+        if (!isMiuiPermissionGranted(OP_SERVICE_FOREGROUND)) add("Permanent notification")
+    }
+
+    if (denied.isEmpty()) return
+
+    val permissionList = denied.joinToString("\n") { "• $it" }
+
+    AlertDialog.Builder(this)
+        .setTitle("Additional permissions needed")
+        .setMessage("Voice needs the following permissions on Xiaomi devices to show incoming calls:\n\n$permissionList")
+        .setPositiveButton("Open settings") { _, _ ->
+            startActivity(miuiPermissionManagerIntent())
+        }
+        .setNegativeButton("Later", null)
+        .show()
+}
+
+private fun Activity.isMiuiPermissionGranted(op: Int): Boolean {
+    return try {
+        val mgr = getSystemService(AppOpsManager::class.java)
+        val method = AppOpsManager::class.java.getMethod(
+            "checkOpNoThrow", Int::class.java, Int::class.java, String::class.java
+        )
+        val result = method.invoke(mgr, op, android.os.Process.myUid(), packageName) as Int
+        result == AppOpsManager.MODE_ALLOWED
+    } catch (e: Exception) {
+        true
+    }
+}
+
+private fun Activity.miuiPermissionManagerIntent() = Intent("miui.intent.action.APP_PERM_EDITOR").apply {
+    setPackage("com.miui.securitycenter")
+    putExtra("extra_package_uid", android.os.Process.myUid())
+    putExtra("extra_pkgname", packageName)
+}
 
 fun Activity.ensureMiuiAutostart() {
     if (!isMiui()) return

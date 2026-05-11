@@ -47,6 +47,7 @@ class MainActivity : ReactActivity() {
         ensureFullScreenIntentPermission()
         ensureBatteryOptimizationExemption()
         ensureMiuiAutostart()
+        ensureMiuiAppPermissions()
   }
 
   override fun onNewIntent(intent: Intent) {
