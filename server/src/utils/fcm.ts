@@ -35,6 +35,7 @@ export async function sendCallNotification(
     },
     android: {
       priority: 'high',
+      collapseKey: 'call',
     },
   });
 }
@@ -43,6 +44,6 @@ export async function sendCallCancelledNotification(fcmToken: string): Promise<v
   await getMessaging().send({
     token: fcmToken,
     data: { type: 'call_cancelled' },
-    android: { priority: 'high' },
+    android: { priority: 'high', collapseKey: 'call' },
   });
 }
