@@ -32,7 +32,7 @@ fun Activity.ensureMiuiAppPermissions(): Boolean {
         .setPositiveButton("Open settings") { _, _ ->
             startActivity(miuiPermissionManagerIntent())
         }
-        .setNegativeButton("Later", null)
+        .setNegativeButton("Skip", null)
         .show()
     return false
 }
@@ -66,7 +66,7 @@ fun Activity.ensureMiuiAutostart(): Boolean {
         .setPositiveButton("Open settings") { _, _ ->
             startActivity(miuiAutostartIntent())
         }
-        .setNegativeButton("Later", null)
+        .setNegativeButton("Skip", null)
         .show()
     return false
 }

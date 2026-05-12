@@ -114,7 +114,7 @@ internal var reactNativePermissionsGranted = false
                         .setData(Uri.parse("package:$packageName"))
                 )
             }
-            .setNegativeButton("Later", null)
+            .setNegativeButton("Skip", null)
             .show()
         return false
     }

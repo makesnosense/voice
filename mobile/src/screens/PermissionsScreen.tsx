@@ -131,7 +131,7 @@ export default function PermissionsScreen({
             ]}
             onPress={dismiss}
           >
-            <Text style={styles.buttonSecondaryText}>Later</Text>
+            <Text style={styles.buttonSecondaryText}>Skip</Text>
           </Pressable>
         )}
       </View>
