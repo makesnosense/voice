@@ -33,6 +33,7 @@ export async function getFcmToken(): Promise<string | null> {
 
   return null;
 }
+// if Google rotates FCM token while app is open
 export function listenForTokenRefresh(
   callback: (token: string) => Promise<void>,
 ) {
