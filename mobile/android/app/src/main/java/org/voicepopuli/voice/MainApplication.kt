@@ -9,6 +9,7 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import org.voicepopuli.voice.lockscreenbypass.LockScreenBypassPackage
 import org.voicepopuli.voice.activityready.ActivityReadyPackage
 import org.voicepopuli.voice.callforegroundservice.CallForegroundServicePackage
+import org.voicepopuli.voice.runnativepermissions.RunNativePermissionsPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -22,6 +23,7 @@ class MainApplication : Application(), ReactApplication {
           add(LockScreenBypassPackage())
           add(ActivityReadyPackage())
           add(CallForegroundServicePackage())
+          add(RunNativePermissionsPackage())
         },
     )
   }

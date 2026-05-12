@@ -14,6 +14,7 @@ import {
   type AppPermissions,
 } from './useAppPermissions.types';
 import { waitForActivity } from '../utils/wait-for-activity';
+import { runNativePermissions } from '../native/runNativePermissions';
 
 function toStatus(granted: boolean): PermissionStatus {
   return granted ? PERMISSION_STATUS.GRANTED : PERMISSION_STATUS.DENIED;
@@ -88,6 +89,12 @@ export function useAppPermissions(): AppPermissions {
   const isChecking =
     notificationsStatus === PERMISSION_STATUS.CHECKING ||
     microphoneStatus === PERMISSION_STATUS.CHECKING;
+
+  useEffect(() => {
+    if (allGranted) {
+      runNativePermissions();
+    }
+  }, [allGranted]);
 
   return {
     notificationsPermission: { status: notificationsStatus },

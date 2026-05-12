@@ -22,6 +22,8 @@ import org.voicepopuli.voice.incomingcall.VoiceFirebaseMessagingService
 
 class MainActivity : ReactActivity() {
 
+internal var reactNativePermissionsGranted = false
+
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
@@ -53,16 +55,16 @@ class MainActivity : ReactActivity() {
     )
 
 
-  override fun onResume() {
+    override fun onResume() {
         super.onResume()
-        // ensureFullScreenIntentPermission()
-        // ensureBatteryOptimizationExemption()
-        // ensureMiuiAutostart()
-        // ensureMiuiAppPermissions()
-        runNativePermissionsFlow()
-  }
+        if (reactNativePermissionsGranted) {
+            runNativePermissionsFlow()
+        }
+    }
 
-    private fun runNativePermissionsFlow() {
+
+
+    internal fun runNativePermissionsFlow() {
         for (step in nativePermissionsSteps) {
             if (!step()) return // step prompted; halt until next onResume resumes the flow
         }
