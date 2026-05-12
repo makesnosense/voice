@@ -61,6 +61,11 @@ export default function PermissionsScreen({
     },
   ];
 
+  const canDismiss =
+    hasAttempted &&
+    microphonePermission.status === PERMISSION_STATUS.GRANTED &&
+    notificationsPermission.status === PERMISSION_STATUS.DENIED;
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.content}>
@@ -118,7 +123,7 @@ export default function PermissionsScreen({
           if the system dialog doesn't appear, open settings and grant manually
         </Text>
 
-        {hasAttempted && (
+        {canDismiss && (
           <Pressable
             style={({ pressed }) => [
               styles.buttonSecondary,
