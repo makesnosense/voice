@@ -41,6 +41,7 @@ function requestAll() {
 }
 
 export function useAppPermissions(): AppPermissions {
+  const [permissionsDismissed, setPermissionsDismissed] = useState(false);
   const [notificationsStatus, setNotificationsStatus] =
     useState<PermissionStatus>(PERMISSION_STATUS.CHECKING);
   const [microphoneStatus, setMicrophoneStatus] = useState<PermissionStatus>(
@@ -91,17 +92,19 @@ export function useAppPermissions(): AppPermissions {
     microphoneStatus === PERMISSION_STATUS.CHECKING;
 
   useEffect(() => {
-    if (allGranted) {
+    if (allGranted || permissionsDismissed) {
       runNativePermissions();
     }
-  }, [allGranted]);
+  }, [allGranted, permissionsDismissed]);
 
   return {
     notificationsPermission: { status: notificationsStatus },
     microphonePermission: { status: microphoneStatus },
     isChecking,
     allGranted,
+    permissionsDismissed,
     requestAll: handleRequestAll,
     openAppSettings: handleOpenAppSettings,
+    dismiss: useCallback(() => setPermissionsDismissed(true), []),
   };
 }

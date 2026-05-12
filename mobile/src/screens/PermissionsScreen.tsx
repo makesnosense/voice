@@ -30,7 +30,9 @@ export default function PermissionsScreen({
     microphonePermission,
     requestAll,
     openAppSettings,
+    dismiss,
   } = permissions;
+
   const [hasAttempted, setHasAttempted] = useState(false);
 
   useEffect(() => {
@@ -112,10 +114,21 @@ export default function PermissionsScreen({
             <Text style={styles.buttonText}>Grant permissions</Text>
           </Pressable>
         )}
-
         <Text style={styles.hint}>
           if the system dialog doesn't appear, open settings and grant manually
         </Text>
+
+        {hasAttempted && (
+          <Pressable
+            style={({ pressed }) => [
+              styles.buttonSecondary,
+              pressed && pressedStyle,
+            ]}
+            onPress={dismiss}
+          >
+            <Text style={styles.buttonSecondaryText}>Later</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -216,5 +229,17 @@ const styles = StyleSheet.create({
     color: TEXT_MUTED,
     textAlign: 'center',
     lineHeight: 18,
+    paddingBottom: 16,
+  },
+  buttonSecondary: {
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: NEUTRAL_COLOR,
+    padding: 14,
+    alignItems: 'center',
+  },
+  buttonSecondaryText: {
+    color: TEXT_SECONDARY,
+    fontSize: 15,
   },
 });

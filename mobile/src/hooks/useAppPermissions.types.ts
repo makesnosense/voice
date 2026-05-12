@@ -17,6 +17,8 @@ export interface AppPermissions {
   microphonePermission: PermissionState;
   isChecking: boolean;
   allGranted: boolean;
+  permissionsDismissed: boolean;
   requestAll: () => Promise<void>;
   openAppSettings: () => void;
+  dismiss: () => void;
 }

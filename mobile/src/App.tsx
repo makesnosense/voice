@@ -64,8 +64,9 @@ export default function App() {
   });
 
   if (permissions.isChecking || serverConnectivity.isChecking) return null;
-  if (!permissions.allGranted)
+  if (!permissions.allGranted && !permissions.permissionsDismissed)
     return <PermissionsScreen permissions={permissions} />;
+
   if (serverConnectivity.isUnreachable)
     return (
       <NoConnectionScreen
