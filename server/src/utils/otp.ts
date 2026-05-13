@@ -12,7 +12,7 @@ export async function sendOtpEmail(email: string, code: string): Promise<void> {
   await resend.emails.send({
     from: 'Voice <verify@odnokreslo.ru>',
     to: email,
-    subject: 'Your Voice verification code',
+    subject: `Your Voice verification code: ${code}`,
     html: `
 <!doctype html>
 <html>
