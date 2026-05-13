@@ -80,14 +80,16 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
 
     requestPermissions: async () => {
       await waitForActivity();
-      applyPermissionsResults(
-        await Promise.all([
-          requestNotifications([]).then(({ status }) => status),
-          requestMultiple([PERMISSIONS.ANDROID.RECORD_AUDIO]).then(
-            statuses => statuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
-          ),
-        ]),
-      );
+
+      const { status: notifications } = await requestNotifications([]);
+      const micStatuses = await requestMultiple([
+        PERMISSIONS.ANDROID.RECORD_AUDIO,
+      ]);
+
+      applyPermissionsResults([
+        notifications,
+        micStatuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
+      ]);
       set({ permissionsRequested: true });
     },
 
