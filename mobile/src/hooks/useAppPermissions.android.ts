@@ -12,7 +12,7 @@ import {
   PERMISSION_STATUS,
   type PermissionStatus,
   type AppPermissions,
-} from './useAppPermissions.types';
+} from '../types/permissions';
 import { waitForActivity } from '../utils/wait-for-activity';
 import { runNativePermissions } from '../native/runNativePermissions';
 

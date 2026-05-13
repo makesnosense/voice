@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Mic } from 'lucide-react-native';
-import type { AppPermissions } from '../hooks/useAppPermissions.types';
-import { PERMISSION_STATUS } from '../hooks/useAppPermissions.types';
+import type { AppPermissions } from '../types/permissions';
+import { PERMISSION_STATUS } from '../types/permissions';
 import { pressedStyle } from '../styles/common';
 import {
   BACKGROUND_CARD,
