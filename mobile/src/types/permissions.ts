@@ -1,9 +1,9 @@
-import type { ObjectValues } from '../../../shared/types/core';
+import { RESULTS } from 'react-native-permissions';
+import type { PermissionStatus as RNPermissionStatus } from 'react-native-permissions';
 
 export const PERMISSION_STATUS = {
+  ...RESULTS,
   CHECKING: 'checking',
-  GRANTED: 'granted',
-  DENIED: 'denied',
 } as const;
 
-export type PermissionStatus = ObjectValues<typeof PERMISSION_STATUS>;
+export type PermissionStatus = RNPermissionStatus | 'checking';

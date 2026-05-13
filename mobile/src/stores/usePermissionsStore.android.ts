@@ -6,22 +6,17 @@ import {
   checkNotifications,
   requestNotifications,
   PERMISSIONS,
-  RESULTS,
+  type PermissionStatus as RNPermissionStatus,
 } from 'react-native-permissions';
 import { PERMISSION_STATUS, type PermissionStatus } from '../types/permissions';
 import { waitForActivity } from '../utils/wait-for-activity';
 import { runNativePermissions } from '../native/runNativePermissions';
 
-function toStatus(granted: boolean): PermissionStatus {
-  return granted ? PERMISSION_STATUS.GRANTED : PERMISSION_STATUS.DENIED;
-}
-
-function checkPermissions() {
+function checkPermissions(): Promise<[RNPermissionStatus, RNPermissionStatus]> {
   return Promise.all([
-    checkNotifications().then(({ status }) => status === RESULTS.GRANTED),
+    checkNotifications().then(({ status }) => status),
     checkMultiple([PERMISSIONS.ANDROID.RECORD_AUDIO]).then(
-      statuses =>
-        statuses[PERMISSIONS.ANDROID.RECORD_AUDIO] === RESULTS.GRANTED,
+      statuses => statuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
     ),
   ]);
 }
@@ -42,18 +37,16 @@ interface PermissionsStore {
 
 export const usePermissionsStore = create<PermissionsStore>((set, get) => {
   const applyPermissionsResults = ([notifications, microphone]: [
-    boolean,
-    boolean,
+    RNPermissionStatus,
+    RNPermissionStatus,
   ]) => {
-    const notificationsStatus = toStatus(notifications);
-    const microphoneStatus = toStatus(microphone);
     const allPermissionsGranted =
-      notificationsStatus === PERMISSION_STATUS.GRANTED &&
-      microphoneStatus === PERMISSION_STATUS.GRANTED;
+      notifications === PERMISSION_STATUS.GRANTED &&
+      microphone === PERMISSION_STATUS.GRANTED;
 
     set({
-      notificationsStatus,
-      microphoneStatus,
+      notificationsStatus: notifications,
+      microphoneStatus: microphone,
       allPermissionsGranted,
       isCheckingPermissions: false,
     });
@@ -89,12 +82,9 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
       await waitForActivity();
       applyPermissionsResults(
         await Promise.all([
-          requestNotifications([]).then(
-            ({ status }) => status === RESULTS.GRANTED,
-          ),
+          requestNotifications([]).then(({ status }) => status),
           requestMultiple([PERMISSIONS.ANDROID.RECORD_AUDIO]).then(
-            statuses =>
-              statuses[PERMISSIONS.ANDROID.RECORD_AUDIO] === RESULTS.GRANTED,
+            statuses => statuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
           ),
         ]),
       );

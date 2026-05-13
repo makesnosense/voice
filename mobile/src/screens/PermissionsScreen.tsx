@@ -27,10 +27,10 @@ export default function PermissionsScreen() {
     dismiss,
   } = usePermissionsStore();
 
-  const anyDenied =
+  const shouldOpenSettings =
     permissionsRequested &&
-    (notificationsStatus === PERMISSION_STATUS.DENIED ||
-      microphoneStatus === PERMISSION_STATUS.DENIED);
+    (notificationsStatus !== PERMISSION_STATUS.GRANTED ||
+      microphoneStatus !== PERMISSION_STATUS.GRANTED);
 
   const items = [
     {
@@ -52,7 +52,8 @@ export default function PermissionsScreen() {
   const canDismiss =
     permissionsRequested &&
     microphoneStatus === PERMISSION_STATUS.GRANTED &&
-    notificationsStatus === PERMISSION_STATUS.DENIED;
+    (notificationsStatus === PERMISSION_STATUS.DENIED ||
+      notificationsStatus === PERMISSION_STATUS.BLOCKED);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -81,7 +82,8 @@ export default function PermissionsScreen() {
                       styles.statusDot,
                       status === PERMISSION_STATUS.GRANTED
                         ? styles.statusGranted
-                        : status === PERMISSION_STATUS.DENIED
+                        : status === PERMISSION_STATUS.DENIED ||
+                          status === PERMISSION_STATUS.BLOCKED
                         ? styles.statusDenied
                         : styles.statusChecking,
                     ]}
@@ -92,7 +94,7 @@ export default function PermissionsScreen() {
           </View>
         </View>
 
-        {anyDenied ? (
+        {shouldOpenSettings ? (
           <Pressable
             style={({ pressed }) => [styles.button, pressed && pressedStyle]}
             onPress={openAppSettings}
@@ -104,7 +106,7 @@ export default function PermissionsScreen() {
             style={({ pressed }) => [styles.button, pressed && pressedStyle]}
             onPress={requestPermissions}
           >
-            <Text style={styles.buttonText}>Grant permissions</Text>
+            <Text style={styles.buttonText}>Request permissions</Text>
           </Pressable>
         )}
         <Text style={styles.hint}>
