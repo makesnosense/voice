@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Mic } from 'lucide-react-native';
-import { PERMISSION_STATUS } from '../types/permissions';
+import { PERMISSION_STATUS, type PermissionStatus } from '../types/permissions';
 import { pressedStyle } from '../styles/common';
 import {
   BACKGROUND_CARD,
@@ -10,6 +10,7 @@ import {
   NEUTRAL_COLOR,
   STATUS_GREEN,
   STATUS_RED,
+  STATUS_YELLOW,
   TEXT_MUTED,
   TEXT_PRIMARY,
   TEXT_SECONDARY,
@@ -31,6 +32,13 @@ export default function PermissionsScreen() {
     permissionsRequested &&
     (notificationsStatus !== PERMISSION_STATUS.GRANTED ||
       microphoneStatus !== PERMISSION_STATUS.GRANTED);
+
+  const STATUS_DOT_COLOR: Partial<Record<PermissionStatus, string>> = {
+    [PERMISSION_STATUS.GRANTED]: STATUS_GREEN,
+    [PERMISSION_STATUS.DENIED]: STATUS_RED,
+    [PERMISSION_STATUS.BLOCKED]: STATUS_YELLOW,
+    // CHECKING falls through to statusDot base style (NEUTRAL_COLOR)
+  };
 
   const items = [
     {
@@ -80,12 +88,10 @@ export default function PermissionsScreen() {
                   <View
                     style={[
                       styles.statusDot,
-                      status === PERMISSION_STATUS.GRANTED
-                        ? styles.statusGranted
-                        : status === PERMISSION_STATUS.DENIED ||
-                          status === PERMISSION_STATUS.BLOCKED
-                        ? styles.statusDenied
-                        : styles.statusChecking,
+                      {
+                        backgroundColor:
+                          STATUS_DOT_COLOR[status] ?? NEUTRAL_COLOR,
+                      },
                     ]}
                   />
                 </View>
@@ -197,15 +203,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-  },
-  statusGranted: {
-    backgroundColor: STATUS_GREEN,
-  },
-  statusDenied: {
-    backgroundColor: STATUS_RED,
-  },
-  statusChecking: {
-    backgroundColor: NEUTRAL_COLOR,
   },
   button: {
     backgroundColor: TEXT_PRIMARY,
