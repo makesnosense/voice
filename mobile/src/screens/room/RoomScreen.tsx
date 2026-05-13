@@ -50,8 +50,12 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   const isLoading = roomUsers.length === 0;
 
   const [invitedContact, setInvitedContact] = useState<InvitedContact | null>(
-    null,
+    () => useRoomStore.getState().pendingInvitedContact,
   );
+
+  useEffect(() => {
+    useRoomStore.setState({ pendingInvitedContact: null });
+  }, []);
 
   const requestMicrophone = useMicrophoneStore(
     state => state.requestMicrophone,
