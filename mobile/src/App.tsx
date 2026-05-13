@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
-import { useAppPermissions } from './hooks/useAppPermissions.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
 import PermissionsScreen from './screens/PermissionsScreen';
@@ -17,13 +16,29 @@ import { useServerConnectivity } from './hooks/useServerConnectivity';
 import NoConnectionScreen from './screens/NoConnectionScreen';
 
 import type { RoomId } from '../../shared/types/core';
+import { usePermissionsStore } from './stores/usePermissionsStore.android';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function App() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
+  const { isCheckingPermissions, allPermissionsGranted, permissionsSkipped } =
+    usePermissionsStore(
+      useShallow(state => ({
+        isCheckingPermissions: state.isCheckingPermissions,
+        allPermissionsGranted: state.allPermissionsGranted,
+        permissionsSkipped: state.permissionsSkipped,
+      })),
+    );
+
   const activeRoomId = useActiveRoomStore(state => state.activeRoomId);
 
-  const permissions = useAppPermissions();
+  // const permissions = useAppPermissions();
   const serverConnectivity = useServerConnectivity();
+
+  useEffect(() => {
+    usePermissionsStore.getState().initialize();
+  }, []);
 
   useEffect(() => {
     if (serverConnectivity.isChecking) return;
@@ -31,6 +46,7 @@ export default function App() {
       RNBootSplash.hide({ fade: true });
       return;
     }
+
     useAuthStore
       .getState()
       .initialize()
@@ -63,9 +79,9 @@ export default function App() {
     useActiveRoomStore.setState({ activeRoomId: roomId });
   });
 
-  if (permissions.isChecking || serverConnectivity.isChecking) return null;
-  if (!permissions.allGranted && !permissions.permissionsDismissed)
-    return <PermissionsScreen permissions={permissions} />;
+  if (isCheckingPermissions || serverConnectivity.isChecking) return null;
+  if (!allPermissionsGranted && !permissionsSkipped)
+    return <PermissionsScreen />;
 
   if (serverConnectivity.isUnreachable)
     return (

@@ -7,18 +7,3 @@ export const PERMISSION_STATUS = {
 } as const;
 
 export type PermissionStatus = ObjectValues<typeof PERMISSION_STATUS>;
-
-export interface PermissionState {
-  status: PermissionStatus;
-}
-
-export interface AppPermissions {
-  notificationsPermission: PermissionState;
-  microphonePermission: PermissionState;
-  isChecking: boolean;
-  allGranted: boolean;
-  permissionsDismissed: boolean;
-  requestAll: () => Promise<void>;
-  openAppSettings: () => void;
-  dismiss: () => void;
-}

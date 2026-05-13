@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Mic } from 'lucide-react-native';
-import type { AppPermissions } from '../types/permissions';
 import { PERMISSION_STATUS } from '../types/permissions';
 import { pressedStyle } from '../styles/common';
 import {
@@ -16,33 +14,23 @@ import {
   TEXT_PRIMARY,
   TEXT_SECONDARY,
 } from '../styles/colors';
+import { usePermissionsStore } from '../stores/usePermissionsStore.android';
 
-interface PermissionsScreenProps {
-  permissions: AppPermissions;
-}
-
-export default function PermissionsScreen({
-  permissions,
-}: PermissionsScreenProps) {
+export default function PermissionsScreen() {
   const insets = useSafeAreaInsets();
   const {
-    notificationsPermission,
-    microphonePermission,
-    requestAll,
+    notificationsStatus,
+    microphoneStatus,
+    requestPermissions,
+    permissionsRequested,
     openAppSettings,
     dismiss,
-  } = permissions;
-
-  const [hasAttempted, setHasAttempted] = useState(false);
-
-  useEffect(() => {
-    requestAll().then(() => setHasAttempted(true));
-  }, [requestAll]);
+  } = usePermissionsStore();
 
   const anyDenied =
-    hasAttempted &&
-    (notificationsPermission.status === PERMISSION_STATUS.DENIED ||
-      microphonePermission.status === PERMISSION_STATUS.DENIED);
+    permissionsRequested &&
+    (notificationsStatus === PERMISSION_STATUS.DENIED ||
+      microphoneStatus === PERMISSION_STATUS.DENIED);
 
   const items = [
     {
@@ -50,21 +38,21 @@ export default function PermissionsScreen({
       icon: <Bell size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
       label: 'Notifications',
       description: 'required to receive incoming calls',
-      status: notificationsPermission.status,
+      status: notificationsStatus,
     },
     {
       key: 'microphone',
       icon: <Mic size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
       label: 'Microphone',
       description: 'required for voice calls',
-      status: microphonePermission.status,
+      status: microphoneStatus,
     },
   ];
 
   const canDismiss =
-    hasAttempted &&
-    microphonePermission.status === PERMISSION_STATUS.GRANTED &&
-    notificationsPermission.status === PERMISSION_STATUS.DENIED;
+    permissionsRequested &&
+    microphoneStatus === PERMISSION_STATUS.GRANTED &&
+    notificationsStatus === PERMISSION_STATUS.DENIED;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -114,7 +102,7 @@ export default function PermissionsScreen({
         ) : (
           <Pressable
             style={({ pressed }) => [styles.button, pressed && pressedStyle]}
-            onPress={requestAll}
+            onPress={requestPermissions}
           >
             <Text style={styles.buttonText}>Grant permissions</Text>
           </Pressable>
