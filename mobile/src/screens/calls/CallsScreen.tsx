@@ -21,6 +21,7 @@ import {
   BORDER_MUTED,
   BACKGROUND_PRIMARY,
 } from '../../styles/colors';
+import NotificationsDisabledBanner from './NotificationsDisabledBanner';
 
 function CallsScreen() {
   const insets = useSafeAreaInsets();
@@ -58,7 +59,7 @@ function CallsScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <Header title="Calls" />
-
+      <NotificationsDisabledBanner />
       <RejoinCard />
 
       {isLoading && history.length === 0 && (

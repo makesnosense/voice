@@ -17,3 +17,7 @@ export const BACKGROUND_NAV = 'rgba(255, 255, 255, 0.88)';
 export const STATUS_GREEN = '#22c55e';
 export const STATUS_YELLOW = '#fbbf24';
 export const STATUS_RED = '#ef4444';
+
+export const AMBER_BG = '#fef3c7'; // amber-100
+export const AMBER_BORDER = '#fde68a'; // amber-200
+export const AMBER_TEXT = '#92400e'; // amber-800
