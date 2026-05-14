@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { api } from '../../../../api';
 import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
 import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
 import { useAudioAnalyserStore } from '../../../../stores/useAudioAnalyserStore';
 import { useAuthStore } from '../../../../stores/useAuthStore';
-import usersStyles from './Users.module.css';
-import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
+import { useInvitedUserStore } from '../../../../stores/useInvitedUserStore';
+import usersStyles from './Users.module.css';
 import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
-import type { InvitedContact } from '../../../../../../shared/types/contacts';
+import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
 
 interface UsersProps {
   currentUserId: SocketId | undefined;
@@ -19,15 +19,8 @@ interface UsersProps {
 export default function Users({ currentUserId }: UsersProps) {
   const roomId = useRoomId();
 
-  const [invitedContact, setInvitedContact] = useState<InvitedContact | null>(() => {
-    const pending = useRoomStore.getState().pendingInvitedContact;
-    console.log('Users mount, pendingInvitedContact:', pending);
-    return pending;
-  });
-
-  useEffect(() => {
-    useRoomStore.setState({ pendingInvitedContact: null });
-  }, []);
+  const invitedUser = useInvitedUserStore((state) => state.invitedUser);
+  const invitedContact = invitedUser?.roomId === roomId ? invitedUser.contact : null;
 
   const roomUsers = useRoomStore((state) => state.roomUsers);
   const isCallDeclined = useRoomStore((state) => state.isCallDeclined);
@@ -40,7 +33,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
 
   const handleCancelInvite = async () => {
-    setInvitedContact(null);
+    useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await getValidAccessToken();
       await api.rooms.cancelInviteToRoom(roomId!, token);
@@ -50,7 +43,9 @@ export default function Users({ currentUserId }: UsersProps) {
   };
 
   useEffect(() => {
-    if (roomUsers.length >= 2) setInvitedContact(null);
+    if (roomUsers.length >= 2) {
+      useInvitedUserStore.setState({ invitedUser: null });
+    }
   }, [roomUsers.length]);
 
   const isAlone = roomUsers.length === 1;
@@ -58,11 +53,12 @@ export default function Users({ currentUserId }: UsersProps) {
   useEffect(() => {
     if (!isCallDeclined) return;
     const timeout = setTimeout(() => {
-      setInvitedContact(null);
+      useInvitedUserStore.setState({ invitedUser: null });
       useRoomStore.setState({ isCallDeclined: false });
     }, 3000);
     return () => clearTimeout(timeout);
   }, [isCallDeclined]);
+
   return (
     <div className={usersStyles.usersContainer}>
       {roomUsers.map((user) => {
@@ -96,7 +92,12 @@ export default function Users({ currentUserId }: UsersProps) {
       })}
 
       {isAlone && isAuthenticated && !invitedContact && (
-        <InviteCard roomId={roomId!} onUserInvited={(contact) => setInvitedContact(contact)} />
+        <InviteCard
+          roomId={roomId!}
+          onUserInvited={(contact) =>
+            useInvitedUserStore.setState({ invitedUser: { roomId: roomId!, contact } })
+          }
+        />
       )}
 
       {isAlone && invitedContact && (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import InCallManager from 'react-native-incall-manager';
@@ -9,6 +9,7 @@ import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useInvitedUserStore } from '../../stores/useInvitedUserStore';
 import useWebRTCInit from '../../hooks/useWebRTCInit';
 import { api } from '../../api';
 import { BASE_URL } from '../../config';
@@ -22,7 +23,6 @@ import RemoteUserCard from './components/RemoteUserCard';
 import CallingCard from './components/calling-card/CallingCard';
 import InviteCard from './components/invite-card/InviteCard';
 import { TEXT_MUTED } from '../../styles/colors';
-import type { InvitedContact } from '../../../../shared/types/contacts';
 import type { RoomId } from '../../../../shared/types/core';
 
 interface RoomScreenProps {
@@ -49,13 +49,9 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   const isAlone = roomUsers.length === 1;
   const isLoading = roomUsers.length === 0;
 
-  const [invitedContact, setInvitedContact] = useState<InvitedContact | null>(
-    () => useRoomStore.getState().pendingInvitedContact,
-  );
-
-  useEffect(() => {
-    useRoomStore.setState({ pendingInvitedContact: null });
-  }, []);
+  const invitedUser = useInvitedUserStore(state => state.invitedUser);
+  const invitedContact =
+    invitedUser?.roomId === roomId ? invitedUser.contact : null;
 
   const requestMicrophone = useMicrophoneStore(
     state => state.requestMicrophone,
@@ -92,20 +88,22 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   }, []);
 
   useEffect(() => {
-    if (roomUsers.length >= 2) setInvitedContact(null);
+    if (roomUsers.length >= 2) {
+      useInvitedUserStore.setState({ invitedUser: null });
+    }
   }, [roomUsers.length]);
 
   useEffect(() => {
     if (!isCallDeclined) return;
     const timeout = setTimeout(() => {
-      setInvitedContact(null);
+      useInvitedUserStore.setState({ invitedUser: null });
       useRoomStore.setState({ isCallDeclined: false });
     }, 3000);
     return () => clearTimeout(timeout);
   }, [isCallDeclined]);
 
   const handleCancelInvite = async () => {
-    setInvitedContact(null);
+    useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
       await api.rooms.cancelInviteToRoom(roomId, token);
@@ -128,7 +126,12 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
     }
     return (
       <View style={styles.aloneTopSlot}>
-        <InviteCard roomId={roomId} onUserInvited={setInvitedContact} />
+        <InviteCard
+          roomId={roomId}
+          onUserInvited={contact =>
+            useInvitedUserStore.setState({ invitedUser: { roomId, contact } })
+          }
+        />
         <CopyCard roomId={roomId} />
       </View>
     );

@@ -8,7 +8,6 @@ interface RoomState {
   messages: Message[];
   roomConnectionStatus: RoomConnectionStatus;
   isCallDeclined: boolean;
-  pendingInvitedContact: InvitedContact | null;
 }
 
 interface RoomStore extends RoomState {
@@ -23,7 +22,6 @@ const initialState: RoomState = {
   messages: [],
   roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
   isCallDeclined: false,
-  pendingInvitedContact: null,
 };
 
 export const useRoomStore = create<RoomStore>((set) => ({
@@ -32,11 +30,5 @@ export const useRoomStore = create<RoomStore>((set) => ({
   setRoomUsers: (users) => set({ roomUsers: users }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
   setConnectionStatus: (status) => set({ roomConnectionStatus: status }),
-  reset: () =>
-    set({
-      roomUsers: [],
-      messages: [],
-      roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
-      isCallDeclined: false,
-    }),
+  reset: () => set(initialState),
 }));

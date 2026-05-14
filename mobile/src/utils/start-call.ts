@@ -3,7 +3,7 @@ import { useCallHistoryStore } from '../stores/useCallHistoryStore';
 import { api } from '../api';
 import { CALL_DIRECTION } from '../../../shared/constants/calls';
 import { useActiveRoomStore } from '../stores/useActiveRoomStore';
-import { useRoomStore } from '../../../shared/stores/useRoomStore';
+import { useInvitedUserStore } from '../stores/useInvitedUserStore';
 
 interface CallTarget {
   contactId: string;
@@ -22,10 +22,10 @@ export async function startCall(target: CallTarget) {
       contactName: target.contactName,
       contactHasMobileDevice: true,
     });
-    useRoomStore.setState({
-      pendingInvitedContact: {
-        email: target.contactEmail,
-        name: target.contactName,
+    useInvitedUserStore.setState({
+      invitedUser: {
+        roomId,
+        contact: { email: target.contactEmail, name: target.contactName },
       },
     });
     useActiveRoomStore.setState({ activeRoomId: roomId });
