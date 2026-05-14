@@ -7,7 +7,7 @@
   gap: 0.75rem;
   cursor: pointer;
   border-style: dashed;
-  color: var(--text-muted);
+  color: var(--text-primary);
   background: transparent;
   transition: all 0.2s ease;
 }
@@ -16,10 +16,6 @@
   color: var(--text-secondary);
   border-color: var(--border-secondary);
   background: var(--accent-blue-hover);
-}
-
-.icon {
-  opacity: 0.7;
 }
 
 .label {
