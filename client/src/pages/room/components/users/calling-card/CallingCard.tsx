@@ -3,15 +3,16 @@ import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from '../usercard/UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import callingCardStyles from './CallingCard.module.css';
+import type { InvitedContact } from '../../../../../../../shared/types/contacts';
 
 interface CallingCardProps {
-  email: string;
+  contact: InvitedContact;
   onCancel: () => void;
   declined?: boolean;
 }
 
-export default function CallingCard({ email, onCancel, declined = false }: CallingCardProps) {
-  const displayName = email.split('@')[0];
+export default function CallingCard({ contact, onCancel, declined = false }: CallingCardProps) {
+  const displayName = contact.name ?? contact.email.split('@')[0];
 
   return (
     <div

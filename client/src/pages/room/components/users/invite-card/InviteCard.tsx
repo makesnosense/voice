@@ -4,10 +4,11 @@ import baseStyles from '../../../../../styles/BaseCard.module.css';
 import styles from './InviteCard.module.css';
 import InviteModal from './invite-modal/InviteModal';
 import type { RoomId } from '../../../../../../../shared/types/core';
+import type { InvitedContact } from '../../../../../../../shared/types/contacts';
 
 interface InviteCardProps {
   roomId: RoomId;
-  onUserInvited: (email: string) => void;
+  onUserInvited: (contact: InvitedContact) => void;
 }
 
 export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
@@ -28,9 +29,9 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
         <InviteModal
           roomId={roomId}
           onClose={() => setIsModalOpen(false)}
-          onInviteSent={(email) => {
+          onInviteSent={(contact) => {
             setIsModalOpen(false);
-            onUserInvited(email);
+            onUserInvited(contact);
           }}
         />
       )}

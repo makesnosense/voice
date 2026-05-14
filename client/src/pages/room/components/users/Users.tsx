@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 import { api } from '../../../../api';
 import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
@@ -11,24 +10,24 @@ import type { SocketId, AudioFrequencyData } from '../../../../../../shared/type
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
-
-type LocationState = { calledContactEmail?: string } | null;
+import type { InvitedContact } from '../../../../../../shared/types/contacts';
 
 interface UsersProps {
   currentUserId: SocketId | undefined;
 }
 
-const getCalledContactEmail = (state: unknown): string | null =>
-  (state as LocationState)?.calledContactEmail ?? null;
-
 export default function Users({ currentUserId }: UsersProps) {
   const roomId = useRoomId();
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  const [calledContactEmail, setCalledContactEmail] = useState<string | null>(() =>
-    getCalledContactEmail(location.state)
-  );
+  const [invitedContact, setInvitedContact] = useState<InvitedContact | null>(() => {
+    const pending = useRoomStore.getState().pendingInvitedContact;
+    console.log('Users mount, pendingInvitedContact:', pending);
+    return pending;
+  });
+
+  useEffect(() => {
+    useRoomStore.setState({ pendingInvitedContact: null });
+  }, []);
 
   const roomUsers = useRoomStore((state) => state.roomUsers);
   const isCallDeclined = useRoomStore((state) => state.isCallDeclined);
@@ -41,8 +40,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
 
   const handleCancelInvite = async () => {
-    navigate('.', { replace: true, state: {} });
-    setCalledContactEmail(null);
+    setInvitedContact(null);
     try {
       const token = await getValidAccessToken();
       await api.rooms.cancelInviteToRoom(roomId!, token);
@@ -52,23 +50,19 @@ export default function Users({ currentUserId }: UsersProps) {
   };
 
   useEffect(() => {
-    if (roomUsers.length >= 2) {
-      setCalledContactEmail(null);
-    }
+    if (roomUsers.length >= 2) setInvitedContact(null);
   }, [roomUsers.length]);
 
   const isAlone = roomUsers.length === 1;
 
   useEffect(() => {
     if (!isCallDeclined) return;
-    navigate('.', { replace: true, state: {} });
     const timeout = setTimeout(() => {
-      setCalledContactEmail(null);
+      setInvitedContact(null);
       useRoomStore.setState({ isCallDeclined: false });
     }, 3000);
     return () => clearTimeout(timeout);
-  }, [isCallDeclined, navigate]);
-
+  }, [isCallDeclined]);
   return (
     <div className={usersStyles.usersContainer}>
       {roomUsers.map((user) => {
@@ -101,19 +95,13 @@ export default function Users({ currentUserId }: UsersProps) {
         );
       })}
 
-      {isAlone && isAuthenticated && !calledContactEmail && (
-        <InviteCard
-          roomId={roomId!}
-          onUserInvited={(email) => {
-            navigate('.', { replace: true, state: { calledContactEmail: email } });
-            setCalledContactEmail(email);
-          }}
-        />
+      {isAlone && isAuthenticated && !invitedContact && (
+        <InviteCard roomId={roomId!} onUserInvited={(contact) => setInvitedContact(contact)} />
       )}
 
-      {isAlone && calledContactEmail && (
+      {isAlone && invitedContact && (
         <CallingCard
-          email={calledContactEmail}
+          contact={invitedContact}
           onCancel={handleCancelInvite}
           declined={isCallDeclined}
         />
