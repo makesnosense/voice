@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { Text, Pressable, StyleSheet } from 'react-native';
-import { BORDER_MUTED, TEXT_MUTED } from '../../../../styles/colors';
+import { Pressable, StyleSheet } from 'react-native';
+import {
+  NEUTRAL_COLOR,
+  BORDER_MUTED,
+  TEXT_MUTED,
+} from '../../../../styles/colors';
 import { pressedStyle } from '../../../../styles/common';
 import InviteModal from './invite-modal/InviteModal';
-import PhonePlus from './PhonePlus';
+import { UserPlus } from 'lucide-react-native';
 import type { InvitedContact } from '../../../../../../shared/types/contacts';
 import type { RoomId } from '../../../../../../shared/types/core';
 
@@ -21,8 +25,7 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
         style={({ pressed }) => [styles.card, pressed && pressedStyle]}
         onPress={() => setIsModalOpen(true)}
       >
-        <PhonePlus size={18} color={TEXT_MUTED} />
-        <Text style={styles.label}>Add user</Text>
+        <UserPlus size={34} color={NEUTRAL_COLOR} />
       </Pressable>
 
       {isModalOpen && (
@@ -45,10 +48,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BORDER_MUTED,
     borderStyle: 'dashed',
-    // padding: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
     height: 150,
   },
   label: {
