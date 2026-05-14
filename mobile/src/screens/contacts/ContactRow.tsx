@@ -19,6 +19,9 @@ interface ContactRowProps {
 
 function ContactRow({ contact, onRemove }: ContactRowProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCalling, setIsCalling] = useState(false);
+
+  const isRemoveModeActive = onRemove !== undefined;
 
   const handleRemove = async () => {
     if (isDeleting || !onRemove) return;
@@ -30,7 +33,45 @@ function ContactRow({ contact, onRemove }: ContactRowProps) {
     }
   };
 
-  const isRemoveModeActive = onRemove !== undefined;
+  const handleCall = async () => {
+    if (isCalling) return;
+    setIsCalling(true);
+    await startCall({
+      contactId: contact.id,
+      contactEmail: contact.email,
+      contactName: contact.name,
+    });
+    setIsCalling(false);
+  };
+
+  const renderRightSlot = () => {
+    if (isRemoveModeActive)
+      return (
+        <Pressable
+          onPress={handleRemove}
+          disabled={isDeleting}
+          style={({ pressed }) => [styles.rightSlot, pressed && pressedStyle]}
+          hitSlop={8}
+        >
+          {isDeleting ? (
+            <ActivityIndicator size="small" color={TEXT_MUTED} />
+          ) : (
+            <Trash2 size={20} color="#ef4444" strokeWidth={1.75} />
+          )}
+        </Pressable>
+      );
+
+    if (isCalling)
+      return (
+        <ActivityIndicator
+          size="small"
+          color={TEXT_MUTED}
+          style={styles.rightSlot}
+        />
+      );
+
+    return null;
+  };
 
   return (
     <Pressable
@@ -41,14 +82,8 @@ function ContactRow({ contact, onRemove }: ContactRowProps) {
           !contact.hasMobileDevice &&
           styles.contactRowDisabled,
       ]}
-      disabled={isRemoveModeActive || !contact.hasMobileDevice}
-      onPress={() =>
-        startCall({
-          contactId: contact.id,
-          contactEmail: contact.email,
-          contactName: contact.name,
-        })
-      }
+      disabled={isRemoveModeActive || !contact.hasMobileDevice || isCalling}
+      onPress={handleCall}
     >
       <View style={styles.contactInfo}>
         <Text
@@ -68,23 +103,7 @@ function ContactRow({ contact, onRemove }: ContactRowProps) {
         )}
       </View>
 
-      {isRemoveModeActive && (
-        <Pressable
-          onPress={handleRemove}
-          disabled={isDeleting}
-          style={({ pressed }) => [
-            styles.removeButton,
-            pressed && pressedStyle,
-          ]}
-          hitSlop={8}
-        >
-          {isDeleting ? (
-            <ActivityIndicator size="small" color={TEXT_MUTED} />
-          ) : (
-            <Trash2 size={20} color="#ef4444" strokeWidth={1.75} />
-          )}
-        </Pressable>
-      )}
+      {renderRightSlot()}
     </Pressable>
   );
 }
@@ -116,7 +135,7 @@ const styles = StyleSheet.create({
   contactTextDisabled: {
     color: TEXT_MUTED,
   },
-  removeButton: {
+  rightSlot: {
     width: 36,
     alignItems: 'center',
     justifyContent: 'center',
