@@ -6,9 +6,8 @@
   justify-content: center;
   cursor: pointer;
   border-style: dashed;
-  color: #cbd5e1; /* slate-300 */
+  color: var(--text-very-muted);
   background: transparent;
-  transition: all 0.2s ease;
 }
 
 .inviteCard:hover {

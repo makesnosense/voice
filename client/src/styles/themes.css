@@ -7,6 +7,7 @@
   --text-primary: #1e293b; /* slate-800 */
   --text-secondary: #64748b; /* slate-500 */
   --text-muted: #94a3b8; /* slate-400 */
+  --text-very-muted: #cbd5e1; /* slate-300 */
 
   --border-primary: rgba(226, 232, 240, 0.8); /* slate-200 */
   --border-secondary: rgba(71, 85, 105, 0.3); /* slate-600 */
@@ -39,6 +40,7 @@
   --text-primary: #f1f5f9; /* slate-100 */
   --text-secondary: #cbd5e1; /* slate-300 */
   --text-muted: #71849e; /* custom */
+  --text-very-muted: #4a5e78; /* custom */
 
   --border-primary: rgba(51, 65, 85, 0.8); /* slate-700 */
   --border-secondary: rgba(156, 163, 175, 0.25); /* gray-400 (not slate) */
