@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PhoneCall } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import baseStyles from '../../../../../styles/BaseCard.module.css';
 import styles from './InviteCard.module.css';
 import InviteModal from './invite-modal/InviteModal';
@@ -21,8 +21,7 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
         onClick={() => setIsModalOpen(true)}
         title="Add user to room"
       >
-        <PhoneCall size={18} className={styles.icon} />
-        <span className={styles.label}>Add user</span>
+        <UserPlus size={32} />
       </button>
 
       {isModalOpen && (
