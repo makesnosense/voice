@@ -1,11 +1,12 @@
 import { ApiBase } from './base';
 import type { RenewAccessTokenResponse } from '../types/auth';
 import type { DataExport } from '../types/core';
+import type { PublicUser } from '../types/users';
 
 export class UsersApi extends ApiBase {
-  getUserByEmail(email: string, accessToken: string): Promise<{ id: string }> {
+  getUserByEmail(email: string, accessToken: string): Promise<PublicUser> {
     const params = new URLSearchParams({ email });
-    return this.apiFetch<{ id: string }>(`/users?${params}`, {
+    return this.apiFetch<PublicUser>(`/users?${params}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
   }

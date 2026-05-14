@@ -5,7 +5,11 @@ import { getCallHistory } from './calls';
 import { getContacts } from './contacts';
 
 export async function findUserByEmail(email: string) {
-  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const [user] = await db
+    .select({ id: users.id, email: users.email, name: users.name })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
   return user ?? null;
 }
 
