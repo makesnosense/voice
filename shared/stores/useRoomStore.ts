@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import type { UserDataClientSide, Message } from '../types/core';
 import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../constants/room';
-import type { InvitedContact } from '../types/contacts';
 
 interface RoomState {
   roomUsers: UserDataClientSide[];
