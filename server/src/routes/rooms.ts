@@ -101,6 +101,8 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
         room.pendingInviteFcmTokens.map((token) => sendCallCancelledNotification(token))
       );
 
+      room.pendingInviteFcmTokens = [];
+
       console.log(`🚫 [Rooms] call cancelled for room ${roomId}`);
       res.status(204).end();
     }
