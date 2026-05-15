@@ -63,12 +63,17 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
     }
   });
 
-  router.post('/:roomId/decline', inviteDeclineLimiter, (req, res) => {
+  router.post('/:roomId/decline', inviteDeclineLimiter, async (req, res) => {
     const roomId = req.params.roomId as RoomId;
 
-    if (!rooms.has(roomId)) {
-      return res.status(404).json({ error: 'room not found' });
-    }
+    const room = rooms.get(roomId);
+    if (!room) return res.status(404).json({ error: 'room not found' });
+
+    // cancel notifications on all other devices
+    await Promise.allSettled(
+      room.pendingInviteFcmTokens.map((token) => sendCallCancelledNotification(token))
+    );
+    room.pendingInviteFcmTokens = [];
 
     io.to(roomId).emit('call-declined');
     console.log(`📵 [Rooms] call declined for room ${roomId}`);

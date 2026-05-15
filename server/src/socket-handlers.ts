@@ -14,6 +14,7 @@ import type {
   UserDataClientSide,
 } from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
+import { sendCallCancelledNotification } from './utils/fcm';
 
 export default function createConnectionHandler(
   io: TypedServer,
@@ -197,6 +198,13 @@ const handleRoomJoin = (
 
   // send success to the joining user
   socket.emit('room-join-success', { roomId });
+
+  if (room.pendingInviteFcmTokens.length > 0) {
+    room.pendingInviteFcmTokens.forEach((token) =>
+      sendCallCancelledNotification(token).catch(() => {})
+    );
+    room.pendingInviteFcmTokens = [];
+  }
 };
 
 const handleNewMessage = (
