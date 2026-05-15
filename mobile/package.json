@@ -11,7 +11,8 @@
     "android:clean": "cd android && ./gradlew clean",
     "android:release": "cd android && ./gradlew assembleRelease",
     "android:release:install": "adb install $(ls android/app/build/outputs/apk/release/*.apk)",
-    "android:release:run": "npm run android:release && npm run android:release:install"
+    "android:release:run": "npm run android:release && npm run android:release:install",
+    "version:patch": "npm version patch --no-git-tag-version"
   },
   "dependencies": {
     "@react-native-clipboard/clipboard": "^1.16.3",
