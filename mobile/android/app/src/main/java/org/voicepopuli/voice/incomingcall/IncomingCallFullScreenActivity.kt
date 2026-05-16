@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import kotlin.concurrent.thread
+import android.widget.ImageButton
 
 import org.voicepopuli.voice.MainActivity
 import org.voicepopuli.voice.R
@@ -84,11 +85,12 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.callerName).text = callerName
 
-        findViewById<Button>(R.id.btnAccept).setOnClickListener {
+
+        findViewById<ImageButton>(R.id.btnAccept).setOnClickListener {
             acceptCall(roomId)
         }
 
-        findViewById<Button>(R.id.btnDecline).setOnClickListener {
+        findViewById<ImageButton>(R.id.btnDecline).setOnClickListener {
             declineCall()
         }
     }

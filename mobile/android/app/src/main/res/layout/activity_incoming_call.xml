@@ -5,16 +5,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#0f172a"
+    android:background="#f8fafc"
     android:padding="32dp">
 
     <TextView
         android:id="@+id/callerName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="28sp"
-        android:textColor="#f1f5f9"
-        android:layout_marginBottom="8dp"/>
+        android:textSize="36sp"
+        android:textColor="#1e293b"
+        android:layout_marginBottom="12dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -31,25 +31,61 @@
         android:gravity="center"
         android:weightSum="2">
 
-        <Button
-            android:id="@+id/btnDecline"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="12dp"
-            android:text="decline"
-            android:backgroundTint="#ef4444"
-            android:textColor="#ffffff"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginEnd="12dp">
 
-        <Button
-            android:id="@+id/btnAccept"
-            android:layout_width="0dp"
+        <ImageButton
+            android:id="@+id/btnDecline"
+            android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_btn_decline"
+            android:src="@drawable/call_end_24px"
+            android:tint="#ef4444"
+            android:scaleType="fitCenter"
+            android:contentDescription="decline"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="decline"
+                android:textSize="14sp"
+                android:textColor="#94a3b8"
+                android:layout_marginTop="6dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:text="accept"
-            android:backgroundTint="#22c55e"
-            android:textColor="#ffffff"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="12dp">
+
+        <ImageButton
+            android:id="@+id/btnAccept"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_btn_accept"
+            android:src="@drawable/call_24px"
+            android:tint="#22c55e"
+            android:scaleType="fitCenter"
+            android:contentDescription="accept"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="accept"
+                android:textSize="14sp"
+                android:textColor="#94a3b8"
+                android:layout_marginTop="6dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>
