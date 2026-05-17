@@ -51,8 +51,11 @@ export default function PrivacyPage() {
               cached locally on the user's device.
             </li>
             <li>
-              <strong>Device tokens</strong> — FCM tokens stored on Voice's server to deliver
-              incoming call notifications to the user's device.
+              <strong>Device information</strong> — device name (e.g. "Samsung Galaxy S22" or
+              "Chrome on macOS"), platform, last active timestamp, and FCM token are stored on
+              Voice's server per signed-in session. This is used to identify active sessions and
+              deliver incoming call notifications. Device records are removed on logout or when
+              manually removed from the active sessions list in Settings.
             </li>
             <li>
               <strong>Contacts</strong> — the list of users you have added as contacts is stored on
@@ -113,7 +116,7 @@ export default function PrivacyPage() {
           <h2 className={styles.heading}>Data retention</h2>
           <p className={styles.paragraph}>
             Data is retained until account deletion. Deleting an account permanently removes the
-            associated email, name, contacts, device tokens, and call history from Voice's server.
+            associated email, name, contacts, device records, and call history from Voice's server.
             This includes any call history entries that appear in other users' history involving the
             deleted account.
           </p>
