@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ThemeSelector from './theme-selector/ThemeSelector';
-import { User, KeyRound } from 'lucide-react';
+import { User, KeyRound, Loader } from 'lucide-react';
 import baseStyles from '../../../styles/BaseCard.module.css';
 import pillStyles from './Pill.module.css';
 import { useAuthStore } from '../../../stores/useAuthStore';
@@ -16,11 +16,10 @@ const OPEN_DROPDOWN = {
 type OpenDropdown = ObjectValues<typeof OPEN_DROPDOWN> | null;
 
 export default function Pill() {
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitializing = useAuthStore((state) => state.isInitializing);
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
-
   const [isAuthSuccessDelayActive, setIsAuthSuccessDelayActive] = useState(false);
-
   const pillRef = useRef<HTMLDivElement>(null);
 
   const handleLoginSuccessTimeout = () => {
@@ -56,8 +55,18 @@ export default function Pill() {
       <ThemeSelector isOpen={openDropdown === OPEN_DROPDOWN.THEME} onToggle={handleThemeToggle} />
       <div className={pillStyles.separator} />
       <div className={pillStyles.userSection}>
-        <button className={pillStyles.userButton} onClick={handleUserToggle}>
-          {isAuthenticated ? <User size={18} /> : <KeyRound size={18} />}
+        <button
+          className={pillStyles.userButton}
+          onClick={handleUserToggle}
+          disabled={isInitializing}
+        >
+          {isInitializing ? (
+            <Loader size={18} className={pillStyles.spinner} />
+          ) : isAuthenticated ? (
+            <User size={18} />
+          ) : (
+            <KeyRound size={18} />
+          )}
         </button>
 
         {openDropdown === OPEN_DROPDOWN.USER && (
