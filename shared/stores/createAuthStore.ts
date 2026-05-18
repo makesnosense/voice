@@ -5,6 +5,7 @@ import type { Api } from '../api';
 import type { TokenStorage, User } from '../types/auth';
 
 export interface AuthStore {
+  isInitializing: boolean;
   accessToken: string | null;
   user: User | null;
   currentDeviceJti: string | null;
@@ -45,32 +46,36 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
     };
 
     return {
+      isInitializing: true,
       accessToken: null,
       user: null,
       currentDeviceJti: null,
       isAuthenticated: false,
       isLoading: false,
-
       initialize: async () => {
-        let refreshToken: string | null;
         try {
-          refreshToken = await storage.getRefreshToken();
-        } catch (error) {
-          console.error('❌ failed to read token storage:', error);
-          return;
-        }
-        if (!refreshToken) return;
-
-        try {
-          await get().getValidAccessToken();
-          console.log('✅ session restored');
-        } catch (error) {
-          if (error instanceof ApiError && error.status === 401) {
-            console.error('❌ auth rejected by server, clearing credentials');
-            await get().logout();
-          } else {
-            console.error('❌ session restore failed, keeping credentials:', error);
+          let refreshToken: string | null;
+          try {
+            refreshToken = await storage.getRefreshToken();
+          } catch (error) {
+            console.error('❌ failed to read token storage:', error);
+            return;
           }
+          if (!refreshToken) return;
+
+          try {
+            await get().getValidAccessToken();
+            console.log('✅ session restored');
+          } catch (error) {
+            if (error instanceof ApiError && error.status === 401) {
+              console.error('❌ auth rejected by server, clearing credentials');
+              await get().logout();
+            } else {
+              console.error('❌ session restore failed, keeping credentials:', error);
+            }
+          }
+        } finally {
+          set({ isInitializing: false });
         }
       },
 

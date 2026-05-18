@@ -7,13 +7,18 @@ import LandingPage from './pages/LandingPage';
 import SettingsPage from './pages/settings/SettingsPage';
 import RoomPage from './pages/room/RoomPage';
 import PrivacyPage from './pages/privacy/PrivacyPage';
+import Spinner from './components/spinner/Spinner';
 
 export default function App() {
+  const isInitializing = useAuthStore((state) => state.isInitializing);
+
   useEffect(() => {
     useAuthStore.getState().initialize();
   }, []);
 
   useDeviceRegistration();
+
+  if (isInitializing) return <Spinner />;
 
   return (
     <Routes>
