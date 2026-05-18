@@ -15,13 +15,15 @@ export function useRoomSocket(
   roomId: RoomId,
   onDisconnect: () => void,
   onCleanup: () => void,
-  onJoinSuccess?: (roomId: RoomId) => void,
+  accessToken?: string,
+  onJoinSuccess?: (roomId: RoomId) => void, // mobile-only for rejoin
   url?: string
 ) {
   const socketRef = useRef<TypedClientSocket | null>(null);
 
   useEffect(() => {
-    const socket: TypedClientSocket = url ? io(url, SOCKET_OPTIONS) : io(SOCKET_OPTIONS);
+    const options = { ...SOCKET_OPTIONS, ...(accessToken ? { auth: { accessToken } } : {}) };
+    const socket: TypedClientSocket = url ? io(url, options) : io(options);
     socketRef.current = socket;
 
     socket.on('connect', () => {

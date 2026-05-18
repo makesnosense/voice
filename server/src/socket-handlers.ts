@@ -117,6 +117,8 @@ const getUsersForClient = (room: Room): UserDataClientSide[] => {
   return Array.from(room.users.entries()).map(([userId, userData]) => ({
     userId,
     isMuted: userData.isMuted,
+    name: userData.name,
+    email: userData.email,
   }));
 };
 
@@ -186,7 +188,12 @@ const handleRoomJoin = (
     roomDestructionManager.cancelDestruction(roomId);
   }
 
-  room.users.set(socket.id as SocketId, { webRTCReady: false, isMuted: false });
+  room.users.set(socket.id as SocketId, {
+    webRTCReady: false,
+    isMuted: false,
+    name: socket.data.name ?? null,
+    email: socket.data.email ?? null,
+  });
 
   socket.join(roomId);
   socket.roomId = roomId as RoomId;

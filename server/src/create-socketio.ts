@@ -11,6 +11,7 @@ import type {
   ExtendedConnectedSocket,
 } from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
+import { verifyAccessToken } from './utils/jwt';
 
 const getClientIp = (socket: ExtendedConnectedSocket): string => {
   if (config.rateLimiting.trustProxy) {
@@ -51,6 +52,20 @@ export function createSocketIO(
     if (!allowed) {
       console.warn(`🚫 [RateLimit] connection rejected for ${ip}`);
       return next(new Error('too many connections'));
+    }
+    next();
+  });
+
+  io.use((socket, next) => {
+    const token = socket.handshake.auth?.accessToken;
+    if (token) {
+      try {
+        const payload = verifyAccessToken(token);
+        socket.data.name = payload.name;
+        socket.data.email = payload.email;
+      } catch {
+        // anonymous — socket.data fields stay undefined, collapse to null on join
+      }
     }
     next();
   });

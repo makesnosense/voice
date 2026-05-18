@@ -8,12 +8,24 @@ export type ObjectValues<T> = T[keyof T];
 export type RoomId = string & { readonly __brand: 'RoomId' };
 export type SocketId = string & { readonly __brand: 'SocketId' };
 
-export interface UserDataServerSide {
+// pre-collapse: fields may be absent if socket is anonymous
+export interface VoiceSocketData {
+  name?: string | null;
+  email?: string | null;
+}
+
+// post-collapse: always present, anonymous users get null
+export interface UserIdentity {
+  name: string | null;
+  email: string | null;
+}
+
+export interface UserDataServerSide extends UserIdentity {
   webRTCReady: boolean;
   isMuted: boolean;
 }
 
-export interface UserDataClientSide {
+export interface UserDataClientSide extends UserIdentity {
   userId: SocketId;
   isMuted: boolean;
 }
@@ -71,12 +83,14 @@ export interface ClientToServerEvents {
   'webrtc-ice-candidate': (data: { candidate: IceCandidate; toUserId: SocketId }) => void;
 }
 
-export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
+export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents, {}, VoiceSocketData>;
 export type TypedClientSocket = ClientSocket<ServerToClientEvents, ClientToServerEvents>;
 
 export type ExtendedConnectedSocket = ConnectedSocket<
   ClientToServerEvents,
-  ServerToClientEvents
+  ServerToClientEvents,
+  {},
+  VoiceSocketData
 > & {
   roomId?: RoomId;
 };

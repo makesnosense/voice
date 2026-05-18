@@ -57,6 +57,8 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
     state => state.requestMicrophone,
   );
 
+  const accessToken = useAuthStore(state => state.accessToken);
+
   useEffect(() => {
     requestMicrophone();
   }, [requestMicrophone]);
@@ -65,10 +67,10 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
     roomId,
     handleDisconnect,
     handleCleanup,
+    accessToken ?? undefined,
     handleJoinSuccess,
     BASE_URL,
   );
-
   useWebRTCInit(socketRef);
 
   useEffect(() => {

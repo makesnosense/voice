@@ -12,6 +12,7 @@ import {
   STATUS_YELLOW,
   STATUS_RED,
 } from '../../../styles/colors';
+import { getDisplayName } from '../../../../../shared/utils/display-name';
 
 const CONNECTION_DOT_COLOR: Record<string, string> = {
   [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: TEXT_MUTED,
@@ -28,10 +29,11 @@ export default function RemoteUserCard() {
   );
 
   const remoteUser = roomUsers.find(u => u.userId === remoteUserId);
+  const displayName = getDisplayName(remoteUser?.name, remoteUser?.email);
 
   return (
     <View style={styles.card}>
-      <Text style={styles.name}>Other</Text>
+      <Text style={styles.name}>{displayName}</Text>
 
       {remoteUser?.isMuted ? (
         <MicOff size={22} color={STATUS_RED} />

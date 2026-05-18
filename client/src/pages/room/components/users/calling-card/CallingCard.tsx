@@ -4,6 +4,7 @@ import userCardStyles from '../usercard/UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import callingCardStyles from './CallingCard.module.css';
 import type { InvitedContact } from '../../../../../../../shared/types/contacts';
+import { getDisplayName } from '../../../../../../../shared/utils/display-name';
 
 interface CallingCardProps {
   contact: InvitedContact;
@@ -12,7 +13,7 @@ interface CallingCardProps {
 }
 
 export default function CallingCard({ contact, onCancel, declined = false }: CallingCardProps) {
-  const displayName = contact.name ?? contact.email.split('@')[0];
+  const displayName = getDisplayName(contact.name, contact.email);
 
   return (
     <div

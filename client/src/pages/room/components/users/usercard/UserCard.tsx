@@ -4,10 +4,10 @@ import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from './UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import WebRTCConnectionStatusDot from './WebRTCConnectionStatusDot/WebRTCConnectionStatusDot';
-import type { SocketId, AudioFrequencyData } from '../../../../../../../shared/types/core';
+import type { AudioFrequencyData } from '../../../../../../../shared/types/core';
 
 interface UserCardProps {
-  userId: SocketId;
+  displayName: string;
   isCurrentUser: boolean;
 
   // audio visualization (for any user)
@@ -26,6 +26,7 @@ interface UserCardProps {
 }
 
 export default function UserCard({
+  displayName,
   isCurrentUser,
   getAudioData,
   isAudioActive = false,
@@ -34,8 +35,6 @@ export default function UserCard({
   isMicConnected = false,
   isRemoteUserMuted = false,
 }: UserCardProps) {
-  const displayName = isCurrentUser ? 'You' : 'Other';
-
   const isMutedRemoteUser = !isCurrentUser && isRemoteUserMuted;
 
   return (
