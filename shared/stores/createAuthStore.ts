@@ -45,6 +45,15 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
       }
     };
 
+    const getRefreshTokenFromStorage = async (): Promise<string | null> => {
+      try {
+        return await storage.getRefreshToken();
+      } catch (error) {
+        console.error('❌ failed to read token storage:', error);
+        return null;
+      }
+    };
+
     return {
       isInitializing: true,
       accessToken: null,
@@ -52,27 +61,20 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
       currentDeviceJti: null,
       isAuthenticated: false,
       isLoading: false,
+
       initialize: async () => {
         try {
-          let refreshToken: string | null;
-          try {
-            refreshToken = await storage.getRefreshToken();
-          } catch (error) {
-            console.error('❌ failed to read token storage:', error);
-            return;
-          }
+          const refreshToken = await getRefreshTokenFromStorage();
           if (!refreshToken) return;
 
-          try {
-            await get().getValidAccessToken();
-            console.log('✅ session restored');
-          } catch (error) {
-            if (error instanceof ApiError && error.status === 401) {
-              console.error('❌ auth rejected by server, clearing credentials');
-              await get().logout();
-            } else {
-              console.error('❌ session restore failed, keeping credentials:', error);
-            }
+          await get().getValidAccessToken();
+          console.log('✅ signed in as', get().user?.email);
+        } catch (error) {
+          if (error instanceof ApiError && error.status === 401) {
+            console.error('❌ auth rejected by server, clearing credentials');
+            await get().logout();
+          } else {
+            console.error('❌ session restore failed, keeping credentials:', error);
           }
         } finally {
           set({ isInitializing: false });
