@@ -11,19 +11,27 @@ import type { RoomId } from '../../../../shared/types/core';
 import BackButton from '../../components/header/back-button/BackButton';
 import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackButton.constants';
 import { APP_ERROR } from '../../components/app-error/AppError.constants';
+import { useAuthStore } from '../../stores/useAuthStore';
 
 const exitButton = <BackButton label="Exit" variant={BACK_BUTTON_VARIANT.RED} to="/" />;
 
 export default function RoomPage() {
   const roomId = useRoomId(); // returns RoomId | null
   const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);
+  const isInitializing = useAuthStore((state) => state.isInitializing);
 
   const leftSlot = roomConnectionStatus === ROOM_CONNECTION_STATUS.JOINED ? exitButton : null;
 
   return (
     <div className={layoutStyles.page}>
       <Header leftSlot={leftSlot} />
-      {roomId ? <RoomPageContent roomId={roomId} /> : <AppError error={APP_ERROR.ROOM_NOT_FOUND} />}
+      {!roomId ? (
+        <AppError error={APP_ERROR.ROOM_NOT_FOUND} />
+      ) : isInitializing ? (
+        <Spinner />
+      ) : (
+        <RoomPageContent roomId={roomId} />
+      )}
     </div>
   );
 }
