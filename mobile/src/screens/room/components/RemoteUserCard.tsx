@@ -12,7 +12,7 @@ import {
   STATUS_YELLOW,
   STATUS_RED,
 } from '../../../styles/colors';
-import { getDisplayName } from '../../../../../shared/utils/display-name';
+import { formatDisplayName } from '../../../../../shared/utils/format';
 
 const CONNECTION_DOT_COLOR: Record<string, string> = {
   [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: TEXT_MUTED,
@@ -29,7 +29,7 @@ export default function RemoteUserCard() {
   );
 
   const remoteUser = roomUsers.find(user => user.socketId === remoteSocketId);
-  const displayName = getDisplayName(remoteUser?.name, remoteUser?.email);
+  const displayName = formatDisplayName(remoteUser?.name, remoteUser?.email);
 
   return (
     <View style={styles.card}>

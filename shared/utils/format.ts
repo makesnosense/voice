@@ -8,3 +8,10 @@ export const formatLastSeen = (lastSeen: string): string => {
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
 };
+
+export const formatDisplayName = (
+  name: string | null | undefined,
+  email: string | null | undefined
+): string => {
+  return name ?? email?.split('@')[0] ?? 'Other';
+};

@@ -2,7 +2,7 @@ import { Monitor, Smartphone } from 'lucide-react';
 import sessionRowStyles from './SessionRow.module.css';
 import { PLATFORM } from '../../../../../../shared/constants/platform';
 import RemoveButton from '../../../../components/remove-button/RemoveButton';
-import { formatLastSeen } from '../../../../../../shared/utils/format-last-seen';
+import { formatLastSeen } from '../../../../../../shared/utils/format';
 import type { Device } from '../../../../../../shared/types/devices';
 
 interface SessionRowProps {

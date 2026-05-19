@@ -10,7 +10,7 @@ import { useInvitedUserStore } from '../../../../stores/useInvitedUserStore';
 import usersStyles from './Users.module.css';
 import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
-import { getDisplayName } from '../../../../../../shared/utils/display-name';
+import { formatDisplayName } from '../../../../../../shared/utils/format';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
 
 interface UsersProps {
@@ -66,7 +66,7 @@ export default function Users({ localSocketId }: UsersProps) {
         const isLocalUser = user.socketId === localSocketId;
         const isRemoteUser = user.socketId === remoteSocketId;
 
-        const displayName = isLocalUser ? 'You' : getDisplayName(user.name, user.email);
+        const displayName = isLocalUser ? 'You' : formatDisplayName(user.name, user.email);
 
         let getAudioData: (() => AudioFrequencyData) | undefined;
         let isUserAudioActive = false;

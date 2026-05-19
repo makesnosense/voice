@@ -14,7 +14,7 @@ import {
   NEUTRAL_COLOR,
   BACKGROUND_PRIMARY,
 } from '../../../styles/colors';
-import { formatLastSeen } from '../../../../../shared/utils/format-last-seen';
+import { formatLastSeen } from '../../../../../shared/utils/format';
 import type { Device } from '../../../../../shared/types/devices';
 
 interface DeviceRowProps {
