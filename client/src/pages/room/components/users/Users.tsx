@@ -14,10 +14,10 @@ import { getDisplayName } from '../../../../../../shared/utils/display-name';
 import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
 
 interface UsersProps {
-  currentUserId: SocketId | undefined;
+  localSocketId: SocketId | undefined;
 }
 
-export default function Users({ currentUserId }: UsersProps) {
+export default function Users({ localSocketId }: UsersProps) {
   const roomId = useRoomId();
 
   const invitedUser = useInvitedUserStore((state) => state.invitedUser);
@@ -31,7 +31,7 @@ export default function Users({ currentUserId }: UsersProps) {
   const isMicActive = useWebRTCStore((state) => state.isMicActive);
   const isMutedLocal = useWebRTCStore((state) => state.isMutedLocal);
   const toggleMute = useWebRTCStore((state) => state.toggleMute);
-  const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
+  const remoteSocketId = useWebRTCStore((state) => state.remoteSocketId);
 
   const handleCancelInvite = async () => {
     useInvitedUserStore.setState({ invitedUser: null });
@@ -63,15 +63,15 @@ export default function Users({ currentUserId }: UsersProps) {
   return (
     <div className={usersStyles.usersContainer}>
       {roomUsers.map((user) => {
-        const isCurrentUser = user.userId === currentUserId;
-        const isRemoteUser = user.userId === remoteUserId;
+        const isLocalUser = user.socketId === localSocketId;
+        const isRemoteUser = user.socketId === remoteSocketId;
 
-        const displayName = isCurrentUser ? 'You' : getDisplayName(user.name, user.email);
+        const displayName = isLocalUser ? 'You' : getDisplayName(user.name, user.email);
 
         let getAudioData: (() => AudioFrequencyData) | undefined;
         let isUserAudioActive = false;
 
-        if (isCurrentUser && isMicActive) {
+        if (isLocalUser && isMicActive) {
           getAudioData = () => useAudioAnalyserStore.getState().getLocalAudioData();
           isUserAudioActive = !isMutedLocal;
         } else if (isRemoteUser) {
@@ -81,15 +81,15 @@ export default function Users({ currentUserId }: UsersProps) {
 
         return (
           <UserCard
-            key={user.userId}
+            key={user.socketId}
             displayName={displayName}
-            isCurrentUser={isCurrentUser}
+            isCurrentUser={isLocalUser}
             getAudioData={getAudioData}
             isAudioActive={isUserAudioActive}
-            isMutedLocal={isCurrentUser ? isMutedLocal : undefined}
-            onToggleMute={isCurrentUser ? toggleMute : undefined}
-            isMicConnected={isCurrentUser ? isMicActive : undefined}
-            isRemoteUserMuted={!isCurrentUser ? user.isMuted : undefined}
+            isMutedLocal={isLocalUser ? isMutedLocal : undefined}
+            onToggleMute={isLocalUser ? toggleMute : undefined}
+            isMicConnected={isLocalUser ? isMicActive : undefined}
+            isRemoteUserMuted={!isLocalUser ? user.isMuted : undefined}
           />
         );
       })}

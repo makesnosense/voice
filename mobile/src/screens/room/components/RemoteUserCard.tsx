@@ -23,12 +23,12 @@ const CONNECTION_DOT_COLOR: Record<string, string> = {
 
 export default function RemoteUserCard() {
   const roomUsers = useRoomStore(state => state.roomUsers);
-  const remoteUserId = useWebRTCStore(state => state.remoteUserId);
+  const remoteSocketId = useWebRTCStore(state => state.remoteSocketId);
   const webRTCConnectionState = useWebRTCStore(
     state => state.webRTCConnectionState,
   );
 
-  const remoteUser = roomUsers.find(u => u.userId === remoteUserId);
+  const remoteUser = roomUsers.find(user => user.socketId === remoteSocketId);
   const displayName = getDisplayName(remoteUser?.name, remoteUser?.email);
 
   return (

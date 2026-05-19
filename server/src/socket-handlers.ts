@@ -114,8 +114,8 @@ const checkRateLimit = (
 
 // helper function to convert server user data to client user data
 const getUsersForClient = (room: Room): UserDataClientSide[] => {
-  return Array.from(room.users.entries()).map(([userId, userData]) => ({
-    userId,
+  return Array.from(room.users.entries()).map(([socketId, userData]) => ({
+    socketId,
     isMuted: userData.isMuted,
     name: userData.name,
     email: userData.email,
@@ -125,26 +125,26 @@ const getUsersForClient = (room: Room): UserDataClientSide[] => {
 const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number => {
   let removedCount = 0;
 
-  for (const [userId, userData] of room.users.entries()) {
-    const socket = io.sockets.sockets.get(userId);
+  for (const [socketId, userData] of room.users.entries()) {
+    const socket = io.sockets.sockets.get(socketId);
 
     // kick if socket is dead or disconnected
     if (!socket || !socket.connected) {
-      console.log(`💀 [Cleanup] removing dead socket ${userId} from room ${roomId}`);
-      room.users.delete(userId);
-      io.to(roomId).emit('user-left', userId as SocketId);
+      console.log(`💀 [Cleanup] removing dead socket ${socketId} from room ${roomId}`);
+      room.users.delete(socketId);
+      io.to(roomId).emit('user-left', socketId as SocketId);
       removedCount++;
       continue;
     }
 
     // kick if not webrtc ready (stuck in some broken state)
     if (!userData.webRTCReady) {
-      console.log(`🚫 [Cleanup] removing non-webRTC-ready socket ${userId} from room ${roomId}`);
-      room.users.delete(userId);
+      console.log(`🚫 [Cleanup] removing non-webRTC-ready socket ${socketId} from room ${roomId}`);
+      room.users.delete(socketId);
 
       socket.disconnect(true);
 
-      io.to(roomId).emit('user-left', userId as SocketId);
+      io.to(roomId).emit('user-left', socketId as SocketId);
       removedCount++;
     }
   }
@@ -237,7 +237,7 @@ const handleNewMessage = (
 
   const message: Message = {
     text: data.text,
-    userId: socket.id as SocketId,
+    socketId: socket.id as SocketId,
     timestamp: Date.now(),
   };
 
@@ -349,38 +349,38 @@ const handleMuteStatusChanged = (
 const handleWebRTCOffer = (
   io: TypedServer,
   socket: ExtendedConnectedSocket,
-  data: { offer: WebRTCOffer; toUserId: SocketId }
+  data: { offer: WebRTCOffer; toSocketId: SocketId }
 ) => {
-  console.log(`📞 Relaying offer from ${socket.id} to ${data.toUserId}`);
+  console.log(`📞 Relaying offer from ${socket.id} to ${data.toSocketId}`);
 
-  io.to(data.toUserId).emit('webrtc-offer', {
+  io.to(data.toSocketId).emit('webrtc-offer', {
     offer: data.offer,
-    fromUserId: socket.id as SocketId,
+    fromSocketId: socket.id as SocketId,
   });
 };
 
 const handleWebRTCAnswer = (
   io: TypedServer,
   socket: ExtendedConnectedSocket,
-  data: { answer: WebRTCAnswer; toUserId: SocketId }
+  data: { answer: WebRTCAnswer; toSocketId: SocketId }
 ) => {
-  console.log(`✅ Relaying answer from ${socket.id} to ${data.toUserId}`);
+  console.log(`✅ Relaying answer from ${socket.id} to ${data.toSocketId}`);
 
-  io.to(data.toUserId).emit('webrtc-answer', {
+  io.to(data.toSocketId).emit('webrtc-answer', {
     answer: data.answer,
-    fromUserId: socket.id as SocketId,
+    fromSocketId: socket.id as SocketId,
   });
 };
 
 const handleWebRTCIceCandidate = (
   io: TypedServer,
   socket: ExtendedConnectedSocket,
-  data: { candidate: IceCandidate; toUserId: SocketId }
+  data: { candidate: IceCandidate; toSocketId: SocketId }
 ) => {
-  console.log(`🧊 Relaying ICE candidate from ${socket.id} to ${data.toUserId}`);
+  console.log(`🧊 Relaying ICE candidate from ${socket.id} to ${data.toSocketId}`);
 
-  io.to(data.toUserId).emit('webrtc-ice-candidate', {
+  io.to(data.toSocketId).emit('webrtc-ice-candidate', {
     candidate: data.candidate,
-    fromUserId: socket.id as SocketId,
+    fromSocketId: socket.id as SocketId,
   });
 };

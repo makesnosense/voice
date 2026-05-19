@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import type { SocketId } from '../../../../../shared/types/core';
 
 interface RemoteAudioProps {
-  userId: SocketId;
+  socketId: SocketId;
   stream: MediaStream;
   onAutoplayBlocked?: () => void;
 }
 
-export default function RemoteAudio({ userId, stream, onAutoplayBlocked }: RemoteAudioProps) {
+export default function RemoteAudio({ socketId, stream, onAutoplayBlocked }: RemoteAudioProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -23,24 +23,24 @@ export default function RemoteAudio({ userId, stream, onAutoplayBlocked }: Remot
         const playPromise = audioElement.play();
 
         await playPromise;
-        console.log(`✅ Playing audio for user ${userId}`);
+        console.log(`✅ Playing audio for user with socketId ${socketId}`);
       } catch (error: unknown) {
         if (error instanceof DOMException) {
           // ignore AbortError - this happens when play() is interrupted
           if (error.name === 'AbortError') {
-            console.log(`⏸️ Play interrupted for ${userId} (this is normal during mounting)`);
+            console.log(`⏸️ Play interrupted for ${socketId} (this is normal during mounting)`);
             return;
           }
 
           // handle NotAllowedError - browser blocked autoplay
           if (error.name === 'NotAllowedError') {
-            console.warn(`🔇 Autoplay blocked for ${userId}`, error);
+            console.warn(`🔇 Autoplay blocked for ${socketId}`, error);
             onAutoplayBlocked?.();
             return;
           }
         }
         // log other errors
-        console.error(`❌ Error playing audio for ${userId}:`, error);
+        console.error(`❌ Error playing audio for ${socketId}:`, error);
       }
     };
 
@@ -56,9 +56,15 @@ export default function RemoteAudio({ userId, stream, onAutoplayBlocked }: Remot
         audioElement.srcObject = null;
       }
     };
-  }, [stream, userId, onAutoplayBlocked]);
+  }, [stream, socketId, onAutoplayBlocked]);
 
   return (
-    <audio ref={audioRef} autoPlay playsInline style={{ display: 'none' }} data-user-id={userId} />
+    <audio
+      ref={audioRef}
+      autoPlay
+      playsInline
+      style={{ display: 'none' }}
+      data-user-id={socketId}
+    />
   );
 }

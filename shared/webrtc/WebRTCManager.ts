@@ -22,7 +22,7 @@ export class WebRTCManager {
   private localStream: MediaStream;
   private peerConnection: RTCPeerConnection | null = null;
   private socket: TypedClientSocket;
-  private currentRemoteUserId: SocketId | null = null;
+  private currentRemoteSocketId: SocketId | null = null;
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
   private isInitiator: boolean = false;
@@ -30,7 +30,7 @@ export class WebRTCManager {
   private pendingCandidates: IceCandidate[] = [];
   private remoteDescriptionSet: boolean = false;
 
-  private onStreamAdded: (userId: SocketId, stream: MediaStream) => void;
+  private onStreamAdded: (socketId: SocketId, stream: MediaStream) => void;
   private onStreamRemoved: (reason: DisconnectReason) => void;
 
   // callback to update WebRTCState in Zustand
@@ -51,29 +51,29 @@ export class WebRTCManager {
 
   private readonly socketHandlers = {
     // second user joins - we initiate
-    initiateWebRTCCall: async (remoteUserId: SocketId) => {
+    initiateWebRTCCall: async (remoteSocketId: SocketId) => {
       this.isInitiator = true;
-      console.log(`👋 [Socket] second user ${remoteUserId} joined - initiating WebRTC call`);
-      await this.initiateCall(remoteUserId);
+      console.log(`👋 [Socket] second user ${remoteSocketId} joined - initiating WebRTC call`);
+      await this.initiateCall(remoteSocketId);
     },
     // we are second user - handle incoming offer
-    webRTCOffer: async (data: { fromUserId: SocketId; offer: WebRTCOffer }) => {
-      console.log(`📞 [Socket] received WebRTC offer from ${data.fromUserId}`);
+    webRTCOffer: async (data: { fromSocketId: SocketId; offer: WebRTCOffer }) => {
+      console.log(`📞 [Socket] received WebRTC offer from ${data.fromSocketId}`);
       this.isInitiator = false;
-      await this.handleOffer(data.fromUserId, data.offer);
+      await this.handleOffer(data.fromSocketId, data.offer);
     },
     // we initiated - handle answer
-    webRTCAnswer: async (data: { fromUserId: SocketId; answer: WebRTCAnswer }) => {
-      console.log(`✅ [Socket] received WebRTC answer from ${data.fromUserId}`);
-      await this.handleAnswer(data.fromUserId, data.answer);
+    webRTCAnswer: async (data: { fromSocketId: SocketId; answer: WebRTCAnswer }) => {
+      console.log(`✅ [Socket] received WebRTC answer from ${data.fromSocketId}`);
+      await this.handleAnswer(data.fromSocketId, data.answer);
     },
-    webRTCIceCandidate: async (data: { fromUserId: SocketId; candidate: IceCandidate }) => {
-      console.log(`🧊 [Socket] received ICE candidate from ${data.fromUserId}`);
+    webRTCIceCandidate: async (data: { fromSocketId: SocketId; candidate: IceCandidate }) => {
+      console.log(`🧊 [Socket] received ICE candidate from ${data.fromSocketId}`);
       await this.handleIceCandidate(data.candidate);
     },
     // socket-level user left (not webrtc disconnect)
-    userLeft: (userId: SocketId) => {
-      console.log(`👋 [Socket] user ${userId} left the room (socket disconnect)`);
+    userLeft: (socketId: SocketId) => {
+      console.log(`👋 [Socket] user ${socketId} left the room (socket disconnect)`);
       this.handlePeerDisconnect(DISCONNECT_REASON.PEER_LEFT);
     },
   };
@@ -81,7 +81,7 @@ export class WebRTCManager {
   constructor(
     socket: TypedClientSocket,
     passedMicStream: MediaStream,
-    onStreamAdded: (userId: SocketId, stream: MediaStream) => void,
+    onStreamAdded: (socketId: SocketId, stream: MediaStream) => void,
     onStreamRemoved: (reason: DisconnectReason) => void,
     onConnectionStateChange: (state: WebRTCConnectionState) => void,
     turnServerConfig: {
@@ -109,10 +109,10 @@ export class WebRTCManager {
     this.setupSocketListeners();
   }
 
-  private async createPeerConnection(remoteUserId: SocketId): Promise<RTCPeerConnection> {
-    console.log(`🔗 [WebRTC] Creating peer connection to ${remoteUserId}`);
+  private async createPeerConnection(remoteSocketId: SocketId): Promise<RTCPeerConnection> {
+    console.log(`🔗 [WebRTC] Creating peer connection to ${remoteSocketId}`);
 
-    this.currentRemoteUserId = remoteUserId;
+    this.currentRemoteSocketId = remoteSocketId;
 
     const { host, port, username, credential } = this.turnServerConfig;
 
@@ -141,14 +141,14 @@ export class WebRTCManager {
         console.log(
           `🧊 [WebRTC] LOCAL candidate: ${event.candidate.type} ${event.candidate.address}:${event.candidate.port} ${event.candidate.protocol}`
         );
-        console.log(`🧊 [WebRTC] sending ICE candidate to ${remoteUserId}`);
+        console.log(`🧊 [WebRTC] sending ICE candidate to ${remoteSocketId}`);
         this.socket.emit('webrtc-ice-candidate', {
           candidate: {
             candidate: event.candidate.candidate,
             sdpMLineIndex: event.candidate.sdpMLineIndex,
             sdpMid: event.candidate.sdpMid,
           },
-          toUserId: remoteUserId,
+          toSocketId: remoteSocketId,
         });
       } else {
         console.log(`🧊 [WebRTC] ICE gathering completed`);
@@ -207,10 +207,10 @@ export class WebRTCManager {
     // handle incoming audio stream from remote peer
     peerConnection.ontrack = (event) => {
       if (peerConnection !== this.peerConnection) return;
-      console.log(`🎵 [WebRTC] received remote stream from ${remoteUserId}`);
+      console.log(`🎵 [WebRTC] received remote stream from ${remoteSocketId}`);
       const [remoteStream] = event.streams;
 
-      this.onStreamAdded(remoteUserId, remoteStream);
+      this.onStreamAdded(remoteSocketId, remoteStream);
       this.analyserCallbacks?.onRemoteStream(remoteStream);
     };
 
@@ -236,19 +236,19 @@ export class WebRTCManager {
 
   // we are first user and initiate the call when second user joins
   // offer is created here
-  private async initiateCall(remoteUserId: SocketId) {
+  private async initiateCall(remoteSocketId: SocketId) {
     try {
-      const peerConnection = await this.createPeerConnection(remoteUserId);
+      const peerConnection = await this.createPeerConnection(remoteSocketId);
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
 
-      console.log(`📤 [WebRTC] sending offer to ${remoteUserId}`);
+      console.log(`📤 [WebRTC] sending offer to ${remoteSocketId}`);
       this.socket.emit('webrtc-offer', {
         offer: {
           sdp: offer.sdp!,
           type: offer.type as 'offer',
         },
-        toUserId: remoteUserId,
+        toSocketId: remoteSocketId,
       });
     } catch (error) {
       console.error('❌ [WebRTC] failed to initiate call:', error);
@@ -257,7 +257,7 @@ export class WebRTCManager {
 
   // we are second user that joined the room, we receive the offer and handle it
   // by creating answer
-  private async handleOffer(fromUserId: SocketId, offer: WebRTCOffer) {
+  private async handleOffer(fromSocketId: SocketId, offer: WebRTCOffer) {
     try {
       // close any existing connection before handling the new offer,
       // otherwise the stale pc holds TURN allocations and interferes with ICE
@@ -268,7 +268,7 @@ export class WebRTCManager {
         this.closePeerConnection(DISCONNECT_REASON.MANUAL_CLEANUP);
       }
 
-      const peerConnection = await this.createPeerConnection(fromUserId);
+      const peerConnection = await this.createPeerConnection(fromSocketId);
       await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
 
       this.remoteDescriptionSet = true;
@@ -279,13 +279,13 @@ export class WebRTCManager {
       const answer = await peerConnection.createAnswer();
       await peerConnection.setLocalDescription(answer);
 
-      console.log(`📤 [WebRTC] sending answer to ${fromUserId}`);
+      console.log(`📤 [WebRTC] sending answer to ${fromSocketId}`);
       this.socket.emit('webrtc-answer', {
         answer: {
           sdp: answer.sdp!,
           type: answer.type as 'answer',
         },
-        toUserId: fromUserId,
+        toSocketId: fromSocketId,
       });
     } catch (error) {
       console.error('❌ [WebRTC] failed to handle offer:', error);
@@ -293,7 +293,7 @@ export class WebRTCManager {
   }
 
   // we are the user that initiated the call and we handle the answer to our offer
-  private async handleAnswer(fromUserId: SocketId, answer: WebRTCAnswer) {
+  private async handleAnswer(fromSocketId: SocketId, answer: WebRTCAnswer) {
     try {
       if (!this.peerConnection) return;
 
@@ -307,7 +307,7 @@ export class WebRTCManager {
       this.remoteDescriptionSet = true;
       await this.processPendingCandidates();
 
-      console.log(`✅ [WebRTC] call established with ${fromUserId}`);
+      console.log(`✅ [WebRTC] call established with ${fromSocketId}`);
     } catch (error) {
       console.error('❌ [WebRTC] failed to handle answer:', error);
     }
@@ -391,10 +391,10 @@ export class WebRTCManager {
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (this.currentRemoteUserId) {
-        await this.initiateCall(this.currentRemoteUserId);
+      if (this.currentRemoteSocketId) {
+        await this.initiateCall(this.currentRemoteSocketId);
       } else {
-        console.error('❌ [WebRTC] no remote user id for reconnection');
+        console.error('❌ [WebRTC] no remote socket id for reconnection');
         this.closePeerConnection(reason);
       }
     } else {

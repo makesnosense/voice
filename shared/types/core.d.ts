@@ -26,7 +26,7 @@ export interface UserDataServerSide extends UserIdentity {
 }
 
 export interface UserDataClientSide extends UserIdentity {
-  userId: SocketId;
+  socketId: SocketId;
   isMuted: boolean;
 }
 
@@ -37,7 +37,7 @@ export interface Room {
 
 export interface Message {
   text: string;
-  userId: SocketId;
+  socketId: SocketId;
   timestamp: number;
 }
 
@@ -62,13 +62,13 @@ export interface ServerToClientEvents {
 
   error: (data: { message: string; type?: string }) => void;
 
-  'initiate-webrtc-call': (targetUserId: SocketId) => void;
+  'initiate-webrtc-call': (targetSocketId: SocketId) => void;
 
   // WebRTC events
-  'webrtc-offer': (data: { offer: WebRTCOffer; fromUserId: SocketId }) => void;
-  'webrtc-answer': (data: { answer: WebRTCAnswer; fromUserId: SocketId }) => void;
-  'webrtc-ice-candidate': (data: { candidate: IceCandidate; fromUserId: SocketId }) => void;
-  'user-left': (userId: SocketId) => void;
+  'webrtc-offer': (data: { offer: WebRTCOffer; fromSocketId: SocketId }) => void;
+  'webrtc-answer': (data: { answer: WebRTCAnswer; fromSocketId: SocketId }) => void;
+  'webrtc-ice-candidate': (data: { candidate: IceCandidate; fromSocketId: SocketId }) => void;
+  'user-left': (socketId: SocketId) => void;
 }
 
 export interface ClientToServerEvents {
@@ -78,9 +78,9 @@ export interface ClientToServerEvents {
   'mute-status-changed': (data: { isMuted: boolean }) => void;
 
   // WebRTC events
-  'webrtc-offer': (data: { offer: WebRTCOffer; toUserId: SocketId }) => void;
-  'webrtc-answer': (data: { answer: WebRTCAnswer; toUserId: SocketId }) => void;
-  'webrtc-ice-candidate': (data: { candidate: IceCandidate; toUserId: SocketId }) => void;
+  'webrtc-offer': (data: { offer: WebRTCOffer; toSocketId: SocketId }) => void;
+  'webrtc-answer': (data: { answer: WebRTCAnswer; toSocketId: SocketId }) => void;
+  'webrtc-ice-candidate': (data: { candidate: IceCandidate; toSocketId: SocketId }) => void;
 }
 
 export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents, {}, VoiceSocketData>;

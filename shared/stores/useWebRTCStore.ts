@@ -20,7 +20,7 @@ export async function fetchTurnCredentials(credentialsUrl: string): Promise<Turn
 interface WebRTCStore {
   manager: WebRTCManager | null;
   remoteStream: MediaStream | null;
-  remoteUserId: SocketId | null;
+  remoteSocketId: SocketId | null;
   isMicActive: boolean;
   isMutedLocal: boolean;
   webRTCConnectionState: WebRTCConnectionState | null;
@@ -40,14 +40,14 @@ interface WebRTCStore {
   ) => Promise<void>;
   toggleMute: () => void;
   cleanup: () => void;
-  setRemoteStream: (userId: SocketId, stream: MediaStream) => void;
+  setRemoteStream: (socketId: SocketId, stream: MediaStream) => void;
   clearRemoteStream: (reason: DisconnectReason) => void;
 }
 
 export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   manager: null,
   remoteStream: null,
-  remoteUserId: null,
+  remoteSocketId: null,
   isMicActive: false,
   isMutedLocal: false,
   webRTCConnectionState: null,
@@ -67,7 +67,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const newManager = new WebRTCManager(
       socket,
       localStream,
-      (userId, stream) => get().setRemoteStream(userId, stream),
+      (socketId, stream) => get().setRemoteStream(socketId, stream),
       (reason) => get().clearRemoteStream(reason),
       (state) => set({ webRTCConnectionState: state }),
       { host, port, username, credential },
@@ -77,7 +77,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({
       manager: newManager,
       isMicActive: true,
-      isMutedLocal: newManager.isMuted, // sync initial state
+      isMutedLocal: newManager.isMuted,
     });
 
     console.log('✅ [Store] emitting webrtc-ready to server');
@@ -89,23 +89,21 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     const { manager } = get();
     if (manager) {
       manager.toggleMute();
-
       const actualMutedState = manager.isMuted;
       set({ isMutedLocal: actualMutedState });
     }
   },
 
-  setRemoteStream: (userId, stream) => {
-    console.log(`✅ [Store] remote stream set for user ${userId}`);
-    set({ remoteStream: stream, remoteUserId: userId });
+  setRemoteStream: (socketId, stream) => {
+    console.log(`✅ [Store] remote stream set for user with socketId ${socketId}`);
+    set({ remoteStream: stream, remoteSocketId: socketId });
   },
 
   clearRemoteStream: (reason) => {
     console.log(`🔌 [Store] clearing remote stream (reason: ${reason})`);
     set({
       remoteStream: null,
-      remoteUserId: null,
-      // remoteAudioFrequencyData: { bands: [0, 0, 0, 0, 0], overallLevel: 0 }, // reset remote audio data
+      remoteSocketId: null,
     });
   },
 
@@ -117,7 +115,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     set({
       manager: null,
       remoteStream: null,
-      remoteUserId: null,
+      remoteSocketId: null,
       isMicActive: false,
     });
   },

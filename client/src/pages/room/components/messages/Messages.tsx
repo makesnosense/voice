@@ -44,15 +44,15 @@ export default function Messages({ socketRef }: MessagesProps) {
     }
   };
 
-  const renderUsername = (userId: string) => {
-    const currentUserId = socketRef.current?.id;
-    const isCurrentUser = userId === currentUserId;
+  const renderUsername = (socketId: string) => {
+    const localSocketId = socketRef.current?.id;
+    const isLocalUser = socketId === localSocketId;
 
     return (
       <strong
-        className={`${messagesStyles.username} ${isCurrentUser ? messagesStyles.currentUser : ''}`}
+        className={`${messagesStyles.username} ${isLocalUser ? messagesStyles.currentUser : ''}`}
       >
-        {isCurrentUser ? 'You' : 'Other'}
+        {isLocalUser ? 'You' : 'Other'}
       </strong>
     );
   };
@@ -67,7 +67,7 @@ export default function Messages({ socketRef }: MessagesProps) {
             {messages.map((msg, index) => (
               <div key={index} className={messagesStyles.message}>
                 <div className={messagesStyles.messageHeader}>
-                  {renderUsername(msg.userId)}
+                  {renderUsername(msg.socketId)}
                   <span className={messagesStyles.timestamp}>
                     {new Date(msg.timestamp).toLocaleTimeString('en-GB', {
                       hour: '2-digit',

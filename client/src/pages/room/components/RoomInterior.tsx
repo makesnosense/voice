@@ -16,7 +16,7 @@ interface RoomInteriorProps {
 
 export default function RoomInterior({ socketRef }: RoomInteriorProps) {
   const remoteStream = useWebRTCStore((state) => state.remoteStream);
-  const remoteUserId = useWebRTCStore((state) => state.remoteUserId);
+  const remoteSocketId = useWebRTCStore((state) => state.remoteSocketId);
   const micPermissionStatus = useMicrophoneStore((state) => state.status);
 
   return (
@@ -24,9 +24,11 @@ export default function RoomInterior({ socketRef }: RoomInteriorProps) {
       <CopyCard />
 
       {/* single remote audio component */}
-      {remoteStream && remoteUserId && <RemoteAudio userId={remoteUserId} stream={remoteStream} />}
+      {remoteStream && remoteSocketId && (
+        <RemoteAudio socketId={remoteSocketId} stream={remoteStream} />
+      )}
 
-      <Users currentUserId={socketRef.current?.id as SocketId} />
+      <Users localSocketId={socketRef.current?.id as SocketId} />
 
       {(micPermissionStatus === MIC_PERMISSION_STATUS.DENIED ||
         micPermissionStatus === MIC_PERMISSION_STATUS.NOT_SUPPORTED) && (
