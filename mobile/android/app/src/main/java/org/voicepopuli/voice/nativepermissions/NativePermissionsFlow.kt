@@ -46,35 +46,34 @@ class NativePermissionsFlow(private val activity: Activity) {
         ),
         PermissionStep(
             isGranted = { !isMiui() || activity.isMiuiAutostartGranted() },
-            prompt = { activity.promptMiuiAutostart(onSkip = { isStepInProgress = false; currentStepIndex++; runNativePermissions() }) },
+            prompt = { activity.promptMiuiAutostart(onSkip = { currentStepIndex++; runNativePermissions() }) },
             alwaysIncrementStepAfterPrompt = false
         ),
         PermissionStep(
             isGranted = { !isMiui() || activity.isMiuiAppPermissionsGranted() },
-            prompt = { activity.promptMiuiAppPermissions(onSkip = { isStepInProgress = false; currentStepIndex++; runNativePermissions() }) },
+            prompt = { activity.promptMiuiAppPermissions(onSkip = { currentStepIndex++; runNativePermissions() }) },
             alwaysIncrementStepAfterPrompt = false
         ),
     )
 
-    val hasStarted: Boolean get() = currentStepIndex > 0 || isStepInProgress
+    var hasStarted = false
+        private set
     private var currentStepIndex = 0
-    private var isStepInProgress = false
+
 
     fun runNativePermissions() {
-        Log.d("NativePermissions", "RUN ran")
+        hasStarted = true
+        Log.d("NativePermissions", "runNativePermissions ran")
 
         while (currentStepIndex < steps.size && steps[currentStepIndex].isGranted()) {
             Log.d("NativePermissions", "step $currentStepIndex granted, advancing")
             currentStepIndex++
-            isStepInProgress = false
         }
-        if (currentStepIndex < steps.size && !isStepInProgress) {
+        if (currentStepIndex < steps.size ) {
             Log.d("NativePermissions", "prompting step $currentStepIndex")
-            isStepInProgress = true
             steps[currentStepIndex].prompt()
             if (steps[currentStepIndex].alwaysIncrementStepAfterPrompt) {
                 currentStepIndex++ // enables some steps' "Deny" to act as "Skip"
-                isStepInProgress = false
             }
         }
 }
