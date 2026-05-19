@@ -18,6 +18,7 @@ import NoConnectionScreen from './screens/NoConnectionScreen';
 import type { RoomId } from '../../shared/types/core';
 import { usePermissionsStore } from './stores/usePermissionsStore.android';
 import { useShallow } from 'zustand/react/shallow';
+import { runNativePermissions } from './native/runNativePermissions';
 
 export default function App() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -33,12 +34,17 @@ export default function App() {
 
   const activeRoomId = useActiveRoomStore(state => state.activeRoomId);
 
-  // const permissions = useAppPermissions();
   const serverConnectivity = useServerConnectivity();
 
   useEffect(() => {
     usePermissionsStore.getState().initialize();
   }, []);
+
+  useEffect(() => {
+    if (allPermissionsGranted || permissionsSkipped) {
+      runNativePermissions();
+    }
+  }, [allPermissionsGranted, permissionsSkipped]);
 
   useEffect(() => {
     if (serverConnectivity.isChecking) return;

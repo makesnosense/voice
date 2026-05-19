@@ -10,7 +10,6 @@ import {
 } from 'react-native-permissions';
 import { PERMISSION_STATUS, type PermissionStatus } from '../types/permissions';
 import { waitForActivity } from '../utils/wait-for-activity';
-import { runNativePermissions } from '../native/runNativePermissions';
 
 function checkPermissions(): Promise<[RNPermissionStatus, RNPermissionStatus]> {
   return Promise.all([
@@ -51,8 +50,8 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
       isCheckingPermissions: false,
     });
 
-    if (allPermissionsGranted || get().permissionsSkipped)
-      runNativePermissions();
+    if (allPermissionsGranted || get().permissionsSkipped) {
+    }
   };
 
   return {
@@ -71,6 +70,7 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
 
       AppState.addEventListener('change', nextState => {
         if (nextState === 'active') {
+          // console.log('AppState active — re-checking permissions');
           checkPermissions()
             .then(applyPermissionsResults)
             .catch(() => {});
@@ -97,7 +97,6 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
 
     dismiss: () => {
       set({ permissionsSkipped: true });
-      runNativePermissions();
     },
   };
 });
