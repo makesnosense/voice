@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import InCallManager from 'react-native-incall-manager';
 import { revokeLockScreenBypass } from '../../native/lock-screen-bypass';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
@@ -16,7 +16,7 @@ import {
   stopCallForegroundService,
 } from '../../native/call-foreground-service';
 import SelfCard from './components/SelfCard';
-import { TEXT_MUTED } from '../../styles/colors';
+import { BACKGROUND_SECONDARY, TEXT_MUTED } from '../../styles/colors';
 import type { RoomId } from '../../../../shared/types/core';
 import RoomTop from './RoomTop';
 
@@ -39,6 +39,7 @@ const handleJoinSuccess = (roomId: RoomId) => {
 };
 
 export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
+  const insets = useSafeAreaInsets();
   const roomUsers = useRoomStore(state => state.roomUsers);
 
   const isLoading = roomUsers.length === 0;
@@ -80,7 +81,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   }, []);
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <View style={[styles.screen, { paddingVertical: insets.top + 16 }]}>
       <View style={styles.roomTop}>
         {isLoading ? (
           <ActivityIndicator color={TEXT_MUTED} />
@@ -90,18 +91,19 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
       </View>
 
       <SelfCard onLeave={onLeave} isLoading={isLoading} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f8fafc',
-    padding: 16,
+    backgroundColor: BACKGROUND_SECONDARY,
     justifyContent: 'space-between',
   },
   roomTop: {
+    flex: 1,
     gap: 12,
+    justifyContent: 'center',
   },
 });
