@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Platform as RNPlatform } from 'react-native';
 import { useAuthStore } from '../stores/useAuthStore';
 import { keychainStorage } from '../utils/keychain';
@@ -26,37 +26,30 @@ const getDeviceName = (): string | undefined => {
   return undefined;
 };
 
+const syncDevice = async (token: string) => {
+  const refreshToken = await keychainStorage.getRefreshToken();
+  if (!refreshToken) return;
+  try {
+    await api.devices.syncDevice(refreshToken, getNativePlatform(), {
+      fcmToken: token,
+      deviceName: getDeviceName(),
+    });
+    console.log('✅ Device synced');
+  } catch (err) {
+    console.warn('⚠️ Device sync failed:', err);
+  }
+};
+
 export const useDeviceRegistration = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const [fcmToken, setFcmToken] = useState<string | null>(null);
 
   useEffect(() => {
-    getFcmToken().then(setFcmToken);
+    if (!isAuthenticated) return;
 
-    const unsubscribe = listenForTokenRefresh(async newToken => {
-      setFcmToken(newToken);
+    getFcmToken().then(token => {
+      if (token) syncDevice(token);
     });
+    const unsubscribe = listenForTokenRefresh(syncDevice);
     return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated || !fcmToken) return;
-
-    const syncDevice = async () => {
-      const refreshToken = await keychainStorage.getRefreshToken();
-      if (!refreshToken) return;
-
-      try {
-        await api.devices.syncDevice(refreshToken, getNativePlatform(), {
-          fcmToken,
-          deviceName: getDeviceName(),
-        });
-        console.log('✅ Device synced');
-      } catch (err) {
-        console.warn('⚠️ Device sync failed:', err);
-      }
-    };
-
-    syncDevice();
-  }, [isAuthenticated, fcmToken]);
+  }, [isAuthenticated]);
 };
