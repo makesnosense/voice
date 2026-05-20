@@ -9,21 +9,16 @@ import { useWebRTCStore } from '../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { useInvitedUserStore } from '../../stores/useInvitedUserStore';
 import useWebRTCInit from '../../hooks/useWebRTCInit';
-import { api } from '../../api';
 import { BASE_URL } from '../../config';
 import {
   startCallForegroundService,
   stopCallForegroundService,
 } from '../../native/call-foreground-service';
 import SelfCard from './components/SelfCard';
-import CopyCard from './components/CopyCard';
-import RemoteUserCard from './components/RemoteUserCard';
-import CallingCard from './components/calling-card/CallingCard';
-import InviteCard from './components/invite-card/InviteCard';
 import { TEXT_MUTED } from '../../styles/colors';
 import type { RoomId } from '../../../../shared/types/core';
+import RoomTop from './RoomTop';
 
 interface RoomScreenProps {
   roomId: RoomId;
@@ -45,13 +40,8 @@ const handleJoinSuccess = (roomId: RoomId) => {
 
 export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   const roomUsers = useRoomStore(state => state.roomUsers);
-  const isCallDeclined = useRoomStore(state => state.isCallDeclined);
-  const isAlone = roomUsers.length === 1;
-  const isLoading = roomUsers.length === 0;
 
-  const invitedUser = useInvitedUserStore(state => state.invitedUser);
-  const invitedContact =
-    invitedUser?.roomId === roomId ? invitedUser.contact : null;
+  const isLoading = roomUsers.length === 0;
 
   const requestMicrophone = useMicrophoneStore(
     state => state.requestMicrophone,
@@ -89,60 +79,14 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
     };
   }, []);
 
-  useEffect(() => {
-    if (roomUsers.length >= 2) {
-      useInvitedUserStore.setState({ invitedUser: null });
-    }
-  }, [roomUsers.length]);
-
-  useEffect(() => {
-    if (!isCallDeclined) return;
-    const timeout = setTimeout(() => {
-      useInvitedUserStore.setState({ invitedUser: null });
-      useRoomStore.setState({ isCallDeclined: false });
-    }, 3000);
-    return () => clearTimeout(timeout);
-  }, [isCallDeclined]);
-
-  const handleCancelInvite = async () => {
-    useInvitedUserStore.setState({ invitedUser: null });
-    try {
-      const token = await useAuthStore.getState().getValidAccessToken();
-      await api.rooms.cancelInviteToRoom(roomId, token);
-    } catch (error) {
-      console.error('Failed to cancel invite:', error);
-    }
-  };
-
-  const renderTopSlot = () => {
-    if (!isAlone) return <RemoteUserCard />;
-    if (invitedContact) {
-      return (
-        <CallingCard
-          contactName={invitedContact.name}
-          contactEmail={invitedContact.email}
-          isDeclined={isCallDeclined}
-          onCancel={handleCancelInvite}
-        />
-      );
-    }
-    return (
-      <View style={styles.aloneTopSlot}>
-        <InviteCard
-          roomId={roomId}
-          onUserInvited={contact =>
-            useInvitedUserStore.setState({ invitedUser: { roomId, contact } })
-          }
-        />
-        <CopyCard roomId={roomId} />
-      </View>
-    );
-  };
-
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.topSlot}>
-        {isLoading ? <ActivityIndicator color={TEXT_MUTED} /> : renderTopSlot()}
+      <View>
+        {isLoading ? (
+          <ActivityIndicator color={TEXT_MUTED} />
+        ) : (
+          <RoomTop roomId={roomId} />
+        )}
       </View>
 
       <SelfCard onLeave={onLeave} isLoading={isLoading} />
@@ -156,12 +100,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
     padding: 16,
     justifyContent: 'space-between',
-  },
-  topSlot: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  aloneTopSlot: {
-    gap: 12,
   },
 });
