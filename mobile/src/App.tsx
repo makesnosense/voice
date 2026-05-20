@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
@@ -21,6 +21,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { runNativePermissions } from './native/runNativePermissions';
 
 export default function App() {
+  const [bootSplashActive, setBootSplashActive] = useState(true);
+
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const { isCheckingPermissions, allPermissionsGranted, permissionsSkipped } =
@@ -41,15 +43,16 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (bootSplashActive) return;
     if (allPermissionsGranted || permissionsSkipped) {
       runNativePermissions();
     }
-  }, [allPermissionsGranted, permissionsSkipped]);
+  }, [allPermissionsGranted, permissionsSkipped, bootSplashActive]);
 
   useEffect(() => {
     if (serverConnectivity.isChecking) return;
     if (serverConnectivity.isUnreachable) {
-      RNBootSplash.hide({ fade: true });
+      RNBootSplash.hide({ fade: true }).then(() => setBootSplashActive(false));
       return;
     }
 
@@ -57,7 +60,9 @@ export default function App() {
       .getState()
       .initialize()
       .finally(() => {
-        RNBootSplash.hide({ fade: true });
+        RNBootSplash.hide({ fade: true }).then(() =>
+          setBootSplashActive(false),
+        );
       });
   }, [serverConnectivity.isChecking, serverConnectivity.isUnreachable]);
 
