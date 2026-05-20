@@ -81,7 +81,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View>
+      <View style={styles.roomTop}>
         {isLoading ? (
           <ActivityIndicator color={TEXT_MUTED} />
         ) : (
@@ -100,5 +100,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
     padding: 16,
     justifyContent: 'space-between',
+  },
+  roomTop: {
+    gap: 12,
   },
 });

@@ -1,4 +1,3 @@
-import { StyleSheet, View } from 'react-native';
 import CallingCard from './components/calling-card/CallingCard';
 import RemoteUserCard from './components/RemoteUserCard';
 import InviteCard from './components/invite-card/InviteCard';
@@ -60,7 +59,7 @@ export default function RoomTop({ roomId }: RoomTopProps) {
     );
   }
   return (
-    <View style={styles.aloneTopSlot}>
+    <>
       <InviteCard
         roomId={roomId}
         onUserInvited={contact =>
@@ -68,12 +67,6 @@ export default function RoomTop({ roomId }: RoomTopProps) {
         }
       />
       <CopyCard roomId={roomId} />
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  aloneTopSlot: {
-    gap: 12,
-  },
-});
