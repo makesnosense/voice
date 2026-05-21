@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import WaveformBars from '../../components/WaveformBars';
 import EmailStep from './EmailStep';
@@ -20,11 +20,12 @@ export default function AuthScreen() {
   };
 
   return (
-    <View
+    <Pressable
       style={[
         styles.container,
         { paddingTop: insets.top, paddingBottom: insets.bottom + 24 },
       ]}
+      onPress={Keyboard.dismiss}
     >
       <View style={styles.titleRow}>
         <WaveformBars />
@@ -50,7 +51,7 @@ export default function AuthScreen() {
           <CreateRoomButton mutedColor />
         </View>
       )}
-    </View>
+    </Pressable>
   );
 }
 
