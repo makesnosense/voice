@@ -15,11 +15,14 @@ import {
   getMessaging,
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 setBackgroundMessageHandler(getMessaging(), async () => {});
 const Root = () => (
   <SafeAreaProvider>
-    <App />
+    <KeyboardProvider>
+      <App />
+    </KeyboardProvider>
   </SafeAreaProvider>
 );
 
