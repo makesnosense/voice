@@ -9,6 +9,7 @@ import {
   BACKGROUND_NAV,
   NEUTRAL_COLOR,
   BACKGROUND_CARD,
+  TEXT_SECONDARY,
 } from '../styles/colors';
 import type { ObjectValues } from '../../../shared/types/core';
 
@@ -126,7 +127,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 10,
-    color: TEXT_MUTED,
+    color: TEXT_SECONDARY,
+    fontWeight: '500',
   },
   labelActive: {
     color: TEXT_PRIMARY,
