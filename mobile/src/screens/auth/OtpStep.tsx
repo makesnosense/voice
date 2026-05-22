@@ -17,15 +17,15 @@ import {
   BORDER_MUTED,
 } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
 interface OtpStepProps {
   email: string;
-  onBack: () => void;
 }
 
-export default function OtpStep({ email, onBack }: OtpStepProps) {
+export default function OtpStep({ email }: OtpStepProps) {
   const { isLoading, verifyOtp, requestOtp } = useAuthStore();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +86,11 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
   const canResend = secondsLeft === 0;
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior="position"
+      keyboardVerticalOffset={10}
+      style={styles.container}
+    >
       <View style={styles.card}>
         <View style={styles.cardInfoBlock}>
           <Text style={styles.textSecondary}>Code sent to</Text>
@@ -128,29 +132,18 @@ export default function OtpStep({ email, onBack }: OtpStepProps) {
         </Pressable>
       </View>
 
-      <Pressable
-        onPress={onBack}
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.buttonPressed,
-        ]}
-      >
-        <Text style={styles.textPrimary}>Change email address</Text>
-      </Pressable>
-
       {error && (
         <View style={styles.errorCard}>
           <Text style={styles.textError}>{error}</Text>
         </View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    gap: 12,
   },
   card: {
     width: '100%',
@@ -192,19 +185,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: StyleSheet.hairlineWidth,
     backgroundColor: NEUTRAL_COLOR,
-  },
-
-  button: {
-    width: '100%',
-    paddingVertical: 14,
-    borderRadius: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: NEUTRAL_COLOR,
-    backgroundColor: BACKGROUND_CARD,
-    alignItems: 'center',
-  },
-  buttonPressed: {
-    backgroundColor: BORDER_MUTED,
   },
 
   textSecondary: {

@@ -6,7 +6,11 @@ import EmailStep from './EmailStep';
 import OtpStep from './OtpStep';
 import CreateRoomButton from '../../components/CreateRoomButton';
 import { TEXT_PRIMARY } from '../../styles/colors';
-
+import {
+  BACKGROUND_CARD,
+  NEUTRAL_COLOR,
+  BORDER_MUTED,
+} from '../../styles/colors';
 type AuthStep = 'email' | 'otp';
 
 export default function AuthScreen() {
@@ -27,21 +31,33 @@ export default function AuthScreen() {
       ]}
       onPress={Keyboard.dismiss}
     >
-      <View style={styles.titleRow}>
-        <WaveformBars />
-        <Text style={styles.title}>Voice</Text>
-      </View>
-
       {step === 'email' && (
-        <EmailStep
-          email={email}
-          onEmailChange={setEmail}
-          onSuccess={handleEmailSuccess}
-        />
+        <>
+          <View style={styles.titleRow}>
+            <WaveformBars />
+            <Text style={styles.title}>Voice</Text>
+          </View>
+          <EmailStep
+            email={email}
+            onEmailChange={setEmail}
+            onSuccess={handleEmailSuccess}
+          />
+        </>
       )}
 
       {step === 'otp' && (
-        <OtpStep email={email} onBack={() => setStep('email')} />
+        <>
+          <OtpStep email={email} />
+          <Pressable
+            onPress={() => setStep('email')}
+            style={({ pressed }) => [
+              styles.changeEmailButton,
+              pressed && styles.changeEmailButtonPressed,
+            ]}
+          >
+            <Text style={styles.textPrimary}>Change email address</Text>
+          </Pressable>
+        </>
       )}
 
       {step === 'email' && (
@@ -62,12 +78,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
-    gap: 32,
+    gap: 12,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
+    marginBottom: 20,
   },
   title: {
     fontSize: 36,
@@ -78,5 +95,21 @@ const styles = StyleSheet.create({
   },
   createCallContainer: {
     position: 'absolute',
+  },
+  changeEmailButton: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: NEUTRAL_COLOR,
+    backgroundColor: BACKGROUND_CARD,
+    alignItems: 'center',
+  },
+  changeEmailButtonPressed: {
+    backgroundColor: BORDER_MUTED,
+  },
+  textPrimary: {
+    fontSize: 15,
+    color: TEXT_PRIMARY,
   },
 });

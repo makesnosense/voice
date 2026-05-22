@@ -7,6 +7,8 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+
 import { ArrowRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { TEXT_PRIMARY, TEXT_SECONDARY } from '../../styles/colors';
@@ -44,7 +46,11 @@ export default function EmailStep({
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={10}
+      style={styles.container}
+    >
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
@@ -80,14 +86,13 @@ export default function EmailStep({
           <Text style={styles.error}>{error}</Text>
         </View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    gap: 10,
   },
   inputWrapper: {
     width: '100%',
