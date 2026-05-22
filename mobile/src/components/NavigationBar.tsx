@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
+import { Svg, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Users, Phone, Settings } from 'lucide-react-native';
 import { pressedStyle } from '../styles/common';
@@ -27,7 +28,8 @@ const TABS = [
   { key: HOME_TAB.SETTINGS, label: 'Settings', icon: Settings },
 ] as const;
 
-export const SCREEN_PADDING_H = 40;
+export const SCREEN_PADDING_H = 50;
+const NAV_PILL_HEIGHT = 67;
 
 interface NavBarProps {
   activeTab: HomeTab;
@@ -53,48 +55,69 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
   }, [activeTab, indicatorScales]);
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          bottom: insets.bottom + 20,
-          left: SCREEN_PADDING_H + insets.left,
-          right: SCREEN_PADDING_H + insets.right,
-        },
-      ]}
-    >
-      {TABS.map(({ key, label, icon: Icon }, i) => {
-        const isActive = key === activeTab;
-        return (
-          <Pressable
-            key={key}
-            style={({ pressed }) => [styles.tab, pressed && pressedStyle]}
-            onPress={() => onTabPress(key)}
-          >
-            <View style={styles.pill}>
-              <Animated.View
-                style={[
-                  styles.indicator,
-                  { transform: [{ scale: indicatorScales[i] }] },
-                ]}
-              />
-              <Icon
-                size={24}
-                color={isActive ? TEXT_PRIMARY : TEXT_MUTED}
-                strokeWidth={isActive ? 2 : 1.75}
-              />
-              <Text style={[styles.label, isActive && styles.labelActive]}>
-                {label}
-              </Text>
-            </View>
-          </Pressable>
-        );
-      })}
-    </View>
+    <>
+      <Svg
+        style={[styles.wash, { height: insets.bottom + 20 + NAV_PILL_HEIGHT }]}
+        width="100%"
+      >
+        <Defs>
+          <LinearGradient id="wash" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+            <Stop offset="0.25" stopColor="#ffffff" stopOpacity="0.7" />
+            <Stop offset="1" stopColor="#ffffff" stopOpacity="0.8" />
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" fill="url(#wash)" />
+      </Svg>
+      <View
+        style={[
+          styles.container,
+          {
+            bottom: insets.bottom + 20,
+            left: SCREEN_PADDING_H + insets.left,
+            right: SCREEN_PADDING_H + insets.right,
+          },
+        ]}
+      >
+        {TABS.map(({ key, label, icon: Icon }, i) => {
+          const isActive = key === activeTab;
+          return (
+            <Pressable
+              key={key}
+              style={({ pressed }) => [styles.tab, pressed && pressedStyle]}
+              onPress={() => onTabPress(key)}
+            >
+              <View style={styles.pill}>
+                <Animated.View
+                  style={[
+                    styles.indicator,
+                    { transform: [{ scale: indicatorScales[i] }] },
+                  ]}
+                />
+                <Icon
+                  size={24}
+                  color={isActive ? TEXT_PRIMARY : TEXT_MUTED}
+                  strokeWidth={isActive ? 2 : 1.75}
+                />
+                <Text style={[styles.label, isActive && styles.labelActive]}>
+                  {label}
+                </Text>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  wash: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
   container: {
     position: 'absolute',
     flexDirection: 'row',
