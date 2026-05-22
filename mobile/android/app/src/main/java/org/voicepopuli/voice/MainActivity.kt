@@ -34,6 +34,10 @@ private val nativePermissionsFlow = NativePermissionsFlow(this)
   override fun onCreate(savedInstanceState: Bundle?) {
       RNBootSplash.init(this, R.style.BootTheme)
       super.onCreate(savedInstanceState)
+      window.navigationBarColor = android.graphics.Color.TRANSPARENT
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          window.isNavigationBarContrastEnforced = false
+      }
       applyLockScreenFlagsIfCallIntent(intent)
       cancelCallNotificationIfNeeded(intent)
   }
