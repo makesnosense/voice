@@ -6,9 +6,9 @@ import { pressedStyle } from '../styles/common';
 import {
   TEXT_PRIMARY,
   TEXT_MUTED,
-  BORDER_MUTED,
   BACKGROUND_NAV,
-  BACKGROUND_SECONDARY,
+  NEUTRAL_COLOR,
+  BACKGROUND_CARD,
 } from '../styles/colors';
 import type { ObjectValues } from '../../../shared/types/core';
 
@@ -26,7 +26,7 @@ const TABS = [
   { key: HOME_TAB.SETTINGS, label: 'Settings', icon: Settings },
 ] as const;
 
-const INDICATOR_WIDTH = 76;
+export const SCREEN_PADDING_H = 40;
 
 interface NavBarProps {
   activeTab: HomeTab;
@@ -52,7 +52,16 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
   }, [activeTab, indicatorScales]);
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom || 16 }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          bottom: insets.bottom + 20,
+          left: SCREEN_PADDING_H + insets.left,
+          right: SCREEN_PADDING_H + insets.right,
+        },
+      ]}
+    >
       {TABS.map(({ key, label, icon: Icon }, i) => {
         const isActive = key === activeTab;
         return (
@@ -61,20 +70,22 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
             style={({ pressed }) => [styles.tab, pressed && pressedStyle]}
             onPress={() => onTabPress(key)}
           >
-            <Animated.View
-              style={[
-                styles.indicator,
-                { transform: [{ scale: indicatorScales[i] }] },
-              ]}
-            />
-            <Icon
-              size={24}
-              color={isActive ? TEXT_PRIMARY : TEXT_MUTED}
-              strokeWidth={isActive ? 2 : 1.75}
-            />
-            <Text style={[styles.label, isActive && styles.labelActive]}>
-              {label}
-            </Text>
+            <View style={styles.pill}>
+              <Animated.View
+                style={[
+                  styles.indicator,
+                  { transform: [{ scale: indicatorScales[i] }] },
+                ]}
+              />
+              <Icon
+                size={24}
+                color={isActive ? TEXT_PRIMARY : TEXT_MUTED}
+                strokeWidth={isActive ? 2 : 1.75}
+              />
+              <Text style={[styles.label, isActive && styles.labelActive]}>
+                {label}
+              </Text>
+            </View>
           </Pressable>
         );
       })}
@@ -84,30 +95,37 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
     flexDirection: 'row',
-    paddingTop: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: BORDER_MUTED,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: NEUTRAL_COLOR,
+    borderRadius: 24,
     backgroundColor: BACKGROUND_NAV,
+    overflow: 'hidden',
   },
+
   tab: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
-    paddingTop: 7,
-    zIndex: 1,
+    paddingVertical: 6,
+  },
+  pill: {
+    width: 72,
+    alignItems: 'center',
+    paddingVertical: 6,
+    gap: 2,
   },
   indicator: {
     position: 'absolute',
-    alignSelf: 'center',
     top: 0,
-    width: INDICATOR_WIDTH,
-    height: 58,
-    borderRadius: 28,
-    backgroundColor: BACKGROUND_SECONDARY,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 16,
+    backgroundColor: BACKGROUND_CARD,
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     color: TEXT_MUTED,
   },
   labelActive: {
