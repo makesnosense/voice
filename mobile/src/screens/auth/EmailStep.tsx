@@ -93,6 +93,7 @@ export default function EmailStep({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    gap: 8,
   },
   inputWrapper: {
     width: '100%',
