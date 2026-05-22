@@ -111,20 +111,24 @@ function SettingsScreen() {
               />
             </Pressable>
           </View>
-        </View>
 
-        <View style={styles.menuCard}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.menuRow,
-              pressed && styles.menuRowPressed,
-            ]}
-            onPress={() => setView(SETTINGS_VIEW.ABOUT)}
-          >
-            <Info size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-            <Text style={styles.menuLabel}>About</Text>
-            <ChevronRight size={16} color={NEUTRAL_COLOR} strokeWidth={1.75} />
-          </Pressable>
+          <View style={styles.menuCard}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.menuRow,
+                pressed && styles.menuRowPressed,
+              ]}
+              onPress={() => setView(SETTINGS_VIEW.ABOUT)}
+            >
+              <Info size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
+              <Text style={styles.menuLabel}>About</Text>
+              <ChevronRight
+                size={16}
+                color={NEUTRAL_COLOR}
+                strokeWidth={1.75}
+              />
+            </Pressable>
+          </View>
         </View>
       </View>
     </View>
@@ -139,7 +143,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-    justifyContent: 'space-between',
   },
   topGroup: {
     gap: 8,
