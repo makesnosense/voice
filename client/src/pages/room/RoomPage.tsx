@@ -37,7 +37,7 @@ export default function RoomPage() {
 }
 
 function RoomPageContent({ roomId }: { roomId: RoomId }) {
-  const { socketRef } = useRoom(roomId);
+  useRoom(roomId);
   const roomConnectionStatus = useRoomStore((state) => state.roomConnectionStatus);
 
   if (roomConnectionStatus === ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND)
@@ -46,5 +46,5 @@ function RoomPageContent({ roomId }: { roomId: RoomId }) {
     return <AppError error={ROOM_CONNECTION_STATUS.ROOM_FULL} />;
   if (roomConnectionStatus === ROOM_CONNECTION_STATUS.CONNECTING) return <Spinner />;
 
-  return <RoomInterior socketRef={socketRef} />;
+  return <RoomInterior />;
 }

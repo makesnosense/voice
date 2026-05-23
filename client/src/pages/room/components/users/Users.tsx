@@ -11,15 +11,12 @@ import usersStyles from './Users.module.css';
 import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
 import { formatDisplayName } from '../../../../../../shared/utils/format';
-import type { SocketId, AudioFrequencyData } from '../../../../../../shared/types/core';
+import type { AudioFrequencyData } from '../../../../../../shared/types/core';
 
-interface UsersProps {
-  localSocketId: SocketId | undefined;
-}
-
-export default function Users({ localSocketId }: UsersProps) {
+export default function Users() {
   const roomId = useRoomId();
 
+  const localSocketId = useRoomStore((state) => state.localSocketId);
   const invitedUser = useInvitedUserStore((state) => state.invitedUser);
   const invitedContact = invitedUser?.roomId === roomId ? invitedUser.contact : null;
 

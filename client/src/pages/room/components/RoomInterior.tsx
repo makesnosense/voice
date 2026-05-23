@@ -8,13 +8,7 @@ import { useWebRTCStore } from './../../../../../shared/stores/useWebRTCStore';
 import { useMicrophoneStore } from '../../../stores/useMicrophoneStore';
 import { MIC_PERMISSION_STATUS } from '../../../../../shared/constants/microphone';
 
-import type { TypedClientSocket, SocketId } from '../../../../../shared/types/core';
-
-interface RoomInteriorProps {
-  socketRef: React.RefObject<TypedClientSocket | null>;
-}
-
-export default function RoomInterior({ socketRef }: RoomInteriorProps) {
+export default function RoomInterior() {
   const remoteStream = useWebRTCStore((state) => state.remoteStream);
   const remoteSocketId = useWebRTCStore((state) => state.remoteSocketId);
   const micPermissionStatus = useMicrophoneStore((state) => state.status);
@@ -28,14 +22,14 @@ export default function RoomInterior({ socketRef }: RoomInteriorProps) {
         <RemoteAudio socketId={remoteSocketId} stream={remoteStream} />
       )}
 
-      <Users localSocketId={socketRef.current?.id as SocketId} />
+      <Users />
 
       {(micPermissionStatus === MIC_PERMISSION_STATUS.DENIED ||
         micPermissionStatus === MIC_PERMISSION_STATUS.NOT_SUPPORTED) && (
         <MicWarning micPermissionStatus={micPermissionStatus} />
       )}
 
-      <Messages socketRef={socketRef} />
+      <Messages />
     </div>
   );
 }

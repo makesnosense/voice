@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useRoomStore } from '../stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../constants/room';
-import type { RoomId, TypedClientSocket } from '../types/core';
+import type { RoomId, SocketId, TypedClientSocket } from '../types/core';
 
 const SOCKET_OPTIONS = {
   reconnection: true,
@@ -29,6 +29,11 @@ export function useRoomSocket(
     socket.on('connect', () => {
       console.log('✅ Connected to server:', socket.id);
       socket.emit('join-room', roomId);
+
+      useRoomStore.setState({
+        localSocketId: socket.id as SocketId,
+        sendMessage: (text) => socket.emit('message', { text }),
+      });
     });
 
     socket.on('room-join-success', ({ roomId: joinedId }) => {
@@ -43,7 +48,7 @@ export function useRoomSocket(
     });
 
     socket.on('message', (message) => {
-      useRoomStore.getState().addMessage(message);
+      useRoomStore.setState((state) => ({ messages: [...state.messages, message] }));
     });
 
     socket.on('room-not-found', (error) => {

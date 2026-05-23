@@ -1,12 +1,8 @@
-import type { TypedClientSocket } from '../../../../../../shared/types/core';
 import { Send } from 'lucide-react';
 import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
-interface MessagesProps {
-  socketRef: React.RefObject<TypedClientSocket | null>;
-}
 
 function useAutoScroll(dependencies: React.DependencyList) {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -23,29 +19,30 @@ function useAutoScroll(dependencies: React.DependencyList) {
   return elementRef;
 }
 
-export default function Messages({ socketRef }: MessagesProps) {
+export default function Messages() {
+  const localSocketId = useRoomStore((state) => state.localSocketId);
   const messages = useRoomStore((state) => state.messages);
+  const sendMessage = useRoomStore((state) => state.sendMessage);
   const [messageInput, setMessageInput] = useState('');
 
   const messagesRef = useAutoScroll(messages);
 
-  const sendMessage = () => {
+  const handleSend = () => {
     const text = messageInput.trim();
-    if (text && socketRef.current) {
-      console.log(messageInput);
-      socketRef.current.emit('message', { text });
-      setMessageInput('');
-    }
+    if (!text || !sendMessage) return;
+    console.log(messageInput);
+    sendMessage(text);
+    setMessageInput('');
   };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSend();
     }
   };
 
   const renderUsername = (socketId: string) => {
-    const localSocketId = socketRef.current?.id;
     const isLocalUser = socketId === localSocketId;
 
     return (
@@ -92,7 +89,7 @@ export default function Messages({ socketRef }: MessagesProps) {
           placeholder="type message..."
         />
         <button
-          onClick={sendMessage}
+          onClick={handleSend}
           disabled={!messageInput.trim()}
           className={messagesStyles.sendButton}
         >
