@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.WindowManager
 import android.content.Intent
 import android.app.NotificationManager
+import androidx.core.view.WindowCompat
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -32,8 +33,10 @@ private val nativePermissionsFlow = NativePermissionsFlow(this)
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
   override fun onCreate(savedInstanceState: Bundle?) {
+      WindowCompat.setDecorFitsSystemWindows(window, false) 
       RNBootSplash.init(this, R.style.BootTheme)
       super.onCreate(savedInstanceState)
+      window.statusBarColor = android.graphics.Color.TRANSPARENT
       window.navigationBarColor = android.graphics.Color.TRANSPARENT
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
           window.isNavigationBarContrastEnforced = false

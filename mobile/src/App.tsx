@@ -19,6 +19,7 @@ import type { RoomId } from '../../shared/types/core';
 import { usePermissionsStore } from './stores/usePermissionsStore.android';
 import { useShallow } from 'zustand/react/shallow';
 import { runNativePermissions } from './native/runNativePermissions';
+import { StatusBar } from 'react-native';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
@@ -111,5 +112,14 @@ export default function App() {
 
   if (!isAuthenticated) return <AuthScreen />;
 
-  return <HomeScreen />;
+  return (
+    <>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
+      <HomeScreen />
+    </>
+  );
 }
