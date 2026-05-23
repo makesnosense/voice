@@ -8,6 +8,9 @@ import { useEffect } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { api } from '../../api';
 import type { RoomId } from '../../../../shared/types/core';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { StyleSheet } from 'react-native';
+import ChatCard from './components/ChatCard';
 
 interface RoomTopProps {
   roomId: RoomId;
@@ -59,7 +62,7 @@ export default function RoomTop({ roomId }: RoomTopProps) {
     );
   }
   return (
-    <>
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <InviteCard
         roomId={roomId}
         onUserInvited={contact =>
@@ -67,6 +70,14 @@ export default function RoomTop({ roomId }: RoomTopProps) {
         }
       />
       <CopyCard roomId={roomId} />
-    </>
+      <ChatCard />
+    </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    gap: 12,
+  },
+});
