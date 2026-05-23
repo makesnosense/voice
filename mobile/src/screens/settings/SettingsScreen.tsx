@@ -1,6 +1,5 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { memo, useState } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   LogOut,
   Smartphone,
@@ -25,6 +24,7 @@ import {
   STATUS_RED,
 } from '../../styles/colors';
 import type { ObjectValues } from '../../../../shared/types/core';
+import { useContentPadding } from '../../hooks/useContentPadding';
 
 const SETTINGS_VIEW = {
   MAIN: 'main',
@@ -36,7 +36,7 @@ const SETTINGS_VIEW = {
 type SettingsView = ObjectValues<typeof SETTINGS_VIEW>;
 
 function SettingsScreen() {
-  const insets = useSafeAreaInsets();
+  const listPadding = useContentPadding();
   const { user, logout } = useAuthStore();
   const [view, setView] = useState<SettingsView>(SETTINGS_VIEW.MAIN);
 
@@ -53,10 +53,9 @@ function SettingsScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <Header title="Settings" />
-
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, listPadding]}>
         <View style={styles.topGroup}>
           <View style={styles.card}>
             <View style={styles.accountRow}>
@@ -130,7 +129,7 @@ function SettingsScreen() {
             </Pressable>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -141,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_PRIMARY,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
   },
   topGroup: {

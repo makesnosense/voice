@@ -8,7 +8,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { memo } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import { api } from '../../../api';
 import Header from '../../../components/Header';
@@ -24,13 +23,14 @@ import {
 } from '../../../styles/colors';
 import { pressedStyle } from '../../../styles/common';
 import type { Device } from '../../../../../shared/types/devices';
+import { useContentPadding } from '../../../hooks/useContentPadding';
 
 interface DevicesScreenProps {
   onBack: () => void;
 }
 
 function DevicesScreen({ onBack }: DevicesScreenProps) {
-  const insets = useSafeAreaInsets();
+  const contentPadding = useContentPadding();
   const { getValidAccessToken, getRefreshToken, currentDeviceJti } =
     useAuthStore();
 
@@ -77,7 +77,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container]}>
       <Header
         title="Devices"
         leftSlot={<HeaderBackButton onPress={onBack} />}
@@ -103,7 +103,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
       {isLoading ? (
         <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       ) : (
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentContainerStyle={[styles.content, contentPadding]}>
           {currentDevice && (
             <>
               <Text style={styles.sectionLabel}>this device</Text>

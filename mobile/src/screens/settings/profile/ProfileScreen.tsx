@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { memo } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
 import NameRow from './NameRow';
@@ -14,19 +13,20 @@ import {
   BACKGROUND_CARD,
 } from '../../../styles/colors';
 import ExportData from './ExportData';
+import { useContentPadding } from '../../../hooks/useContentPadding';
 
 interface ProfileScreenProps {
   onBack: () => void;
 }
 
 function ProfileScreen({ onBack }: ProfileScreenProps) {
-  const insets = useSafeAreaInsets();
+  const contentPadding = useContentPadding();
   const [isEditing, setIsEditing] = useState(false);
   const cancelEditingRef = useRef<(() => void) | null>(null);
 
   return (
     <Pressable
-      style={[styles.container, { paddingTop: insets.top }]}
+      style={[styles.container, { paddingTop: contentPadding.paddingTop }]}
       onPress={isEditing ? () => cancelEditingRef.current?.() : undefined}
     >
       <Header
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_PRIMARY,
   },
   content: {
-    padding: 20,
+    paddingHorizontal: 20,
   },
   sectionLabel: {
     fontSize: 11,

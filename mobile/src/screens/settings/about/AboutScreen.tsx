@@ -1,6 +1,5 @@
 import { View, Text, Pressable, Linking, StyleSheet } from 'react-native';
 import { memo } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ExternalLink } from 'lucide-react-native';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
@@ -11,18 +10,19 @@ import {
   BACKGROUND_PRIMARY,
 } from '../../../styles/colors';
 import { version } from '../../../../package.json';
+import { useContentPadding } from '../../../hooks/useContentPadding';
 
 interface AboutScreenProps {
   onBack: () => void;
 }
 
 function AboutScreen({ onBack }: AboutScreenProps) {
-  const insets = useSafeAreaInsets();
+  const contentPadding = useContentPadding();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container]}>
       <Header title="About" leftSlot={<HeaderBackButton onPress={onBack} />} />
-      <View style={styles.content}>
+      <View style={[styles.content, contentPadding]}>
         <View style={styles.brandingBlock}>
           <Text style={styles.appName}>Voice</Text>
           <Text style={styles.appVersion}>{version}</Text>
@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
+    marginBottom: 12,
   },
   privacyLinkPressed: {
     opacity: 0.5,

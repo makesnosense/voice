@@ -6,12 +6,8 @@ import {
   Pressable,
   ActivityIndicator,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useContactsStore } from '../../stores/useContactsStore';
-import { PLATFORM } from '../../../../shared/constants/platform';
 import Header from '../../components/Header';
 import HeaderBackButton from '../../components/HeaderBackButton';
 import {
@@ -21,13 +17,14 @@ import {
   BACKGROUND_PRIMARY,
   BACKGROUND_CARD,
 } from '../../styles/colors';
+import { useContentPadding } from '../../hooks/useContentPadding';
 
 interface AddContactScreenProps {
   onBack: () => void;
 }
 
 export default function AddContactScreen({ onBack }: AddContactScreenProps) {
-  const insets = useSafeAreaInsets();
+  const contentPadding = useContentPadding();
   const addContact = useContactsStore(state => state.addContact);
 
   const [email, setEmail] = useState('');
@@ -55,57 +52,52 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
   const isSubmitDisabled = !email.trim() || isSubmitting;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === PLATFORM.IOS ? 'padding' : 'height'}
-    >
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <Header
-          title="Add contact"
-          leftSlot={<HeaderBackButton onPress={onBack} />}
-        />
+    <View style={styles.container}>
+      <Header
+        title="Add contact"
+        leftSlot={<HeaderBackButton onPress={onBack} />}
+      />
 
-        <View style={styles.content}>
-          <View style={styles.card}>
-            <TextInput
-              style={[styles.input, error ? styles.inputError : null]}
-              placeholder="Email address"
-              placeholderTextColor={TEXT_MUTED}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoFocus
-              value={email}
-              onChangeText={value => {
-                setEmail(value);
-                setError(null);
-              }}
-              onSubmitEditing={handleSubmit}
-              returnKeyType="done"
-              editable={!isSubmitting}
-            />
-          </View>
-
-          {error && <Text style={styles.error}>{error}</Text>}
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              isSubmitDisabled && styles.buttonDisabled,
-              pressed && !isSubmitDisabled && styles.pressedStyle,
-            ]}
-            onPress={handleSubmit}
-            disabled={isSubmitDisabled}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator size="small" color={BACKGROUND_PRIMARY} />
-            ) : (
-              <Text style={styles.buttonText}>Add</Text>
-            )}
-          </Pressable>
+      <View style={[styles.content, contentPadding]}>
+        <View style={styles.card}>
+          <TextInput
+            style={[styles.input, error ? styles.inputError : null]}
+            placeholder="Email address"
+            placeholderTextColor={TEXT_MUTED}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus
+            value={email}
+            onChangeText={value => {
+              setEmail(value);
+              setError(null);
+            }}
+            onSubmitEditing={handleSubmit}
+            returnKeyType="done"
+            editable={!isSubmitting}
+          />
         </View>
+
+        {error && <Text style={styles.error}>{error}</Text>}
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            isSubmitDisabled && styles.buttonDisabled,
+            pressed && !isSubmitDisabled && styles.pressedStyle,
+          ]}
+          onPress={handleSubmit}
+          disabled={isSubmitDisabled}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator size="small" color={BACKGROUND_PRIMARY} />
+          ) : (
+            <Text style={styles.buttonText}>Add</Text>
+          )}
+        </Pressable>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 

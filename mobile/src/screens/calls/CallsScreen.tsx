@@ -8,7 +8,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
 import { useContactsStore } from '../../stores/useContactsStore';
 import { startCall } from '../../utils/start-call';
@@ -23,8 +22,11 @@ import {
 } from '../../styles/colors';
 import NotificationsDisabledBanner from './NotificationsDisabledBanner';
 
+import { useContentPadding } from '../../hooks/useContentPadding';
+
 function CallsScreen() {
-  const insets = useSafeAreaInsets();
+  const contentPadding = useContentPadding();
+
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { history, isLoading, fetchHistory, refresh } = useCallHistoryStore(
@@ -57,22 +59,22 @@ function CallsScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <Header title="Calls" />
       <NotificationsDisabledBanner />
-      <RejoinCard />
 
       {isLoading && history.length === 0 && (
         <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       )}
 
       <ScrollView
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, contentPadding]}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
         }
       >
         <CreateRoomButton style={styles.createRoomButton} />
+        <RejoinCard />
         {!isLoading && history.length === 0 && (
           <Text style={styles.empty}>No past calls</Text>
         )}
@@ -117,7 +119,6 @@ const styles = StyleSheet.create({
   },
   createRoomButton: {
     marginHorizontal: 16,
-    marginBottom: 4,
   },
   separator: {
     height: StyleSheet.hairlineWidth,

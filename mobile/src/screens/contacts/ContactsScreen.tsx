@@ -8,7 +8,6 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { UserPlus, UserMinus } from 'lucide-react-native';
 import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -24,6 +23,7 @@ import {
 import { pressedStyle } from '../../styles/common';
 import { sortContactsWithMobileFirst } from '../../../../shared/utils/sort-contacts';
 import type { ObjectValues } from '../../../../shared/types/core';
+import { useContentPadding } from '../../hooks/useContentPadding';
 
 const CONTACTS_VIEW = {
   CONTACTS_LIST: 'contacts-list',
@@ -35,7 +35,7 @@ type ContactsView = ObjectValues<typeof CONTACTS_VIEW>;
 const ContactSeparator = () => <View style={styles.separator} />;
 
 function ContactsScreen() {
-  const insets = useSafeAreaInsets();
+  const listPadding = useContentPadding();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
   const [isRemoveModeActive, setRemoveModeActive] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -65,7 +65,7 @@ function ContactsScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <Header
         title="Contacts"
         leftSlot={
@@ -101,7 +101,7 @@ function ContactsScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, listPadding]}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
         }
@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingTop: 8,
+    flexGrow: 1,
   },
   separator: {
     height: StyleSheet.hairlineWidth,

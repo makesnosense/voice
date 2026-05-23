@@ -29,7 +29,8 @@ const TABS = [
 ] as const;
 
 export const SCREEN_PADDING_H = 50;
-const NAV_PILL_HEIGHT = 67;
+export const NAV_PILL_HEIGHT = 67;
+export const NAV_PILL_BOTTOM_MARGIN = 20;
 
 interface NavBarProps {
   activeTab: HomeTab;
@@ -57,7 +58,10 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
   return (
     <>
       <Svg
-        style={[styles.wash, { height: insets.bottom + 20 + NAV_PILL_HEIGHT }]}
+        style={[
+          styles.wash,
+          { height: insets.bottom + NAV_PILL_BOTTOM_MARGIN + NAV_PILL_HEIGHT },
+        ]}
         width="100%"
       >
         <Defs>
@@ -73,7 +77,7 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
         style={[
           styles.container,
           {
-            bottom: insets.bottom + 20,
+            bottom: insets.bottom + NAV_PILL_BOTTOM_MARGIN,
             left: SCREEN_PADDING_H + insets.left,
             right: SCREEN_PADDING_H + insets.right,
           },
