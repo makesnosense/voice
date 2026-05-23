@@ -81,7 +81,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   }, []);
 
   return (
-    <View style={[styles.screen, { paddingVertical: insets.top + 16 }]}>
+    <View style={[styles.screen, { paddingBottom: insets.bottom + 12 }]}>
       <View style={styles.roomTop}>
         {isLoading ? (
           <ActivityIndicator color={TEXT_MUTED} />
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BACKGROUND_SECONDARY,
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
   roomTop: {
     flex: 1,
