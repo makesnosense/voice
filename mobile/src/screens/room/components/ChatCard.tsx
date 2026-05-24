@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import {
   TEXT_PRIMARY,
   TEXT_MUTED,
 } from '../../../styles/colors';
+import { useKeyboardHandler } from 'react-native-keyboard-controller';
+import { runOnJS } from 'react-native-worklets';
 
 export default function ChatCard() {
   const localSocketId = useRoomStore(state => state.localSocketId);
@@ -26,9 +28,23 @@ export default function ChatCard() {
   const [messageInput, setMessageInput] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
+  const scrollToBottom = useCallback((animated: boolean) => {
+    scrollRef.current?.scrollToEnd({ animated });
+  }, []);
+
   useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
-  }, [messages.length]);
+    scrollToBottom(true);
+  }, [messages.length, scrollToBottom]);
+
+  useKeyboardHandler(
+    {
+      onMove: () => {
+        'worklet';
+        runOnJS(scrollToBottom)(false);
+      },
+    },
+    [scrollToBottom],
+  );
 
   const handleSend = () => {
     const text = messageInput.trim();
