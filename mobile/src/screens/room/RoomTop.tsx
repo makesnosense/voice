@@ -20,6 +20,6 @@ export default function RoomTop({ roomId }: RoomTopProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 12,
+    gap: 8,
   },
 });

@@ -101,10 +101,10 @@ const styles = StyleSheet.create({
     backgroundColor: BACKGROUND_SECONDARY,
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    gap: 8,
   },
   roomTop: {
     flex: 1,
-    gap: 12,
     justifyContent: 'center',
   },
 });
