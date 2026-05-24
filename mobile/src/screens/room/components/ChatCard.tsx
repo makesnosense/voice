@@ -126,7 +126,7 @@ export default function ChatCard() {
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
+    flexGrow: 3,
     backgroundColor: BACKGROUND_PRIMARY,
     borderRadius: 16,
     borderWidth: 1,
