@@ -10,21 +10,21 @@ import {
   Animated,
 } from 'react-native';
 import { X } from 'lucide-react-native';
-import { useContactsStore } from '../../../../../stores/useContactsStore';
-import { useAuthStore } from '../../../../../stores/useAuthStore';
-import { api } from '../../../../../api';
-import { pressedStyle } from '../../../../../styles/common';
+import { useContactsStore } from '../../../../../../stores/useContactsStore';
+import { useAuthStore } from '../../../../../../stores/useAuthStore';
+import { api } from '../../../../../../api';
+import { pressedStyle } from '../../../../../../styles/common';
 import {
   BORDER_MUTED,
   TEXT_MUTED,
   TEXT_PRIMARY,
-} from '../../../../../styles/colors';
+} from '../../../../../../styles/colors';
 import ContactRow from './ContactRow';
-import type { RoomId } from '../../../../../../../shared/types/core';
+import type { RoomId } from '../../../../../../../../shared/types/core';
 import type {
   Contact,
   InvitedContact,
-} from '../../../../../../../shared/types/contacts';
+} from '../../../../../../../../shared/types/contacts';
 
 interface InviteModalProps {
   roomId: RoomId;

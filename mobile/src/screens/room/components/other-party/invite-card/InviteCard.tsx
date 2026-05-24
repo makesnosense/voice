@@ -4,12 +4,12 @@ import {
   NEUTRAL_COLOR,
   BORDER_MUTED,
   TEXT_MUTED,
-} from '../../../../styles/colors';
-import { pressedStyle } from '../../../../styles/common';
+} from '../../../../../styles/colors';
+import { pressedStyle } from '../../../../../styles/common';
 import InviteModal from './invite-modal/InviteModal';
 import { UserPlus } from 'lucide-react-native';
-import type { InvitedContact } from '../../../../../../shared/types/contacts';
-import type { RoomId } from '../../../../../../shared/types/core';
+import type { InvitedContact } from '../../../../../../../shared/types/contacts';
+import type { RoomId } from '../../../../../../../shared/types/core';
 
 interface InviteCardProps {
   roomId: RoomId;
@@ -44,13 +44,13 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
 
 const styles = StyleSheet.create({
   card: {
+    flexGrow: 1,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: BORDER_MUTED,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 150,
   },
   label: {
     fontSize: 12,

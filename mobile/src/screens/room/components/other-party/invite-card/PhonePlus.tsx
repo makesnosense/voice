@@ -1,5 +1,5 @@
 import Svg, { Path } from 'react-native-svg';
-import { TEXT_MUTED } from '../../../../styles/colors';
+import { TEXT_MUTED } from '../../../../../styles/colors';
 
 interface Props {
   size?: number;

@@ -1,12 +1,12 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { PhoneOff } from 'lucide-react-native';
-import { pressedStyle } from '../../../../styles/common';
+import { pressedStyle } from '../../../../../styles/common';
 import CallingDots from './CallingDots';
 import {
   TEXT_PRIMARY,
   BORDER_MUTED,
   BACKGROUND_PRIMARY,
-} from '../../../../styles/colors';
+} from '../../../../../styles/colors';
 
 interface CallingCardProps {
   contactName: string | null;

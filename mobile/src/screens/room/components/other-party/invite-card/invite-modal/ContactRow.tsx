@@ -6,9 +6,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
-import { pressedStyle } from '../../../../../styles/common';
-import { TEXT_PRIMARY, TEXT_MUTED } from '../../../../../styles/colors';
-import type { Contact } from '../../../../../../../shared/types/contacts';
+import { pressedStyle } from '../../../../../../styles/common';
+import { TEXT_PRIMARY, TEXT_MUTED } from '../../../../../../styles/colors';
+import type { Contact } from '../../../../../../../../shared/types/contacts';
 
 interface ContactRowProps {
   contact: Contact;
