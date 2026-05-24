@@ -81,7 +81,12 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   }, []);
 
   return (
-    <View style={[styles.screen, { paddingBottom: insets.bottom + 12 }]}>
+    <View
+      style={[
+        styles.screen,
+        { paddingTop: insets.top, paddingBottom: insets.bottom + 12 },
+      ]}
+    >
       <View style={styles.roomTop}>
         {isLoading ? (
           <ActivityIndicator color={TEXT_MUTED} />
