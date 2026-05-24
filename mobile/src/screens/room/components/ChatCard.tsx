@@ -28,6 +28,8 @@ export default function ChatCard() {
   const [messageInput, setMessageInput] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
+  const hasMessages = messages.length > 0;
+
   const scrollToBottom = useCallback((animated: boolean) => {
     scrollRef.current?.scrollToEnd({ animated });
   }, []);
@@ -55,18 +57,20 @@ export default function ChatCard() {
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, hasMessages && styles.cardExpanded]}>
       <ScrollView
         ref={scrollRef}
-        style={styles.scrollView}
+        style={[styles.scrollView, !hasMessages && styles.scrollViewEmpty]}
         contentContainerStyle={styles.scrollContent}
         onContentSizeChange={() =>
           scrollRef.current?.scrollToEnd({ animated: false })
         }
         keyboardShouldPersistTaps="handled"
       >
-        {messages.length === 0 ? (
-          <Text style={styles.emptyText}>no messages yet</Text>
+        {!hasMessages ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>No messages yet</Text>
+          </View>
         ) : (
           messages.map((msg, index) => {
             const isOwn = msg.socketId === localSocketId;
@@ -99,7 +103,7 @@ export default function ChatCard() {
           style={styles.input}
           value={messageInput}
           onChangeText={setMessageInput}
-          placeholder="message..."
+          placeholder="Message..."
           placeholderTextColor={TEXT_MUTED}
           onSubmitEditing={handleSend}
           returnKeyType="send"
@@ -126,15 +130,26 @@ export default function ChatCard() {
 
 const styles = StyleSheet.create({
   card: {
-    flexGrow: 3,
     backgroundColor: BACKGROUND_PRIMARY,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: BORDER_SUBTLE,
     overflow: 'hidden',
   },
+  cardExpanded: {
+    flexGrow: 3,
+  },
   scrollView: {
     flex: 1,
+  },
+  scrollViewEmpty: {
+    flex: 0,
+    height: 70,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   scrollContent: {
     flexGrow: 1,
