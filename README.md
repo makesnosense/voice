@@ -11,6 +11,9 @@
 <br>
 <img src=".github/screenshot.png" alt="App screenshot" width=600px/>
 
+## Download
+[![Android](https://img.shields.io/badge/Android-v0.9.6-green?logo=android)](https://github.com/makesnosense/voice/releases/tag/mobile-v0.9.6)
+
 ## Self-hosting
 
 ### Prerequisites
