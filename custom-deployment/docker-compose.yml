@@ -24,6 +24,9 @@ services:
       dockerfile: server/Dockerfile # but use server/Dockerfile
     env_file:
       - .env.production
+    environment:
+      - DEPLOYED_COMMIT=${DEPLOYED_COMMIT}
+      - DEPLOYED_AT=${DEPLOYED_AT}
     restart: unless-stopped
     networks:
       - web

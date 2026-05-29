@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --watch --env-file=../.env.development src/server.ts",
+    "dev": "DEPLOYED_COMMIT=$(git rev-parse --short HEAD) DEPLOYED_AT=$(git log -1 --format=%cI) bun --watch --env-file=../.env.development src/server.ts",
     "build": "bun build src/server.ts --target bun --outfile dist/server.js",
     "start": "bun --env-file=../.env.production ./dist/server.js",
     "db:generate": "bun --env-file=../.env.development drizzle-kit generate --config=drizzle.config.ts",

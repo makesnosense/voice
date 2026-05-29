@@ -3,6 +3,7 @@ import authRoutes from './routes/auth';
 import devicesRoutes from './routes/devices';
 import turnRoutes from './routes/turn';
 import createCallsRouter from './routes/calls';
+import statusRoutes from './routes/status';
 
 import contactsRoutes from './routes/contacts';
 import usersRoutes from './routes/users';
@@ -19,7 +20,7 @@ export function createApp(rooms: Map<RoomId, Room>) {
     app.set('trust proxy', 1);
   }
 
-  app.get('/health', generalApiLimiter, (_req, res) => res.status(200).end());
+  app.use('/', generalApiLimiter, statusRoutes);
   app.use('/api/', generalApiLimiter);
 
   app.use('/api/calls', createCallsRouter(rooms));
