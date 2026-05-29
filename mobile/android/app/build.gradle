@@ -83,8 +83,8 @@ android {
         applicationId "org.voicepopuli.voice"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "0.9.6"
+        versionCode 8
+        versionName "0.9.7"
         archivesBaseName = "voice-${versionName}"
     }
     signingConfigs {
