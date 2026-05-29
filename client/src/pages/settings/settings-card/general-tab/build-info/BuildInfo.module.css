@@ -1,0 +1,31 @@
+.buildInfo {
+  font-family: ui-monospace, monospace;
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+.buildLabel {
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.buildHash {
+  cursor: default;
+  position: relative;
+}
+
+.buildHash[data-date]:hover::after {
+  content: attr(data-date);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-size: 0.625rem;
+  padding: 3px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+}

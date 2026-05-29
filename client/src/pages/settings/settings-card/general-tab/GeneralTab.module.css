@@ -28,3 +28,10 @@
 .privacyLink:hover {
   color: var(--text-secondary);
 }
+
+.bottomRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 2px;
+}

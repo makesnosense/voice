@@ -3,6 +3,7 @@ import styles from './GeneralTab.module.css';
 import NameField from './name-field/NameField';
 import DeleteAccount from './delete-account/DeleteAccount';
 import ExportData from './export-data/ExportData';
+import BuildInfo from './build-info/BuildInfo';
 
 export default function GeneralTab() {
   return (
@@ -17,9 +18,12 @@ export default function GeneralTab() {
       <DeleteAccount />
       <div className={styles.divider} />
 
-      <Link to="/privacy" className={styles.privacyLink}>
-        Privacy Policy
-      </Link>
+      <div className={styles.bottomRow}>
+        <Link to="/privacy" className={styles.privacyLink}>
+          Privacy Policy
+        </Link>
+        <BuildInfo />
+      </div>
     </div>
   );
 }

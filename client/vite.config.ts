@@ -1,5 +1,5 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react-swc';
 import fs from 'node:fs';
 
 export default defineConfig(({ command, mode }) => {
@@ -10,7 +10,7 @@ export default defineConfig(({ command, mode }) => {
     plugins: [react()],
     envDir: '../',
     resolve: {
-      dedupe: ['react', 'react-dom','socket.io-client'],
+      dedupe: ['react', 'react-dom', 'socket.io-client'],
     },
 
     // production build config
@@ -25,10 +25,10 @@ export default defineConfig(({ command, mode }) => {
             vendor: ['react', 'react-dom'],
             router: ['react-router'],
             socket: ['socket.io-client'],
-            ui: ['lucide-react']
-          }
-        }
-      }
+            ui: ['lucide-react'],
+          },
+        },
+      },
     },
 
     // only apply dev server config in development
@@ -49,8 +49,12 @@ export default defineConfig(({ command, mode }) => {
             ws: true,
             secure: false,
           },
+          '/version': {
+            target: `https://${env.SERVER_HOST}:${env.SERVER_PORT}`,
+            secure: false,
+          },
         },
-      }
-    })
-  }
-})
+      },
+    }),
+  };
+});
