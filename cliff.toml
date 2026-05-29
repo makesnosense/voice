@@ -1,3 +1,22 @@
+[changelog]
+body = """
+{% if version %}\
+## {{ version | trim_start_matches(pat="mobile-") | replace(from="v", to="Android v") }} – {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [unreleased]
+{% endif %}\
+{% set groups = ["🚀 Features", "💅 Improvements", "⚡ Performance", "🐛 Bug Fixes", "🚜 Refactor", "📚 Documentation", "🧪 Testing", "⚙️ Miscellaneous", "💼 Other"] %}
+{% for group in groups %}\
+{% set group_commits = commits | filter(attribute="group", value=group) %}\
+{% if group_commits %}\
+### {{ group }}
+{% for commit in group_commits -%}
+▪ {% if commit.scope %}[{{ commit.scope }}] {% endif %}{{ commit.message | upper_first }}
+{% endfor %}
+{% endif %}\
+{% endfor %}\n
+"""
+
 [git]
 conventional_commits = true
 filter_unconventional = false
