@@ -1,0 +1,15 @@
+[git]
+conventional_commits = true
+filter_unconventional = false
+commit_parsers = [
+  { message = "^feat", group = "🚀 Features" },
+  { message = "^fix", group = "🐛 Bug Fixes" },
+  { message = "^improvement", group = "💅 Improvements" },
+  { message = "^perf", group = "⚡ Performance" },
+  { message = "^refactor", group = "🚜 Refactor" },
+  { message = "^docs", group = "📚 Documentation" },
+  { message = "^test", group = "🧪 Testing" },
+  { message = "bump version", skip = true },
+  { message = "^chore|^ci|^build", group = "⚙️ Miscellaneous" },
+  { message = ".*", group = "💼 Other" },
+]
