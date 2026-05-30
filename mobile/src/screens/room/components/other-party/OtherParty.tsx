@@ -22,7 +22,7 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
 
   const invitedContact =
     invitedUser?.roomId === roomId ? invitedUser.contact : null;
-  const isAlone = roomUsers.length === 1;
+  const isRemoteUserPresent = roomUsers.length >= 2;
 
   useEffect(() => {
     if (roomUsers.length >= 2) {
@@ -49,7 +49,7 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     }
   };
 
-  if (!isAlone) return <RemoteUserCard />;
+  if (isRemoteUserPresent) return <RemoteUserCard />;
 
   if (!isAuthenticated) {
     return (
