@@ -8,12 +8,14 @@ import CallingCard from './calling-card/CallingCard';
 import InviteCard from './invite-card/InviteCard';
 import CopyCard from './CopyCard';
 import type { RoomId } from '../../../../../../shared/types/core';
+import { StyleSheet, View } from 'react-native';
 
 interface OtherPartyProps {
   roomId: RoomId;
 }
 
 export default function OtherParty({ roomId }: OtherPartyProps) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isCallDeclined = useRoomStore(state => state.isCallDeclined);
   const roomUsers = useRoomStore(state => state.roomUsers);
   const invitedUser = useInvitedUserStore(state => state.invitedUser);
@@ -46,7 +48,18 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
       console.error('Failed to cancel invite:', error);
     }
   };
+
   if (!isAlone) return <RemoteUserCard />;
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <View style={styles.unauthenticatedFiller} />
+        <CopyCard roomId={roomId} />
+      </>
+    );
+  }
+
   if (invitedContact) {
     return (
       <CallingCard
@@ -70,3 +83,9 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  unauthenticatedFiller: {
+    flex: 1,
+  },
+});
