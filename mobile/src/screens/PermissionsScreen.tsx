@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Bell, Mic } from 'lucide-react-native';
+import { Bell, Bluetooth, Mic } from 'lucide-react-native';
 import { PERMISSION_STATUS, type PermissionStatus } from '../types/permissions';
 import { pressedStyle } from '../styles/common';
 import {
@@ -17,61 +17,63 @@ import {
 } from '../styles/colors';
 import { usePermissionsStore } from '../stores/usePermissionsStore.android';
 
+const STATUS_DOT_COLOR: Partial<Record<PermissionStatus, string>> = {
+  [PERMISSION_STATUS.GRANTED]: STATUS_GREEN,
+  [PERMISSION_STATUS.DENIED]: STATUS_RED,
+  [PERMISSION_STATUS.BLOCKED]: STATUS_YELLOW,
+};
+
 export default function PermissionsScreen() {
   const insets = useSafeAreaInsets();
   const {
     notificationsStatus,
     microphoneStatus,
-    requestPermissions,
+    bluetoothStatus,
+    allPermissionsGranted,
     permissionsRequested,
+    requestPermissions,
     openAppSettings,
     dismiss,
   } = usePermissionsStore();
 
-  const shouldOpenSettings =
+  const shouldOpenSettings = permissionsRequested && !allPermissionsGranted;
+  const canDismiss =
     permissionsRequested &&
-    (notificationsStatus !== PERMISSION_STATUS.GRANTED ||
-      microphoneStatus !== PERMISSION_STATUS.GRANTED);
+    microphoneStatus === PERMISSION_STATUS.GRANTED &&
+    !allPermissionsGranted;
 
-  const STATUS_DOT_COLOR: Partial<Record<PermissionStatus, string>> = {
-    [PERMISSION_STATUS.GRANTED]: STATUS_GREEN,
-    [PERMISSION_STATUS.DENIED]: STATUS_RED,
-    [PERMISSION_STATUS.BLOCKED]: STATUS_YELLOW,
-    // CHECKING falls through to statusDot base style (NEUTRAL_COLOR)
-  };
-
-  const items = [
+  const allItems = [
     {
       key: 'notifications',
       icon: <Bell size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
       label: 'Notifications',
-      description: 'required to receive incoming calls',
+      description: 'to receive incoming calls',
       status: notificationsStatus,
     },
     {
       key: 'microphone',
       icon: <Mic size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
       label: 'Microphone',
-      description: 'required for voice calls',
+      description: 'for voice calls',
       status: microphoneStatus,
+    },
+    {
+      key: 'bluetooth',
+      icon: <Bluetooth size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
+      label: 'Nearby devices',
+      description: 'to use bluetooth headsets in calls',
+      status: bluetoothStatus,
     },
   ];
 
-  const canDismiss =
-    permissionsRequested &&
-    microphoneStatus === PERMISSION_STATUS.GRANTED &&
-    (notificationsStatus === PERMISSION_STATUS.DENIED ||
-      notificationsStatus === PERMISSION_STATUS.BLOCKED);
+  const items = allItems.filter(
+    item => item.status !== PERMISSION_STATUS.UNAVAILABLE,
+  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.content}>
-        <View style={styles.heading}>
-          <Text style={styles.title}>Voice needs access</Text>
-          <Text style={styles.subtitle}>
-            both permissions are required to use the app
-          </Text>
-        </View>
+        <Text style={styles.title}>Voice needs access</Text>
 
         <View>
           <Text style={styles.sectionLabel}>required permissions</Text>
@@ -115,6 +117,7 @@ export default function PermissionsScreen() {
             <Text style={styles.buttonText}>Request permissions</Text>
           </Pressable>
         )}
+
         <Text style={styles.hint}>
           if the system dialog doesn't appear, open settings and grant manually
         </Text>

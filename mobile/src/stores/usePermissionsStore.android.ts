@@ -11,18 +11,31 @@ import {
 import { PERMISSION_STATUS, type PermissionStatus } from '../types/permissions';
 import { waitForActivity } from '../utils/wait-for-activity';
 
-function checkPermissions(): Promise<[RNPermissionStatus, RNPermissionStatus]> {
-  return Promise.all([
+type PermissionsResult = {
+  notifications: RNPermissionStatus;
+  microphone: RNPermissionStatus;
+  bluetooth: RNPermissionStatus;
+};
+
+async function checkPermissions(): Promise<PermissionsResult> {
+  const [notifications, statuses] = await Promise.all([
     checkNotifications().then(({ status }) => status),
-    checkMultiple([PERMISSIONS.ANDROID.RECORD_AUDIO]).then(
-      statuses => statuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
-    ),
+    checkMultiple([
+      PERMISSIONS.ANDROID.RECORD_AUDIO,
+      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+    ]),
   ]);
+  return {
+    notifications,
+    microphone: statuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
+    bluetooth: statuses[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
+  };
 }
 
 interface PermissionsStore {
   notificationsStatus: PermissionStatus;
   microphoneStatus: PermissionStatus;
+  bluetoothStatus: PermissionStatus;
   isCheckingPermissions: boolean;
   permissionsRequested: boolean;
   allPermissionsGranted: boolean;
@@ -34,29 +47,31 @@ interface PermissionsStore {
   dismiss: () => void;
 }
 
-export const usePermissionsStore = create<PermissionsStore>((set, get) => {
-  const applyPermissionsResults = ([notifications, microphone]: [
-    RNPermissionStatus,
-    RNPermissionStatus,
-  ]) => {
+export const usePermissionsStore = create<PermissionsStore>(set => {
+  const applyPermissionsResults = ({
+    notifications,
+    microphone,
+    bluetooth,
+  }: PermissionsResult) => {
     const allPermissionsGranted =
       notifications === PERMISSION_STATUS.GRANTED &&
-      microphone === PERMISSION_STATUS.GRANTED;
+      microphone === PERMISSION_STATUS.GRANTED &&
+      (bluetooth === PERMISSION_STATUS.GRANTED ||
+        bluetooth === PERMISSION_STATUS.UNAVAILABLE);
 
     set({
       notificationsStatus: notifications,
       microphoneStatus: microphone,
+      bluetoothStatus: bluetooth,
       allPermissionsGranted,
       isCheckingPermissions: false,
     });
-
-    if (allPermissionsGranted || get().permissionsSkipped) {
-    }
   };
 
   return {
     notificationsStatus: PERMISSION_STATUS.CHECKING,
     microphoneStatus: PERMISSION_STATUS.CHECKING,
+    bluetoothStatus: PERMISSION_STATUS.CHECKING,
     isCheckingPermissions: true,
     permissionsRequested: false,
     allPermissionsGranted: false,
@@ -70,7 +85,6 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
 
       AppState.addEventListener('change', nextState => {
         if (nextState === 'active') {
-          // console.log('AppState active — re-checking permissions');
           checkPermissions()
             .then(applyPermissionsResults)
             .catch(() => {});
@@ -82,21 +96,21 @@ export const usePermissionsStore = create<PermissionsStore>((set, get) => {
       await waitForActivity();
 
       const { status: notifications } = await requestNotifications([]);
-      const micStatuses = await requestMultiple([
+      const statuses = await requestMultiple([
         PERMISSIONS.ANDROID.RECORD_AUDIO,
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
       ]);
 
-      applyPermissionsResults([
+      applyPermissionsResults({
         notifications,
-        micStatuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
-      ]);
+        microphone: statuses[PERMISSIONS.ANDROID.RECORD_AUDIO],
+        bluetooth: statuses[PERMISSIONS.ANDROID.BLUETOOTH_CONNECT],
+      });
       set({ permissionsRequested: true });
     },
 
     openAppSettings: () => Linking.openSettings(),
 
-    dismiss: () => {
-      set({ permissionsSkipped: true });
-    },
+    dismiss: () => set({ permissionsSkipped: true }),
   };
 });
