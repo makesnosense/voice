@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import { useInvitedUserStore } from '../../../../stores/useInvitedUserStore';
 import { useAuthStore } from '../../../../stores/useAuthStore';
@@ -9,6 +9,8 @@ import InviteCard from './invite-card/InviteCard';
 import CopyCard from './CopyCard';
 import type { RoomId } from '../../../../../../shared/types/core';
 import { StyleSheet, View } from 'react-native';
+
+const CALL_TIMEOUT_MS = 60_000;
 
 interface OtherPartyProps {
   roomId: RoomId;
@@ -39,7 +41,9 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     return () => clearTimeout(timeout);
   }, [isCallDeclined]);
 
-  const handleCancelInvite = async () => {
+  const handleCancelInvite = useCallback(async () => {
+    const currentInvitedUser = useInvitedUserStore.getState().invitedUser;
+    if (!currentInvitedUser) return;
     useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
@@ -47,7 +51,17 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     } catch (error) {
       console.error('Failed to cancel invite:', error);
     }
-  };
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!invitedContact) return;
+    const timeout = setTimeout(handleCancelInvite, CALL_TIMEOUT_MS);
+    return () => {
+      clearTimeout(timeout);
+      useInvitedUserStore.setState({ invitedUser: null });
+      // server handler cleans up invite on socket disconnect
+    };
+  }, [invitedContact, handleCancelInvite]);
 
   if (isRemoteUserPresent) return <RemoteUserCard />;
 

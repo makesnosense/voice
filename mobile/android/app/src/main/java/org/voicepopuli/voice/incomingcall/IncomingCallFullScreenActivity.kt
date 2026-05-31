@@ -9,6 +9,8 @@ import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
@@ -69,6 +71,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         callerEmail = intent.getStringExtra("callerEmail")
         callerName = intent.getStringExtra("callerName") ?: intent.getStringExtra("callerEmail") ?: "unknown"
 
+
         when (action) {
             "accept" -> {
                 acceptCall(roomId)
@@ -93,6 +96,15 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnDecline).setOnClickListener {
             declineCall()
         }
+
+        val remainingNotificationLifeMs = intent.getLongExtra(
+            "remainingNotificationLifeMs",
+            VoiceFirebaseMessagingService.CALL_NOTIFICATION_TIMEOUT_MS,
+        )
+        Handler(Looper.getMainLooper()).postDelayed({
+            cancelNotification()
+            finish()
+        }, remainingNotificationLifeMs)
     }
 
     override fun onNewIntent(intent: Intent) {

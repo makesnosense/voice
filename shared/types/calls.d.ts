@@ -5,6 +5,7 @@ export interface CallNotificationPayload {
   callerEmail: string;
   callerName: string | null;
   roomId: string;
+  sentAt: number;
 }
 
 export interface CallHistoryEntry {

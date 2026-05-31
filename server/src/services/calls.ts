@@ -12,6 +12,7 @@ export async function notifyDevicesOfCall(
   devices: { fcmToken: string | null }[],
   roomId: RoomId
 ): Promise<void> {
+  const sentAt = Date.now();
   await Promise.allSettled(
     devices.map((device) =>
       sendCallNotification(device.fcmToken!, {
@@ -19,6 +20,7 @@ export async function notifyDevicesOfCall(
         callerEmail: caller.email,
         callerName: caller.name,
         roomId,
+        sentAt,
       })
     )
   );

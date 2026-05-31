@@ -267,6 +267,14 @@ const handleDisconnect = (
   const wasInRoom = room.users.has(socket.id as SocketId);
   room.users.delete(socket.id as SocketId);
 
+  // TODO: remove when invite state moves to server — server will own cancellation
+  if (room.pendingInviteFcmTokens.length > 0) {
+    room.pendingInviteFcmTokens.forEach((token) =>
+      sendCallCancelledNotification(token).catch(() => {})
+    );
+    room.pendingInviteFcmTokens = [];
+  }
+
   if (wasInRoom) {
     console.log(
       `🔌 [Socket] removed ${socket.id} from room ${socket.roomId} (${room.users.size} remaining)`

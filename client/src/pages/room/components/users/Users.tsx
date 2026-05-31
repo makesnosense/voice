@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { api } from '../../../../api';
 import InviteCard from './invite-card/InviteCard';
 import UserCard from './usercard/UserCard';
@@ -12,6 +12,8 @@ import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
 import { formatDisplayName } from '../../../../../../shared/utils/format';
 import type { AudioFrequencyData } from '../../../../../../shared/types/core';
+
+const CALL_NOTIFICATION_TIMEOUT_MS = 60_000;
 
 export default function Users() {
   const roomId = useRoomId();
@@ -30,7 +32,9 @@ export default function Users() {
   const toggleMute = useWebRTCStore((state) => state.toggleMute);
   const remoteSocketId = useWebRTCStore((state) => state.remoteSocketId);
 
-  const handleCancelInvite = async () => {
+  const handleCancelInvite = useCallback(async () => {
+    const currentInvitedUser = useInvitedUserStore.getState().invitedUser;
+    if (!currentInvitedUser) return;
     useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await getValidAccessToken();
@@ -38,7 +42,7 @@ export default function Users() {
     } catch (error) {
       console.error('failed to cancel invite:', error);
     }
-  };
+  }, [roomId, getValidAccessToken]);
 
   useEffect(() => {
     if (roomUsers.length >= 2) {
@@ -56,6 +60,16 @@ export default function Users() {
     }, 3000);
     return () => clearTimeout(timeout);
   }, [isCallDeclined]);
+
+  useEffect(() => {
+    if (!invitedContact) return;
+    const timeout = setTimeout(handleCancelInvite, CALL_NOTIFICATION_TIMEOUT_MS);
+    return () => {
+      clearTimeout(timeout);
+      useInvitedUserStore.setState({ invitedUser: null });
+      // server handles FCM cancellation on socket disconnect
+    };
+  }, [invitedContact, handleCancelInvite]);
 
   return (
     <div className={usersStyles.usersContainer}>

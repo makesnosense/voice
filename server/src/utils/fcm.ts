@@ -32,10 +32,12 @@ export async function sendCallNotification(
       callerEmail: payload.callerEmail,
       callerName: payload.callerName ?? '',
       roomId: payload.roomId,
+      sentAt: payload.sentAt.toString(),
     },
     android: {
       priority: 'high',
       collapseKey: 'call',
+      ttl: 60,
     },
   });
 }
