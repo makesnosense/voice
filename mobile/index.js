@@ -16,7 +16,9 @@ import {
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { installLogger } from './src/utils/logger';
 
+installLogger();
 setBackgroundMessageHandler(getMessaging(), async () => {});
 const Root = () => (
   <SafeAreaProvider>

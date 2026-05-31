@@ -1,4 +1,11 @@
-import { View, Text, Pressable, Linking, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  Linking,
+  Share,
+  StyleSheet,
+} from 'react-native';
 import { memo } from 'react';
 import { ExternalLink } from 'lucide-react-native';
 import Header from '../../../components/Header';
@@ -8,9 +15,12 @@ import {
   TEXT_PRIMARY,
   TEXT_SECONDARY,
   BACKGROUND_PRIMARY,
+  TEXT_MUTED,
 } from '../../../styles/colors';
 import { version } from '../../../../package.json';
 import { useContentPadding } from '../../../hooks/useContentPadding';
+import { formatLogsForSharing } from '../../../utils/logger';
+import { pressedStyle } from '../../../styles/common';
 
 interface AboutScreenProps {
   onBack: () => void;
@@ -19,24 +29,39 @@ interface AboutScreenProps {
 function AboutScreen({ onBack }: AboutScreenProps) {
   const contentPadding = useContentPadding();
 
+  const handleShareLog = async () => {
+    await Share.share({ message: formatLogsForSharing() });
+  };
+
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <Header title="About" leftSlot={<HeaderBackButton onPress={onBack} />} />
       <View style={[styles.content, contentPadding]}>
         <View style={styles.brandingBlock}>
           <Text style={styles.appName}>Voice</Text>
           <Text style={styles.appVersion}>{version}</Text>
         </View>
-        <Pressable
-          style={({ pressed }) => [
-            styles.privacyLink,
-            pressed && styles.privacyLinkPressed,
-          ]}
-          onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
-        >
-          <Text style={styles.privacyLinkText}>Privacy Policy</Text>
-          <ExternalLink size={12} color={TEXT_SECONDARY} strokeWidth={1.75} />
-        </Pressable>
+        <View style={styles.bottomRow}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.shareButton,
+              pressed && pressedStyle,
+            ]}
+            onPress={handleShareLog}
+          >
+            <Text style={styles.shareButtonText}>Share local log</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.privacyLink,
+              pressed && styles.privacyLinkPressed,
+            ]}
+            onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+          >
+            <Text style={styles.privacyLinkText}>Privacy Policy</Text>
+            <ExternalLink size={12} color={TEXT_SECONDARY} strokeWidth={1.75} />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -51,23 +76,40 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 28,
+    paddingHorizontal: 20,
   },
   brandingBlock: {
     alignItems: 'center',
     gap: 6,
     paddingTop: 28,
-    paddingBottom: 28,
   },
   appName: {
     fontSize: 32,
     fontWeight: '600',
     color: TEXT_PRIMARY,
-    letterSpacing: -0.8, // -0.025em × 32px
+    letterSpacing: -0.8,
     includeFontPadding: false,
   },
   appVersion: {
     fontSize: 13,
+    color: TEXT_SECONDARY,
+  },
+  bottomRow: {
+    alignItems: 'center',
+    gap: 12,
+    width: '100%',
+  },
+  shareButton: {
+    width: '100%',
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: TEXT_MUTED,
+    padding: 14,
+    alignItems: 'center',
+  },
+  shareButtonText: {
+    fontSize: 15,
     color: TEXT_SECONDARY,
   },
   privacyLink: {
