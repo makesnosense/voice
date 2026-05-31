@@ -47,13 +47,13 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
         return res.status(404).json({ error: 'User not reachable' });
       }
 
-      const fcmTokens = mobileDevices
-        .map((device) => device.fcmToken)
-        .filter((fcmToken) => fcmToken !== null);
+      const fcmTokens = mobileDevices.flatMap((device) =>
+        device.fcmToken ? [device.fcmToken] : []
+      );
 
       room.pendingInviteFcmTokens = fcmTokens;
 
-      await notifyDevicesOfCall(caller, mobileDevices, roomId);
+      await notifyDevicesOfCall(caller, fcmTokens, roomId);
       await createCallsLogEntry(caller.userId, targetUserId);
 
       res.status(204).end();

@@ -9,13 +9,13 @@ import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
   caller: { userId: string; email: string; name: string | null },
-  devices: { fcmToken: string | null }[],
+  fcmTokens: string[],
   roomId: RoomId
 ): Promise<void> {
   const sentAt = Date.now();
   await Promise.allSettled(
-    devices.map((device) =>
-      sendCallNotification(device.fcmToken!, {
+    fcmTokens.map((token) =>
+      sendCallNotification(token, {
         callerUserId: caller.userId,
         callerEmail: caller.email,
         callerName: caller.name,
