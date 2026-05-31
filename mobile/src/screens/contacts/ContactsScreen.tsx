@@ -11,7 +11,7 @@ import {
 import { UserPlus, UserMinus } from 'lucide-react-native';
 import { useContactsStore } from '../../stores/useContactsStore';
 import { useAuthStore } from '../../stores/useAuthStore';
-import AddContactScreen from './AddContactScreen';
+import AddContactScreen from './add-contact/AddContactScreen';
 import Header from '../../components/Header';
 import ContactRow from './ContactRow';
 import {
