@@ -9,11 +9,13 @@ import {
 import {
   TEXT_PRIMARY,
   TEXT_MUTED,
-  NEUTRAL_COLOR,
-  BACKGROUND_CARD,
   TEXT_SECONDARY,
+  NEUTRAL_COLOR,
+  BACKGROUND_PRIMARY,
+  BACKGROUND_CARD,
+  BORDER_MUTED,
 } from '../../../styles/colors';
-import { pressedStyle, disabledStyle } from '../../../styles/common';
+import { pressedStyle } from '../../../styles/common';
 
 interface InputCardProps {
   email: string;
@@ -58,7 +60,7 @@ export default function InputCard({
       <Pressable
         style={({ pressed }) => [
           styles.button,
-          isSubmitDisabled && disabledStyle,
+          isSubmitDisabled ? styles.buttonInactive : styles.buttonActive,
           pressed && !isSubmitDisabled && pressedStyle,
         ]}
         onPress={onSubmit}
@@ -67,7 +69,16 @@ export default function InputCard({
         {isSubmitting ? (
           <ActivityIndicator size="small" color="#ffffff" />
         ) : (
-          <Text style={styles.buttonText}>Add contact</Text>
+          <Text
+            style={[
+              styles.buttonText,
+              isSubmitDisabled
+                ? styles.buttonTextInactive
+                : styles.buttonTextActive,
+            ]}
+          >
+            Add contact
+          </Text>
         )}
       </Pressable>
     </View>
@@ -102,14 +113,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   button: {
-    backgroundColor: TEXT_SECONDARY,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
+    borderWidth: 1,
+  },
+  buttonActive: {
+    backgroundColor: TEXT_SECONDARY,
+    borderColor: TEXT_SECONDARY,
+  },
+  buttonInactive: {
+    backgroundColor: BACKGROUND_PRIMARY,
+    borderColor: BORDER_MUTED,
   },
   buttonText: {
-    color: '#ffffff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  buttonTextActive: {
+    color: '#ffffff',
+  },
+  buttonTextInactive: {
+    color: BORDER_MUTED,
   },
 });
