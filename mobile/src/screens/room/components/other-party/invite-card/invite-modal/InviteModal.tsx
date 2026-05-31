@@ -25,6 +25,7 @@ import type {
   Contact,
   InvitedContact,
 } from '../../../../../../../../shared/types/contacts';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface InviteModalProps {
   roomId: RoomId;
@@ -47,6 +48,7 @@ export default function InviteModal({
   const [invitedUserId, setInvitedUserId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
 
+  const insets = useSafeAreaInsets();
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetTranslateY = useRef(new Animated.Value(SHEET_TRANSLATE_Y)).current;
 
@@ -103,7 +105,7 @@ export default function InviteModal({
 
   return (
     <Modal transparent animationType="none" onRequestClose={handleClose}>
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <Animated.View
           style={[styles.backdrop, { opacity: backdropOpacity }]}
           pointerEvents="box-none"
