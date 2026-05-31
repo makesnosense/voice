@@ -65,17 +65,17 @@ export default function createConnectionHandler(
     });
 
     // WebRTC signaling events with rate limiting
-    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toUserId: SocketId }) => {
+    socket.on('webrtc-offer', (data: { offer: WebRTCOffer; toSocketId: SocketId }) => {
       if (!checkRateLimit(socket, 'webrtc-offer')) return;
       handleWebRTCOffer(io, socket, data);
     });
 
-    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toUserId: SocketId }) => {
+    socket.on('webrtc-answer', (data: { answer: WebRTCAnswer; toSocketId: SocketId }) => {
       if (!checkRateLimit(socket, 'webrtc-answer')) return;
       handleWebRTCAnswer(io, socket, data);
     });
 
-    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toUserId: SocketId }) => {
+    socket.on('webrtc-ice-candidate', (data: { candidate: IceCandidate; toSocketId: SocketId }) => {
       if (!checkRateLimit(socket, 'webrtc-ice-candidate')) return;
       handleWebRTCIceCandidate(io, socket, data);
     });
