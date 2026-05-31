@@ -10,7 +10,7 @@ import CopyCard from './CopyCard';
 import type { RoomId } from '../../../../../../shared/types/core';
 import { StyleSheet, View } from 'react-native';
 
-const CALL_TIMEOUT_MS = 60_000;
+const CALL_NOTIFICATION_TIMEOUT_MS = 60_000;
 
 interface OtherPartyProps {
   roomId: RoomId;
@@ -55,7 +55,10 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
 
   useEffect(() => {
     if (!invitedContact) return;
-    const timeout = setTimeout(handleCancelInvite, CALL_TIMEOUT_MS);
+    const timeout = setTimeout(
+      handleCancelInvite,
+      CALL_NOTIFICATION_TIMEOUT_MS,
+    );
     return () => {
       clearTimeout(timeout);
       useInvitedUserStore.setState({ invitedUser: null });
