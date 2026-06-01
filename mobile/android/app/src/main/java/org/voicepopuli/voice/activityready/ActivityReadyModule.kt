@@ -8,8 +8,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 class ActivityReadyModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext),
-    LifecycleEventListener {
+    ReactContextBaseJavaModule(reactContext), LifecycleEventListener {
 
     companion object {
         const val EVENT_ACTIVITY_READY = "ActivityReady"
@@ -26,9 +25,7 @@ class ActivityReadyModule(reactContext: ReactApplicationContext) :
 
     override fun onHostResume() {
         isReady = true
-        reactApplicationContext
-            .getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit(EVENT_ACTIVITY_READY, null)
+        reactApplicationContext.getJSModule(RCTDeviceEventEmitter::class.java).emit(EVENT_ACTIVITY_READY, null)
     }
 
     override fun onHostPause() {}
@@ -43,6 +40,6 @@ class ActivityReadyModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod fun isActivityReady(promise: Promise) = promise.resolve(isReady)
-    @ReactMethod fun addListener(eventName: String) {}
-    @ReactMethod fun removeListeners(count: Double) {}
+    @ReactMethod @Suppress("UNUSED_PARAMETER") fun addListener(_eventName: String) {}
+    @ReactMethod @Suppress("UNUSED_PARAMETER") fun removeListeners(_count: Double) {}
 }

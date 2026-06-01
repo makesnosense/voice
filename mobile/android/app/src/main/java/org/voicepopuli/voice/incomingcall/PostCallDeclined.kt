@@ -1,8 +1,8 @@
 package org.voicepopuli.voice.incomingcall
 
-import org.voicepopuli.voice.ServerConfig
 import java.net.HttpURLConnection
 import java.net.URL
+import org.voicepopuli.voice.ServerConfig
 
 fun postCallDeclined(roomId: String) {
     val url = URL("${ServerConfig.BASE_URL}/api/rooms/$roomId/decline")

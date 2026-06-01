@@ -1,11 +1,10 @@
 package org.voicepopuli.voice
 
-import android.os.Bundle
-import android.os.Build
-import android.net.Uri
-import android.view.WindowManager
-import android.content.Intent
 import android.app.NotificationManager
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -17,79 +16,80 @@ import org.voicepopuli.voice.nativepermissions.NativePermissionsFlow
 
 class MainActivity : ReactActivity() {
 
-private val nativePermissionsFlow = NativePermissionsFlow(this)
+    private val nativePermissionsFlow = NativePermissionsFlow(this)
 
-  /**
-   * Returns the name of the main component registered from JavaScript. This is used to schedule
-   * rendering of the component.
-   */
-  override fun getMainComponentName(): String = "Voice"
+    /**
+     * Returns the name of the main component registered from JavaScript. This is used to schedule rendering of the
+     * component.
+     */
+    override fun getMainComponentName(): String = "Voice"
 
-  /**
-   * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
-   * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
-   */
-  override fun createReactActivityDelegate(): ReactActivityDelegate =
-      DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+    /**
+     * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate] which allows you to
+     * enable New Architecture with a single boolean flags [fabricEnabled]
+     */
+    override fun createReactActivityDelegate(): ReactActivityDelegate =
+        DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-      WindowCompat.setDecorFitsSystemWindows(window, false) 
-      RNBootSplash.init(this, R.style.BootTheme)
-      super.onCreate(savedInstanceState)
-      window.statusBarColor = android.graphics.Color.TRANSPARENT
-      window.navigationBarColor = android.graphics.Color.TRANSPARENT
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-          window.isNavigationBarContrastEnforced = false
-      }
-      applyLockScreenFlagsIfCallIntent(intent)
-      cancelCallNotificationIfNeeded(intent)
-  }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        RNBootSplash.init(this, R.style.BootTheme)
+        super.onCreate(savedInstanceState)
 
-  override fun onResume() {
-      super.onResume()
-    if (nativePermissionsFlow.hasStarted) {
-        runNativePermissionsFlow()
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            window.statusBarColor = android.graphics.Color.TRANSPARENT
+            window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+        applyLockScreenFlagsIfCallIntent(intent)
+        cancelCallNotificationIfNeeded(intent)
     }
-  }
 
-  internal fun runNativePermissionsFlow() {
-      nativePermissionsFlow.runNativePermissions()
-  }
+    override fun onResume() {
+        super.onResume()
+        if (nativePermissionsFlow.hasStarted) {
+            runNativePermissionsFlow()
+        }
+    }
 
-  override fun onNewIntent(intent: Intent) {
-    // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
-    // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
-      super.onNewIntent(intent)
-      applyLockScreenFlagsIfCallIntent(intent)
-      setIntent(intent)
-      cancelCallNotificationIfNeeded(intent)
-  }
+    internal fun runNativePermissionsFlow() {
+        nativePermissionsFlow.runNativePermissions()
+    }
 
-  private fun cancelCallNotificationIfNeeded(intent: Intent) {
-      val data = intent.data
-      if (intent.action == Intent.ACTION_VIEW && 
-          data?.scheme == "voice" &&
-          data.host == "call") {
-          getSystemService(NotificationManager::class.java)
-              .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
-      }
-  }
+    override fun onNewIntent(intent: Intent) {
+        // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
+        // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
+        super.onNewIntent(intent)
+        applyLockScreenFlagsIfCallIntent(intent)
+        setIntent(intent)
+        cancelCallNotificationIfNeeded(intent)
+    }
 
-  private fun applyLockScreenFlagsIfCallIntent(intent: Intent?) {
-      val data = intent?.data
-      val isCallIntent = data?.scheme == "voice" && data.host == "call"
-      if (!isCallIntent) return
+    private fun cancelCallNotificationIfNeeded(intent: Intent) {
+        val data = intent.data
+        if (intent.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data.host == "call") {
+            getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+        }
+    }
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-          setShowWhenLocked(true)
-          setTurnScreenOn(true)
-      } else {
-          @Suppress("DEPRECATION")
-          window.addFlags(
-              WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-              WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-              WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-          )
-      }
-  }
+    private fun applyLockScreenFlagsIfCallIntent(intent: Intent?) {
+        val data = intent?.data
+        val isCallIntent = data?.scheme == "voice" && data.host == "call"
+        if (!isCallIntent) return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            )
+        }
+    }
 }

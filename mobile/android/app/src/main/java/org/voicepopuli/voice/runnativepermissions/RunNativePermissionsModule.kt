@@ -1,17 +1,15 @@
 package org.voicepopuli.voice.runnativepermissions
 
+import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import org.voicepopuli.voice.MainActivity
-import android.util.Log
 
-
-class RunNativePermissionsModule(reactContext: ReactApplicationContext)
-    : ReactContextBaseJavaModule(reactContext) {
+class RunNativePermissionsModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     override fun getName() = "RunNativePermissions"
-    
+
     private var started = false
 
     @ReactMethod

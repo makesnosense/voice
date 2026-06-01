@@ -35,25 +35,29 @@ class CallForegroundService : Service() {
         val manager = getSystemService(NotificationManager::class.java)
         if (manager.getNotificationChannel(CHANNEL_ID) != null) return
 
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            "active call",
-            NotificationManager.IMPORTANCE_LOW // low = no sound, no heads-up
-        ).apply {
-            description = "keeps call alive while app is backgrounded"
-        }
+        val channel =
+            NotificationChannel(
+                    CHANNEL_ID,
+                    "active call",
+                    NotificationManager.IMPORTANCE_LOW // low = no sound, no heads-up
+                )
+                .apply { description = "keeps call alive while app is backgrounded" }
         manager.createNotificationChannel(channel)
     }
 
     private fun buildNotification(): Notification {
         // tapping the notification brings the user back to the call
-        val openAppIntent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, openAppIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val openAppIntent =
+            Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_call)

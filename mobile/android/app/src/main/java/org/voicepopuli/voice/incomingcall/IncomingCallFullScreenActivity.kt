@@ -1,24 +1,21 @@
 package org.voicepopuli.voice.incomingcall
 
-import android.app.KeyguardManager
 import android.app.NotificationManager
-import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
-import androidx.core.content.ContextCompat
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.WindowManager
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
+import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
-import android.widget.ImageButton
-
 import org.voicepopuli.voice.MainActivity
 import org.voicepopuli.voice.R
 
@@ -27,9 +24,10 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private var callerEmail: String? = null
     private var callerName: String? = null
 
-    private val callCancelledReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) = finish()
-    }
+    private val callCancelledReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) = finish()
+        }
 
     override fun onStart() {
         super.onStart()
@@ -57,12 +55,10 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
             @Suppress("DEPRECATION")
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             )
         }
-
-
 
         // handle action extras (from notification action buttons)
         val action = intent.getStringExtra("action")
@@ -70,7 +66,6 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         callerUserId = intent.getStringExtra("callerUserId")
         callerEmail = intent.getStringExtra("callerEmail")
         callerName = intent.getStringExtra("callerName") ?: intent.getStringExtra("callerEmail") ?: "unknown"
-
 
         when (action) {
             "accept" -> {
@@ -88,23 +83,23 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.callerName).text = callerName
 
+        findViewById<ImageButton>(R.id.btnAccept).setOnClickListener { acceptCall(roomId) }
 
-        findViewById<ImageButton>(R.id.btnAccept).setOnClickListener {
-            acceptCall(roomId)
-        }
+        findViewById<ImageButton>(R.id.btnDecline).setOnClickListener { declineCall() }
 
-        findViewById<ImageButton>(R.id.btnDecline).setOnClickListener {
-            declineCall()
-        }
-
-        val remainingNotificationLifeMs = intent.getLongExtra(
-            "remainingNotificationLifeMs",
-            VoiceFirebaseMessagingService.CALL_NOTIFICATION_TIMEOUT_MS,
-        )
-        Handler(Looper.getMainLooper()).postDelayed({
-            cancelNotification()
-            finish()
-        }, remainingNotificationLifeMs)
+        val remainingNotificationLifeMs =
+            intent.getLongExtra(
+                "remainingNotificationLifeMs",
+                VoiceFirebaseMessagingService.CALL_NOTIFICATION_TIMEOUT_MS,
+            )
+        Handler(Looper.getMainLooper())
+            .postDelayed(
+                {
+                    cancelNotification()
+                    finish()
+                },
+                remainingNotificationLifeMs
+            )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -112,22 +107,30 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         setIntent(intent)
         // reached only if a second call arrives while this screen is showing
         // TODO: remove once server-side busy detection is implemented
-        getSystemService(NotificationManager::class.java)
-            .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+        getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 
     private fun acceptCall(roomId: String?) {
         cancelNotification()
         val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName)
-        val intent = Intent(this, MainActivity::class.java).apply {
-            action = Intent.ACTION_VIEW
-            data = uri
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
+        val intent =
+            Intent(this, MainActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                data = uri
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+
         val options = android.app.ActivityOptions.makeCustomAnimation(this, 0, 0)
         startActivity(intent, options.toBundle())
         finish()
-        overridePendingTransition(0, 0)
+
+        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        } else {
+            overridePendingTransition(0, 0)
+        }
     }
 
     private fun declineCall() {
@@ -147,7 +150,6 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun cancelNotification() {
         VoiceFirebaseMessagingService.cancelVibration()
-        getSystemService(NotificationManager::class.java)
-            .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+        getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 }

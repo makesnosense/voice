@@ -10,8 +10,7 @@ import kotlin.concurrent.thread
 class DeclineCallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         VoiceFirebaseMessagingService.cancelVibration()
-        context.getSystemService(NotificationManager::class.java)
-            .cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+        context.getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
 
         val roomId = intent.getStringExtra("roomId") ?: return
         val pendingResult = goAsync()

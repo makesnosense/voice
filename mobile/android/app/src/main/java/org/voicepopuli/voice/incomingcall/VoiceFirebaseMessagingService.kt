@@ -7,13 +7,13 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.os.Handler
-import android.os.Looper
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -26,7 +26,6 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         const val NOTIFICATION_ID = 3333
         const val ACTION_CALL_CANCELLED = "org.voicepopuli.voice.CALL_CANCELLED"
         const val CALL_NOTIFICATION_TIMEOUT_MS = 60_000L
-
 
         private var vibrator: Vibrator? = null
 
@@ -42,7 +41,6 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             "call_cancelled" -> handleCallCancelled()
         }
     }
-
 
     private fun handleIncomingCall(data: Map<String, String>) {
         // acquire before anything else — wakes screen so full-screen intent fires reliably
@@ -78,22 +76,25 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         manager.deleteNotificationChannel(CHANNEL_ID)
 
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
+        val audioAttributes =
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
 
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            "incoming calls",
-            // high importance is required for heads-up + full-screen intent
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "incoming voice call alerts"
-            // channel vibration as fallback for ringer-on mode
-            enableVibration(true)
-            setSound(ringtoneUri, audioAttributes)
-        }
+        val channel =
+            NotificationChannel(
+                    CHANNEL_ID,
+                    "incoming calls",
+                    // high importance is required for heads-up + full-screen intent
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+                .apply {
+                    description = "incoming voice call alerts"
+                    // channel vibration as fallback for ringer-on mode
+                    enableVibration(true)
+                    setSound(ringtoneUri, audioAttributes)
+                }
         manager.createNotificationChannel(channel)
     }
 
@@ -101,40 +102,36 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         // repeating: 0ms delay, 500ms on, 500ms off
         val effect = VibrationEffect.createWaveform(longArrayOf(0, 500, 500), 0)
 
-        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            getSystemService(VibratorManager::class.java).defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(Vibrator::class.java)
-        }
+        vibrator =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                getSystemService(VibratorManager::class.java).defaultVibrator
+            } else {
+                @Suppress("DEPRECATION") getSystemService(Vibrator::class.java)
+            }
 
+        @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // USAGE_RINGTONE bypasses silent/ringer mode
-            val attrs = VibrationAttributes.Builder()
-                .setUsage(VibrationAttributes.USAGE_RINGTONE)
-                .build()
+            val attrs = VibrationAttributes.Builder().setUsage(VibrationAttributes.USAGE_RINGTONE).build()
             vibrator?.vibrate(effect, attrs)
         } else {
             // USAGE_ALARM is the closest pre-api-33 equivalent
-            @Suppress("DEPRECATION")
-            val attrs = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build()
+            val attrs = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()
             vibrator?.vibrate(effect, attrs)
         }
     }
 
-
     private fun acquireScreenWakeLock() {
         val powerManager = getSystemService(PowerManager::class.java)
         @Suppress("DEPRECATION")
-        val wakeLock = powerManager.newWakeLock(
-            // SCREEN_BRIGHT_WAKE_LOCK is deprecated but ACQUIRE_CAUSES_WAKEUP
-            // has no modern equivalent — this is the only way to wake the screen
-            // from a non-activity context. 
-            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "voice:incoming_call_wake"
-        )
+        val wakeLock =
+            powerManager.newWakeLock(
+                // SCREEN_BRIGHT_WAKE_LOCK is deprecated but ACQUIRE_CAUSES_WAKEUP
+                // has no modern equivalent — this is the only way to wake the screen
+                // from a non-activity context.
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "voice:incoming_call_wake"
+            )
         // 30s is generous — the activity will take over screen management once shown
         wakeLock.acquire(30_000L)
     }
@@ -148,52 +145,63 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     ) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
-        val incomingCallFullscreenIntent = Intent(this, IncomingCallFullScreenActivity::class.java).apply {
-            putExtra("callerName", callerName)
-            putExtra("callerUserId", callerUserId)
-            putExtra("callerEmail", callerEmail)
-            putExtra("roomId", roomId)
-            putExtra("remainingNotificationLifeMs", remainingNotificationLifeMs)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val incomingCallFullscreenPendingIntent = PendingIntent.getActivity(
-            this, 0, incomingCallFullscreenIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val incomingCallFullscreenIntent =
+            Intent(this, IncomingCallFullScreenActivity::class.java).apply {
+                putExtra("callerName", callerName)
+                putExtra("callerUserId", callerUserId)
+                putExtra("callerEmail", callerEmail)
+                putExtra("roomId", roomId)
+                putExtra("remainingNotificationLifeMs", remainingNotificationLifeMs)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+        val incomingCallFullscreenPendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                incomingCallFullscreenIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-        val notificationBarDeclineIntent = Intent(this, DeclineCallReceiver::class.java).apply {
-            putExtra("roomId", roomId)
-        }
+        val notificationBarDeclineIntent =
+            Intent(this, DeclineCallReceiver::class.java).apply { putExtra("roomId", roomId) }
 
-        val notificationBarDeclinePendingIntent = PendingIntent.getBroadcast(
-            this, 1, notificationBarDeclineIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val notificationBarDeclinePendingIntent =
+            PendingIntent.getBroadcast(
+                this,
+                1,
+                notificationBarDeclineIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-        val notificationBarAcceptIntent = Intent(this, AcceptCallReceiver::class.java).apply {
-            putExtra("roomId", roomId)
-            putExtra("callerUserId", callerUserId)
-            putExtra("callerEmail", callerEmail)
-            putExtra("callerName", callerName)
-        }
-        val notificationBarAcceptPendingIntent = PendingIntent.getBroadcast(
-            this, 2, notificationBarAcceptIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val notificationBarAcceptIntent =
+            Intent(this, AcceptCallReceiver::class.java).apply {
+                putExtra("roomId", roomId)
+                putExtra("callerUserId", callerUserId)
+                putExtra("callerEmail", callerEmail)
+                putExtra("callerName", callerName)
+            }
+        val notificationBarAcceptPendingIntent =
+            PendingIntent.getBroadcast(
+                this,
+                2,
+                notificationBarAcceptIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification_call)
-            .setContentTitle("incoming call")
-            .setContentText(callerName)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setFullScreenIntent(incomingCallFullscreenPendingIntent, true)
-            .setOngoing(true)
-            .setAutoCancel(false)
-            .addAction(R.drawable.ic_notification_call, "decline", notificationBarDeclinePendingIntent)
-            .addAction(R.drawable.ic_notification_call, "accept", notificationBarAcceptPendingIntent)
-            .setTimeoutAfter(remainingNotificationLifeMs)
-            .build()
+        val notification =
+            NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification_call)
+                .setContentTitle("incoming call")
+                .setContentText(callerName)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setFullScreenIntent(incomingCallFullscreenPendingIntent, true)
+                .setOngoing(true)
+                .setAutoCancel(false)
+                .addAction(R.drawable.ic_notification_call, "decline", notificationBarDeclinePendingIntent)
+                .addAction(R.drawable.ic_notification_call, "accept", notificationBarAcceptPendingIntent)
+                .setTimeoutAfter(remainingNotificationLifeMs)
+                .build()
 
         notificationManager.notify(NOTIFICATION_ID, notification)
     }

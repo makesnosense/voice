@@ -17,49 +17,64 @@ class NativePermissionsFlow(private val activity: Activity) {
         val alwaysIncrementStepAfterPrompt: Boolean,
     )
 
-    private val steps: List<PermissionStep> = listOf(
-        PermissionStep(
-            isGranted = {
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
-                activity.getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
-            },
-            prompt = {
-                activity.startActivity(
-                    Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
-                        .setData(Uri.parse("package:${activity.packageName}"))
-                )
-            },
-            alwaysIncrementStepAfterPrompt = true
-        ),
-        PermissionStep(
-            isGranted = {
-                activity.getSystemService(PowerManager::class.java)
-                    .isIgnoringBatteryOptimizations(activity.packageName)
-            },
-            prompt = {
-                activity.startActivity(
-                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                        .setData(Uri.parse("package:${activity.packageName}"))
-                )
-            },
-            alwaysIncrementStepAfterPrompt = true
-        ),
-        PermissionStep(
-            isGranted = { !isMiui() || activity.isMiuiAutostartGranted() },
-            prompt = { activity.promptMiuiAutostart(onSkip = { currentStepIndex++; runNativePermissions() }) },
-            alwaysIncrementStepAfterPrompt = false
-        ),
-        PermissionStep(
-            isGranted = { !isMiui() || activity.isMiuiAppPermissionsGranted() },
-            prompt = { activity.promptMiuiAppPermissions(onSkip = { currentStepIndex++; runNativePermissions() }) },
-            alwaysIncrementStepAfterPrompt = false
-        ),
-    )
+    private val steps: List<PermissionStep> =
+        listOf(
+            PermissionStep(
+                isGranted = {
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
+                        activity.getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
+                },
+                prompt = {
+                    activity.startActivity(
+                        Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+                            .setData(Uri.parse("package:${activity.packageName}"))
+                    )
+                },
+                alwaysIncrementStepAfterPrompt = true
+            ),
+            PermissionStep(
+                isGranted = {
+                    activity
+                        .getSystemService(PowerManager::class.java)
+                        .isIgnoringBatteryOptimizations(activity.packageName)
+                },
+                prompt = {
+                    activity.startActivity(
+                        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                            .setData(Uri.parse("package:${activity.packageName}"))
+                    )
+                },
+                alwaysIncrementStepAfterPrompt = true
+            ),
+            PermissionStep(
+                isGranted = { !isMiui() || activity.isMiuiAutostartGranted() },
+                prompt = {
+                    activity.promptMiuiAutostart(
+                        onSkip = {
+                            currentStepIndex++
+                            runNativePermissions()
+                        }
+                    )
+                },
+                alwaysIncrementStepAfterPrompt = false
+            ),
+            PermissionStep(
+                isGranted = { !isMiui() || activity.isMiuiAppPermissionsGranted() },
+                prompt = {
+                    activity.promptMiuiAppPermissions(
+                        onSkip = {
+                            currentStepIndex++
+                            runNativePermissions()
+                        }
+                    )
+                },
+                alwaysIncrementStepAfterPrompt = false
+            ),
+        )
 
     var hasStarted = false
         private set
     private var currentStepIndex = 0
-
 
     fun runNativePermissions() {
         hasStarted = true
@@ -69,12 +84,12 @@ class NativePermissionsFlow(private val activity: Activity) {
             Log.d("NativePermissions", "step $currentStepIndex granted, advancing")
             currentStepIndex++
         }
-        if (currentStepIndex < steps.size ) {
+        if (currentStepIndex < steps.size) {
             Log.d("NativePermissions", "prompting step $currentStepIndex")
             steps[currentStepIndex].prompt()
             if (steps[currentStepIndex].alwaysIncrementStepAfterPrompt) {
                 currentStepIndex++ // enables some steps' "Deny" to act as "Skip"
             }
         }
-}
+    }
 }
