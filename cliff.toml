@@ -5,7 +5,7 @@ body = """
 {% else %}\
 ## [unreleased]
 {% endif %}\
-{% set groups = ["🚀 Features", "💅 Improvements", "⚡ Performance", "🐛 Bug Fixes", "🚜 Refactor", "📚 Documentation", "🧪 Testing", "⚙️ Miscellaneous", "💼 Other"] %}
+{% set groups = ["🚀 Features", "✨ Improvements", "⚡ Performance", "🐛 Bug Fixes", "🚜 Refactor", "📚 Documentation", "🧪 Testing", "💅 Code Style", "⚙️ Miscellaneous", "💼 Other"] %}
 {% for group in groups %}\
 {% set group_commits = commits | filter(attribute="group", value=group) %}\
 {% if group_commits %}\
@@ -22,12 +22,13 @@ conventional_commits = true
 filter_unconventional = false
 commit_parsers = [
   { message = "^feat", group = "🚀 Features" },
-  { message = "^fix", group = "🐛 Bug Fixes" },
-  { message = "^improvement", group = "💅 Improvements" },
+  { message = "^improvement", group = "✨ Improvements" },
   { message = "^perf", group = "⚡ Performance" },
+  { message = "^fix", group = "🐛 Bug Fixes" },
   { message = "^refactor", group = "🚜 Refactor" },
   { message = "^docs", group = "📚 Documentation" },
   { message = "^test", group = "🧪 Testing" },
+  { message = "^style", group = "💅 Code Style" },
   { message = "bump version", skip = true },
   { message = "^chore|^ci|^build", group = "⚙️ Miscellaneous" },
   { message = ".*", group = "💼 Other" },
