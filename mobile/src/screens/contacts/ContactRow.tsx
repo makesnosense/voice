@@ -40,6 +40,7 @@ function ContactRow({ contact, onRemove }: ContactRowProps) {
       contactId: contact.id,
       contactEmail: contact.email,
       contactName: contact.name,
+      contactHasMobileDevice: contact.hasMobileDevice,
     });
     setIsCalling(false);
   };

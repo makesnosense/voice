@@ -49,6 +49,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val callerEmail = data["callerEmail"] ?: "unknown"
         val callerName = data["callerName"]?.takeIf { it.isNotEmpty() } ?: callerEmail
         val callerUserId = data["callerUserId"] ?: return
+        val callId = data["callId"] ?: return
         val roomId = data["roomId"] ?: return
 
         val sentAt = data["sentAt"]?.toLongOrNull() ?: System.currentTimeMillis()
@@ -57,7 +58,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         if (remainingNotificationLifeMs <= 0) return // call already expired before delivery
 
         ensureNotificationChannel()
-        showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId, remainingNotificationLifeMs)
+        showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId, callId, remainingNotificationLifeMs)
         startVibration()
         Handler(Looper.getMainLooper()).postDelayed({ cancelVibration() }, remainingNotificationLifeMs)
     }
@@ -141,6 +142,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         callerUserId: String,
         callerEmail: String,
         roomId: String,
+        callId: String,
         remainingNotificationLifeMs: Long,
     ) {
         val notificationManager = getSystemService(NotificationManager::class.java)
@@ -151,6 +153,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra("callerUserId", callerUserId)
                 putExtra("callerEmail", callerEmail)
                 putExtra("roomId", roomId)
+                putExtra("callId", callId)
                 putExtra("remainingNotificationLifeMs", remainingNotificationLifeMs)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
@@ -179,6 +182,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra("callerUserId", callerUserId)
                 putExtra("callerEmail", callerEmail)
                 putExtra("callerName", callerName)
+                putExtra("callId", callId)
             }
         val notificationBarAcceptPendingIntent =
             PendingIntent.getBroadcast(

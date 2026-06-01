@@ -15,8 +15,9 @@ class AcceptCallReceiver : BroadcastReceiver() {
         val callerUserId = intent.getStringExtra("callerUserId")
         val callerEmail = intent.getStringExtra("callerEmail")
         val callerName = intent.getStringExtra("callerName")
+        val callId = intent.getStringExtra("callId")
 
-        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName)
+        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName, callId)
         context.startActivity(
             Intent(Intent.ACTION_VIEW, uri).apply {
                 setClass(context, MainActivity::class.java)

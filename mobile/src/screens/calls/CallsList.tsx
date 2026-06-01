@@ -32,6 +32,7 @@ function CallsList({
             contactId: entry.contactId,
             contactEmail: entry.contactEmail,
             contactName: entry.contactName,
+            contactHasMobileDevice: entry.contactHasMobileDevice,
           })
         }
         onAddToContacts={

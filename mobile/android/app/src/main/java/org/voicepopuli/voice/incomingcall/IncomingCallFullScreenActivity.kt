@@ -23,6 +23,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private var callerUserId: String? = null
     private var callerEmail: String? = null
     private var callerName: String? = null
+    private var callId: String? = null
 
     private val callCancelledReceiver =
         object : BroadcastReceiver() {
@@ -66,6 +67,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         callerUserId = intent.getStringExtra("callerUserId")
         callerEmail = intent.getStringExtra("callerEmail")
         callerName = intent.getStringExtra("callerName") ?: intent.getStringExtra("callerEmail") ?: "unknown"
+        callId = intent.getStringExtra("callId")
 
         when (action) {
             "accept" -> {
@@ -112,7 +114,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun acceptCall(roomId: String?) {
         cancelNotification()
-        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName)
+        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName, callId)
         val intent =
             Intent(this, MainActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
@@ -141,7 +143,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
                 try {
                     postCallDeclined(roomId)
                 } catch (exception: Exception) {
-                    Log.e("DeclineCallReceiver", "failed to notify server of decline", exception)
+                    Log.e("IncomingCallFullScreenActivity", "failed to notify server of decline", exception)
                 }
             }
         }

@@ -6,6 +6,7 @@ export interface IncomingCallParams {
   callerUserId: string;
   callerEmail: string;
   callerName: string | null;
+  callId: string;
 }
 
 function extractCallParams(url: string): IncomingCallParams | null {
@@ -16,13 +17,15 @@ function extractCallParams(url: string): IncomingCallParams | null {
   const roomId = params.get('roomId');
   const callerUserId = params.get('callerUserId');
   const callerEmail = params.get('callerEmail');
-  if (!roomId || !callerUserId || !callerEmail) return null;
+  const callId = params.get('callId');
+  if (!roomId || !callerUserId || !callerEmail || !callId) return null;
 
   return {
     roomId,
     callerUserId,
     callerEmail,
     callerName: params.get('callerName'),
+    callId,
   };
 }
 

@@ -3,6 +3,7 @@ import { StatusBar } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
+import { useContactsStore } from './stores/useContactsStore';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
 import { usePermissionsStore } from './stores/usePermissionsStore.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
@@ -10,8 +11,8 @@ import { useIncomingCall } from './hooks/useIncomingCall';
 import { useRoomLink } from './hooks/useRoomLink';
 import { useServerConnectivity } from './hooks/useServerConnectivity';
 import { runNativePermissions } from './native/runNativePermissions';
-import { queryClient } from './query-client';
-import { callHistoryQueryOptions } from './queries/call-history';
+import { prependCallHistoryEntry } from './queries/call-history';
+import { CALL_DIRECTION } from '../../shared/constants/calls';
 import PermissionsScreen from './screens/PermissionsScreen';
 import AuthScreen from './screens/auth/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -64,8 +65,18 @@ export default function App() {
   useDeviceRegistration();
 
   useIncomingCall(incomingCallParams => {
-    queryClient.invalidateQueries({
-      queryKey: callHistoryQueryOptions.queryKey,
+    const contactInStore = useContactsStore
+      .getState()
+      .contacts.find(contact => contact.id === incomingCallParams.callerUserId);
+
+    prependCallHistoryEntry({
+      id: incomingCallParams.callId,
+      createdAt: new Date().toISOString(),
+      direction: CALL_DIRECTION.INCOMING,
+      contactId: incomingCallParams.callerUserId,
+      contactEmail: incomingCallParams.callerEmail,
+      contactName: incomingCallParams.callerName,
+      contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
     });
 
     useActiveRoomStore.setState({
@@ -80,7 +91,6 @@ export default function App() {
   if (isCheckingPermissions || serverConnectivity.isChecking) return null;
   if (!allPermissionsGranted && !permissionsSkipped)
     return <PermissionsScreen />;
-
   if (serverConnectivity.isUnreachable)
     return (
       <NoConnectionScreen
@@ -95,7 +105,6 @@ export default function App() {
         onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
       />
     );
-
   if (!isAuthenticated) return <AuthScreen />;
 
   return (
