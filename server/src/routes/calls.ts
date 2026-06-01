@@ -43,11 +43,10 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
       );
 
       const roomId = createRoom(rooms);
+      const entry = await createCallsLogEntry(caller.userId, targetUserId);
+      await notifyDevicesOfCall(caller, fcmTokens, roomId, entry.id);
 
-      await notifyDevicesOfCall(caller, fcmTokens, roomId);
-      await createCallsLogEntry(caller.userId, targetUserId);
-
-      res.json({ roomId });
+      res.json({ roomId, callId: entry.id });
     } catch (error) {
       console.error('Failed to initiate call:', error);
       res.status(500).json({ error: 'Failed to initiate call' });

@@ -10,8 +10,8 @@ export class RoomsApi extends ApiBase {
     roomId: RoomId,
     target: { targetUserId: string },
     accessToken: string
-  ): Promise<void> {
-    return this.apiFetch(`/rooms/${roomId}/invite`, {
+  ): Promise<{ callId: string }> {
+    return this.apiFetch<{ callId: string }>(`/rooms/${roomId}/invite`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify(target),

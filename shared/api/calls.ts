@@ -3,8 +3,8 @@ import type { RoomId } from '../types/core';
 import type { CallHistoryEntry } from '../types/calls';
 
 export class CallsApi extends ApiBase {
-  create(targetUserId: string, accessToken: string): Promise<{ roomId: RoomId }> {
-    return this.apiFetch<{ roomId: RoomId }>('/calls', {
+  create(targetUserId: string, accessToken: string): Promise<{ roomId: RoomId; callId: string }> {
+    return this.apiFetch<{ roomId: RoomId; callId: string }>('/calls', {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ targetUserId }),

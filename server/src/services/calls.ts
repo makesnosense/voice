@@ -10,7 +10,8 @@ import type { CallHistoryEntry } from '../../../shared/types/calls';
 export async function notifyDevicesOfCall(
   caller: { userId: string; email: string; name: string | null },
   fcmTokens: string[],
-  roomId: RoomId
+  roomId: RoomId,
+  callId: string
 ): Promise<void> {
   const sentAt = Date.now();
   await Promise.allSettled(
@@ -20,6 +21,7 @@ export async function notifyDevicesOfCall(
         callerEmail: caller.email,
         callerName: caller.name,
         roomId,
+        callId,
         sentAt,
       })
     )
@@ -27,7 +29,8 @@ export async function notifyDevicesOfCall(
 }
 
 export async function createCallsLogEntry(fromUserId: string, toUserId: string) {
-  await db.insert(calls).values({ fromUserId, toUserId });
+  const [entry] = await db.insert(calls).values({ fromUserId, toUserId }).returning();
+  return entry;
 }
 
 export async function getCallHistory(userId: string) {

@@ -46,17 +46,16 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
       if (mobileDevices.length === 0) {
         return res.status(404).json({ error: 'User not reachable' });
       }
-
       const fcmTokens = mobileDevices.flatMap((device) =>
         device.fcmToken ? [device.fcmToken] : []
       );
 
       room.pendingInviteFcmTokens = fcmTokens;
 
-      await notifyDevicesOfCall(caller, fcmTokens, roomId);
-      await createCallsLogEntry(caller.userId, targetUserId);
+      const entry = await createCallsLogEntry(caller.userId, targetUserId);
+      await notifyDevicesOfCall(caller, fcmTokens, roomId, entry.id);
 
-      res.status(204).end();
+      res.json({ callId: entry.id });
     } catch (error) {
       console.error('failed to send invite:', error);
       res.status(500).json({ error: 'failed to send invite' });

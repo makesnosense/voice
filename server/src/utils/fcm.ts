@@ -32,6 +32,7 @@ export async function sendCallNotification(
       callerEmail: payload.callerEmail,
       callerName: payload.callerName ?? '',
       roomId: payload.roomId,
+      callId: payload.callId,
       sentAt: payload.sentAt.toString(),
     },
     android: {
