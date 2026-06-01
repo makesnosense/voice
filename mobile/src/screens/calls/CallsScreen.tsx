@@ -7,8 +7,8 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { useShallow } from 'zustand/react/shallow';
-import { useCallHistoryStore } from '../../stores/useCallHistoryStore';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { callHistoryQueryOptions } from '../../queries/call-history';
 import { useContactsStore } from '../../stores/useContactsStore';
 import { startCall } from '../../utils/start-call';
 import CallRow from './CallRow';
@@ -21,22 +21,14 @@ import {
   BACKGROUND_PRIMARY,
 } from '../../styles/colors';
 import NotificationsDisabledBanner from './NotificationsDisabledBanner';
-
 import { useContentPadding } from '../../hooks/useContentPadding';
 
 function CallsScreen() {
   const contentPadding = useContentPadding();
-
+  const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { history, isLoading, fetchHistory, refresh } = useCallHistoryStore(
-    useShallow(state => ({
-      history: state.history,
-      isLoading: state.isLoading,
-      fetchHistory: state.fetchHistory,
-      refresh: state.refresh,
-    })),
-  );
+  const { data: history = [], isPending } = useQuery(callHistoryQueryOptions);
 
   const contacts = useContactsStore(state => state.contacts);
   const fetchContacts = useContactsStore(state => state.fetchContacts);
@@ -48,13 +40,14 @@ function CallsScreen() {
   );
 
   useEffect(() => {
-    fetchHistory();
     fetchContacts();
-  }, [fetchHistory, fetchContacts]);
+  }, [fetchContacts]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refresh();
+    await queryClient.invalidateQueries({
+      queryKey: callHistoryQueryOptions.queryKey,
+    });
     setIsRefreshing(false);
   };
 
@@ -63,7 +56,7 @@ function CallsScreen() {
       <Header title="Calls" />
       <NotificationsDisabledBanner />
 
-      {isLoading && history.length === 0 && (
+      {isPending && (
         <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       )}
 
@@ -75,7 +68,7 @@ function CallsScreen() {
       >
         <CreateRoomButton style={styles.createRoomButton} />
         <RejoinCard />
-        {!isLoading && history.length === 0 && (
+        {!isPending && history.length === 0 && (
           <Text style={styles.empty}>No past calls</Text>
         )}
 
@@ -106,6 +99,8 @@ function CallsScreen() {
   );
 }
 
+export default memo(CallsScreen);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -114,23 +109,22 @@ const styles = StyleSheet.create({
   loader: {
     marginTop: 48,
   },
+  empty: {
+    textAlign: 'center',
+    marginTop: 80,
+    color: TEXT_MUTED,
+    fontSize: 15,
+  },
   list: {
     paddingTop: 8,
   },
   createRoomButton: {
     marginHorizontal: 16,
+    marginBottom: 8,
   },
   separator: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: BORDER_MUTED,
     marginLeft: 58,
   },
-  empty: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: TEXT_MUTED,
-    fontSize: 15,
-  },
 });
-
-export default memo(CallsScreen);

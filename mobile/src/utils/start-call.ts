@@ -1,9 +1,9 @@
 import { useAuthStore } from '../stores/useAuthStore';
-import { useCallHistoryStore } from '../stores/useCallHistoryStore';
 import { api } from '../api';
-import { CALL_DIRECTION } from '../../../shared/constants/calls';
 import { useActiveRoomStore } from '../stores/useActiveRoomStore';
 import { useInvitedUserStore } from '../stores/useInvitedUserStore';
+import { queryClient } from '../query-client';
+import { callHistoryQueryOptions } from '../queries/call-history';
 
 interface CallTarget {
   contactId: string;
@@ -15,12 +15,8 @@ export async function startCall(target: CallTarget) {
   try {
     const token = await useAuthStore.getState().getValidAccessToken();
     const { roomId } = await api.calls.create(target.contactId, token);
-    useCallHistoryStore.getState().prependEntry({
-      direction: CALL_DIRECTION.OUTGOING,
-      contactId: target.contactId,
-      contactEmail: target.contactEmail,
-      contactName: target.contactName,
-      contactHasMobileDevice: true,
+    queryClient.invalidateQueries({
+      queryKey: callHistoryQueryOptions.queryKey,
     });
     useInvitedUserStore.setState({
       invitedUser: {

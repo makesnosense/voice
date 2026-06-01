@@ -1,25 +1,23 @@
 import { useEffect, useState } from 'react';
+import { StatusBar } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
+import { useActiveRoomStore } from './stores/useActiveRoomStore';
+import { usePermissionsStore } from './stores/usePermissionsStore.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useIncomingCall } from './hooks/useIncomingCall';
+import { useRoomLink } from './hooks/useRoomLink';
+import { useServerConnectivity } from './hooks/useServerConnectivity';
+import { runNativePermissions } from './native/runNativePermissions';
+import { queryClient } from './query-client';
+import { callHistoryQueryOptions } from './queries/call-history';
 import PermissionsScreen from './screens/PermissionsScreen';
 import AuthScreen from './screens/auth/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
 import RoomScreen from './screens/room/RoomScreen';
-import { CALL_DIRECTION } from '../../shared/constants/calls';
-import { useCallHistoryStore } from './stores/useCallHistoryStore';
-import { useContactsStore } from './stores/useContactsStore';
-import { useActiveRoomStore } from './stores/useActiveRoomStore';
-import { useRoomLink } from './hooks/useRoomLink';
-import { useServerConnectivity } from './hooks/useServerConnectivity';
 import NoConnectionScreen from './screens/NoConnectionScreen';
-
 import type { RoomId } from '../../shared/types/core';
-import { usePermissionsStore } from './stores/usePermissionsStore.android';
-import { useShallow } from 'zustand/react/shallow';
-import { runNativePermissions } from './native/runNativePermissions';
-import { StatusBar } from 'react-native';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
@@ -36,7 +34,6 @@ export default function App() {
     );
 
   const activeRoomId = useActiveRoomStore(state => state.activeRoomId);
-
   const serverConnectivity = useServerConnectivity();
 
   useEffect(() => {
@@ -45,9 +42,7 @@ export default function App() {
 
   useEffect(() => {
     if (bootSplashActive) return;
-    if (allPermissionsGranted || permissionsSkipped) {
-      runNativePermissions();
-    }
+    if (allPermissionsGranted || permissionsSkipped) runNativePermissions();
   }, [allPermissionsGranted, permissionsSkipped, bootSplashActive]);
 
   useEffect(() => {
@@ -56,7 +51,6 @@ export default function App() {
       RNBootSplash.hide({ fade: true }).then(() => setBootSplashActive(false));
       return;
     }
-
     useAuthStore
       .getState()
       .initialize()
@@ -70,16 +64,8 @@ export default function App() {
   useDeviceRegistration();
 
   useIncomingCall(incomingCallParams => {
-    const contactInStore = useContactsStore
-      .getState()
-      .contacts.find(contact => contact.id === incomingCallParams.callerUserId);
-
-    useCallHistoryStore.getState().prependEntry({
-      direction: CALL_DIRECTION.INCOMING,
-      contactId: incomingCallParams.callerUserId,
-      contactEmail: incomingCallParams.callerEmail,
-      contactName: incomingCallParams.callerName,
-      contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
+    queryClient.invalidateQueries({
+      queryKey: callHistoryQueryOptions.queryKey,
     });
 
     useActiveRoomStore.setState({
