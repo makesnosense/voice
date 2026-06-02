@@ -6,13 +6,13 @@ import callingCardStyles from './CallingCard.module.css';
 import type { InvitedContact } from '../../../../../../../shared/types/contacts';
 import { formatDisplayName } from '../../../../../../../shared/utils/format';
 import {
-  CALL_DISMISSAL_REASON,
+  CALL_OUTCOME,
   type CallDismissalReason,
 } from '../../../../../../../shared/constants/calls';
 
 const DISMISSAL_REASON_LABEL: Record<CallDismissalReason, string> = {
-  [CALL_DISMISSAL_REASON.DECLINED]: 'declined',
-  [CALL_DISMISSAL_REASON.NO_ANSWER]: 'no answer',
+  [CALL_OUTCOME.DECLINED]: 'declined',
+  [CALL_OUTCOME.NO_ANSWER]: 'no answer',
 };
 
 interface CallingCardProps {

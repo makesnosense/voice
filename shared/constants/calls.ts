@@ -7,9 +7,13 @@ export const CALL_DIRECTION = {
 
 export type CallDirection = ObjectValues<typeof CALL_DIRECTION>;
 
-export const CALL_DISMISSAL_REASON = {
+export const CALL_OUTCOME = {
+  ANSWERED: 'answered',
   DECLINED: 'declined',
   NO_ANSWER: 'no-answer',
+  CANCELLED: 'cancelled',
 } as const;
 
-export type CallDismissalReason = ObjectValues<typeof CALL_DISMISSAL_REASON>;
+export type CallOutcome = ObjectValues<typeof CALL_OUTCOME>;
+
+export type CallDismissalReason = Extract<CallOutcome, 'declined' | 'no-answer'>;

@@ -12,7 +12,7 @@ import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
 import { formatDisplayName } from '../../../../../../shared/utils/format';
 import type { AudioFrequencyData } from '../../../../../../shared/types/core';
-import { CALL_DISMISSAL_REASON } from '../../../../../../shared/constants/calls';
+import { CALL_OUTCOME } from '../../../../../../shared/constants/calls';
 
 const CALL_NOTIFICATION_TIMEOUT_MS = 60_000;
 
@@ -65,7 +65,7 @@ export default function Users() {
 
   const handleInviteTimeout = useCallback(async () => {
     if (!useInvitedUserStore.getState().invitedUser) return;
-    useRoomStore.setState({ callDismissalReason: CALL_DISMISSAL_REASON.NO_ANSWER });
+    useRoomStore.setState({ callDismissalReason: CALL_OUTCOME.NO_ANSWER });
     try {
       const token = await getValidAccessToken();
       await api.rooms.cancelInviteToRoom(roomId!, token);

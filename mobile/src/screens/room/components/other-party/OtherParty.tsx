@@ -8,7 +8,7 @@ import CallingCard from './calling-card/CallingCard';
 import InviteCard from './invite-card/InviteCard';
 import CopyCard from './CopyCard';
 import type { RoomId } from '../../../../../../shared/types/core';
-import { CALL_DISMISSAL_REASON } from '../../../../../../shared/constants/calls';
+import { CALL_OUTCOME } from '../../../../../../shared/constants/calls';
 import { StyleSheet, View } from 'react-native';
 
 const CALL_NOTIFICATION_TIMEOUT_MS = 60_000;
@@ -56,7 +56,7 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
   const handleInviteTimeout = useCallback(async () => {
     if (!useInvitedUserStore.getState().invitedUser) return;
     useRoomStore.setState({
-      callDismissalReason: CALL_DISMISSAL_REASON.NO_ANSWER,
+      callDismissalReason: CALL_OUTCOME.NO_ANSWER,
     });
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
