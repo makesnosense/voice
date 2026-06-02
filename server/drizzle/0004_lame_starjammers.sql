@@ -1,0 +1,2 @@
+CREATE TYPE "public"."call_outcome" AS ENUM('answered', 'declined', 'no-answer', 'cancelled');--> statement-breakpoint
+ALTER TABLE "calls" ADD COLUMN "outcome" "call_outcome" DEFAULT 'no-answer' NOT NULL;

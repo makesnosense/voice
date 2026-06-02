@@ -7,6 +7,7 @@ import {
   boolean,
   primaryKey,
 } from 'drizzle-orm/pg-core';
+import { CALL_OUTCOME } from '../../../shared/constants/calls';
 import type { ObjectValues } from '../../../shared/types/core';
 
 export const users = pgTable('users', {
@@ -71,6 +72,13 @@ export const contacts = pgTable(
   (t) => [primaryKey({ columns: [t.ownerId, t.contactId] })]
 );
 
+export const callOutcomeEnum = pgEnum('call_outcome', [
+  CALL_OUTCOME.ANSWERED,
+  CALL_OUTCOME.DECLINED,
+  CALL_OUTCOME.NO_ANSWER,
+  CALL_OUTCOME.CANCELLED,
+]);
+
 export const calls = pgTable('calls', {
   id: uuid('id').defaultRandom().primaryKey(),
   fromUserId: uuid('from_user_id')
@@ -80,4 +88,5 @@ export const calls = pgTable('calls', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  outcome: callOutcomeEnum('outcome').notNull().default(CALL_OUTCOME.NO_ANSWER),
 });
