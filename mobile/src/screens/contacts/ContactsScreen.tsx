@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, memo } from 'react';
+import { useMemo, useState, memo } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,11 @@ import {
   StyleSheet,
 } from 'react-native';
 import { UserPlus, UserMinus } from 'lucide-react-native';
-import { useContactsStore } from '../../stores/useContactsStore';
-import { useAuthStore } from '../../stores/useAuthStore';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  contactsQueryOptions,
+  useRemoveContactMutation,
+} from '../../queries/contacts';
 import AddContactScreen from './add-contact/AddContactScreen';
 import Header from '../../components/Header';
 import ContactRow from './ContactRow';
@@ -36,16 +39,19 @@ const ContactSeparator = () => <View style={styles.separator} />;
 
 function ContactsScreen() {
   const listPadding = useContentPadding();
+  const queryClient = useQueryClient();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
   const [isRemoveModeActive, setRemoveModeActive] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const { contacts, isLoading, fetchContacts, refresh, removeContact } =
-    useContactsStore();
+
+  const { data: contacts = [], isPending } = useQuery(contactsQueryOptions);
+  const removeContactMutation = useRemoveContactMutation();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refresh();
+    await queryClient.invalidateQueries({
+      queryKey: contactsQueryOptions.queryKey,
+    });
     setIsRefreshing(false);
   };
 
@@ -53,10 +59,6 @@ function ContactsScreen() {
     () => sortContactsWithMobileFirst(contacts),
     [contacts],
   );
-
-  useEffect(() => {
-    if (isAuthenticated) fetchContacts();
-  }, [isAuthenticated, fetchContacts]);
 
   if (view === CONTACTS_VIEW.ADD_CONTACT) {
     return (
@@ -92,11 +94,11 @@ function ContactsScreen() {
         }
       />
 
-      {isLoading && (
+      {isPending && (
         <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       )}
 
-      {!isLoading && contacts.length === 0 && (
+      {!isPending && contacts.length === 0 && (
         <Text style={styles.empty}>No contacts yet</Text>
       )}
 
@@ -112,7 +114,9 @@ function ContactsScreen() {
             <ContactRow
               contact={contact}
               onRemove={
-                isRemoveModeActive ? () => removeContact(contact.id) : undefined
+                isRemoveModeActive
+                  ? () => removeContactMutation.mutateAsync(contact.id)
+                  : undefined
               }
             />
           </View>
@@ -121,6 +125,8 @@ function ContactsScreen() {
     </View>
   );
 }
+
+export default memo(ContactsScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -146,5 +152,3 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
 });
-
-export default memo(ContactsScreen);

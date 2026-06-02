@@ -10,7 +10,8 @@ import {
   Animated,
 } from 'react-native';
 import { X } from 'lucide-react-native';
-import { useContactsStore } from '../../../../../../stores/useContactsStore';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { contactsQueryOptions } from '../../../../../../queries/contacts';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
 import { api } from '../../../../../../api';
 import { pressedStyle } from '../../../../../../styles/common';
@@ -44,7 +45,8 @@ export default function InviteModal({
   onClose,
   onUserInvited,
 }: InviteModalProps) {
-  const { contacts, isLoading, refresh } = useContactsStore();
+  const queryClient = useQueryClient();
+  const { data: contacts = [], isPending } = useQuery(contactsQueryOptions);
   const [invitedUserId, setInvitedUserId] = useState<string | null>(null);
   const [errorId, setErrorId] = useState<string | null>(null);
 
@@ -53,8 +55,8 @@ export default function InviteModal({
   const sheetTranslateY = useRef(new Animated.Value(SHEET_TRANSLATE_Y)).current;
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    queryClient.invalidateQueries({ queryKey: contactsQueryOptions.queryKey });
+  }, [queryClient]);
 
   useEffect(() => {
     Animated.parallel([
@@ -133,7 +135,7 @@ export default function InviteModal({
             </Pressable>
           </View>
 
-          {isLoading ? (
+          {isPending ? (
             <ActivityIndicator style={styles.loader} color="#94a3b8" />
           ) : mobileContacts.length === 0 ? (
             <Text style={styles.empty}>no contacts with the app installed</Text>

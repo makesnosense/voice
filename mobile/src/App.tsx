@@ -3,7 +3,8 @@ import { StatusBar } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
-import { useContactsStore } from './stores/useContactsStore';
+import { queryClient } from './query-client';
+import { contactsQueryOptions } from './queries/contacts';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
 import { usePermissionsStore } from './stores/usePermissionsStore.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
@@ -19,6 +20,7 @@ import HomeScreen from './screens/HomeScreen';
 import RoomScreen from './screens/room/RoomScreen';
 import NoConnectionScreen from './screens/NoConnectionScreen';
 import type { RoomId } from '../../shared/types/core';
+import type { Contact } from '../../shared/types/contacts';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
@@ -65,9 +67,11 @@ export default function App() {
   useDeviceRegistration();
 
   useIncomingCall(incomingCallParams => {
-    const contactInStore = useContactsStore
-      .getState()
-      .contacts.find(contact => contact.id === incomingCallParams.callerUserId);
+    const cachedContacts =
+      queryClient.getQueryData<Contact[]>(contactsQueryOptions.queryKey) ?? [];
+    const contactInStore = cachedContacts.find(
+      contact => contact.id === incomingCallParams.callerUserId,
+    );
 
     prependCallHistoryEntry({
       id: incomingCallParams.callId,
@@ -91,6 +95,7 @@ export default function App() {
   if (isCheckingPermissions || serverConnectivity.isChecking) return null;
   if (!allPermissionsGranted && !permissionsSkipped)
     return <PermissionsScreen />;
+
   if (serverConnectivity.isUnreachable)
     return (
       <NoConnectionScreen
@@ -105,6 +110,7 @@ export default function App() {
         onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
       />
     );
+
   if (!isAuthenticated) return <AuthScreen />;
 
   return (

@@ -1,8 +1,11 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { View, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { callHistoryQueryOptions } from '../../queries/call-history';
-import { useContactsStore } from '../../stores/useContactsStore';
+import {
+  contactsQueryOptions,
+  useAddContactMutation,
+} from '../../queries/contacts';
 import Header from '../../components/Header';
 import CreateRoomButton from '../../components/CreateRoomButton';
 import { BACKGROUND_PRIMARY } from '../../styles/colors';
@@ -17,19 +20,13 @@ function CallsScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: history = [], isPending } = useQuery(callHistoryQueryOptions);
-
-  const contacts = useContactsStore(state => state.contacts);
-  const fetchContacts = useContactsStore(state => state.fetchContacts);
-  const addContact = useContactsStore(state => state.addContact);
+  const { data: contacts = [] } = useQuery(contactsQueryOptions);
+  const addContactMutation = useAddContactMutation();
 
   const contactIdSet = useMemo(
     () => new Set(contacts.map(contact => contact.id)),
     [contacts],
   );
-
-  useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -59,7 +56,9 @@ function CallsScreen() {
           isPending={isPending}
           history={history}
           contactIdSet={contactIdSet}
-          onAddContact={addContact}
+          onAddContact={async email => {
+            await addContactMutation.mutateAsync(email);
+          }}
         />
       </ScrollView>
     </View>

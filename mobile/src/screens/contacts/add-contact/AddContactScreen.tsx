@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, StyleSheet, Pressable, Keyboard } from 'react-native';
-import { useContactsStore } from '../../../stores/useContactsStore';
+import { useAddContactMutation } from '../../../queries/contacts';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
 import { BACKGROUND_PRIMARY } from '../../../styles/colors';
@@ -14,7 +14,7 @@ interface AddContactScreenProps {
 
 export default function AddContactScreen({ onBack }: AddContactScreenProps) {
   const contentPadding = useContentPadding();
-  const addContact = useContactsStore(state => state.addContact);
+  const addContactMutation = useAddContactMutation();
 
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +32,7 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
     setIsSubmitting(true);
     setError(null);
     try {
-      await addContact(trimmed);
+      await addContactMutation.mutateAsync(trimmed);
       onBack();
     } catch (err) {
       const message =
