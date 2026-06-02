@@ -8,6 +8,7 @@ import CallingCard from './calling-card/CallingCard';
 import InviteCard from './invite-card/InviteCard';
 import CopyCard from './CopyCard';
 import type { RoomId } from '../../../../../../shared/types/core';
+import { CALL_DISMISSAL_REASON } from '../../../../../../shared/constants/calls';
 import { StyleSheet, View } from 'react-native';
 
 const CALL_NOTIFICATION_TIMEOUT_MS = 60_000;
@@ -18,7 +19,7 @@ interface OtherPartyProps {
 
 export default function OtherParty({ roomId }: OtherPartyProps) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const isCallDeclined = useRoomStore(state => state.isCallDeclined);
+  const callDismissalReason = useRoomStore(state => state.callDismissalReason);
   const roomUsers = useRoomStore(state => state.roomUsers);
   const invitedUser = useInvitedUserStore(state => state.invitedUser);
 
@@ -33,17 +34,16 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
   }, [roomUsers.length]);
 
   useEffect(() => {
-    if (!isCallDeclined) return;
+    if (callDismissalReason === null) return;
     const timeout = setTimeout(() => {
       useInvitedUserStore.setState({ invitedUser: null });
-      useRoomStore.setState({ isCallDeclined: false });
+      useRoomStore.setState({ callDismissalReason: null });
     }, 3000);
     return () => clearTimeout(timeout);
-  }, [isCallDeclined]);
+  }, [callDismissalReason]);
 
   const handleCancelInvite = useCallback(async () => {
-    const currentInvitedUser = useInvitedUserStore.getState().invitedUser;
-    if (!currentInvitedUser) return;
+    if (!useInvitedUserStore.getState().invitedUser) return;
     useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
@@ -53,18 +53,31 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     }
   }, [roomId]);
 
+  const handleInviteTimeout = useCallback(async () => {
+    if (!useInvitedUserStore.getState().invitedUser) return;
+    useRoomStore.setState({
+      callDismissalReason: CALL_DISMISSAL_REASON.NO_ANSWER,
+    });
+    try {
+      const token = await useAuthStore.getState().getValidAccessToken();
+      await api.rooms.cancelInviteToRoom(roomId, token);
+    } catch (error) {
+      console.error('Failed to cancel invite on timeout:', error);
+    }
+  }, [roomId]);
+
   useEffect(() => {
     if (!invitedContact) return;
     const timeout = setTimeout(
-      handleCancelInvite,
+      handleInviteTimeout,
       CALL_NOTIFICATION_TIMEOUT_MS,
     );
     return () => {
       clearTimeout(timeout);
       useInvitedUserStore.setState({ invitedUser: null });
-      // server handler cleans up invite on socket disconnect
+      // server handles FCM cancellation on socket disconnect
     };
-  }, [invitedContact, handleCancelInvite]);
+  }, [invitedContact, handleInviteTimeout]);
 
   if (isRemoteUserPresent) return <RemoteUserCard />;
 
@@ -82,7 +95,7 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
       <CallingCard
         contactName={invitedContact.name}
         contactEmail={invitedContact.email}
-        isDeclined={isCallDeclined}
+        callDismissalReason={callDismissalReason}
         onCancel={handleCancelInvite}
       />
     );

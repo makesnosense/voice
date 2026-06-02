@@ -1,6 +1,7 @@
 .declinedLabel {
   font-size: 0.65rem;
   color: var(--accent-red);
+  white-space: nowrap;
 }
 
 .declinedCard {

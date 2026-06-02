@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import { useRoomStore } from '../stores/useRoomStore';
 import { ROOM_CONNECTION_STATUS } from '../constants/room';
 import type { RoomId, SocketId, TypedClientSocket } from '../types/core';
+import { CALL_DISMISSAL_REASON } from '../constants/calls';
 
 const SOCKET_OPTIONS = {
   reconnection: true,
@@ -63,7 +64,7 @@ export function useRoomSocket(
 
     socket.on('call-declined', () => {
       console.log('📵 [Socket] call declined by remote');
-      useRoomStore.setState({ isCallDeclined: true });
+      useRoomStore.setState({ callDismissalReason: CALL_DISMISSAL_REASON.DECLINED });
     });
 
     socket.on('connect_error', (error) => {

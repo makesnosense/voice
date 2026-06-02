@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { UserDataClientSide, Message, SocketId } from '../types/core';
 import { ROOM_CONNECTION_STATUS, type RoomConnectionStatus } from '../constants/room';
+import type { CallDismissalReason } from '../constants/calls';
 
 interface RoomState {
   roomUsers: UserDataClientSide[];
@@ -8,7 +9,7 @@ interface RoomState {
   localSocketId: SocketId | null;
   sendMessage: ((text: string) => void) | null;
   roomConnectionStatus: RoomConnectionStatus;
-  isCallDeclined: boolean;
+  callDismissalReason: CallDismissalReason | null;
 }
 
 interface RoomStore extends RoomState {
@@ -23,7 +24,7 @@ const initialState: RoomState = {
   localSocketId: null,
   sendMessage: null,
   roomConnectionStatus: ROOM_CONNECTION_STATUS.CONNECTING,
-  isCallDeclined: false,
+  callDismissalReason: null,
 };
 
 export const useRoomStore = create<RoomStore>((set) => ({

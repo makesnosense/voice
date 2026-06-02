@@ -12,6 +12,7 @@ import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
 import { formatDisplayName } from '../../../../../../shared/utils/format';
 import type { AudioFrequencyData } from '../../../../../../shared/types/core';
+import { CALL_DISMISSAL_REASON } from '../../../../../../shared/constants/calls';
 
 const CALL_NOTIFICATION_TIMEOUT_MS = 60_000;
 
@@ -23,7 +24,8 @@ export default function Users() {
   const invitedContact = invitedUser?.roomId === roomId ? invitedUser.contact : null;
 
   const roomUsers = useRoomStore((state) => state.roomUsers);
-  const isCallDeclined = useRoomStore((state) => state.isCallDeclined);
+
+  const callDismissalReason = useRoomStore((state) => state.callDismissalReason);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const getValidAccessToken = useAuthStore((state) => state.getValidAccessToken);
@@ -53,23 +55,34 @@ export default function Users() {
   const isAlone = roomUsers.length === 1;
 
   useEffect(() => {
-    if (!isCallDeclined) return;
+    if (callDismissalReason === null) return;
     const timeout = setTimeout(() => {
       useInvitedUserStore.setState({ invitedUser: null });
-      useRoomStore.setState({ isCallDeclined: false });
+      useRoomStore.setState({ callDismissalReason: null });
     }, 3000);
     return () => clearTimeout(timeout);
-  }, [isCallDeclined]);
+  }, [callDismissalReason]);
+
+  const handleInviteTimeout = useCallback(async () => {
+    if (!useInvitedUserStore.getState().invitedUser) return;
+    useRoomStore.setState({ callDismissalReason: CALL_DISMISSAL_REASON.NO_ANSWER });
+    try {
+      const token = await getValidAccessToken();
+      await api.rooms.cancelInviteToRoom(roomId!, token);
+    } catch (error) {
+      console.error('failed to cancel invite on timeout:', error);
+    }
+  }, [roomId, getValidAccessToken]);
 
   useEffect(() => {
     if (!invitedContact) return;
-    const timeout = setTimeout(handleCancelInvite, CALL_NOTIFICATION_TIMEOUT_MS);
+    const timeout = setTimeout(handleInviteTimeout, CALL_NOTIFICATION_TIMEOUT_MS);
     return () => {
       clearTimeout(timeout);
       useInvitedUserStore.setState({ invitedUser: null });
       // server handles FCM cancellation on socket disconnect
     };
-  }, [invitedContact, handleCancelInvite]);
+  }, [invitedContact, handleInviteTimeout]);
 
   return (
     <div className={usersStyles.usersContainer}>
@@ -118,7 +131,7 @@ export default function Users() {
         <CallingCard
           contact={invitedContact}
           onCancel={handleCancelInvite}
-          declined={isCallDeclined}
+          callDismissalReason={callDismissalReason}
         />
       )}
     </div>

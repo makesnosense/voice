@@ -7,30 +7,42 @@ import {
   BORDER_MUTED,
   BACKGROUND_PRIMARY,
 } from '../../../../../styles/colors';
+import {
+  CALL_DISMISSAL_REASON,
+  type CallDismissalReason,
+} from '../../../../../../../shared/constants/calls';
+
+const DISMISSAL_REASON_LABEL: Record<CallDismissalReason, string> = {
+  [CALL_DISMISSAL_REASON.DECLINED]: 'declined',
+  [CALL_DISMISSAL_REASON.NO_ANSWER]: 'no answer',
+};
 
 interface CallingCardProps {
   contactName: string | null;
   contactEmail: string;
-  isDeclined: boolean;
+  callDismissalReason: CallDismissalReason | null;
   onCancel: () => void;
 }
 
 export default function CallingCard({
   contactName,
   contactEmail,
-  isDeclined,
+  callDismissalReason,
   onCancel,
 }: CallingCardProps) {
   const displayName = contactName ?? contactEmail.split('@')[0];
+  const isCallDismissed = callDismissalReason !== null;
 
   return (
-    <View style={[styles.card, isDeclined && styles.cardDeclined]}>
+    <View style={[styles.card, isCallDismissed && styles.cardDismissed]}>
       <Text style={styles.name} numberOfLines={1}>
         {displayName}
       </Text>
 
-      {isDeclined ? (
-        <Text style={styles.declinedLabel}>Declined</Text>
+      {isCallDismissed ? (
+        <Text style={styles.dismissedLabel}>
+          {DISMISSAL_REASON_LABEL[callDismissalReason]}
+        </Text>
       ) : (
         <>
           <CallingDots />
@@ -59,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 26,
   },
-  cardDeclined: {
+  cardDismissed: {
     backgroundColor: 'transparent',
     gap: 80,
     borderColor: 'rgba(239, 68, 68, 0.3)',
@@ -70,7 +82,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: TEXT_PRIMARY,
   },
-  declinedLabel: {
+  dismissedLabel: {
     fontSize: 16,
     color: '#ef4444',
   },
