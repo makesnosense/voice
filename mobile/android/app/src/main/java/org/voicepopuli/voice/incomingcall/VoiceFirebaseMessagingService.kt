@@ -34,7 +34,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private val timeoutHandler = Handler(Looper.getMainLooper())
         private val timeoutRunnable = Runnable {
             cancelVibration()
-            appContext?.run { sendBroadcast(Intent(ACTION_CALL_CANCELLED)) }
+            appContext?.run { sendBroadcast(Intent(ACTION_CALL_CANCELLED).setPackage(packageName)) }
         }
 
         fun cancelVibration() {
@@ -84,7 +84,9 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         cancelTimeout()
         cancelVibration()
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
-        sendBroadcast(Intent(ACTION_CALL_CANCELLED)) // we need this to close fullscreen activity
+        sendBroadcast(
+            Intent(ACTION_CALL_CANCELLED).setPackage(packageName)
+        ) // we need this to close fullscreen activity
     }
 
     private fun ensureNotificationChannel() {
