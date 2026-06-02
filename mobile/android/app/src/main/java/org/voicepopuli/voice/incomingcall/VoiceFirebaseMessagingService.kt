@@ -3,6 +3,7 @@ package org.voicepopuli.voice.incomingcall
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
@@ -28,18 +29,27 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         const val CALL_NOTIFICATION_TIMEOUT_MS = 60_000L
 
         private var vibrator: Vibrator? = null
+        private var appContext: Context? = null
+
+        private val timeoutHandler = Handler(Looper.getMainLooper())
+        private val timeoutRunnable = Runnable {
+            cancelVibration()
+            appContext?.run { sendBroadcast(Intent(ACTION_CALL_CANCELLED)) }
+        }
 
         fun cancelVibration() {
             vibrator?.cancel()
             vibrator = null
         }
-    }
 
-    // keep reference so handleCallCancelled can cancel it
-    private val timeoutHandler = Handler(Looper.getMainLooper())
-    private val timeoutRunnable = Runnable {
-        cancelVibration()
-        sendBroadcast(Intent(ACTION_CALL_CANCELLED)) // closes activity if it's showing
+        fun scheduleTimeout(context: Context) {
+            appContext = context.applicationContext
+            timeoutHandler.postDelayed(timeoutRunnable, CALL_NOTIFICATION_TIMEOUT_MS)
+        }
+
+        fun cancelTimeout() {
+            timeoutHandler.removeCallbacks(timeoutRunnable)
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -67,11 +77,11 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         ensureNotificationChannel()
         showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId, callId)
         startVibration()
-        timeoutHandler.postDelayed(timeoutRunnable, CALL_NOTIFICATION_TIMEOUT_MS)
+        scheduleTimeout(this)
     }
 
     private fun handleCallCancelled() {
-        timeoutHandler.removeCallbacks(timeoutRunnable)
+        cancelTimeout()
         cancelVibration()
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
         sendBroadcast(Intent(ACTION_CALL_CANCELLED)) // we need this to close fullscreen activity

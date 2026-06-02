@@ -9,6 +9,7 @@ import kotlin.concurrent.thread
 
 class DeclineCallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        VoiceFirebaseMessagingService.cancelTimeout()
         VoiceFirebaseMessagingService.cancelVibration()
         context.getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
 
