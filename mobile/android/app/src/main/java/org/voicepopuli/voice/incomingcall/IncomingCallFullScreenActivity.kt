@@ -7,8 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.WindowManager
 import android.widget.ImageButton
@@ -88,20 +86,6 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnAccept).setOnClickListener { acceptCall(roomId) }
 
         findViewById<ImageButton>(R.id.btnDecline).setOnClickListener { declineCall() }
-
-        val remainingNotificationLifeMs =
-            intent.getLongExtra(
-                "remainingNotificationLifeMs",
-                VoiceFirebaseMessagingService.CALL_NOTIFICATION_TIMEOUT_MS,
-            )
-        Handler(Looper.getMainLooper())
-            .postDelayed(
-                {
-                    cancelNotification()
-                    finish()
-                },
-                remainingNotificationLifeMs
-            )
     }
 
     override fun onNewIntent(intent: Intent) {

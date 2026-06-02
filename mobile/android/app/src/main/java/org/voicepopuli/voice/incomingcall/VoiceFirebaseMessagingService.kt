@@ -35,6 +35,13 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
+    // keep reference so handleCallCancelled can cancel it
+    private val timeoutHandler = Handler(Looper.getMainLooper())
+    private val timeoutRunnable = Runnable {
+        cancelVibration()
+        sendBroadcast(Intent(ACTION_CALL_CANCELLED)) // closes activity if it's showing
+    }
+
     override fun onMessageReceived(message: RemoteMessage) {
         when (message.data["type"]) {
             "incoming_call" -> handleIncomingCall(message.data)
@@ -58,12 +65,13 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         if (remainingNotificationLifeMs <= 0) return // call already expired before delivery
 
         ensureNotificationChannel()
-        showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId, callId, remainingNotificationLifeMs)
+        showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId, callId)
         startVibration()
-        Handler(Looper.getMainLooper()).postDelayed({ cancelVibration() }, remainingNotificationLifeMs)
+        timeoutHandler.postDelayed(timeoutRunnable, CALL_NOTIFICATION_TIMEOUT_MS)
     }
 
     private fun handleCallCancelled() {
+        timeoutHandler.removeCallbacks(timeoutRunnable)
         cancelVibration()
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
         sendBroadcast(Intent(ACTION_CALL_CANCELLED)) // we need this to close fullscreen activity
@@ -143,7 +151,6 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         callerEmail: String,
         roomId: String,
         callId: String,
-        remainingNotificationLifeMs: Long,
     ) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
@@ -154,7 +161,6 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra("callerEmail", callerEmail)
                 putExtra("roomId", roomId)
                 putExtra("callId", callId)
-                putExtra("remainingNotificationLifeMs", remainingNotificationLifeMs)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
         val incomingCallFullscreenPendingIntent =
@@ -204,7 +210,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 .setAutoCancel(false)
                 .addAction(R.drawable.ic_notification_call, "decline", notificationBarDeclinePendingIntent)
                 .addAction(R.drawable.ic_notification_call, "accept", notificationBarAcceptPendingIntent)
-                .setTimeoutAfter(remainingNotificationLifeMs)
+                .setTimeoutAfter(CALL_NOTIFICATION_TIMEOUT_MS)
                 .build()
 
         notificationManager.notify(NOTIFICATION_ID, notification)
