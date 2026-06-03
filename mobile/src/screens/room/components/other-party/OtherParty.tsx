@@ -48,11 +48,8 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
-      await api.rooms.cancelInviteToRoom(
-        roomId,
-        token,
-        currentInvitedUser.callId,
-      );
+      await api.rooms.cancelInviteToRoom(roomId, token);
+      await api.calls.markCancelled(currentInvitedUser.callId, token);
     } catch (error) {
       console.error('Failed to cancel invite:', error);
     }

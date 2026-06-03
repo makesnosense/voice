@@ -41,8 +41,9 @@ export default function Users() {
     try {
       const token = await getValidAccessToken();
       await api.rooms.cancelInviteToRoom(roomId!, token);
+      await api.calls.markCancelled(currentInvitedUser.callId, token);
     } catch (error) {
-      console.error('failed to cancel invite:', error);
+      console.error('Failed to cancel invite:', error);
     }
   }, [roomId, getValidAccessToken]);
 

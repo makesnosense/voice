@@ -5,6 +5,7 @@ import {
   notifyDevicesOfCall,
   getCallHistory,
   markCallAnswered,
+  markCallCancelled,
 } from '../services/calls';
 import { getUserMobileDevices } from '../services/devices';
 import { createRoom } from '../services/rooms';
@@ -59,7 +60,7 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
     }
   });
 
-  router.post('/:callId/answer', requireAccessToken, async (req, res) => {
+  router.post('/:callId/mark-answered', requireAccessToken, async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
 
     const { callId } = req.params;
@@ -70,6 +71,18 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
     const updated = await markCallAnswered(callId, req.user.userId);
     if (!updated) return res.status(404).json({ error: 'Call not found or already resolved' });
 
+    res.status(204).end();
+  });
+
+  router.post('/:callId/mark-cancelled', requireAccessToken, async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const { callId } = req.params;
+    if (!z.uuid().safeParse(callId).success) {
+      return res.status(400).json({ error: 'Invalid call id' });
+    }
+    const updated = await markCallCancelled(callId, req.user.userId);
+    if (!updated) return res.status(404).json({ error: 'Call not found or already resolved' });
     res.status(204).end();
   });
 
