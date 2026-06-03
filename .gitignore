@@ -13,6 +13,9 @@ dist
 dist-ssr
 *.local
 
+shared/dist/
+*tsconfig.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
