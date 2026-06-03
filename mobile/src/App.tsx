@@ -13,7 +13,7 @@ import { useRoomLink } from './hooks/useRoomLink';
 import { useServerConnectivity } from './hooks/useServerConnectivity';
 import { runNativePermissions } from './native/runNativePermissions';
 import { prependCallHistoryEntry } from './queries/call-history';
-import { CALL_DIRECTION } from '../../shared/constants/calls';
+import { CALL_DIRECTION, CALL_OUTCOME } from '../../shared/constants/calls';
 import PermissionsScreen from './screens/PermissionsScreen';
 import AuthScreen from './screens/auth/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -21,6 +21,7 @@ import RoomScreen from './screens/room/RoomScreen';
 import NoConnectionScreen from './screens/NoConnectionScreen';
 import type { RoomId } from '../../shared/types/core';
 import type { Contact } from '../../shared/types/contacts';
+import { api } from './api';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
@@ -73,10 +74,19 @@ export default function App() {
       contact => contact.id === incomingCallParams.callerUserId,
     );
 
+    useAuthStore
+      .getState()
+      .getValidAccessToken()
+      .then(token => api.calls.markAnswered(incomingCallParams.callId, token))
+      .catch(err =>
+        console.error('❌ Failed to record answered outcome:', err),
+      );
+
     prependCallHistoryEntry({
       id: incomingCallParams.callId,
       createdAt: new Date().toISOString(),
       direction: CALL_DIRECTION.INCOMING,
+      outcome: CALL_OUTCOME.ANSWERED,
       contactId: incomingCallParams.callerUserId,
       contactEmail: incomingCallParams.callerEmail,
       contactName: incomingCallParams.callerName,
