@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import { createRoom } from '../services/rooms';
-import { notifyDevicesOfCall } from '../services/calls';
 import { getUserMobileDevices } from '../services/devices';
 import { requireAccessToken } from '../middleware/auth';
-import { callSchema } from '../schemas/calls';
-import { createCallsLogEntry } from '../services/calls';
+import { callSchema, callIdSchema } from '../schemas/calls';
+import {
+  createCallsLogEntry,
+  notifyDevicesOfCall,
+  markCallDeclined,
+  markCallCancelled,
+} from '../services/calls';
 import { sendCallCancelledNotification } from '../utils/fcm';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import {
@@ -75,6 +79,10 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
     room.pendingInviteFcmTokens = [];
 
     io.to(roomId).emit('call-declined');
+
+    const { data } = callIdSchema.safeParse(req.body);
+    if (data?.callId) await markCallDeclined(data.callId);
+
     console.log(`📵 [Rooms] call declined for room ${roomId}`);
     res.status(204).end();
   });
@@ -101,6 +109,9 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
       );
 
       room.pendingInviteFcmTokens = [];
+
+      const { data } = callIdSchema.safeParse(req.body);
+      if (data?.callId) await markCallCancelled(data.callId, req.user!.userId);
 
       console.log(`🚫 [Rooms] call cancelled for room ${roomId}`);
       res.status(204).end();

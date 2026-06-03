@@ -1,7 +1,7 @@
 import { sendCallNotification } from '../utils/fcm';
 import { db } from '../db';
 import { calls } from '../db/schema';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, SQL, sql } from 'drizzle-orm';
 
 import type { RoomId } from '../../../shared/types/core';
 import { CALL_OUTCOME, CallOutcome, type CallDirection } from '../../../shared/constants/calls';
@@ -79,20 +79,29 @@ export async function getCallHistory(userId: string) {
   return rows.map(mapCallHistoryRow);
 }
 
-export async function markCallAnswered(callId: string, toUserId: string) {
+// only transitions a call out of its unresolved default state.
+// a call never explicitly resolved stays no-answer = correctly marked as missed.
+async function resolveCallOutcome(
+  callId: string,
+  outcome: CallOutcome,
+  extraConditions: SQL<unknown>[] = []
+) {
   const [updated] = await db
     .update(calls)
-    .set({ outcome: CALL_OUTCOME.ANSWERED })
-    .where(
-      and(
-        eq(calls.id, callId),
-        eq(calls.toUserId, toUserId),
-        eq(calls.outcome, CALL_OUTCOME.NO_ANSWER)
-      )
-    )
+    .set({ outcome })
+    .where(and(eq(calls.id, callId), eq(calls.outcome, CALL_OUTCOME.NO_ANSWER), ...extraConditions))
     .returning({ id: calls.id });
   return updated;
 }
+
+export const markCallAnswered = (callId: string, toUserId: string) =>
+  resolveCallOutcome(callId, CALL_OUTCOME.ANSWERED, [eq(calls.toUserId, toUserId)]);
+
+export const markCallCancelled = (callId: string, fromUserId: string) =>
+  resolveCallOutcome(callId, CALL_OUTCOME.CANCELLED, [eq(calls.fromUserId, fromUserId)]);
+
+export const markCallDeclined = (callId: string) =>
+  resolveCallOutcome(callId, CALL_OUTCOME.DECLINED);
 
 function mapCallHistoryRow(row: Record<string, unknown>): CallHistoryEntry {
   return {
