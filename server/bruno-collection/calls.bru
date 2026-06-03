@@ -21,6 +21,13 @@ body:json {
   }
 }
 
+script:post-response {
+  const response = res.getBody();
+  if (response && response.callId) {
+    bru.setVar("voiceCallId", response.callId);
+  }
+}
+
 settings {
   encodeUrl: true
   timeout: 0

@@ -1,10 +1,10 @@
 import { sendCallNotification } from '../utils/fcm';
 import { db } from '../db';
 import { calls } from '../db/schema';
-import { sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 import type { RoomId } from '../../../shared/types/core';
-import type { CallDirection } from '../../../shared/constants/calls';
+import { CALL_OUTCOME, type CallDirection } from '../../../shared/constants/calls';
 import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
@@ -75,6 +75,21 @@ export async function getCallHistory(userId: string) {
   `);
 
   return rows.map(mapCallHistoryRow);
+}
+
+export async function markCallAnswered(callId: string, toUserId: string) {
+  const [updated] = await db
+    .update(calls)
+    .set({ outcome: CALL_OUTCOME.ANSWERED })
+    .where(
+      and(
+        eq(calls.id, callId),
+        eq(calls.toUserId, toUserId),
+        eq(calls.outcome, CALL_OUTCOME.NO_ANSWER)
+      )
+    )
+    .returning({ id: calls.id });
+  return updated;
 }
 
 function mapCallHistoryRow(row: Record<string, unknown>): CallHistoryEntry {
