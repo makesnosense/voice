@@ -3,7 +3,7 @@ import { api } from '../api';
 import { useActiveRoomStore } from '../stores/useActiveRoomStore';
 import { useInvitedUserStore } from '../stores/useInvitedUserStore';
 import { prependCallHistoryEntry } from '../queries/call-history';
-import { CALL_DIRECTION } from '../../../shared/constants/calls';
+import { CALL_DIRECTION, CALL_OUTCOME } from '../../../shared/constants/calls';
 
 interface CallTarget {
   contactId: string;
@@ -20,6 +20,7 @@ export async function startCall(target: CallTarget) {
       id: callId,
       createdAt: new Date().toISOString(),
       direction: CALL_DIRECTION.OUTGOING,
+      outcome: CALL_OUTCOME.NO_ANSWER,
       contactId: target.contactId,
       contactEmail: target.contactEmail,
       contactName: target.contactName,
