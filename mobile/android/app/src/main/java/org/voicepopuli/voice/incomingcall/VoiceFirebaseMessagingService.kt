@@ -184,7 +184,10 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             )
 
         val notificationBarDeclineIntent =
-            Intent(this, DeclineCallReceiver::class.java).apply { putExtra("roomId", roomId) }
+            Intent(this, DeclineCallReceiver::class.java).apply {
+                putExtra("roomId", roomId)
+                putExtra("callId", callId)
+            }
 
         val notificationBarDeclinePendingIntent =
             PendingIntent.getBroadcast(

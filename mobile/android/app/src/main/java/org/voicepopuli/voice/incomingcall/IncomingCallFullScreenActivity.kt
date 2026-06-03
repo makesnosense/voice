@@ -121,14 +121,12 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun declineCall() {
         cancelNotification()
-        val roomId = intent.getStringExtra("roomId")
-        if (roomId != null) {
-            thread {
-                try {
-                    postCallDeclined(roomId)
-                } catch (exception: Exception) {
-                    Log.e("IncomingCallFullScreenActivity", "failed to notify server of decline", exception)
-                }
+        val roomId = intent.getStringExtra("roomId") ?: return finish()
+        thread {
+            try {
+                postCallDeclined(roomId, callId ?: return@thread)
+            } catch (exception: Exception) {
+                Log.e("IncomingCallFullScreenActivity", "Failed to notify server of decline", exception)
             }
         }
         finish()

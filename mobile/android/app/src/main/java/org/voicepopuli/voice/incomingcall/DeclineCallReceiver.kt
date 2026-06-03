@@ -14,10 +14,12 @@ class DeclineCallReceiver : BroadcastReceiver() {
         context.getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
 
         val roomId = intent.getStringExtra("roomId") ?: return
+        val callId = intent.getStringExtra("callId") ?: return
+
         val pendingResult = goAsync()
         thread {
             try {
-                postCallDeclined(roomId)
+                postCallDeclined(roomId, callId)
             } catch (exception: Exception) {
                 Log.e("DeclineCallReceiver", "failed to notify server of decline", exception)
             } finally {
