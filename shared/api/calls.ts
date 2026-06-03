@@ -16,4 +16,11 @@ export class CallsApi extends ApiBase {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
   }
+
+  markAnswered(callId: string, accessToken: string): Promise<void> {
+    return this.apiFetch(`/calls/${callId}/answer`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+  }
 }

@@ -18,10 +18,11 @@ export class RoomsApi extends ApiBase {
     });
   }
 
-  cancelInviteToRoom(roomId: RoomId, accessToken: string): Promise<void> {
+  cancelInviteToRoom(roomId: RoomId, accessToken: string, callId?: string): Promise<void> {
     return this.apiFetch(`/rooms/${roomId}/cancel-invite`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callId }),
     });
   }
 
