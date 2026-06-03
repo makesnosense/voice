@@ -23,9 +23,9 @@ export default function CallButton({ toContact }: CallButtonProps) {
     setHasError(false);
     try {
       const token = await getValidAccessToken();
-      const { roomId } = await api.calls.create(toContact.id, token);
+      const { roomId, callId } = await api.calls.create(toContact.id, token);
       useInvitedUserStore.setState({
-        invitedUser: { roomId, contact: { email: toContact.email, name: toContact.name } },
+        invitedUser: { roomId, callId, contact: { email: toContact.email, name: toContact.name } },
       });
       navigate(`/${roomId}`);
     } catch (error) {

@@ -30,6 +30,7 @@ export async function startCall(target: CallTarget) {
     useInvitedUserStore.setState({
       invitedUser: {
         roomId,
+        callId,
         contact: { email: target.contactEmail, name: target.contactName },
       },
     });

@@ -121,8 +121,8 @@ export default function Users() {
       {isAlone && isAuthenticated && !invitedContact && (
         <InviteCard
           roomId={roomId!}
-          onUserInvited={(contact) =>
-            useInvitedUserStore.setState({ invitedUser: { roomId: roomId!, contact } })
+          onUserInvited={(contact, callId) =>
+            useInvitedUserStore.setState({ invitedUser: { roomId: roomId!, contact, callId } })
           }
         />
       )}

@@ -8,7 +8,7 @@ import type { InvitedContact } from '../../../../../../../shared/types/contacts'
 
 interface InviteCardProps {
   roomId: RoomId;
-  onUserInvited: (contact: InvitedContact) => void;
+  onUserInvited: (contact: InvitedContact, callId: string) => void;
 }
 
 export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
@@ -28,9 +28,9 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
         <InviteModal
           roomId={roomId}
           onClose={() => setIsModalOpen(false)}
-          onInviteSent={(contact) => {
+          onInviteSent={(contact, callId) => {
             setIsModalOpen(false);
-            onUserInvited(contact);
+            onUserInvited(contact, callId);
           }}
         />
       )}

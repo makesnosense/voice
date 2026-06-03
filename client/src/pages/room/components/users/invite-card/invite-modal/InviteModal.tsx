@@ -13,7 +13,7 @@ import type { Contact, InvitedContact } from '../../../../../../../../shared/typ
 interface InviteModalProps {
   roomId: RoomId;
   onClose: () => void;
-  onInviteSent: (contact: InvitedContact) => void;
+  onInviteSent: (contact: InvitedContact, callId: string) => void;
 }
 
 export default function InviteModal({ roomId, onClose, onInviteSent }: InviteModalProps) {
@@ -37,8 +37,8 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
   const inviteByEmail = async (email: string) => {
     const token = await getValidAccessToken();
     const user = await api.users.getUserByEmail(email, token);
-    await api.rooms.inviteToRoom(roomId, { targetUserId: user.id }, token);
-    onInviteSent({ email: user.email, name: user.name });
+    const { callId } = await api.rooms.inviteToRoom(roomId, { targetUserId: user.id }, token);
+    onInviteSent({ email: user.email, name: user.name }, callId);
   };
 
   const handleCall = async (contact: Contact) => {
@@ -47,8 +47,8 @@ export default function InviteModal({ roomId, onClose, onInviteSent }: InviteMod
     setErrorId(null);
     try {
       const token = await getValidAccessToken();
-      await api.rooms.inviteToRoom(roomId, { targetUserId: contact.id }, token);
-      onInviteSent({ email: contact.email, name: contact.name });
+      const { callId } = await api.rooms.inviteToRoom(roomId, { targetUserId: contact.id }, token);
+      onInviteSent({ email: contact.email, name: contact.name }, callId);
     } catch (error) {
       console.error('Failed to invite contact:', error);
       setErrorId(contact.id);

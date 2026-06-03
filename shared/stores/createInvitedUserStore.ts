@@ -5,6 +5,7 @@ import type { InvitedContact } from '../types/contacts';
 
 export interface InvitedUser {
   roomId: string;
+  callId: string;
   contact: InvitedContact;
 }
 

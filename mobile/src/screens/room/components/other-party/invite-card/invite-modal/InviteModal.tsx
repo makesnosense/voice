@@ -31,7 +31,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 interface InviteModalProps {
   roomId: RoomId;
   onClose: () => void;
-  onUserInvited: (contact: InvitedContact) => void;
+  onUserInvited: (contact: InvitedContact, callId: string) => void;
 }
 
 const SHEET_SLIDE_DURATION = 320;
@@ -96,8 +96,12 @@ export default function InviteModal({
     setErrorId(null);
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
-      await api.rooms.inviteToRoom(roomId, { targetUserId: contact.id }, token);
-      onUserInvited({ email: contact.email, name: contact.name });
+      const { callId } = await api.rooms.inviteToRoom(
+        roomId,
+        { targetUserId: contact.id },
+        token,
+      );
+      onUserInvited({ email: contact.email, name: contact.name }, callId);
     } catch (error) {
       console.error('Failed to invite contact:', error);
       setErrorId(contact.id);

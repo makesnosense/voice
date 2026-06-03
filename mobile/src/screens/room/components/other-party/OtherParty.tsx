@@ -43,11 +43,16 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
   }, [callDismissalReason]);
 
   const handleCancelInvite = useCallback(async () => {
-    if (!useInvitedUserStore.getState().invitedUser) return;
+    const currentInvitedUser = useInvitedUserStore.getState().invitedUser;
+    if (!currentInvitedUser) return;
     useInvitedUserStore.setState({ invitedUser: null });
     try {
       const token = await useAuthStore.getState().getValidAccessToken();
-      await api.rooms.cancelInviteToRoom(roomId, token);
+      await api.rooms.cancelInviteToRoom(
+        roomId,
+        token,
+        currentInvitedUser.callId,
+      );
     } catch (error) {
       console.error('Failed to cancel invite:', error);
     }
@@ -105,8 +110,10 @@ export default function OtherParty({ roomId }: OtherPartyProps) {
     <>
       <InviteCard
         roomId={roomId}
-        onUserInvited={contact =>
-          useInvitedUserStore.setState({ invitedUser: { roomId, contact } })
+        onUserInvited={(contact, callId) =>
+          useInvitedUserStore.setState({
+            invitedUser: { roomId, callId, contact },
+          })
         }
       />
       <CopyCard roomId={roomId} />
