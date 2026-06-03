@@ -4,7 +4,7 @@ import { calls } from '../db/schema';
 import { and, eq, sql } from 'drizzle-orm';
 
 import type { RoomId } from '../../../shared/types/core';
-import { CALL_OUTCOME, type CallDirection } from '../../../shared/constants/calls';
+import { CALL_OUTCOME, CallOutcome, type CallDirection } from '../../../shared/constants/calls';
 import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
@@ -38,6 +38,7 @@ export async function getCallHistory(userId: string) {
             WITH outgoing_calls_for_user AS (
           SELECT calls.id,
                  calls.created_at,
+                 calls.outcome,
                  'outgoing' AS direction,
                  users.id AS contact_id,
                  users.email AS contact_email,
@@ -50,6 +51,7 @@ export async function getCallHistory(userId: string) {
                  incoming_calls_for_user AS (
           SELECT calls.id, 
                  calls.created_at,
+                 calls.outcome,
                  'incoming' AS direction,
                  users.id AS contact_id,
                  users.email AS contact_email,
@@ -97,6 +99,7 @@ function mapCallHistoryRow(row: Record<string, unknown>): CallHistoryEntry {
     id: row.id as string,
     createdAt: row.created_at as string,
     direction: row.direction as CallDirection,
+    outcome: row.outcome as CallOutcome,
     contactId: row.contact_id as string,
     contactEmail: row.contact_email as string,
     contactName: row.contact_name as string | null,
