@@ -48,13 +48,18 @@ interface CallRowProps {
 
 function getCallLabel(direction: CallDirection, outcome: CallOutcome): string {
   if (direction === CALL_DIRECTION.INCOMING) {
-    if (outcome === CALL_OUTCOME.NO_ANSWER) return 'Missed';
+    if (
+      outcome === CALL_OUTCOME.CANCELLED ||
+      outcome === CALL_OUTCOME.NO_ANSWER
+    )
+      return 'Missed';
     if (outcome === CALL_OUTCOME.DECLINED) return 'Declined';
     return 'Incoming';
+  } else {
+    if (outcome === CALL_OUTCOME.CANCELLED) return 'Cancelled';
+    if (outcome === CALL_OUTCOME.NO_ANSWER) return 'No answer';
+    return 'Outgoing';
   }
-  if (outcome === CALL_OUTCOME.NO_ANSWER) return 'No answer';
-  if (outcome === CALL_OUTCOME.CANCELLED) return 'Cancelled';
-  return 'Outgoing';
 }
 
 export default function CallRow({
@@ -63,7 +68,11 @@ export default function CallRow({
   onAddToContacts,
 }: CallRowProps) {
   const isIncoming = entry.direction === CALL_DIRECTION.INCOMING;
-  const isMissed = isIncoming && entry.outcome === CALL_OUTCOME.NO_ANSWER;
+  const isMissedOrCancelled =
+    entry.outcome === CALL_OUTCOME.NO_ANSWER ||
+    entry.outcome === CALL_OUTCOME.CANCELLED;
+  const isMissedIncoming = isIncoming && isMissedOrCancelled;
+
   const displayName = entry.contactName ?? entry.contactEmail;
   const isCallable = entry.contactHasMobileDevice ?? true;
 
@@ -100,13 +109,13 @@ export default function CallRow({
       onPress={() => onPress(entry)}
     >
       <View style={styles.iconSlot}>
-        <CallIcon direction={entry.direction} outcome={entry.outcome} />
+        <CallIcon direction={entry.direction} isRed={isMissedIncoming} />
       </View>
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
           {displayName}
         </Text>
-        <Text style={[styles.direction, isMissed && styles.missedCall]}>
+        <Text style={[styles.direction, isMissedIncoming && styles.missedCall]}>
           {getCallLabel(entry.direction, entry.outcome)}
         </Text>
       </View>
