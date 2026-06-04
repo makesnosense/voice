@@ -6,21 +6,22 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { UserPlus, AlertCircle } from 'lucide-react-native';
 import {
-  PhoneIncoming,
-  PhoneOutgoing,
-  UserPlus,
-  AlertCircle,
-} from 'lucide-react-native';
-import { CALL_DIRECTION } from '../../../../shared/constants/calls';
+  CALL_DIRECTION,
+  CALL_OUTCOME,
+  CallDirection,
+  CallOutcome,
+} from '../../../../shared/constants/calls';
 import {
   TEXT_PRIMARY,
-  TEXT_SECONDARY,
   TEXT_MUTED,
   BACKGROUND_CARD,
+  TEXT_DANGER,
 } from '../../styles/colors';
 import { pressedStyle } from '../../styles/common';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
+import CallIcon from './CallIcon';
 
 const ERROR_RESET_MS = 2000;
 
@@ -45,12 +46,24 @@ interface CallRowProps {
   onAddToContacts?: () => Promise<void>;
 }
 
+function getCallLabel(direction: CallDirection, outcome: CallOutcome): string {
+  if (direction === CALL_DIRECTION.INCOMING) {
+    if (outcome === CALL_OUTCOME.NO_ANSWER) return 'Missed';
+    if (outcome === CALL_OUTCOME.DECLINED) return 'Declined';
+    return 'Incoming';
+  }
+  if (outcome === CALL_OUTCOME.NO_ANSWER) return 'No answer';
+  if (outcome === CALL_OUTCOME.CANCELLED) return 'Cancelled';
+  return 'Outgoing';
+}
+
 export default function CallRow({
   entry,
   onPress,
   onAddToContacts,
 }: CallRowProps) {
-  const isOutgoing = entry.direction === CALL_DIRECTION.OUTGOING;
+  const isIncoming = entry.direction === CALL_DIRECTION.INCOMING;
+  const isMissed = isIncoming && entry.outcome === CALL_OUTCOME.NO_ANSWER;
   const displayName = entry.contactName ?? entry.contactEmail;
   const isCallable = entry.contactHasMobileDevice ?? true;
 
@@ -87,18 +100,14 @@ export default function CallRow({
       onPress={() => onPress(entry)}
     >
       <View style={styles.iconSlot}>
-        {isOutgoing ? (
-          <PhoneOutgoing size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-        ) : (
-          <PhoneIncoming size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-        )}
+        <CallIcon direction={entry.direction} outcome={entry.outcome} />
       </View>
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
           {displayName}
         </Text>
-        <Text style={styles.direction}>
-          {isOutgoing ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING}
+        <Text style={[styles.direction, isMissed && styles.missedCall]}>
+          {getCallLabel(entry.direction, entry.outcome)}
         </Text>
       </View>
 
@@ -163,5 +172,8 @@ const styles = StyleSheet.create({
   },
   rowPressed: {
     backgroundColor: BACKGROUND_CARD,
+  },
+  missedCall: {
+    color: TEXT_DANGER,
   },
 });

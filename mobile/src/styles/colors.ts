@@ -1,6 +1,7 @@
 export const TEXT_PRIMARY = '#18181b'; // zinc-900
 export const TEXT_SECONDARY = '#71717a'; // zinc-500, secondary text and icons
 export const TEXT_MUTED = '#a1a1aa'; // zinc-400
+export const TEXT_DANGER = '#ef4444';
 
 export const BORDER_PRIMARY = '#71717a'; // zinc-500
 export const BORDER_MUTED = '#e4e4e7'; // zinc-200
