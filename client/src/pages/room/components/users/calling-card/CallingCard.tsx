@@ -3,7 +3,6 @@ import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from '../usercard/UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import callingCardStyles from './CallingCard.module.css';
-import type { InvitedContact } from '../../../../../../../shared/types/contacts';
 import { formatDisplayName } from '../../../../../../../shared/utils/format';
 import {
   CALL_OUTCOME,
@@ -16,14 +15,21 @@ const DISMISSAL_REASON_LABEL: Record<CallDismissalReason, string> = {
 };
 
 interface CallingCardProps {
-  contact: InvitedContact;
+  contactEmail: string;
+  contactName: string | null;
   onCancel: () => void;
   callDismissalReason: CallDismissalReason | null;
 }
 
-export default function CallingCard({ contact, onCancel, callDismissalReason }: CallingCardProps) {
-  const displayName = formatDisplayName(contact.name, contact.email);
+export default function CallingCard({
+  contactEmail,
+  contactName,
+  onCancel,
+  callDismissalReason,
+}: CallingCardProps) {
+  const displayName = formatDisplayName(contactName, contactEmail);
   const isCallDismissed = callDismissalReason !== null;
+
   return (
     <div
       className={`${baseStyles.card} ${userCardStyles.userCard} ${callingCardStyles.callingCard} ${isCallDismissed ? callingCardStyles.declinedCard : ''}`}

@@ -7,22 +7,26 @@ import RoomDestructionManager from './managers/room-destruction-manager';
 import config, { getProtocol } from './config';
 import type { Room, RoomId } from '../../shared/types/core';
 import CleanupManager from './managers/cleanup-manager';
+import InviteTimeoutManager from './managers/invite-timeout-manager';
+import createCallsRouter from './routes/calls';
 
 await runMigrations();
 console.log('🗄️  DB schema up to date');
 
 const rooms = new Map<RoomId, Room>();
 const roomDestructionManager = new RoomDestructionManager(rooms);
+const inviteTimeoutManager = new InviteTimeoutManager();
 const cleanupManager = new CleanupManager();
 
 roomDestructionManager.start();
 cleanupManager.start();
 
-const app = createApp(rooms);
+const app = createApp();
 const server = createServer(app);
-const io = createSocketIO(server, rooms, roomDestructionManager);
+const io = createSocketIO(server, rooms, roomDestructionManager, inviteTimeoutManager);
 
-app.use('/api/rooms', createRoomsRouter(rooms, io));
+app.use('/api/rooms', createRoomsRouter(rooms, io, inviteTimeoutManager));
+app.use('/api/calls', createCallsRouter(rooms, io, inviteTimeoutManager));
 
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${getProtocol(server)}://${config.host}:${config.port}`);

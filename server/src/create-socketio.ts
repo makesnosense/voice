@@ -12,6 +12,7 @@ import type {
 } from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 import { verifyAccessToken } from './utils/jwt';
+import InviteTimeoutManager from './managers/invite-timeout-manager';
 
 const getClientIp = (socket: ExtendedConnectedSocket): string => {
   if (config.rateLimiting.trustProxy) {
@@ -27,7 +28,8 @@ const getClientIp = (socket: ExtendedConnectedSocket): string => {
 export function createSocketIO(
   server: HttpServer,
   rooms: Map<RoomId, Room>,
-  roomDestructionManager: RoomDestructionManager
+  roomDestructionManager: RoomDestructionManager,
+  inviteTimeoutManager: InviteTimeoutManager
 ) {
   const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
     cors: {
@@ -70,7 +72,12 @@ export function createSocketIO(
     next();
   });
 
-  const handleConnection = createConnectionHandler(io, rooms, roomDestructionManager);
+  const handleConnection = createConnectionHandler(
+    io,
+    rooms,
+    roomDestructionManager,
+    inviteTimeoutManager
+  );
   io.on('connection', handleConnection);
 
   return io;

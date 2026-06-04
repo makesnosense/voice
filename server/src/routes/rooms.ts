@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { createRoom } from '../services/rooms';
 import { getUserMobileDevices } from '../services/devices';
+import { findUserById } from '../services/users';
 import { requireAccessToken } from '../middleware/auth';
 import { callSchema, callIdSchema } from '../schemas/calls';
 import { createCallsLogEntry, notifyDevicesOfCall, markCallDeclined } from '../services/calls';
 import { sendCallCancelledNotification } from '../utils/fcm';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
+import type InviteTimeoutManager from '../managers/invite-timeout-manager';
 import {
   cancelInviteLimiter,
   inviteDeclineLimiter,
@@ -13,7 +15,13 @@ import {
   roomCreationLimiter,
 } from '../middleware/api-rate-limiters';
 
-export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedServer) {
+const INVITE_TIMEOUT_MS = 60_000;
+
+export default function createRoomsRouter(
+  rooms: Map<RoomId, Room>,
+  io: TypedServer,
+  inviteTimeoutManager: InviteTimeoutManager
+) {
   const router = Router();
 
   router.post('/', roomCreationLimiter, (req, res) => {
@@ -47,14 +55,37 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
       if (mobileDevices.length === 0) {
         return res.status(404).json({ error: 'User not reachable' });
       }
+
       const fcmTokens = mobileDevices.flatMap((device) =>
         device.fcmToken ? [device.fcmToken] : []
       );
 
-      room.pendingInviteFcmTokens = fcmTokens;
-
       const entry = await createCallsLogEntry(caller.userId, targetUserId);
       await notifyDevicesOfCall(caller, fcmTokens, roomId, entry.id);
+
+      const targetUser = await findUserById(targetUserId);
+      if (targetUser) {
+        // cancel any pre-existing invite timer for this room (e.g. re-invite)
+        inviteTimeoutManager.cancel(roomId);
+
+        room.invitedUser = {
+          userId: targetUserId,
+          email: targetUser.email,
+          name: targetUser.name,
+          callId: entry.id,
+          fcmTokens,
+        };
+
+        inviteTimeoutManager.schedule(roomId, INVITE_TIMEOUT_MS, () => {
+          const currentRoom = rooms.get(roomId);
+          if (!currentRoom?.invitedUser) return;
+          const { fcmTokens: tokens } = currentRoom.invitedUser;
+          currentRoom.invitedUser = null;
+          tokens.forEach((token) => sendCallCancelledNotification(token).catch(() => {}));
+          io.to(roomId).emit('invite-expired');
+          console.log(`⏰ [Invite] timed out for room ${roomId}`);
+        });
+      }
 
       res.json({ callId: entry.id });
     } catch (error) {
@@ -69,11 +100,14 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
     const room = rooms.get(roomId);
     if (!room) return res.status(404).json({ error: 'room not found' });
 
-    // cancel notifications on all other devices
-    await Promise.allSettled(
-      room.pendingInviteFcmTokens.map((token) => sendCallCancelledNotification(token))
-    );
-    room.pendingInviteFcmTokens = [];
+    inviteTimeoutManager.cancel(roomId);
+
+    if (room.invitedUser) {
+      await Promise.allSettled(
+        room.invitedUser.fcmTokens.map((token) => sendCallCancelledNotification(token))
+      );
+      room.invitedUser = null;
+    }
 
     io.to(roomId).emit('call-declined');
 
@@ -102,11 +136,14 @@ export default function createRoomsRouter(rooms: Map<RoomId, Room>, io: TypedSer
 
       if (!room) return res.status(404).json({ error: 'room not found' });
 
-      await Promise.allSettled(
-        room.pendingInviteFcmTokens.map((token) => sendCallCancelledNotification(token))
-      );
+      inviteTimeoutManager.cancel(roomId);
 
-      room.pendingInviteFcmTokens = [];
+      if (room.invitedUser) {
+        await Promise.allSettled(
+          room.invitedUser.fcmTokens.map((token) => sendCallCancelledNotification(token))
+        );
+        room.invitedUser = null;
+      }
 
       console.log(`🚫 [Rooms] call cancelled for room ${roomId}`);
       res.status(204).end();

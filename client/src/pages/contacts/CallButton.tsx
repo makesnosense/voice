@@ -3,9 +3,9 @@ import { Phone, AlertCircle, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { api } from '../../api';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 import contactsCardStyles from '../../components/contacts-card/ContactsCard.module.css';
 import type { Contact } from '../../../../shared/types/contacts';
-import { useInvitedUserStore } from '../../stores/useInvitedUserStore';
 
 interface CallButtonProps {
   toContact: Contact;
@@ -24,8 +24,8 @@ export default function CallButton({ toContact }: CallButtonProps) {
     try {
       const token = await getValidAccessToken();
       const { roomId, callId } = await api.calls.create(toContact.id, token);
-      useInvitedUserStore.setState({
-        invitedUser: { roomId, callId, contact: { email: toContact.email, name: toContact.name } },
+      useRoomStore.setState({
+        invitedUser: { email: toContact.email, name: toContact.name, callId },
       });
       navigate(`/${roomId}`);
     } catch (error) {

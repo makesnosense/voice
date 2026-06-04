@@ -1,7 +1,7 @@
 import { useAuthStore } from '../stores/useAuthStore';
 import { api } from '../api';
 import { useActiveRoomStore } from '../stores/useActiveRoomStore';
-import { useInvitedUserStore } from '../stores/useInvitedUserStore';
+import { useRoomStore } from '../../../shared/stores/useRoomStore';
 import { prependCallHistoryEntry } from '../queries/call-history';
 import { CALL_DIRECTION, CALL_OUTCOME } from '../../../shared/constants/calls';
 
@@ -11,6 +11,7 @@ interface CallTarget {
   contactName: string | null;
   contactHasMobileDevice: boolean;
 }
+
 export async function startCall(target: CallTarget) {
   try {
     const token = await useAuthStore.getState().getValidAccessToken();
@@ -27,11 +28,11 @@ export async function startCall(target: CallTarget) {
       contactHasMobileDevice: true,
     });
 
-    useInvitedUserStore.setState({
+    useRoomStore.setState({
       invitedUser: {
-        roomId,
+        email: target.contactEmail,
+        name: target.contactName,
         callId,
-        contact: { email: target.contactEmail, name: target.contactName },
       },
     });
     useActiveRoomStore.setState({ activeRoomId: roomId });

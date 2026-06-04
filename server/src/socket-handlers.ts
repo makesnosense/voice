@@ -1,5 +1,6 @@
 import config from './config';
 import { socketRateLimiter, SOCKET_RATE_LIMITS } from './middleware/socket-rate-limiter';
+import type InviteTimeoutManager from './managers/invite-timeout-manager';
 import type { Transport } from 'engine.io';
 import type {
   Room,
@@ -12,6 +13,7 @@ import type {
   WebRTCAnswer,
   IceCandidate,
   UserDataClientSide,
+  InvitedUserClientState,
 } from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 import { sendCallCancelledNotification } from './utils/fcm';
@@ -19,7 +21,8 @@ import { sendCallCancelledNotification } from './utils/fcm';
 export default function createConnectionHandler(
   io: TypedServer,
   rooms: Map<RoomId, Room>,
-  roomDestructionManager: RoomDestructionManager
+  roomDestructionManager: RoomDestructionManager,
+  inviteTimeoutManager: InviteTimeoutManager
 ) {
   const handleConnection = (socket: ExtendedConnectedSocket) => {
     console.log(`🔌 [Socket] new connection: ${socket.id}`);
@@ -33,7 +36,7 @@ export default function createConnectionHandler(
 
     socket.on('join-room', (roomId: RoomId) => {
       if (!checkRateLimit(socket, 'join-room')) return;
-      handleRoomJoin(io, rooms, socket, roomId, roomDestructionManager);
+      handleRoomJoin(io, rooms, socket, roomId, roomDestructionManager, inviteTimeoutManager);
     });
 
     socket.on('message', (data: { text: string }) => {
@@ -112,7 +115,7 @@ const checkRateLimit = (
   return allowed;
 };
 
-// helper function to convert server user data to client user data
+// helper functions to convert server user data to client user data
 const getUsersForClient = (room: Room): UserDataClientSide[] => {
   return Array.from(room.users.entries()).map(([socketId, userData]) => ({
     socketId,
@@ -120,6 +123,12 @@ const getUsersForClient = (room: Room): UserDataClientSide[] => {
     name: userData.name,
     email: userData.email,
   }));
+};
+
+const getInvitedUserForClient = (room: Room): InvitedUserClientState | null => {
+  if (!room.invitedUser) return null;
+  const { email, name, callId } = room.invitedUser;
+  return { email, name, callId };
 };
 
 const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number => {
@@ -157,7 +166,8 @@ const handleRoomJoin = (
   rooms: Map<RoomId, Room>,
   socket: ExtendedConnectedSocket,
   roomId: RoomId,
-  roomDestructionManager: RoomDestructionManager
+  roomDestructionManager: RoomDestructionManager,
+  inviteTimeoutManager: InviteTimeoutManager
 ): void => {
   const room = rooms.get(roomId);
   if (!room) {
@@ -200,18 +210,22 @@ const handleRoomJoin = (
 
   console.log(`✅ [Socket] ${socket.id} joined room ${roomId} (${room.users.size}/2 users)`);
 
-  const usersForClient = getUsersForClient(room);
-  io.to(roomId).emit('room-users-update', usersForClient);
+  // second user joining means receiver answered — cancel timer, dismiss other devices
+  const joiningEmail = socket.data.email ?? null;
+  const invitedUserJoined =
+    room.invitedUser !== null && joiningEmail !== null && joiningEmail === room.invitedUser.email;
 
-  // send success to the joining user
-  socket.emit('room-join-success', { roomId });
-
-  if (room.pendingInviteFcmTokens.length > 0) {
-    room.pendingInviteFcmTokens.forEach((token) =>
+  if (invitedUserJoined && room.invitedUser) {
+    inviteTimeoutManager.cancel(roomId);
+    room.invitedUser.fcmTokens.forEach((token) =>
       sendCallCancelledNotification(token).catch(() => {})
     );
-    room.pendingInviteFcmTokens = [];
+    room.invitedUser = null;
   }
+
+  const usersForClient = getUsersForClient(room);
+  io.to(roomId).emit('room-users-update', usersForClient);
+  socket.emit('room-join-success', { roomId, invitedUser: getInvitedUserForClient(room) });
 };
 
 const handleNewMessage = (
@@ -266,14 +280,6 @@ const handleDisconnect = (
 
   const wasInRoom = room.users.has(socket.id as SocketId);
   room.users.delete(socket.id as SocketId);
-
-  // TODO: remove when invite state moves to server — server will own cancellation
-  if (room.pendingInviteFcmTokens.length > 0) {
-    room.pendingInviteFcmTokens.forEach((token) =>
-      sendCallCancelledNotification(token).catch(() => {})
-    );
-    room.pendingInviteFcmTokens = [];
-  }
 
   if (wasInRoom) {
     console.log(

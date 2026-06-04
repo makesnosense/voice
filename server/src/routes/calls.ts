@@ -8,13 +8,22 @@ import {
   markCallCancelled,
 } from '../services/calls';
 import { getUserMobileDevices } from '../services/devices';
+import { findUserById } from '../services/users';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/calls';
-import type { Room, RoomId } from '../../../shared/types/core';
+import { sendCallCancelledNotification } from '../utils/fcm';
+import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import { callInitiationLimiter } from '../middleware/api-rate-limiters';
+import type InviteTimeoutManager from '../managers/invite-timeout-manager';
 import z from 'zod';
 
-export default function createCallsRouter(rooms: Map<RoomId, Room>) {
+const INVITE_TIMEOUT_MS = 60_000;
+
+export default function createCallsRouter(
+  rooms: Map<RoomId, Room>,
+  io: TypedServer,
+  inviteTimeoutManager: InviteTimeoutManager
+) {
   const router = Router();
 
   router.get('/', requireAccessToken, async (req, res) => {
@@ -28,13 +37,15 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
   });
 
   router.post('/', requireAccessToken, callInitiationLimiter, async (req, res) => {
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
     const result = callSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: 'invalid request', details: result.error.issues });
     }
 
     const { targetUserId } = result.data;
-    const caller = req.user!;
+    const caller = req.user;
 
     if (targetUserId === caller.userId) {
       return res.status(400).json({ error: 'Cannot call yourself' });
@@ -50,10 +61,33 @@ export default function createCallsRouter(rooms: Map<RoomId, Room>) {
       );
 
       const roomId = createRoom(rooms);
-      const entry = await createCallsLogEntry(caller.userId, targetUserId);
-      await notifyDevicesOfCall(caller, fcmTokens, roomId, entry.id);
+      const room = rooms.get(roomId)!;
 
-      res.json({ roomId, callId: entry.id });
+      const callsLogEntry = await createCallsLogEntry(caller.userId, targetUserId);
+      await notifyDevicesOfCall(caller, fcmTokens, roomId, callsLogEntry.id);
+
+      const targetUser = await findUserById(targetUserId);
+      if (targetUser) {
+        room.invitedUser = {
+          userId: targetUserId,
+          email: targetUser.email,
+          name: targetUser.name,
+          callId: callsLogEntry.id,
+          fcmTokens,
+        };
+
+        inviteTimeoutManager.schedule(roomId, INVITE_TIMEOUT_MS, () => {
+          const currentRoom = rooms.get(roomId);
+          if (!currentRoom?.invitedUser) return;
+          const { fcmTokens: tokens } = currentRoom.invitedUser;
+          currentRoom.invitedUser = null;
+          tokens.forEach((token) => sendCallCancelledNotification(token).catch(() => {}));
+          io.to(roomId).emit('invite-expired');
+          console.log(`⏰ [Invite] timed out for room ${roomId}`);
+        });
+      }
+
+      res.json({ roomId, callId: callsLogEntry.id });
     } catch (error) {
       console.error('Failed to initiate call:', error);
       res.status(500).json({ error: 'Failed to initiate call' });

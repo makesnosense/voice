@@ -30,9 +30,20 @@ export interface UserDataClientSide extends UserIdentity {
   isMuted: boolean;
 }
 
+export interface InvitedUserClientState {
+  email: string;
+  name: string | null;
+  callId: string;
+}
+
+export interface InvitedUserServerState extends InvitedUserClientState {
+  userId: string;
+  fcmTokens: string[];
+}
+
 export interface Room {
   users: Map<SocketId, UserDataServerSide>;
-  pendingInviteFcmTokens: string[];
+  invitedUser: InvitedUserServerState | null;
 }
 
 export interface Message {
@@ -53,13 +64,16 @@ export interface RoomAliveResponse {
 // Socket.IO event types
 export interface ServerToClientEvents {
   'room-users-update': (users: UserDataClientSide[]) => void;
-  'room-join-success': (data: { roomId: RoomId }) => void;
+  'room-join-success': (data: {
+    roomId: RoomId;
+    invitedUser: InvitedUserClientState | null;
+  }) => void;
   'room-full': (error: string) => void;
   message: (message: Message) => void;
   'room-not-found': (error: string) => void;
 
   'call-declined': () => void;
-
+  'invite-expired': () => void;
   error: (data: { message: string; type?: string }) => void;
 
   'initiate-webrtc-call': (targetSocketId: SocketId) => void;
@@ -96,13 +110,13 @@ export type ExtendedConnectedSocket = ConnectedSocket<
 };
 
 export interface WebRTCOffer {
-  sdp: string;
   type: 'offer';
+  sdp: string;
 }
 
 export interface WebRTCAnswer {
-  sdp: string;
   type: 'answer';
+  sdp: string;
 }
 
 export interface IceCandidate {

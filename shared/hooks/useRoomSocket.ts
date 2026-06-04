@@ -37,9 +37,10 @@ export function useRoomSocket(
       });
     });
 
-    socket.on('room-join-success', ({ roomId: joinedId }) => {
+    socket.on('room-join-success', ({ roomId: joinedId, invitedUser }) => {
       console.log('✅ Successfully joined room:', joinedId);
       useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.JOINED);
+      useRoomStore.setState({ invitedUser });
       onJoinSuccess?.(joinedId);
     });
 
@@ -65,6 +66,13 @@ export function useRoomSocket(
     socket.on('call-declined', () => {
       console.log('📵 [Socket] call declined by remote');
       useRoomStore.setState({ callDismissalReason: CALL_OUTCOME.DECLINED });
+    });
+
+    socket.on('invite-expired', () => {
+      console.log('⏰ [Socket] invite expired');
+      // don't clear invitedUser here — CallingCard needs it to stay visible with the dismissal state
+      // the callDismissalReason effect in Users/OtherParty clears it after 3 seconds
+      useRoomStore.setState({ callDismissalReason: CALL_OUTCOME.NO_ANSWER });
     });
 
     socket.on('connect_error', (error) => {
