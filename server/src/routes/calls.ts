@@ -16,8 +16,7 @@ import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import { callInitiationLimiter } from '../middleware/api-rate-limiters';
 import type InviteTimeoutManager from '../managers/invite-timeout-manager';
 import z from 'zod';
-
-const INVITE_TIMEOUT_MS = 60_000;
+import { INVITE_TIMEOUT_MS } from '../../../shared/constants/calls';
 
 export default function createCallsRouter(
   rooms: Map<RoomId, Room>,

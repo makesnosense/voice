@@ -14,8 +14,7 @@ import {
   inviteLimiter,
   roomCreationLimiter,
 } from '../middleware/api-rate-limiters';
-
-const INVITE_TIMEOUT_MS = 60_000;
+import { INVITE_TIMEOUT_MS } from '../../../shared/constants/calls';
 
 export default function createRoomsRouter(
   rooms: Map<RoomId, Room>,

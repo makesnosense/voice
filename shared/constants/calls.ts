@@ -1,5 +1,7 @@
 import type { ObjectValues } from '../types/core';
 
+export const INVITE_TIMEOUT_MS = 60_000;
+
 export const CALL_DIRECTION = {
   OUTGOING: 'outgoing',
   INCOMING: 'incoming',
