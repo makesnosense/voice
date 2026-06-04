@@ -3,8 +3,8 @@ import type { RoomId } from '../../../shared/types/core';
 export default class InviteTimeoutManager {
   private timers = new Map<RoomId, NodeJS.Timeout>();
 
-  schedule(roomId: RoomId, delayMs: number, callback: () => void): void {
-    this.cancel(roomId);
+  scheduleTimeout(roomId: RoomId, delayMs: number, callback: () => void): void {
+    this.cancelTimeout(roomId);
     this.timers.set(
       roomId,
       setTimeout(() => {
@@ -14,7 +14,7 @@ export default class InviteTimeoutManager {
     );
   }
 
-  cancel(roomId: RoomId): void {
+  cancelTimeout(roomId: RoomId): void {
     const timer = this.timers.get(roomId);
     if (!timer) return;
     clearTimeout(timer);

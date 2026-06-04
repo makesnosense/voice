@@ -216,7 +216,7 @@ const handleRoomJoin = (
     room.invitedUser !== null && joiningEmail !== null && joiningEmail === room.invitedUser.email;
 
   if (invitedUserJoined && room.invitedUser) {
-    inviteTimeoutManager.cancel(roomId);
+    inviteTimeoutManager.cancelTimeout(roomId);
     room.invitedUser.fcmTokens.forEach((token) =>
       sendCallCancelledNotification(token).catch(() => {})
     );

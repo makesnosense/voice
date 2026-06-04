@@ -65,7 +65,7 @@ export default function createRoomsRouter(
       const targetUser = await findUserById(targetUserId);
       if (targetUser) {
         // cancel any pre-existing invite timer for this room (e.g. re-invite)
-        inviteTimeoutManager.cancel(roomId);
+        inviteTimeoutManager.cancelTimeout(roomId);
 
         room.invitedUser = {
           userId: targetUserId,
@@ -75,7 +75,7 @@ export default function createRoomsRouter(
           fcmTokens,
         };
 
-        inviteTimeoutManager.schedule(roomId, INVITE_TIMEOUT_MS, () => {
+        inviteTimeoutManager.scheduleTimeout(roomId, INVITE_TIMEOUT_MS, () => {
           const currentRoom = rooms.get(roomId);
           if (!currentRoom?.invitedUser) return;
           const { fcmTokens: tokens } = currentRoom.invitedUser;
@@ -99,7 +99,7 @@ export default function createRoomsRouter(
     const room = rooms.get(roomId);
     if (!room) return res.status(404).json({ error: 'room not found' });
 
-    inviteTimeoutManager.cancel(roomId);
+    inviteTimeoutManager.cancelTimeout(roomId);
 
     if (room.invitedUser) {
       await Promise.allSettled(
@@ -135,7 +135,7 @@ export default function createRoomsRouter(
 
       if (!room) return res.status(404).json({ error: 'room not found' });
 
-      inviteTimeoutManager.cancel(roomId);
+      inviteTimeoutManager.cancelTimeout(roomId);
 
       if (room.invitedUser) {
         await Promise.allSettled(

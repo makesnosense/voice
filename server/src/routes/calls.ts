@@ -75,7 +75,7 @@ export default function createCallsRouter(
           fcmTokens,
         };
 
-        inviteTimeoutManager.schedule(roomId, INVITE_TIMEOUT_MS, () => {
+        inviteTimeoutManager.scheduleTimeout(roomId, INVITE_TIMEOUT_MS, () => {
           const currentRoom = rooms.get(roomId);
           if (!currentRoom?.invitedUser) return;
           const { fcmTokens: tokens } = currentRoom.invitedUser;
