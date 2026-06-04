@@ -6,6 +6,7 @@ import {
   TEXT_PRIMARY,
   BORDER_MUTED,
   BACKGROUND_PRIMARY,
+  TEXT_DANGER,
 } from '../../../../../styles/colors';
 import {
   CALL_OUTCOME,
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   },
   dismissedLabel: {
     fontSize: 16,
-    color: '#ef4444',
+    color: TEXT_DANGER,
   },
   cancelButton: {
     padding: 18,
