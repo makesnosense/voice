@@ -50,3 +50,11 @@ export async function sendCallCancelledNotification(fcmToken: string): Promise<v
     android: { priority: 'high', collapseKey: 'call' },
   });
 }
+
+export async function sendCallDeclinedNotification(fcmToken: string): Promise<void> {
+  await getMessaging().send({
+    token: fcmToken,
+    data: { type: 'call_declined' },
+    android: { priority: 'high', collapseKey: 'call' },
+  });
+}

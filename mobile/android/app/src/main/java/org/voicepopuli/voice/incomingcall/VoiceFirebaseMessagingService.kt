@@ -114,6 +114,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         when (message.data["type"]) {
             "incoming_call" -> handleIncomingCall(message.data)
             "call_cancelled" -> handleCallCancelled()
+            "call_declined" -> handleCallDeclined()
         }
     }
 

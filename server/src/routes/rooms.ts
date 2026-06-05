@@ -3,9 +3,9 @@ import { createRoom } from '../services/rooms';
 import { getUserMobileDevices } from '../services/devices';
 import { findUserById } from '../services/users';
 import { requireAccessToken } from '../middleware/auth';
-import { callSchema, callIdSchema } from '../schemas/calls';
+import { callSchema, declineCallSchema } from '../schemas/calls';
 import { createCallsLogEntry, notifyDevicesOfCall, markCallDeclined } from '../services/calls';
-import { sendCallCancelledNotification } from '../utils/fcm';
+import { sendCallCancelledNotification, sendCallDeclinedNotification } from '../utils/fcm';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import type InviteTimeoutManager from '../managers/invite-timeout-manager';
 import {
@@ -102,18 +102,23 @@ export default function createRoomsRouter(
     inviteTimeoutManager.cancelTimeout(roomId);
 
     if (room.invitedUser) {
-      await Promise.allSettled(
-        room.invitedUser.fcmTokens.map((token) => sendCallCancelledNotification(token))
-      );
+      const { fcmTokens } = room.invitedUser;
+
+      const result = declineCallSchema.safeParse(req.body);
+      if (!result.success) return res.status(400).json({ error: 'invalid request' });
+
+      const { callId, declinerFcmToken } = result.data;
+
+      const tokensToNotify = fcmTokens.filter((token) => token !== declinerFcmToken);
+
+      await Promise.allSettled(tokensToNotify.map((token) => sendCallDeclinedNotification(token)));
+
       room.invitedUser = null;
+
+      await markCallDeclined(callId);
     }
 
     io.to(roomId).emit('call-declined');
-
-    const result = callIdSchema.safeParse(req.body);
-    if (!result.success) return res.status(400).json({ error: 'invalid request' });
-    await markCallDeclined(result.data.callId);
-
     console.log(`📵 [Rooms] call declined for room ${roomId}`);
     res.status(204).end();
   });
