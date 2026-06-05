@@ -120,6 +120,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     }
 
     private fun declineCall() {
+        VoiceFirebaseMessagingService.handleCallDeclined()
         cancelNotification()
         val roomId = intent.getStringExtra("roomId") ?: return finish()
         thread {

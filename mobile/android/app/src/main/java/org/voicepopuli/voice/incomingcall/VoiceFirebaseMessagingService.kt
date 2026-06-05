@@ -43,6 +43,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private const val QUEUE_KEY = "queue"
         private const val OUTCOME_CANCELLED = "cancelled"
         private const val OUTCOME_NO_ANSWER = "no-answer"
+        private const val OUTCOME_DECLINED = "declined"
 
         private var vibrator: Vibrator? = null
         private var appContext: Context? = null
@@ -96,6 +97,16 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 }
             )
             mmkv.encode(QUEUE_KEY, queue.toString())
+        }
+
+        fun handleCallDeclined() {
+            cancelVibration()
+            cancelTimeout()
+            pendingCall?.let { params ->
+                enqueueDismissedCallLog(params, OUTCOME_DECLINED)
+                pendingCall = null
+            }
+            appContext?.run { sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName)) }
         }
     }
 
