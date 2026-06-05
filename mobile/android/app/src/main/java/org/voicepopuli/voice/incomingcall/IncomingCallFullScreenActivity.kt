@@ -33,7 +33,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         ContextCompat.registerReceiver(
             this,
             callCancelledReceiver,
-            IntentFilter(VoiceFirebaseMessagingService.ACTION_CALL_CANCELLED),
+            IntentFilter(VoiceFirebaseMessagingService.ACTION_INCOMING_CALL_DISMISSED),
             ContextCompat.RECEIVER_NOT_EXPORTED,
         )
     }
@@ -135,6 +135,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private fun cancelNotification() {
         VoiceFirebaseMessagingService.cancelTimeout()
         VoiceFirebaseMessagingService.cancelVibration()
+        VoiceFirebaseMessagingService.clearPendingCall()
         getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 }

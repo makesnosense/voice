@@ -18,23 +18,44 @@ import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.tencent.mmkv.MMKV
+import org.json.JSONArray
+import org.json.JSONObject
 import org.voicepopuli.voice.R
 
 class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
+    data class PendingCallParams(
+        val callId: String,
+        val callerUserId: String,
+        val callerEmail: String,
+        val callerName: String?,
+        val sentAt: Long,
+    )
+
     companion object {
         const val CHANNEL_ID = "incoming_calls"
         const val NOTIFICATION_ID = 3333
-        const val ACTION_CALL_CANCELLED = "org.voicepopuli.voice.CALL_CANCELLED"
+        const val ACTION_INCOMING_CALL_DISMISSED = "org.voicepopuli.voice.INCOMING_CALL_DISMISSED"
         const val CALL_NOTIFICATION_TIMEOUT_MS = 60_000L
+
+        private const val DISMISSED_CALL_LOGS_MMKV_ID = "dismissed-call-logs"
+        private const val QUEUE_KEY = "queue"
+        private const val OUTCOME_CANCELLED = "cancelled"
+        private const val OUTCOME_NO_ANSWER = "no-answer"
 
         private var vibrator: Vibrator? = null
         private var appContext: Context? = null
+        var pendingCall: PendingCallParams? = null
 
         private val timeoutHandler = Handler(Looper.getMainLooper())
         private val timeoutRunnable = Runnable {
             cancelVibration()
-            appContext?.run { sendBroadcast(Intent(ACTION_CALL_CANCELLED).setPackage(packageName)) }
+            pendingCall?.let { params ->
+                enqueueDismissedCallLog(params, OUTCOME_NO_ANSWER)
+                pendingCall = null
+            }
+            appContext?.run { sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName)) }
         }
 
         fun cancelVibration() {
@@ -50,6 +71,32 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         fun cancelTimeout() {
             timeoutHandler.removeCallbacks(timeoutRunnable)
         }
+
+        fun clearPendingCall() {
+            pendingCall = null
+        }
+
+        fun enqueueDismissedCallLog(params: PendingCallParams, outcome: String) {
+            val mmkv = MMKV.mmkvWithID(DISMISSED_CALL_LOGS_MMKV_ID)
+            val existing = mmkv.decodeString(QUEUE_KEY) ?: "[]"
+            val queue =
+                try {
+                    JSONArray(existing)
+                } catch (_: Exception) {
+                    JSONArray()
+                }
+            queue.put(
+                JSONObject().apply {
+                    put("callId", params.callId)
+                    put("callerUserId", params.callerUserId)
+                    put("callerEmail", params.callerEmail)
+                    put("callerName", params.callerName ?: JSONObject.NULL)
+                    put("createdAt", params.sentAt)
+                    put("outcome", outcome)
+                }
+            )
+            mmkv.encode(QUEUE_KEY, queue.toString())
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -64,7 +111,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         acquireScreenWakeLock()
 
         val callerEmail = data["callerEmail"] ?: "unknown"
-        val callerName = data["callerName"]?.takeIf { it.isNotEmpty() } ?: callerEmail
+        val callerNameOrNull = data["callerName"]?.takeIf { it.isNotEmpty() }
+        val callerDisplayName = callerNameOrNull ?: callerEmail
         val callerUserId = data["callerUserId"] ?: return
         val callId = data["callId"] ?: return
         val roomId = data["roomId"] ?: return
@@ -74,28 +122,35 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val remainingNotificationLifeMs = CALL_NOTIFICATION_TIMEOUT_MS - notificationAgeMs
         if (remainingNotificationLifeMs <= 0) return // call already expired before delivery
 
+        pendingCall = PendingCallParams(callId, callerUserId, callerEmail, callerNameOrNull, sentAt)
+
         ensureNotificationChannel()
-        showIncomingCallNotification(callerName, callerUserId, callerEmail, roomId, callId)
-        startVibration()
         scheduleTimeout(this)
+        showIncomingCallNotification(
+            callerDisplayName,
+            callerUserId,
+            callerEmail,
+            roomId,
+            callId,
+        )
+        startVibration()
     }
 
     private fun handleCallCancelled() {
-        cancelTimeout()
         cancelVibration()
+        cancelTimeout()
+        pendingCall?.let { params ->
+            enqueueDismissedCallLog(params, OUTCOME_CANCELLED)
+            pendingCall = null
+        }
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
-        sendBroadcast(
-            Intent(ACTION_CALL_CANCELLED).setPackage(packageName)
-        ) // we need this to close fullscreen activity
+        sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
     }
 
     private fun ensureNotificationChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-
         val manager = getSystemService(NotificationManager::class.java)
-        // delete old soundless channel if it exists, recreate with correct sound
         manager.deleteNotificationChannel(CHANNEL_ID)
-
         val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         val audioAttributes =
             AudioAttributes.Builder()

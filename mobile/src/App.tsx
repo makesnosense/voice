@@ -22,6 +22,7 @@ import NoConnectionScreen from './screens/NoConnectionScreen';
 import type { RoomId } from '../../shared/types/core';
 import type { Contact } from '../../shared/types/contacts';
 import { api } from './api';
+import { useDismissedCallLogs } from './hooks/useDismissedCallLogsSync';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
@@ -97,6 +98,8 @@ export default function App() {
       activeRoomId: incomingCallParams.roomId as RoomId,
     });
   });
+
+  useDismissedCallLogs();
 
   useRoomLink(roomId => {
     useActiveRoomStore.setState({ activeRoomId: roomId });
