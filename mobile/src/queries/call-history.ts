@@ -17,9 +17,16 @@ export const callHistoryQueryOptions = queryOptions({
   staleTime: Infinity,
 });
 
-export function prependCallHistoryEntry(entry: CallHistoryEntry) {
+export function prependCallHistoryEntry(newEntry: CallHistoryEntry) {
   queryClient.setQueryData<CallHistoryEntry[]>(
     callHistoryQueryOptions.queryKey,
-    (current = []) => [entry, ...current].slice(0, HISTORY_CAP),
+    (current = []) => {
+      const alreadyPresent = current.some(
+        existing => existing.id === newEntry.id,
+      );
+      if (alreadyPresent) return current;
+
+      return [newEntry, ...current].slice(0, HISTORY_CAP);
+    },
   );
 }
