@@ -8,7 +8,7 @@ import { contactsQueryOptions } from './queries/contacts';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
 import { usePermissionsStore } from './stores/usePermissionsStore.android';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
-import { useIncomingCall } from './hooks/useIncomingCall';
+import { useAnsweredCallDeepLink } from './hooks/useAnsweredCallDeepLink';
 import { useRoomLink } from './hooks/useRoomLink';
 import { useServerConnectivity } from './hooks/useServerConnectivity';
 import { runNativePermissions } from './native/runNativePermissions';
@@ -68,34 +68,34 @@ export default function App() {
 
   useDeviceRegistration();
 
-  useIncomingCall(incomingCallParams => {
+  useAnsweredCallDeepLink(params => {
     const cachedContacts =
       queryClient.getQueryData<Contact[]>(contactsQueryOptions.queryKey) ?? [];
     const contactInStore = cachedContacts.find(
-      contact => contact.id === incomingCallParams.callerUserId,
+      contact => contact.id === params.callerUserId,
     );
 
     useAuthStore
       .getState()
       .getValidAccessToken()
-      .then(token => api.calls.markAnswered(incomingCallParams.callId, token))
+      .then(token => api.calls.markAnswered(params.callId, token))
       .catch(err =>
         console.error('❌ Failed to record answered outcome:', err),
       );
 
     prependCallHistoryEntry({
-      id: incomingCallParams.callId,
+      id: params.callId,
       createdAt: new Date().toISOString(),
       direction: CALL_DIRECTION.INCOMING,
       outcome: CALL_OUTCOME.ANSWERED,
-      contactId: incomingCallParams.callerUserId,
-      contactEmail: incomingCallParams.callerEmail,
-      contactName: incomingCallParams.callerName,
+      contactId: params.callerUserId,
+      contactEmail: params.callerEmail,
+      contactName: params.callerName,
       contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
     });
 
     useActiveRoomStore.setState({
-      activeRoomId: incomingCallParams.roomId as RoomId,
+      activeRoomId: params.roomId as RoomId,
     });
   });
 

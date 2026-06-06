@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Linking } from 'react-native';
 
-export interface IncomingCallParams {
+export interface AnsweredCallDeepLinkParams {
   roomId: string;
   callerUserId: string;
   callerEmail: string;
@@ -9,7 +9,7 @@ export interface IncomingCallParams {
   callId: string;
 }
 
-function extractCallParams(url: string): IncomingCallParams | null {
+function extractCallParams(url: string): AnsweredCallDeepLinkParams | null {
   const [, query] = url.split('?');
   if (!query) return null;
   const params = new URLSearchParams(query);
@@ -29,16 +29,16 @@ function extractCallParams(url: string): IncomingCallParams | null {
   };
 }
 
-export function useIncomingCall(
-  onCall: (incomingCallParams: IncomingCallParams) => void,
+export function useAnsweredCallDeepLink(
+  onAnswered: (params: AnsweredCallDeepLinkParams) => void,
 ) {
-  const onCallRef = useRef(onCall);
-  onCallRef.current = onCall;
+  const onAnsweredRef = useRef(onAnswered);
+  onAnsweredRef.current = onAnswered;
 
   useEffect(() => {
     const handleUrl = (url: string) => {
-      const incomingCallParams = extractCallParams(url);
-      if (incomingCallParams) onCallRef.current(incomingCallParams);
+      const params = extractCallParams(url);
+      if (params) onAnsweredRef.current(params);
     };
 
     Linking.getInitialURL().then(url => {
