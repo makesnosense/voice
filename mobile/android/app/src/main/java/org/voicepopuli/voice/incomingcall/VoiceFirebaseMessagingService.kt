@@ -3,6 +3,7 @@ package org.voicepopuli.voice.incomingcall
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
@@ -20,6 +21,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.tencent.mmkv.MMKV
 import org.json.JSONArray
 import org.json.JSONObject
+import org.voicepopuli.voice.MainActivity
 import org.voicepopuli.voice.R
 import org.voicepopuli.voice.dismissedcallevents.DismissedCallEventsModule
 
@@ -36,6 +38,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     companion object {
         const val CHANNEL_ID = "incoming_calls"
         const val NOTIFICATION_ID = 3333
+        const val MISSED_CALL_NOTIFICATION_ID = 3334
+        private const val MISSED_CALL_CHANNEL_ID = "missed_calls"
         const val ACTION_INCOMING_CALL_DISMISSED = "org.voicepopuli.voice.INCOMING_CALL_DISMISSED"
         const val CALL_NOTIFICATION_TIMEOUT_MS = 60_000L
 
@@ -48,11 +52,15 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private var vibrator: Vibrator? = null
         var pendingCall: PendingCallParams? = null
 
+        private var appContext: Context? = null
+
         private val timeoutHandler = Handler(Looper.getMainLooper())
         private val timeoutRunnable = Runnable {
             cancelVibration()
             pendingCall?.let { params ->
+                val callerDisplayName = params.callerName ?: params.callerEmail
                 enqueueDismissedCallLog(params, OUTCOME_NO_ANSWER)
+                appContext?.let { context -> showMissedCallNotification(context, callerDisplayName) }
                 pendingCall = null
             }
             DismissedCallEventsModule.emitDismissed()
@@ -106,6 +114,55 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             }
             DismissedCallEventsModule.emitDismissed()
         }
+
+        private fun showMissedCallNotification(context: Context, callerDisplayName: String) {
+            ensureMissedCallChannel(context)
+
+            val openAppIntent =
+                Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            val openAppPendingIntent =
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    openAppIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                )
+
+            val notification =
+                NotificationCompat.Builder(context, MISSED_CALL_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notification_call)
+                    .setContentTitle("Missed call")
+                    .setContentText(callerDisplayName)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(openAppPendingIntent)
+                    .setAutoCancel(true)
+                    .build()
+
+            context.getSystemService(NotificationManager::class.java).notify(MISSED_CALL_NOTIFICATION_ID, notification)
+        }
+
+        private fun ensureMissedCallChannel(context: Context) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+            val manager = context.getSystemService(NotificationManager::class.java)
+            if (manager.getNotificationChannel(MISSED_CALL_CHANNEL_ID) != null) return
+
+            val channel =
+                NotificationChannel(
+                        MISSED_CALL_CHANNEL_ID,
+                        "missed calls",
+                        // high importance = heads-up banner; sound/vibration suppressed below
+                        // since the device already rang for the incoming call
+                        NotificationManager.IMPORTANCE_HIGH,
+                    )
+                    .apply {
+                        description = "missed call alerts"
+                        enableVibration(false)
+                        setSound(null, null)
+                    }
+            manager.createNotificationChannel(channel)
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -117,6 +174,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun handleIncomingCall(data: Map<String, String>) {
+        // store application context so the companion-object timeoutRunnable can post a notification
+        appContext = applicationContext
         // acquire before anything else — wakes screen so full-screen intent fires reliably
         acquireScreenWakeLock()
 
@@ -150,7 +209,9 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         cancelVibration()
         cancelTimeout()
         pendingCall?.let { params ->
+            val callerDisplayName = params.callerName ?: params.callerEmail
             enqueueDismissedCallLog(params, OUTCOME_CANCELLED)
+            showMissedCallNotification(applicationContext, callerDisplayName)
             pendingCall = null
         }
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
@@ -174,7 +235,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                     CHANNEL_ID,
                     "incoming calls",
                     // high importance is required for heads-up + full-screen intent
-                    NotificationManager.IMPORTANCE_HIGH
+                    NotificationManager.IMPORTANCE_HIGH,
                 )
                 .apply {
                     description = "incoming voice call alerts"
@@ -217,7 +278,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 // has no modern equivalent — this is the only way to wake the screen
                 // from a non-activity context.
                 PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                "voice:incoming_call_wake"
+                "voice:incoming_call_wake",
             )
         // 30s is generous — the activity will take over screen management once shown
         wakeLock.acquire(30_000L)
@@ -246,7 +307,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 this,
                 0,
                 incomingCallFullscreenIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
 
         val notificationBarDeclineIntent =
@@ -254,13 +315,12 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra("roomId", roomId)
                 putExtra("callId", callId)
             }
-
         val notificationBarDeclinePendingIntent =
             PendingIntent.getBroadcast(
                 this,
                 1,
                 notificationBarDeclineIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
 
         val notificationBarAcceptIntent =
@@ -276,7 +336,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 this,
                 2,
                 notificationBarAcceptIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
 
         val notification =
