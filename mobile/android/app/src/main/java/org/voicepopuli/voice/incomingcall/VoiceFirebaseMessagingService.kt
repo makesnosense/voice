@@ -46,7 +46,6 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private const val OUTCOME_DECLINED = "declined"
 
         private var vibrator: Vibrator? = null
-        // private var appContext: Context? = null
         var pendingCall: PendingCallParams? = null
 
         private val timeoutHandler = Handler(Looper.getMainLooper())
@@ -155,6 +154,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             pendingCall = null
         }
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
+        sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
         DismissedCallEventsModule.emitDismissed()
     }
 
