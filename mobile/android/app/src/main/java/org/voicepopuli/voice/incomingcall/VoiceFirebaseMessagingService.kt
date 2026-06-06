@@ -3,7 +3,6 @@ package org.voicepopuli.voice.incomingcall
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
@@ -22,6 +21,7 @@ import com.tencent.mmkv.MMKV
 import org.json.JSONArray
 import org.json.JSONObject
 import org.voicepopuli.voice.R
+import org.voicepopuli.voice.dismissedcallevents.DismissedCallEventsModule
 
 class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -46,7 +46,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private const val OUTCOME_DECLINED = "declined"
 
         private var vibrator: Vibrator? = null
-        private var appContext: Context? = null
+        // private var appContext: Context? = null
         var pendingCall: PendingCallParams? = null
 
         private val timeoutHandler = Handler(Looper.getMainLooper())
@@ -56,7 +56,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 enqueueDismissedCallLog(params, OUTCOME_NO_ANSWER)
                 pendingCall = null
             }
-            appContext?.run { sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName)) }
+            DismissedCallEventsModule.emitDismissed()
         }
 
         fun cancelVibration() {
@@ -64,8 +64,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             vibrator = null
         }
 
-        fun scheduleTimeout(context: Context) {
-            appContext = context.applicationContext
+        fun scheduleTimeout() {
             timeoutHandler.postDelayed(timeoutRunnable, CALL_NOTIFICATION_TIMEOUT_MS)
         }
 
@@ -106,7 +105,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 enqueueDismissedCallLog(params, OUTCOME_DECLINED)
                 pendingCall = null
             }
-            appContext?.run { sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName)) }
+            DismissedCallEventsModule.emitDismissed()
         }
     }
 
@@ -137,7 +136,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         pendingCall = PendingCallParams(callId, callerUserId, callerEmail, callerNameOrNull, sentAt)
 
         ensureNotificationChannel()
-        scheduleTimeout(this)
+        scheduleTimeout()
         showIncomingCallNotification(
             callerDisplayName,
             callerUserId,
@@ -156,7 +155,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             pendingCall = null
         }
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
-        sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
+        DismissedCallEventsModule.emitDismissed()
     }
 
     private fun ensureNotificationChannel() {

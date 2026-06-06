@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { DeviceEventEmitter } from 'react-native';
 import { useAuthStore } from '../stores/useAuthStore';
 import { queryClient } from '../query-client';
 import { contactsQueryOptions } from '../queries/contacts';
 import { prependCallHistoryEntry } from '../queries/call-history';
 import { drainDismissedCallLogsQueue } from '../native/dismissed-call-logs-queue';
 import { CALL_DIRECTION } from '../../../shared/constants/calls';
+import NativeDismissedCallEvents from '../native/specs/NativeDismissedCallEvents';
 import type { Contact } from '../../../shared/types/contacts';
 
 function prependDismissedCallLogs() {
@@ -42,8 +42,7 @@ export function useDismissedCallLogs() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    const subscription = DeviceEventEmitter.addListener(
-      'IncomingCallDismissed',
+    const subscription = NativeDismissedCallEvents.onCallDismissed(
       prependDismissedCallLogs,
     );
     return () => subscription.remove();
