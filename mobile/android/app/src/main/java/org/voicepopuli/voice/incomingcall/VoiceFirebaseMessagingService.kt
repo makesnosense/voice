@@ -132,7 +132,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
             val notification =
                 NotificationCompat.Builder(context, MISSED_CALL_CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_notification_call)
+                    .setSmallIcon(R.drawable.ic_notification_missed_call)
                     .setContentTitle("Missed call")
                     .setContentText(callerDisplayName)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
