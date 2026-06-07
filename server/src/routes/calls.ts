@@ -59,8 +59,7 @@ export default function createCallsRouter(
         device.fcmToken ? [device.fcmToken] : []
       );
 
-      const roomId = createRoom(rooms);
-      const room = rooms.get(roomId)!;
+      const { roomId, room } = createRoom(rooms);
 
       const callsLogEntry = await createCallsLogEntry(caller.userId, targetUserId);
       await notifyDevicesOfCall(caller, fcmTokens, roomId, callsLogEntry.id);

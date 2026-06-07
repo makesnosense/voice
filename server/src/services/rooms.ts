@@ -1,7 +1,7 @@
 import { generateRoomId } from '../utils/generators';
 import type { Room, RoomId } from '../../../shared/types/core';
 
-export function createRoom(rooms: Map<RoomId, Room>): RoomId {
+export function createRoom(rooms: Map<RoomId, Room>): { roomId: RoomId; room: Room } {
   let roomId: RoomId;
   let attempts = 0;
   const MAX_ATTEMPTS = 100;
@@ -14,7 +14,8 @@ export function createRoom(rooms: Map<RoomId, Room>): RoomId {
     }
   } while (rooms.has(roomId));
 
-  rooms.set(roomId, { users: new Map(), invitedUser: null });
+  const room: Room = { users: new Map(), invitedUser: null };
+  rooms.set(roomId, room);
   console.log(`📱 created room: ${roomId}`);
-  return roomId;
+  return { roomId, room };
 }

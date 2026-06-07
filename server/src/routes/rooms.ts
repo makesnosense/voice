@@ -24,7 +24,7 @@ export default function createRoomsRouter(
   const router = Router();
 
   router.post('/', roomCreationLimiter, (req, res) => {
-    const roomId = createRoom(rooms);
+    const { roomId } = createRoom(rooms);
     res.json({ roomId });
   });
 
