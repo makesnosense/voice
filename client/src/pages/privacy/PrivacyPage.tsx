@@ -82,6 +82,21 @@ export default function PrivacyPage() {
         </section>
 
         <section className={styles.section}>
+          <h2 className={styles.heading}>Android app local logs</h2>
+          <p className={styles.paragraph}>
+            The Android app keeps a rolling diagnostic log on your device capturing application
+            events — call state transitions, WebRTC connection status, errors — which may
+            incidentally include room IDs or contact display names. The log is stored in the app's
+            private storage, never transmitted to any server, and capped at 1,000 entries.
+          </p>
+          <p className={styles.paragraph}>
+            The log can leave your device only if you share it using the{' '}
+            <strong>Share local log</strong> button in Settings → About. This way, you control
+            exactly where it goes.
+          </p>
+        </section>
+
+        <section className={styles.section}>
           <h2 className={styles.heading}>Third-party services</h2>
           <ul className={styles.list}>
             <li>
