@@ -11,7 +11,7 @@ body = """
 {% if group_commits %}\
 ### {{ group }}
 {% for commit in group_commits -%}
-{% if commit.scope %}`{{ commit.scope }}` – {% endif %}{{ commit.message | upper_first }}
+{% if commit.scope %}`{{ commit.scope }}` – {% endif %}{{ commit.message }}
 {% endfor %}
 {% endif %}\
 {% endfor %}\n
