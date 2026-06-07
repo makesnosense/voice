@@ -12,7 +12,7 @@
 <img src=".github/screenshot.png" alt="App screenshot" width=600px/>
 
 ## Download
-[![Android](https://img.shields.io/badge/Android-v0.9.6-green?logo=android)](https://github.com/makesnosense/voice/releases/tag/mobile-v0.9.6)
+[![Android](https://img.shields.io/github/v/release/makesnosense/voice?filter=mobile-v*&logo=android&label=Android&color=green)](https://github.com/makesnosense/voice/releases?q=android%20app)
 
 ## Self-hosting
 
