@@ -15,6 +15,7 @@ import {
 } from '../middleware/api-rate-limiters';
 import { findOrCreateUserForEmail, validateAndDeleteOtp } from '../services/auth';
 import config from '../config';
+import z from 'zod';
 
 const router = Router();
 
@@ -120,7 +121,9 @@ router.post('/refresh', refreshLimiter, requireRefreshToken, async (req, res) =>
 });
 
 router.delete('/sessions/current', requireRefreshToken, async (req, res) => {
-  const { jti, userId } = req.refreshPayload!;
+  if (!req.refreshPayload) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { jti, userId } = req.refreshPayload;
 
   try {
     await db.delete(refreshTokens).where(eq(refreshTokens.jti, jti));
@@ -133,8 +136,14 @@ router.delete('/sessions/current', requireRefreshToken, async (req, res) => {
 });
 
 router.delete('/sessions/:jti', requireRefreshToken, async (req, res) => {
-  const { jti } = req.params;
-  const { userId } = req.refreshPayload!;
+  if (!req.refreshPayload) return res.status(401).json({ error: 'Unauthorized' });
+  const { userId } = req.refreshPayload;
+
+  const jtiResult = z.uuid().safeParse(req.params.jti);
+  if (!jtiResult.success) {
+    return res.status(400).json({ error: 'Invalid session id' });
+  }
+  const jti = jtiResult.data;
 
   // verify that authorized user owns the jti
   const [existingToken] = await db

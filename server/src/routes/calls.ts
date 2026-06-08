@@ -95,10 +95,11 @@ export default function createCallsRouter(
   router.post('/:callId/mark-answered', requireAccessToken, async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { callId } = req.params;
-    if (!z.uuid().safeParse(callId).success) {
+    const callIdResult = z.uuid().safeParse(req.params.callId);
+    if (!callIdResult.success) {
       return res.status(400).json({ error: 'Invalid call id' });
     }
+    const callId = callIdResult.data;
 
     const updated = await markCallAnswered(callId, req.user.userId);
     if (!updated) return res.status(404).json({ error: 'Call not found or already resolved' });
@@ -109,10 +110,13 @@ export default function createCallsRouter(
   router.post('/:callId/mark-cancelled', requireAccessToken, async (req, res) => {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { callId } = req.params;
-    if (!z.uuid().safeParse(callId).success) {
+    const callIdResult = z.uuid().safeParse(req.params.callId);
+    if (!callIdResult.success) {
       return res.status(400).json({ error: 'Invalid call id' });
     }
+
+    const callId = callIdResult.data;
+
     const updated = await markCallCancelled(callId, req.user.userId);
     if (!updated) return res.status(404).json({ error: 'Call not found or already resolved' });
     res.status(204).end();
