@@ -52,6 +52,10 @@ const config = {
     privateKey: getRequiredEnv('FCM_PRIVATE_KEY'),
     clientEmail: getRequiredEnv('FCM_CLIENT_EMAIL'),
   },
+  playStoreReview: {
+    email: process.env.REVIEW_EMAIL,
+    otpCode: process.env.REVIEW_OTP_CODE,
+  },
 };
 
 export function getProtocol(server: Server | HttpsServer): string {
@@ -70,5 +74,8 @@ if (!config.isProduction && config.ssl) {
 }
 console.log(`   CORS Origins: ${config.corsOrigins.join(', ')}`);
 console.log(`   Rate Limiting: ${config.rateLimiting.enabled ? 'enabled' : 'disabled'}`);
+console.log(
+  `   Play Store review bypass: ${config.playStoreReview.email ? 'enabled' : 'disabled'}`
+);
 
 export default config;

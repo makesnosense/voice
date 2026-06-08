@@ -13,7 +13,8 @@ import {
   otpVerificationLimiter,
   refreshLimiter,
 } from '../middleware/api-rate-limiters';
-import { deleteOtpById, findOrCreateUserForEmail, findValidOtp } from '../services/auth';
+import { findOrCreateUserForEmail, validateAndDeleteOtp } from '../services/auth';
+import config from '../config';
 
 const router = Router();
 
@@ -24,6 +25,15 @@ router.post('/request-otp', otpRequestLimiter, async (req, res) => {
   }
 
   const { email } = result.data;
+
+  const isReviewAccount =
+    config.playStoreReview.email &&
+    config.playStoreReview.otpCode &&
+    email === config.playStoreReview.email;
+
+  if (isReviewAccount) {
+    return res.json({ success: true });
+  }
 
   const code = generateOtpCode();
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
@@ -42,13 +52,19 @@ router.post('/verify-otp', otpVerificationLimiter, async (req, res) => {
 
   const { email, code } = result.data;
 
-  const otpRecord = await findValidOtp(email, code);
-  if (!otpRecord) {
+  const isReviewBypass =
+    config.playStoreReview.email &&
+    config.playStoreReview.otpCode &&
+    email === config.playStoreReview.email &&
+    code === config.playStoreReview.otpCode;
+
+  const otpValidated = await validateAndDeleteOtp(email, code);
+
+  const otpIsValid = otpValidated || isReviewBypass;
+
+  if (!otpIsValid) {
     return res.status(401).json({ error: 'Invalid or expired code' });
   }
-
-  // delete used OTP
-  await deleteOtpById(otpRecord.id);
 
   const user = await findOrCreateUserForEmail(email);
 

@@ -25,3 +25,10 @@ export async function findOrCreateUserForEmail(email: string) {
   const [newUser] = await db.insert(users).values({ email }).returning();
   return newUser;
 }
+
+export async function validateAndDeleteOtp(email: string, code: string): Promise<boolean> {
+  const otpRecord = await findValidOtp(email, code);
+  if (!otpRecord) return false;
+  await deleteOtpById(otpRecord.id);
+  return true;
+}
