@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { users, otpCodes, refreshTokens } from '../db/schema';
-import { eq, and, gt, ne } from 'drizzle-orm';
+import { eq, and, ne } from 'drizzle-orm';
 import { generateOtpCode, sendOtpEmail } from '../utils/otp';
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
-import { requestOtpSchema, verifyOtpSchema, refreshSchema } from '../schemas/auth';
+import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
+import { requestOtpSchema, verifyOtpSchema } from '../schemas/auth';
 import { OTP_EXPIRY_MS } from '../utils/otp';
 import { OtpVerificationResponse } from '../../../shared/types/auth';
 import { requireRefreshToken } from '../middleware/auth';
@@ -13,6 +13,7 @@ import {
   otpVerificationLimiter,
   refreshLimiter,
 } from '../middleware/api-rate-limiters';
+import { deleteOtpById, findOrCreateUserForEmail, findValidOtp } from '../services/auth';
 
 const router = Router();
 
@@ -41,28 +42,15 @@ router.post('/verify-otp', otpVerificationLimiter, async (req, res) => {
 
   const { email, code } = result.data;
 
-  // find valid OTP
-  const [otpRecord] = await db
-    .select()
-    .from(otpCodes)
-    .where(
-      and(eq(otpCodes.email, email), eq(otpCodes.code, code), gt(otpCodes.expiresAt, new Date()))
-    )
-    .limit(1);
-
+  const otpRecord = await findValidOtp(email, code);
   if (!otpRecord) {
     return res.status(401).json({ error: 'Invalid or expired code' });
   }
 
   // delete used OTP
-  await db.delete(otpCodes).where(eq(otpCodes.id, otpRecord.id));
+  await deleteOtpById(otpRecord.id);
 
-  // find or create user
-  let [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-
-  if (!user) {
-    [user] = await db.insert(users).values({ email }).returning();
-  }
+  const user = await findOrCreateUserForEmail(email);
 
   // generate tokens
   const accessToken = generateAccessToken({
