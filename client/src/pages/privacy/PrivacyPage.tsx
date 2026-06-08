@@ -137,6 +137,16 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section id="delete-account" className={styles.section}>
+          <h2 className={styles.heading}>How to delete your account</h2>
+          <p className={styles.paragraph}>
+            To delete your account, open the Voice app and go to{' '}
+            <strong>Settings → Profile → Delete account</strong>. On the web, go to{' '}
+            <strong>Settings → General → Delete account</strong>. This permanently and irreversibly
+            deletes your account and all associated data from Voice's server.
+          </p>
+        </section>
+
         <section className={styles.section}>
           <h2 className={styles.heading}>Contact</h2>
           <p className={styles.paragraph}>
