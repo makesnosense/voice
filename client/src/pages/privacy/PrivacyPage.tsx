@@ -70,6 +70,10 @@ export default function PrivacyPage() {
               <strong>IP addresses</strong> — processed transiently for rate limiting and call
               routing. Not stored.
             </li>
+            <li>
+              <strong>In-room messages</strong> — relayed through Voice's server in real time. Never
+              stored.
+            </li>
           </ul>
         </section>
 
