@@ -12,6 +12,8 @@
     "android:release": "cd android && ./gradlew assembleRelease",
     "android:release:install": "adb install $(ls android/app/build/outputs/apk/release/*.apk)",
     "android:release:run": "npm run android:release && npm run android:release:install",
+    "android:bundle": "cd android && ./gradlew bundleRelease",
+    "android:bundle:path": "echo android/app/build/outputs/bundle/release/voice-$(node -p \"require('./package.json').version\")-release.aab",
     "version:patch": "npm version patch --no-git-tag-version",
     "changelog:mobile": "git cliff --latest --include-path 'mobile/*' 'shared/*'"
   },
