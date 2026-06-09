@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  Pressable,
+  Keyboard,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import InCallManager from 'react-native-incall-manager';
 import { revokeLockScreenBypass } from '../../native/lock-screen-bypass';
@@ -81,7 +87,9 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
   }, []);
 
   return (
-    <View
+    <Pressable
+      onPress={Keyboard.dismiss}
+      accessible={false}
       style={[
         styles.screen,
         { paddingTop: insets.top, paddingBottom: insets.bottom + 12 },
@@ -96,7 +104,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
       </View>
 
       <SelfCard onLeave={onLeave} isLoading={isLoading} />
-    </View>
+    </Pressable>
   );
 }
 
