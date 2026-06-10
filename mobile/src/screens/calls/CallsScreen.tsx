@@ -74,9 +74,9 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingTop: 8,
+    gap: 4,
   },
   createRoomButton: {
     marginHorizontal: 16,
-    marginBottom: 8,
   },
 });
