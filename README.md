@@ -16,6 +16,10 @@
 
 ## Self-hosting
 
+### ⚠️ Self-Hosting Availability
+
+Self-hosting is only available in the v1.0-selfhost release tag. Current ongoing releases (main branch) do not yet support self-hosting.
+
 ### Prerequisites
 
 - **Server**: Linux VPS with 1 GB RAM or more
