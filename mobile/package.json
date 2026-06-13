@@ -77,5 +77,10 @@
     "android": {
       "javaPackageName": "org.voicepopuli.voice"
     }
+  },
+  "allowScripts": {
+    "@firebase/util@1.13.0": true,
+    "protobufjs@7.6.1": true,
+    "sharp@0.34.5": true
   }
 }

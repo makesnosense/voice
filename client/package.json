@@ -32,5 +32,9 @@
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "allowScripts": {
+    "esbuild@0.27.2": true,
+    "@swc/core@1.13.5": true
+  }
 }
