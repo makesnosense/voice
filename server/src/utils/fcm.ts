@@ -3,14 +3,8 @@ import { getMessaging } from 'firebase-admin/messaging';
 import config from '../config';
 import type { CallNotificationPayload } from '../../../shared/types/calls';
 
-const { FCM_PROJECT_ID, FCM_PRIVATE_KEY, FCM_CLIENT_EMAIL } = process.env;
-
-if (!FCM_PROJECT_ID || !FCM_PRIVATE_KEY || !FCM_CLIENT_EMAIL) {
-  throw new Error('missing FCM environment variables');
-}
-
 // guard against hot-reload double init
-if (!getApps().length) {
+if (config.fcm.enabled && !getApps().length) {
   initializeApp({
     credential: cert({
       projectId: config.fcm.projectId,
@@ -24,6 +18,7 @@ export async function sendCallNotification(
   fcmToken: string,
   payload: CallNotificationPayload
 ): Promise<void> {
+  if (!config.fcm.enabled) return;
   await getMessaging().send({
     token: fcmToken,
     data: {
@@ -44,6 +39,7 @@ export async function sendCallNotification(
 }
 
 export async function sendCallCancelledNotification(fcmToken: string): Promise<void> {
+  if (!config.fcm.enabled) return;
   await getMessaging().send({
     token: fcmToken,
     data: { type: 'call_cancelled' },
@@ -52,6 +48,7 @@ export async function sendCallCancelledNotification(fcmToken: string): Promise<v
 }
 
 export async function sendCallDeclinedNotification(fcmToken: string): Promise<void> {
+  if (!config.fcm.enabled) return;
   await getMessaging().send({
     token: fcmToken,
     data: { type: 'call_declined' },

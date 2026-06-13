@@ -1,6 +1,22 @@
 import type { Server } from 'http';
 import type { Server as HttpsServer } from 'https';
 
+type FcmConfig =
+  | { enabled: true; projectId: string; privateKey: string; clientEmail: string }
+  | { enabled: false; projectId: undefined; privateKey: undefined; clientEmail: undefined };
+
+const { FCM_PROJECT_ID, FCM_PRIVATE_KEY, FCM_CLIENT_EMAIL } = process.env;
+
+const fcmConfig: FcmConfig =
+  FCM_PROJECT_ID && FCM_PRIVATE_KEY && FCM_CLIENT_EMAIL
+    ? {
+        enabled: true,
+        projectId: FCM_PROJECT_ID,
+        privateKey: FCM_PRIVATE_KEY,
+        clientEmail: FCM_CLIENT_EMAIL,
+      }
+    : { enabled: false, projectId: undefined, privateKey: undefined, clientEmail: undefined };
+
 const getRequiredEnv = (key: string): string => {
   const value = process.env[key];
   if (!value) {
@@ -47,11 +63,7 @@ const config = {
     enabled: rateLimitingEnabled,
     trustProxy: isProduction, // trust proxy headers in production
   },
-  fcm: {
-    projectId: getRequiredEnv('FCM_PROJECT_ID'),
-    privateKey: getRequiredEnv('FCM_PRIVATE_KEY'),
-    clientEmail: getRequiredEnv('FCM_CLIENT_EMAIL'),
-  },
+  fcm: fcmConfig,
   playStoreReview: {
     email: process.env.REVIEW_EMAIL,
     otpCode: process.env.REVIEW_OTP_CODE,
@@ -74,6 +86,7 @@ if (!config.isProduction && config.ssl) {
 }
 console.log(`   CORS Origins: ${config.corsOrigins.join(', ')}`);
 console.log(`   Rate Limiting: ${config.rateLimiting.enabled ? 'enabled' : 'disabled'}`);
+console.log(`   Push notifications: ${config.fcm.enabled ? 'enabled' : 'disabled'}`);
 console.log(
   `   Play Store review bypass: ${config.playStoreReview.email ? 'enabled' : 'disabled'}`
 );
