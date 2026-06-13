@@ -16,9 +16,7 @@
 
 ## Self-hosting
 
-### ⚠️ Self-Hosting Availability
-
-Self-hosting is only available in the v1.0-selfhost release tag. Current ongoing releases (main branch) do not yet support self-hosting.
+For a simple, dependency-free self-hosted version, see the [v1.0-selfhost](https://github.com/makesnosense/voice/releases/tag/v1.0-selfhost) release.
 
 ### Prerequisites
 
