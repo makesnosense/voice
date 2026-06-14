@@ -12,128 +12,128 @@
 <img src=".github/screenshot.png" alt="App screenshot" width=600px/>
 
 ## Download
+
 [![Android](https://img.shields.io/github/v/release/makesnosense/voice?filter=mobile-v*&logo=android&label=Android&color=green)](https://github.com/makesnosense/voice/releases?q=android%20app)
 
 ## Self-hosting
 
 For a simple, dependency-free self-hosted version, see the [v1.0-selfhost](https://github.com/makesnosense/voice/releases/tag/v1.0-selfhost) release.
 
-### Prerequisites
+## Development
 
-- **Server**: Linux VPS with 1 GB RAM or more
-- **Domain**: Any domain pointing to your server's IP (free options: [FreeDNS](https://freedns.afraid.org), [DuckDNS](https://www.duckdns.org))
-- **Docker**
-- **Open Ports**: 80 (HTTP), 443 (HTTPS), 3478 (TURN server), 49152-49172 (TURN server UDP range)
+Depending on the development scope, there are four tiers of requirements:
 
-### Installation
+| Tier | Scope                        | Added requirement          |
+| ---- | ---------------------------- | -------------------------- |
+| 1    | Web UI, non-call features    |                            |
+| 2    | Web calls                    | Local coturn               |
+| 3    | Mobile UI, non-call features | Firebase project           |
+| 4    | Mobile calls                 | Publicly accessible coturn |
 
-#### 1. Clone the repository
+Each tier is a superset of the previous.
+
+### Base setup (all tiers)
+
+**1. Install dependencies**
 
 ```bash
-git clone --branch v1.0-selfhost --depth 1 https://github.com/makesnosense/voice.git
+cd shared && npm install
+cd server && bun install
+cd client && npm install
+```
+
+**2. Set up SSL certs**
+
+```bash
+sudo mkcert -install
+sudo ./scripts/issue-server-dev-certs.sh
+```
+
+**3. Set up dev database**
+
+```bash
+./scripts/spin-up-dev-postgres.sh
+```
+
+**4. Configure environment**
+
+Copy `.env.development.example` to `.env.development` and fill in the values.
+
+**5. Run server and web client**
+
+```bash
+cd server && bun run dev
+cd client && npm run dev
+```
+
+### Tier 2: Local web calls
+
+Local coturn instance is needed.
+
+Set in `.env.development`:
+
+```
+COTURN_SECRET=any-string
+VITE_TURN_SERVER_HOST=localhost
+VITE_TURN_SERVER_PORT=3478
+```
+
+Spin up local coturn instance:
+
+```bash
+cd coturn
+docker build -t voice-coturn-dev .
+docker run -d \
+ --name voice-coturn-dev \
+ --env-file ../.env.development \
+ --network host \
+ --restart unless-stopped \
+ voice-coturn-dev
+```
+
+### Tier 3: Mobile
+
+**1. Set up your own Firebase project and download `google-services.json` to `mobile/android/app/`**
+
+**2. Run `sudo ./scripts/issue-mobile-dev-cert.sh`**
+
+**3. Create `mobile/android/local.properties` with `sdk.dir=/path/to/Android/Sdk`**
+
+```bash
+cd mobile && npm install
+npm run android
+```
+
+### Tier 4: Mobile calls
+
+Requires a publicly reachable TURN server. On a Linux VPS with a public IP:
+
+**1. Clone the repo**
+
+```bash
+git clone https://github.com/makesnosense/voice.git
 cd voice
 ```
 
-This downloads the stable self-hosted version (`v1.0-selfhost`) without full git history.
-
-#### 2. Set up environment
+**2. Create `.env` in the root**
 
 ```bash
-cp .env.selfhost.example .env
-nano .env  # or use vim, micro, etc.
+COTURN_SECRET=your-secret
+VITE_TURN_SERVER_HOST=your-vps-ip-or-domain
+VITE_TURN_SERVER_PORT=3478
 ```
 
-Edit the following in `.env`:
+**3. Build and run coturn**
 
 ```bash
-DOMAIN=your-domain.com        # your actual domain
-EMAIL=your-email@example.com  # for Let's Encrypt notifications
-COTURN_SECRET=                # generate with: openssl rand -base64 32
+cd coturn
+docker build -t voice-coturn .
+docker run -d \
+  --name voice-coturn \
+  --env-file ../.env \
+  --network host \
+  --restart unless-stopped \
+  voice-coturn
 ```
 
-To generate a strong secret:
-
-```bash
-openssl rand -base64 32
-```
-
-#### 3. Choose setup method
-
-##### Option A: Quick Setup
-
-If you don't mind using a setup script, this is the fastest way. (setup.sh is just two `docker run` commands)
-
-```bash
-bash setup.sh
-docker compose up -d
-```
-
-That's it! ✨
-
-Your voice chat is now running at `https://your-domain.com`
-
-##### Option B: Manual Setup
-
-###### 1. Get SSL certificate
-
-Load environment variables and get certificate:
-
-```bash
-source .env
-
-docker run --rm -p 80:80 \
-  -v voice_certbot-conf:/etc/letsencrypt \
-  certbot/certbot certonly --standalone \
-  --email ${EMAIL} \
-  --agree-tos --no-eff-email --non-interactive \
-  -d ${DOMAIN}
-```
-
-You should see: `Successfully received certificate`
-
-###### 2. Build frontend
-
-```bash
-source .env
-docker run --rm \
-  -v ./client:/app/client \
-  -v ./shared:/app/shared \
-  -v voice_client-dist:/app/dist \
-  -e VITE_TURN_SERVER_HOST=${DOMAIN} \
-  -e VITE_TURN_SERVER_PORT=${VITE_TURN_SERVER_PORT} \
-  -w /app/client \
-  node:alpine \
-  sh -c "npm ci && npm run build && cp -r dist/* /app/dist/"
-```
-
-This takes 1-2 minutes. You should see: `✓ built in XXs`
-
-###### 3. Start services
-
-```bash
-docker compose up -d
-```
-
-## Mobile Development
-
-### Setup
-
-1. Install dependencies: `cd mobile && npm install`
-2. Download `google-services.json` from Firebase Console
-3. Place in `mobile/android/app/google-services.json`
-
-### Running
-
-```bash
-cd mobile
-npm start          # Start Metro bundler
-npm run android    # Run on Android device
-```
-
-### Building
-
-```bash
-cd mobile/android
-./gradlew assembleDebug    # Debug APK
-./gradlew assembleRelease  # Release APK (requires signing)
-```
+**4. In your local .env.development, set `COTURN_SECRET`, `VITE_TURN_SERVER_HOST`, and `VITE_TURN_SERVER_PORT` to the same values as in step 2.**
