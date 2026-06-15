@@ -10,6 +10,7 @@ import InviteModal from './invite-modal/InviteModal';
 import { UserPlus } from 'lucide-react-native';
 import type { InvitedContact } from '../../../../../../../shared/types/contacts';
 import type { RoomId } from '../../../../../../../shared/types/core';
+import { useRoomStore } from '../../../../../../../shared/stores/useRoomStore';
 
 interface InviteCardProps {
   roomId: RoomId;
@@ -19,10 +20,16 @@ interface InviteCardProps {
 export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const chatExpanded = useRoomStore(state => state.messages.length > 0);
+
   return (
     <>
       <Pressable
-        style={({ pressed }) => [styles.card, pressed && pressedStyle]}
+        style={({ pressed }) => [
+          styles.card,
+          chatExpanded && styles.cardWithChatExpanded,
+          pressed && pressedStyle,
+        ]}
         onPress={() => setIsModalOpen(true)}
       >
         <UserPlus size={34} color={NEUTRAL_COLOR} />
@@ -44,13 +51,16 @@ export default function InviteCard({ roomId, onUserInvited }: InviteCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    flexGrow: 1,
+    height: 120,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: BORDER_MUTED,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  cardWithChatExpanded: {
+    height: 80,
   },
   label: {
     fontSize: 12,
