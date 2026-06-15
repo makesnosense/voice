@@ -34,7 +34,7 @@ Each tier is a superset of the previous.
 
 ### Base setup (all tiers)
 
-**1. Install dependencies**
+1\. Install dependencies
 
 ```bash
 cd shared && npm install
@@ -42,24 +42,24 @@ cd server && bun install
 cd client && npm install
 ```
 
-**2. Set up SSL certs**
+2\. Set up SSL certs
 
 ```bash
 sudo mkcert -install
 sudo ./scripts/issue-server-dev-certs.sh
 ```
 
-**3. Set up dev database**
+3\. Set up dev database
 
 ```bash
 ./scripts/spin-up-dev-postgres.sh
 ```
 
-**4. Configure environment**
+4\. Configure environment
 
 Copy `.env.development.example` to `.env.development` and fill in the values.
 
-**5. Run server and web client**
+5\. Run server and web client
 
 ```bash
 cd server && bun run dev
@@ -93,11 +93,11 @@ docker run -d \
 
 ### Tier 3: Mobile
 
-**1. Set up your own Firebase project and download `google-services.json` to `mobile/android/app/`**
+1\. Set up your own Firebase project and download `google-services.json` to `mobile/android/app/`
 
-**2. Run `sudo ./scripts/issue-mobile-dev-cert.sh`**
+2\. Run `sudo ./scripts/issue-mobile-dev-cert.sh`
 
-**3. Create `mobile/android/local.properties` with `sdk.dir=/path/to/Android/Sdk`**
+3\. Create `mobile/android/local.properties` with `sdk.dir=/path/to/Android/Sdk`
 
 ```bash
 cd mobile && npm install
@@ -108,14 +108,14 @@ npm run android
 
 Requires a publicly reachable TURN server. On a Linux VPS with a public IP:
 
-**1. Clone the repo**
+1\. Clone the repo
 
 ```bash
 git clone https://github.com/makesnosense/voice.git
 cd voice
 ```
 
-**2. Create `.env` in the root**
+2\. Create `.env` in the root
 
 ```bash
 COTURN_SECRET=your-secret
@@ -123,7 +123,7 @@ VITE_TURN_SERVER_HOST=your-vps-ip-or-domain
 VITE_TURN_SERVER_PORT=3478
 ```
 
-**3. Build and run coturn**
+3\. Build and run coturn
 
 ```bash
 cd coturn
@@ -136,4 +136,4 @@ docker run -d \
   voice-coturn
 ```
 
-**4. In your local .env.development, set `COTURN_SECRET`, `VITE_TURN_SERVER_HOST`, and `VITE_TURN_SERVER_PORT` to the same values as in step 2.**
+4\. In your local .env.development, set `COTURN_SECRET`, `VITE_TURN_SERVER_HOST`, and `VITE_TURN_SERVER_PORT` to the same values as in step 2.
