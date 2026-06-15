@@ -118,10 +118,17 @@ export default function App() {
     );
   if (activeRoomId)
     return (
-      <RoomScreen
-        roomId={activeRoomId}
-        onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
-      />
+      <>
+        <StatusBar
+          translucent
+          backgroundColor="transparent"
+          barStyle="dark-content"
+        />
+        <RoomScreen
+          roomId={activeRoomId}
+          onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
+        />
+      </>
     );
 
   if (!isAuthenticated) return <AuthScreen />;

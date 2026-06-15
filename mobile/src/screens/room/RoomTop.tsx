@@ -46,8 +46,7 @@ export default function RoomTop({ roomId }: RoomTopProps) {
     <KeyboardAvoidingView
       behavior="padding"
       enabled={hasMessages}
-      keyboardVerticalOffset={insets.top + 8}
-      style={styles.container}
+      style={[styles.container, { paddingTop: insets.top + 8 }]}
     >
       {!hasMessages && <View style={styles.filler} />}
       <Animated.View

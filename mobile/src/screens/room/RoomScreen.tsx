@@ -92,7 +92,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
       accessible={false}
       style={[
         styles.screen,
-        { paddingTop: insets.top, paddingBottom: insets.bottom + 12 },
+        { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 },
       ]}
     >
       <View style={styles.roomTop}>
