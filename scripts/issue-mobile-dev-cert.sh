@@ -8,6 +8,7 @@ DEV_CERT_PATH="$PROJECT_ROOT/mobile/android/app/src/main/res/raw/dev_cert.crt"
 
 MKCERT_CA_ROOT="$(mkcert -CAROOT)"
 
+mkdir -p "$(dirname "$DEV_CERT_PATH")"
 cp "$MKCERT_CA_ROOT/rootCA.pem" "$DEV_CERT_PATH"
 
 
