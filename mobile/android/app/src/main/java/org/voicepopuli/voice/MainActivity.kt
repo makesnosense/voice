@@ -44,8 +44,7 @@ class MainActivity : ReactActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
-        applyLockScreenFlagsIfCallIntent(intent)
-        cancelCallNotificationIfNeeded(intent)
+        handleCallIntent(intent)
     }
 
     override fun onResume() {
@@ -63,28 +62,16 @@ class MainActivity : ReactActivity() {
         // super.onNewIntent fires RN's LinkingModule listener, which emits the url event to JS
         // setIntent ensures getInitialURL returns the latest intent if JS queries it after resume
         super.onNewIntent(intent)
-        applyLockScreenFlagsIfCallIntent(intent)
         setIntent(intent)
-        cancelCallNotificationIfNeeded(intent)
+        handleCallIntent(intent)
     }
 
-    private fun cancelCallNotificationIfNeeded(intent: Intent) {
-        val data = intent.data
-        val isCallIntent = intent.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data.host == "call"
-        if (!isCallIntent) return
-
-        getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
-        VoiceFirebaseMessagingService.cancelVibration()
-        VoiceFirebaseMessagingService.cancelTimeout()
-        VoiceFirebaseMessagingService.clearPendingCall()
-        sendBroadcast(Intent(VoiceFirebaseMessagingService.ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
-    }
-
-    private fun applyLockScreenFlagsIfCallIntent(intent: Intent?) {
+    private fun handleCallIntent(intent: Intent?) {
         val data = intent?.data
-        val isCallIntent = data?.scheme == "voice" && data.host == "call"
+        val isCallIntent = intent?.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data?.host == "call"
         if (!isCallIntent) return
 
+        // show over lock screen when accepting a call
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
@@ -96,5 +83,12 @@ class MainActivity : ReactActivity() {
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             )
         }
+
+        // clean up incoming call state
+        getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+        VoiceFirebaseMessagingService.cancelVibration()
+        VoiceFirebaseMessagingService.cancelTimeout()
+        VoiceFirebaseMessagingService.clearPendingCall()
+        sendBroadcast(Intent(VoiceFirebaseMessagingService.ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
     }
 }
