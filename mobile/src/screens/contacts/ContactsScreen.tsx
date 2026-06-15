@@ -98,29 +98,31 @@ function ContactsScreen() {
         <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
       )}
 
-      {!isPending && contacts.length === 0 && (
-        <Text style={styles.empty}>No contacts yet</Text>
-      )}
-
       <ScrollView
         contentContainerStyle={[styles.list, listPadding]}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
         }
       >
-        {sortedContacts.map((contact, index) => (
-          <View key={contact.id}>
-            {index > 0 && <ContactSeparator />}
-            <ContactRow
-              contact={contact}
-              onRemove={
-                isRemoveModeActive
-                  ? () => removeContactMutation.mutateAsync(contact.id)
-                  : undefined
-              }
-            />
+        {contacts.length === 0 && !isPending ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.empty}>No contacts yet</Text>
           </View>
-        ))}
+        ) : (
+          sortedContacts.map((contact, index) => (
+            <View key={contact.id}>
+              {index > 0 && <ContactSeparator />}
+              <ContactRow
+                contact={contact}
+                onRemove={
+                  isRemoveModeActive
+                    ? () => removeContactMutation.mutateAsync(contact.id)
+                    : undefined
+                }
+              />
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -136,9 +138,12 @@ const styles = StyleSheet.create({
   loader: {
     marginTop: 48,
   },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   empty: {
-    textAlign: 'center',
-    marginTop: 80,
     color: TEXT_MUTED,
     fontSize: 15,
   },
