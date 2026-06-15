@@ -70,9 +70,14 @@ class MainActivity : ReactActivity() {
 
     private fun cancelCallNotificationIfNeeded(intent: Intent) {
         val data = intent.data
-        if (intent.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data.host == "call") {
-            getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
-        }
+        val isCallIntent = intent.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data.host == "call"
+        if (!isCallIntent) return
+
+        getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
+        VoiceFirebaseMessagingService.cancelVibration()
+        VoiceFirebaseMessagingService.cancelTimeout()
+        VoiceFirebaseMessagingService.clearPendingCall()
+        sendBroadcast(Intent(VoiceFirebaseMessagingService.ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
     }
 
     private fun applyLockScreenFlagsIfCallIntent(intent: Intent?) {

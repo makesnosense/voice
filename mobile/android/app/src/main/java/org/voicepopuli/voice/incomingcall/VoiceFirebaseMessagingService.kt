@@ -324,15 +324,13 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             )
 
         val notificationBarAcceptIntent =
-            Intent(this, AcceptCallReceiver::class.java).apply {
-                putExtra("roomId", roomId)
-                putExtra("callerUserId", callerUserId)
-                putExtra("callerEmail", callerEmail)
-                putExtra("callerName", callerName)
-                putExtra("callId", callId)
+            Intent(Intent.ACTION_VIEW, buildCallUri(roomId, callerUserId, callerEmail, callerName, callId)).apply {
+                setClass(this@VoiceFirebaseMessagingService, MainActivity::class.java)
+                flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_ANIMATION
             }
         val notificationBarAcceptPendingIntent =
-            PendingIntent.getBroadcast(
+            PendingIntent.getActivity(
                 this,
                 2,
                 notificationBarAcceptIntent,

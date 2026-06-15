@@ -87,9 +87,6 @@
       android:exported="false" />
 
     <receiver
-      android:name=".incomingcall.AcceptCallReceiver"
-      android:exported="false" />
-    <receiver
       android:name=".incomingcall.DeclineCallReceiver"
       android:exported="false" />
   </application>
