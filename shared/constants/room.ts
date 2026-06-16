@@ -8,3 +8,5 @@ export const ROOM_CONNECTION_STATUS = {
 } as const;
 
 export type RoomConnectionStatus = ObjectValues<typeof ROOM_CONNECTION_STATUS>;
+
+export const MAX_ROOM_MESSAGES = 200;

@@ -14,7 +14,7 @@ export function createRoom(rooms: Map<RoomId, Room>): { roomId: RoomId; room: Ro
     }
   } while (rooms.has(roomId));
 
-  const room: Room = { users: new Map(), invitedUser: null };
+  const room: Room = { users: new Map(), invitedUser: null, messages: [] };
   rooms.set(roomId, room);
   console.log(`📱 created room: ${roomId}`);
   return { roomId, room };

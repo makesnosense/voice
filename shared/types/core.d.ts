@@ -44,6 +44,7 @@ export interface InvitedUserServerState extends InvitedUserClientState {
 export interface Room {
   users: Map<SocketId, UserDataServerSide>;
   invitedUser: InvitedUserServerState | null;
+  messages: Message[];
 }
 
 export interface Message {
@@ -67,6 +68,7 @@ export interface ServerToClientEvents {
   'room-join-success': (data: {
     roomId: RoomId;
     invitedUser: InvitedUserClientState | null;
+    messages: Message[];
   }) => void;
   'room-full': (error: string) => void;
   message: (message: Message) => void;

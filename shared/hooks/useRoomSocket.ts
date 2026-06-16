@@ -37,10 +37,10 @@ export function useRoomSocket(
       });
     });
 
-    socket.on('room-join-success', ({ roomId: joinedId, invitedUser }) => {
+    socket.on('room-join-success', ({ roomId: joinedId, invitedUser, messages }) => {
       console.log('✅ Successfully joined room:', joinedId);
       useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.JOINED);
-      useRoomStore.setState({ invitedUser });
+      useRoomStore.setState({ invitedUser, messages });
       onJoinSuccess?.(joinedId);
     });
 

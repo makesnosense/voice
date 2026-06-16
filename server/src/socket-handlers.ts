@@ -17,6 +17,7 @@ import type {
 } from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 import { sendCallCancelledNotification } from './utils/fcm';
+import { MAX_ROOM_MESSAGES } from '../../shared/constants/room';
 
 export default function createConnectionHandler(
   io: TypedServer,
@@ -232,7 +233,11 @@ const handleRoomJoin = (
 
   const usersForClient = getUsersForClient(room);
   io.to(roomId).emit('room-users-update', usersForClient);
-  socket.emit('room-join-success', { roomId, invitedUser: getInvitedUserForClient(room) });
+  socket.emit('room-join-success', {
+    roomId,
+    invitedUser: getInvitedUserForClient(room),
+    messages: room.messages,
+  });
 };
 
 const handleNewMessage = (
@@ -262,6 +267,11 @@ const handleNewMessage = (
     socketId: socket.id as SocketId,
     timestamp: Date.now(),
   };
+
+  room.messages.push(message);
+  if (room.messages.length > MAX_ROOM_MESSAGES) {
+    room.messages.shift();
+  }
 
   io.to(socket.roomId).emit('message', message);
 };
