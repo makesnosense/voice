@@ -94,16 +94,20 @@ function ContactsScreen() {
         }
       />
 
-      {isPending && (
-        <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
-      )}
-
       <ScrollView
         contentContainerStyle={[styles.list, listPadding]}
         refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            progressViewOffset={listPadding.paddingTop}
+          />
         }
       >
+        {isPending && (
+          <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />
+        )}
+
         {contacts.length === 0 && !isPending ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.empty}>No contacts yet</Text>
