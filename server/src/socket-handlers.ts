@@ -36,22 +36,29 @@ export default function createConnectionHandler(
 
     socket.on('join-room', (roomId: RoomId) => {
       if (!checkRateLimit(socket, 'join-room')) return;
-      handleRoomJoin(io, rooms, socket, roomId, roomDestructionManager, inviteTimeoutManager);
+      const room = rooms.get(roomId);
+      handleRoomJoin(io, room, roomId, socket, roomDestructionManager, inviteTimeoutManager);
     });
 
     socket.on('message', (data: { text: string }) => {
       if (!checkRateLimit(socket, 'message')) return;
-      handleNewMessage(io, socket, data);
+      const room = rooms.get(socket.roomId as RoomId);
+      if (!room) return;
+      handleNewMessage(io, room, socket, data);
     });
 
     socket.on('webrtc-ready', () => {
       if (!checkRateLimit(socket, 'webrtc-ready')) return;
-      handleWebRTCReady(io, rooms, socket);
+      const room = rooms.get(socket.roomId as RoomId);
+      if (!room) return;
+      handleWebRTCReady(io, room, socket);
     });
 
     socket.on('mute-status-changed', (data: { isMuted: boolean }) => {
       if (!checkRateLimit(socket, 'mute-status-changed')) return;
-      handleMuteStatusChanged(io, rooms, socket, data);
+      const room = rooms.get(socket.roomId as RoomId);
+      if (!room) return;
+      handleMuteStatusChanged(io, room, socket, data);
     });
 
     socket.on('disconnect', (reason: string) => {
@@ -59,8 +66,9 @@ export default function createConnectionHandler(
       console.log(`   Reason: ${reason}`);
       console.log(`   Transport: ${socket.conn.transport.name}`);
       console.log(`   Timestamp: ${new Date().toISOString()}`);
+      const room = rooms.get(socket.roomId as RoomId);
 
-      handleDisconnect(io, rooms, socket, roomDestructionManager, reason);
+      handleDisconnect(io, room, socket.roomId as RoomId, socket, roomDestructionManager, reason);
     });
 
     socket.on('error', (error: Error) => {
@@ -163,13 +171,12 @@ const forceCleanupRoom = (io: TypedServer, room: Room, roomId: RoomId): number =
 
 const handleRoomJoin = (
   io: TypedServer,
-  rooms: Map<RoomId, Room>,
-  socket: ExtendedConnectedSocket,
+  room: Room | undefined,
   roomId: RoomId,
+  socket: ExtendedConnectedSocket,
   roomDestructionManager: RoomDestructionManager,
   inviteTimeoutManager: InviteTimeoutManager
 ): void => {
-  const room = rooms.get(roomId);
   if (!room) {
     console.warn(`❌ [Socket] room ${roomId} not found`);
     socket.emit('room-not-found', 'Room not found');
@@ -230,6 +237,7 @@ const handleRoomJoin = (
 
 const handleNewMessage = (
   io: TypedServer,
+  room: Room,
   socket: ExtendedConnectedSocket,
   data: { text: string }
 ) => {
@@ -260,21 +268,16 @@ const handleNewMessage = (
 
 const handleDisconnect = (
   io: TypedServer,
-  rooms: Map<RoomId, Room>,
+  room: Room | undefined,
+  roomId: RoomId,
   socket: ExtendedConnectedSocket,
   roomDestructionManager: RoomDestructionManager,
   reason: string
 ) => {
   console.log(`👋 [Socket] ${socket.id} disconnected (socket.io reason: ${reason})`);
 
-  if (!socket.roomId) {
-    console.log(`ℹ️ [Socket] ${socket.id} wasn't in any room`);
-    return;
-  }
-
-  const room = rooms.get(socket.roomId);
   if (!room) {
-    console.warn(`⚠️ [Socket] ${socket.id} had roomId ${socket.roomId} but room not found`);
+    console.log(`ℹ️ [Socket] ${socket.id} wasn't in any room`);
     return;
   }
 
@@ -283,36 +286,21 @@ const handleDisconnect = (
 
   if (wasInRoom) {
     console.log(
-      `🔌 [Socket] removed ${socket.id} from room ${socket.roomId} (${room.users.size} remaining)`
+      `🔌 [Socket] removed ${socket.id} from room ${roomId} (${room.users.size} remaining)`
     );
 
     const usersForClient = getUsersForClient(room);
-    io.to(socket.roomId).emit('room-users-update', usersForClient);
-    io.to(socket.roomId).emit('user-left', socket.id as SocketId);
+    io.to(roomId).emit('room-users-update', usersForClient);
+    io.to(roomId).emit('user-left', socket.id as SocketId);
   }
 
   if (room.users.size === 0) {
-    console.log(`⏰ [Destruction] scheduling destruction for empty room ${socket.roomId}`);
-    roomDestructionManager.scheduleDestruction(socket.roomId);
+    console.log(`⏰ [Destruction] scheduling destruction for empty room ${roomId}`);
+    roomDestructionManager.scheduleDestruction(roomId);
   }
 };
 
-const handleWebRTCReady = (
-  io: TypedServer,
-  rooms: Map<RoomId, Room>,
-  socket: ExtendedConnectedSocket
-) => {
-  if (!socket.roomId) {
-    console.warn(`⚠️ [WebRTC] ${socket.id} is ready but not in a room`);
-    return;
-  }
-
-  const room = rooms.get(socket.roomId);
-  if (!room) {
-    console.warn(`⚠️ [WebRTC] ${socket.id} is ready but room ${socket.roomId} not found`);
-    return;
-  }
-
+const handleWebRTCReady = (io: TypedServer, room: Room, socket: ExtendedConnectedSocket) => {
   const userData = room.users.get(socket.id as SocketId);
   if (userData) {
     room.users.set(socket.id as SocketId, { ...userData, webRTCReady: true });
@@ -338,14 +326,11 @@ const handleWebRTCReady = (
 
 const handleMuteStatusChanged = (
   io: TypedServer,
-  rooms: Map<RoomId, Room>,
+  room: Room,
   socket: ExtendedConnectedSocket,
   data: { isMuted: boolean }
 ) => {
   if (!socket.roomId) return;
-
-  const room = rooms.get(socket.roomId);
-  if (!room) return;
 
   const userData = room.users.get(socket.id as SocketId);
   if (userData) {
