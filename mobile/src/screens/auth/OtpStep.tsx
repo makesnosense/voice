@@ -103,7 +103,7 @@ export default function OtpStep({ email }: OtpStepProps) {
           <TextInput
             style={styles.cardInput}
             placeholder="Code"
-            placeholderTextColor="#57534e"
+            placeholderTextColor={TEXT_MUTED}
             keyboardType="number-pad"
             value={otp}
             onChangeText={handleOtpChange}
