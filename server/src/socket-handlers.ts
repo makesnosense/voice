@@ -179,7 +179,7 @@ const handleRoomJoin = (
 ): void => {
   if (!room) {
     console.warn(`❌ [Socket] room ${roomId} not found`);
-    socket.emit('room-not-found', 'Room not found');
+    socket.emit('room-not-found');
     return;
   }
 

@@ -53,8 +53,8 @@ export function useRoomSocket(
       useRoomStore.setState((state) => ({ messages: [...state.messages, message] }));
     });
 
-    socket.on('room-not-found', (error) => {
-      console.error('❌ Room error:', error);
+    socket.on('room-not-found', () => {
+      console.error(`❌ Room not found: ${roomId}`);
       useRoomStore.getState().setConnectionStatus(ROOM_CONNECTION_STATUS.ROOM_NOT_FOUND);
     });
 

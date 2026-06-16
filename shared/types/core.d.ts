@@ -70,7 +70,7 @@ export interface ServerToClientEvents {
   }) => void;
   'room-full': (error: string) => void;
   message: (message: Message) => void;
-  'room-not-found': (error: string) => void;
+  'room-not-found': () => void;
 
   'call-declined': () => void;
   'invite-expired': () => void;
