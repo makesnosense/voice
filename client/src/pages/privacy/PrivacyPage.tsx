@@ -71,8 +71,9 @@ export default function PrivacyPage() {
               routing. Not stored.
             </li>
             <li>
-              <strong>In-room messages</strong> — relayed through Voice's server in real time. Never
-              stored.
+              <strong>In-room messages</strong> — relayed in real time. Message history is held in
+              server memory only and tied to the room's lifecycle — never written to disk. When the
+              room ends, all messages are permanently deleted.
             </li>
           </ul>
         </section>
