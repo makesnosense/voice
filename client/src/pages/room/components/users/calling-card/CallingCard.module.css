@@ -9,20 +9,6 @@
   border-color: var(--accent-red-border);
 }
 
-.displayName {
-  font-size: 1rem;
-  line-height: 1.2rem;
-  max-width: calc(var(--user-card-width) - 48px); /* subtract horizontal padding */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hidden {
-  visibility: hidden;
-  transition: none;
-}
-
 .dots {
   display: flex;
   align-items: center;

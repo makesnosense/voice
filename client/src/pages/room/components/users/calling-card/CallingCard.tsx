@@ -8,6 +8,7 @@ import {
   CALL_OUTCOME,
   type CallDismissalReason,
 } from '../../../../../../../shared/constants/calls';
+import DisplayName from '../display-name/DisplayName';
 
 const DISMISSAL_REASON_LABEL: Record<CallDismissalReason, string> = {
   [CALL_OUTCOME.DECLINED]: 'declined',
@@ -35,9 +36,7 @@ export default function CallingCard({
       className={`${baseStyles.card} ${userCardStyles.userCard} ${callingCardStyles.callingCard} ${isCallDismissed ? callingCardStyles.declinedCard : ''}`}
     >
       <div className={userCardStyles.userCardContent}>
-        <span className={`${baseStyles.title} ${callingCardStyles.displayName}`}>
-          {displayName}
-        </span>
+        <DisplayName name={displayName} />
 
         {isCallDismissed ? (
           <div className={callingCardStyles.declinedContent}>

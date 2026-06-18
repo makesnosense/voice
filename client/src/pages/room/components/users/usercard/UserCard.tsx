@@ -5,6 +5,7 @@ import userCardStyles from './UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import WebRTCConnectionStatusDot from './WebRTCConnectionStatusDot/WebRTCConnectionStatusDot';
 import type { AudioFrequencyData } from '../../../../../../../shared/types/core';
+import DisplayName from '../display-name/DisplayName';
 
 interface UserCardProps {
   displayName: string;
@@ -40,7 +41,7 @@ export default function UserCard({
   return (
     <div className={`${baseStyles.card} ${userCardStyles.userCard}`}>
       <div className={userCardStyles.userCardContent}>
-        <span className={`${baseStyles.title} ${userCardStyles.displayName}`}>{displayName}</span>
+        <DisplayName name={displayName} />
 
         <div className={userCardStyles.audioWavesContainer}>
           {isMutedRemoteUser && (
