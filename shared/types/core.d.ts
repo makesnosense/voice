@@ -50,6 +50,8 @@ export interface Room {
 export interface Message {
   text: string;
   socketId: SocketId;
+  name: string | null;
+  email: string | null;
   timestamp: number;
 }
 

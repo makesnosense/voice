@@ -11,7 +11,6 @@ import { Send } from 'lucide-react-native';
 import { useRoomStore } from '../../../../../shared/stores/useRoomStore';
 import {
   BACKGROUND_PRIMARY,
-  BACKGROUND_SECONDARY,
   BACKGROUND_CARD,
   BORDER_MUTED,
   BORDER_SUBTLE,
@@ -20,8 +19,11 @@ import {
 } from '../../../styles/colors';
 import { useKeyboardHandler } from 'react-native-keyboard-controller';
 import { runOnJS } from 'react-native-worklets';
+import { getMessageSenderName } from '../../../../../shared/utils/format';
+import { useAuthStore } from '../../../stores/useAuthStore';
 
 export default function ChatCard() {
+  const localUsersEmail = useAuthStore(state => state.user?.email ?? null);
   const localSocketId = useRoomStore(state => state.localSocketId);
   const messages = useRoomStore(state => state.messages);
   const sendMessage = useRoomStore(state => state.sendMessage);
@@ -73,24 +75,16 @@ export default function ChatCard() {
           </View>
         ) : (
           messages.map((msg, index) => {
-            const isOwn = msg.socketId === localSocketId;
+            const senderName = getMessageSenderName(
+              msg,
+              localSocketId,
+              localUsersEmail,
+            );
             return (
-              <View
-                key={index}
-                style={[
-                  styles.bubbleWrapper,
-                  isOwn ? styles.bubbleWrapperOwn : styles.bubbleWrapperOther,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.bubble,
-                    isOwn ? styles.bubbleOwn : styles.bubbleOther,
-                  ]}
-                >
-                  <Text style={isOwn ? styles.textOwn : styles.textOther}>
-                    {msg.text}
-                  </Text>
+              <View key={index} style={styles.bubbleWrapper}>
+                <View style={styles.bubble}>
+                  <Text style={styles.senderName}>{senderName}</Text>
+                  <Text style={styles.text}>{msg.text}</Text>
                 </View>
               </View>
             );
@@ -165,32 +159,20 @@ const styles = StyleSheet.create({
   bubbleWrapper: {
     flexDirection: 'row',
   },
-  bubbleWrapperOwn: {
-    justifyContent: 'flex-end',
-  },
-  bubbleWrapperOther: {
-    justifyContent: 'flex-start',
-  },
   bubble: {
     maxWidth: '78%',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 14,
-  },
-  bubbleOwn: {
-    backgroundColor: TEXT_PRIMARY,
-    borderBottomRightRadius: 3,
-  },
-  bubbleOther: {
     backgroundColor: BACKGROUND_CARD,
-    borderBottomLeftRadius: 3,
   },
-  textOwn: {
-    fontSize: 13,
-    color: BACKGROUND_SECONDARY,
-    lineHeight: 19,
+  senderName: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: TEXT_MUTED,
+    marginBottom: 2,
   },
-  textOther: {
+  text: {
     fontSize: 13,
     color: TEXT_PRIMARY,
     lineHeight: 19,

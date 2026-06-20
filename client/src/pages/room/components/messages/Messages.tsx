@@ -3,6 +3,9 @@ import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
+import { getMessageSenderName, isFromLocalUser } from '../../../../../../shared/utils/format';
+import type { Message } from '../../../../../../shared/types/core';
+import { useAuthStore } from '../../../../stores/useAuthStore';
 
 function useAutoScroll(dependencies: React.DependencyList) {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -20,6 +23,7 @@ function useAutoScroll(dependencies: React.DependencyList) {
 }
 
 export default function Messages() {
+  const localUsersEmail = useAuthStore((state) => state.user?.email ?? null);
   const localSocketId = useRoomStore((state) => state.localSocketId);
   const messages = useRoomStore((state) => state.messages);
   const sendMessage = useRoomStore((state) => state.sendMessage);
@@ -42,14 +46,15 @@ export default function Messages() {
     }
   };
 
-  const renderUsername = (socketId: string) => {
-    const isLocalUser = socketId === localSocketId;
+  const renderUsername = (message: Message) => {
+    const displayName = getMessageSenderName(message, localSocketId, localUsersEmail);
+    const isMessageFromMe = isFromLocalUser(message, localSocketId, localUsersEmail);
 
     return (
       <strong
-        className={`${messagesStyles.username} ${isLocalUser ? messagesStyles.currentUser : ''}`}
+        className={`${messagesStyles.username} ${isMessageFromMe ? messagesStyles.currentUser : ''}`}
       >
-        {isLocalUser ? 'You' : 'Other'}
+        {displayName}
       </strong>
     );
   };
@@ -64,7 +69,7 @@ export default function Messages() {
             {messages.map((msg, index) => (
               <div key={index} className={messagesStyles.message}>
                 <div className={messagesStyles.messageHeader}>
-                  {renderUsername(msg.socketId)}
+                  {renderUsername(msg)}
                   <span className={messagesStyles.timestamp}>
                     {new Date(msg.timestamp).toLocaleTimeString('en-GB', {
                       hour: '2-digit',

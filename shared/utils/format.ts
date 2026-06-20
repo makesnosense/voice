@@ -1,3 +1,5 @@
+import type { Message, SocketId } from '../types/core';
+
 export const formatLastSeen = (lastSeen: string): string => {
   const diffMs = Date.now() - new Date(lastSeen).getTime();
   const minutes = Math.floor(diffMs / 60000);
@@ -14,6 +16,32 @@ export const formatDisplayName = (
   email: string | null | undefined
 ): string => {
   return name ?? email?.split('@')[0] ?? 'Other';
+};
+
+export const isFromLocalUser = (
+  message: Message,
+  localSocketId: SocketId | null,
+  authenticatedEmail: string | null
+): boolean => {
+  const isAuthenticated = authenticatedEmail !== null;
+
+  return isAuthenticated
+    ? message.email === authenticatedEmail
+    : message.socketId === localSocketId;
+};
+
+export const getMessageSenderName = (
+  message: Message,
+  localSocketId: SocketId | null,
+  authenticatedEmail: string | null
+): string => {
+  const isAnonymous = message.name === null && message.email === null;
+
+  if (isAnonymous) {
+    return isFromLocalUser(message, localSocketId, authenticatedEmail) ? 'You' : 'Other';
+  }
+
+  return formatDisplayName(message.name, message.email);
 };
 
 export const formatDeployedAt = (isoString: string): string =>

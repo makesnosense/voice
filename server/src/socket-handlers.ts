@@ -265,6 +265,8 @@ const handleNewMessage = (
   const message: Message = {
     text: data.text,
     socketId: socket.id as SocketId,
+    name: socket.data.name ?? null,
+    email: socket.data.email ?? null,
     timestamp: Date.now(),
   };
 
