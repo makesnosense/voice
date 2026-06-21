@@ -15,24 +15,23 @@ export default function RoomTop({ roomId }: RoomTopProps) {
   const hasMessages = messages.length > 0;
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      keyboardVerticalOffset={52}
-      style={styles.container}
-    >
-      {!hasMessages && <View style={styles.filler} />}
-      <View style={[styles.content, hasMessages && styles.contentExpanded]}>
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={52}
+        style={[styles.content, hasMessages && styles.contentExpanded]}
+      >
         <OtherParty roomId={roomId} />
         <ChatCard />
-      </View>
-      {!hasMessages && <View style={styles.filler} />}
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
   },
   filler: {
     flex: 1,
