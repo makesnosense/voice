@@ -14,7 +14,7 @@ export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const refreshTokens = pgTable('refresh_tokens', {
@@ -22,15 +22,15 @@ export const refreshTokens = pgTable('refresh_tokens', {
   userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const otpCodes = pgTable('otp_codes', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: varchar('email', { length: 255 }).notNull(),
   code: varchar('code', { length: 6 }).notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const PLATFORM = {
@@ -54,8 +54,8 @@ export const devices = pgTable('devices', {
   deviceName: varchar('device_name', { length: 100 }),
   fcmToken: varchar('fcm_token', { length: 255 }),
   voipPushToken: varchar('voip_push_token', { length: 255 }),
-  lastSeen: timestamp('last_seen').notNull().defaultNow(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  lastSeen: timestamp('last_seen', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const contacts = pgTable(
@@ -67,9 +67,9 @@ export const contacts = pgTable(
     contactId: uuid('contact_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [primaryKey({ columns: [t.ownerId, t.contactId] })]
+  (table) => [primaryKey({ columns: [table.ownerId, table.contactId] })]
 );
 
 export const callOutcomeEnum = pgEnum('call_outcome', [
@@ -87,6 +87,6 @@ export const calls = pgTable('calls', {
   toUserId: uuid('to_user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   outcome: callOutcomeEnum('outcome').notNull().default(CALL_OUTCOME.NO_ANSWER),
 });
