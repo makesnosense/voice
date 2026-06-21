@@ -106,7 +106,9 @@ export const markCallDeclined = (callId: string) =>
 function mapCallHistoryRow(row: Record<string, unknown>): CallHistoryEntry {
   return {
     id: row.id as string,
-    createdAt: row.created_at as string,
+    // Postgres's raw text output for timestamptz is not strict ISO 8601
+    // normalize to a strict ISO-8601 string here, in the server's own JS engine
+    createdAt: new Date(row.created_at as string).toISOString(),
     direction: row.direction as CallDirection,
     outcome: row.outcome as CallOutcome,
     contactId: row.contact_id as string,
