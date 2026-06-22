@@ -1,4 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import { Mic, MicOff, PhoneOff, VolumeOff, Volume2 } from 'lucide-react-native';
 import { useWebRTCStore } from '../../../../../shared/stores/useWebRTCStore';
 import InCallManager from 'react-native-incall-manager';
@@ -24,11 +30,21 @@ export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
   const toggleMute = useWebRTCStore(state => state.toggleMute);
 
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+  const [isLeavingRoom, setIsLeavingRoom] = useState(false);
 
   const toggleSpeaker = () => {
     const next = !isSpeakerOn;
     InCallManager.setForceSpeakerphoneOn(next);
     setIsSpeakerOn(next);
+  };
+
+  const handleLeavePress = () => {
+    if (isLeavingRoom) return;
+    setIsLeavingRoom(true);
+
+    // waiting two animation frames lets the spinner above actually paint first
+    // instead of the spinner state and the unmount landing in the same commit.
+    requestAnimationFrame(() => requestAnimationFrame(onLeave));
   };
 
   return (
@@ -40,10 +56,10 @@ export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
           style={[
             styles.button,
             isSpeakerOn ? styles.buttonActive : styles.buttonNeutral,
-            isLoading && disabledStyle,
+            (isLoading || isLeavingRoom) && disabledStyle,
           ]}
           onPress={toggleSpeaker}
-          disabled={isLoading}
+          disabled={isLoading || isLeavingRoom}
         >
           {isSpeakerOn ? (
             <Volume2 size={18} color={ACTIVE_COLOR} />
@@ -57,10 +73,10 @@ export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
             style={[
               styles.button,
               isMutedLocal ? styles.buttonRed : styles.buttonNeutral,
-              isLoading && disabledStyle,
+              (isLoading || isLeavingRoom) && disabledStyle,
             ]}
             onPress={toggleMute}
-            disabled={isLoading}
+            disabled={isLoading || isLeavingRoom}
           >
             {isMutedLocal ? (
               <MicOff size={18} color="#ef4444" />
@@ -79,10 +95,16 @@ export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
             styles.button,
             styles.buttonRed,
             pressed && pressedStyle,
+            isLeavingRoom && disabledStyle,
           ]}
-          onPress={onLeave}
+          onPress={handleLeavePress}
+          disabled={isLeavingRoom}
         >
-          <PhoneOff size={18} color="#ef4444" />
+          {isLeavingRoom ? (
+            <ActivityIndicator size="small" color="#ef4444" />
+          ) : (
+            <PhoneOff size={18} color="#ef4444" />
+          )}
         </Pressable>
       </View>
     </View>
@@ -109,7 +131,10 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   button: {
-    padding: 20,
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 14,
     borderWidth: 1,
   },
