@@ -2,7 +2,7 @@ import type { RoomId } from '../../../../shared/types/core';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { View, StyleSheet } from 'react-native';
 
-import ChatCard from './components/ChatCard';
+import ChatCard from './components/chat-card/ChatCard';
 import OtherParty from './components/other-party/OtherParty';
 import { useRoomStore } from '../../../../shared/stores/useRoomStore';
 

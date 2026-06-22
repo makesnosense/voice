@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Send } from 'lucide-react-native';
-import { useRoomStore } from '../../../../../shared/stores/useRoomStore';
+import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import {
   BACKGROUND_PRIMARY,
   BACKGROUND_CARD,
@@ -16,15 +16,12 @@ import {
   BORDER_SUBTLE,
   TEXT_PRIMARY,
   TEXT_MUTED,
-} from '../../../styles/colors';
+} from '../../../../styles/colors';
 import { useKeyboardHandler } from 'react-native-keyboard-controller';
 import { runOnJS } from 'react-native-worklets';
-import { getMessageSenderName } from '../../../../../shared/utils/format';
-import { useAuthStore } from '../../../stores/useAuthStore';
+import Message from './Message';
 
 export default function ChatCard() {
-  const localUsersEmail = useAuthStore(state => state.user?.email ?? null);
-  const localSocketId = useRoomStore(state => state.localSocketId);
   const messages = useRoomStore(state => state.messages);
   const sendMessage = useRoomStore(state => state.sendMessage);
   const [messageInput, setMessageInput] = useState('');
@@ -74,21 +71,7 @@ export default function ChatCard() {
             <Text style={styles.emptyText}>No messages yet</Text>
           </View>
         ) : (
-          messages.map((msg, index) => {
-            const senderName = getMessageSenderName(
-              msg,
-              localSocketId,
-              localUsersEmail,
-            );
-            return (
-              <View key={index} style={styles.bubbleWrapper}>
-                <View style={styles.bubble}>
-                  <Text style={styles.senderName}>{senderName}</Text>
-                  <Text style={styles.text}>{msg.text}</Text>
-                </View>
-              </View>
-            );
-          })
+          messages.map((msg, index) => <Message key={index} message={msg} />)
         )}
       </ScrollView>
 
@@ -155,27 +138,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: TEXT_MUTED,
     textAlign: 'center',
-  },
-  bubbleWrapper: {
-    flexDirection: 'row',
-  },
-  bubble: {
-    maxWidth: '78%',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    backgroundColor: BACKGROUND_CARD,
-  },
-  senderName: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: TEXT_MUTED,
-    marginBottom: 2,
-  },
-  text: {
-    fontSize: 13,
-    color: TEXT_PRIMARY,
-    lineHeight: 19,
   },
   inputRow: {
     flexDirection: 'row',
