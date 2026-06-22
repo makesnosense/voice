@@ -1,5 +1,33 @@
 import type { Message, SocketId } from '../types/core';
 
+const DAYS_IN_A_WEEK = 7;
+
+const startOfDay = (date: Date, daysAgo = 0): Date =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() - daysAgo);
+
+export const formatCallTimestamp = (createdAtIso: string): string => {
+  const date = new Date(createdAtIso);
+  const now = new Date();
+
+  const todayStart = startOfDay(now);
+  const weekAgoStart = startOfDay(now, DAYS_IN_A_WEEK - 1);
+
+  const isToday = date >= todayStart;
+  const isWithinPastWeek = date >= weekAgoStart && date < todayStart;
+
+  if (isToday) {
+    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  if (isWithinPastWeek) {
+    return date.toLocaleDateString('en-GB', { weekday: 'short' });
+  }
+
+  const month = date.toLocaleDateString('en-GB', { month: 'short' });
+  const day = date.toLocaleDateString('en-GB', { day: '2-digit' });
+  return `${month} ${day}`;
+};
+
 export const formatLastSeen = (lastSeen: string): string => {
   const diffMs = Date.now() - new Date(lastSeen).getTime();
   const minutes = Math.floor(diffMs / 60000);

@@ -22,23 +22,9 @@ import {
 import { pressedStyle } from '../../styles/common';
 import type { CallHistoryEntry } from '../../../../shared/types/calls';
 import CallIcon from './CallIcon';
+import { formatCallTimestamp } from '../../../../shared/utils/format';
 
 const ERROR_RESET_MS = 2000;
-
-const formatDate = (createdAtIso: string) => {
-  const date = new Date(createdAtIso);
-  const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
-
-  if (isToday) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  return date.toLocaleDateString([], {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-  });
-};
 
 interface CallRowProps {
   entry: CallHistoryEntry;
@@ -136,7 +122,7 @@ export default function CallRow({
           )}
         </Pressable>
       )}
-      <Text style={styles.date}>{formatDate(entry.createdAt)}</Text>
+      <Text style={styles.date}>{formatCallTimestamp(entry.createdAt)}</Text>
     </Pressable>
   );
 }
