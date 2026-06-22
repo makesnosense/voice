@@ -127,12 +127,7 @@ export default function App() {
         </View>
         {activeRoomId && (
           <View style={styles.layer}>
-            <RoomScreen
-              roomId={activeRoomId}
-              onLeave={() =>
-                useActiveRoomStore.setState({ activeRoomId: null })
-              }
-            />
+            <RoomScreen roomId={activeRoomId} />
           </View>
         )}
       </View>

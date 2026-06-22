@@ -19,10 +19,10 @@ import SelfCard from './components/SelfCard';
 import { BACKGROUND_SECONDARY, TEXT_MUTED } from '../../styles/colors';
 import type { RoomId } from '../../../../shared/types/core';
 import RoomTop from './RoomTop';
+import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
 
 interface RoomScreenProps {
   roomId: RoomId;
-  onLeave: () => void;
 }
 
 const handleDisconnect = () => {
@@ -38,7 +38,11 @@ const handleJoinSuccess = (roomId: RoomId) => {
   useRejoinStore.setState({ lastRoomId: roomId });
 };
 
-export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
+const handleLeave = () => {
+  useActiveRoomStore.setState({ activeRoomId: null });
+};
+
+export default function RoomScreen({ roomId }: RoomScreenProps) {
   const insets = useSafeAreaInsets();
   const roomUsers = useRoomStore(state => state.roomUsers);
 
@@ -96,7 +100,7 @@ export default function RoomScreen({ roomId, onLeave }: RoomScreenProps) {
         )}
       </View>
 
-      <SelfCard onLeave={onLeave} isLoading={isLoading} />
+      <SelfCard onLeave={handleLeave} isLoading={isLoading} />
     </View>
   );
 }
