@@ -154,3 +154,13 @@
 .currentUser {
   color: var(--accent-blue);
 }
+
+.link {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.link:hover {
+  opacity: 0.8;
+}
