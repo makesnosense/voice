@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-audio-lines-icon lucide-audio-lines"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+<svg width="804" height="804" viewBox="0 0 804 804" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bar { fill: black; }
+    @media (prefers-color-scheme: dark) {
+      .bar { fill: white; }
+    }
+  </style>
+  <rect y="336.52" width="92.6731" height="130.243" rx="46.3365" class="bar"/>
+  <rect x="177.836" y="162.693" width="92.6747" height="478.402" rx="46.3373" class="bar"/>
+  <rect x="711.343" y="304.459" width="92.6731" height="194.864" rx="46.3365" class="bar"/>
+  <rect x="355.672" y="239.838" width="92.6742" height="324.109" rx="46.3371" class="bar"/>
+  <rect x="533.507" y="61" width="92.6747" height="681.785" rx="46.3373" class="bar"/>
+</svg>
