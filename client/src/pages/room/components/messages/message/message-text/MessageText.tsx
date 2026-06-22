@@ -1,5 +1,8 @@
 import messageTextStyles from './MessageText.module.css';
-import { splitTextWithLinks, TEXT_SEGMENT_TYPE } from '../../../../../../../shared/utils/linkify';
+import {
+  splitTextWithLinks,
+  TEXT_SEGMENT_TYPE,
+} from '../../../../../../../../shared/utils/linkify';
 
 interface MessageTextProps {
   text: string;

@@ -3,8 +3,7 @@ import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
-import Username from './username/Username';
-import MessageText from './message-text/MessageText';
+import Message from './message/Message';
 
 function useAutoScroll(dependencies: React.DependencyList) {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -51,19 +50,7 @@ export default function Messages() {
         ) : (
           <div className={messagesStyles.messages}>
             {messages.map((msg, index) => (
-              <div key={index} className={messagesStyles.message}>
-                <div className={messagesStyles.messageHeader}>
-                  <Username message={msg} />
-                  <span className={messagesStyles.timestamp}>
-                    {new Date(msg.timestamp).toLocaleTimeString('en-GB', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      hour12: false,
-                    })}
-                  </span>
-                </div>
-                <MessageText text={msg.text} />
-              </div>
+              <Message key={index} message={msg} />
             ))}
           </div>
         )}
