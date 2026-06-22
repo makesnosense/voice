@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import RNBootSplash from 'react-native-bootsplash';
 import { useAuthStore } from './stores/useAuthStore';
@@ -15,19 +15,16 @@ import { runNativePermissions } from './native/runNativePermissions';
 import { prependCallHistoryEntry } from './queries/call-history';
 import { CALL_DIRECTION, CALL_OUTCOME } from '../../shared/constants/calls';
 import PermissionsScreen from './screens/PermissionsScreen';
-import AuthScreen from './screens/auth/AuthScreen';
-import HomeScreen from './screens/HomeScreen';
 import RoomScreen from './screens/room/RoomScreen';
 import NoConnectionScreen from './screens/NoConnectionScreen';
 import type { RoomId } from '../../shared/types/core';
 import type { Contact } from '../../shared/types/contacts';
 import { api } from './api';
 import { useDismissedCallLogs } from './hooks/useDismissedCallLogsSync';
+import AuthOrHome from './AuthOrHome';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
-
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const { isCheckingPermissions, allPermissionsGranted, permissionsSkipped } =
     usePermissionsStore(
@@ -116,22 +113,6 @@ export default function App() {
         isRetrying={serverConnectivity.isRetrying}
       />
     );
-  if (activeRoomId)
-    return (
-      <>
-        <StatusBar
-          translucent
-          backgroundColor="transparent"
-          barStyle="dark-content"
-        />
-        <RoomScreen
-          roomId={activeRoomId}
-          onLeave={() => useActiveRoomStore.setState({ activeRoomId: null })}
-        />
-      </>
-    );
-
-  if (!isAuthenticated) return <AuthScreen />;
 
   return (
     <>
@@ -140,7 +121,33 @@ export default function App() {
         backgroundColor="transparent"
         barStyle="dark-content"
       />
-      <HomeScreen />
+      <View style={styles.screenStack}>
+        <View style={[styles.layer, activeRoomId && styles.hiddenLayer]}>
+          <AuthOrHome />
+        </View>
+        {activeRoomId && (
+          <View style={styles.layer}>
+            <RoomScreen
+              roomId={activeRoomId}
+              onLeave={() =>
+                useActiveRoomStore.setState({ activeRoomId: null })
+              }
+            />
+          </View>
+        )}
+      </View>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  screenStack: {
+    flex: 1,
+  },
+  layer: {
+    ...StyleSheet.absoluteFill,
+  },
+  hiddenLayer: {
+    display: 'none',
+  },
+});
