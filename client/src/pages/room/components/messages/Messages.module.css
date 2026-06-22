@@ -45,13 +45,6 @@
   gap: 8px;
 }
 
-.username {
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 11px;
-  flex-shrink: 0;
-}
-
 .timestamp {
   font-size: 9px;
   color: var(--text-muted);
@@ -133,10 +126,6 @@
     max-width: 95vw;
   }
 
-  .username {
-    font-size: 10px;
-  }
-
   .timestamp {
     font-size: 8px;
   }
@@ -149,10 +138,6 @@
     font-size: 10px;
     padding: 6px 10px;
   }
-}
-
-.currentUser {
-  color: var(--accent-blue);
 }
 
 .link {
