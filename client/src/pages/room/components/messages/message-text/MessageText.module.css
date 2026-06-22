@@ -1,0 +1,22 @@
+.messageText {
+  color: var(--text-primary);
+  line-height: 1.3;
+  font-size: 12px;
+  word-wrap: break-word;
+}
+
+.link {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.link:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 480px) {
+  .messageText {
+    font-size: 11px;
+  }
+}

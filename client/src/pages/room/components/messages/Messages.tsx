@@ -3,8 +3,8 @@ import messagesStyles from './Messages.module.css';
 import { useState, useEffect, useRef } from 'react';
 import baseStyles from '../../../../styles/BaseCard.module.css';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
-import { splitTextWithLinks, TEXT_SEGMENT_TYPE } from '../../../../../../shared/utils/linkify';
 import Username from './username/Username';
+import MessageText from './message-text/MessageText';
 
 function useAutoScroll(dependencies: React.DependencyList) {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -43,26 +43,6 @@ export default function Messages() {
     }
   };
 
-  const renderMessageText = (text: string) => {
-    const segments = splitTextWithLinks(text);
-
-    return segments.map((segment, index) =>
-      segment.type === TEXT_SEGMENT_TYPE.LINK ? (
-        <a
-          key={index}
-          href={segment.value}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={messagesStyles.link}
-        >
-          {segment.value}
-        </a>
-      ) : (
-        <span key={index}>{segment.value}</span>
-      )
-    );
-  };
-
   return (
     <div className={`${baseStyles.card} ${baseStyles.column} ${messagesStyles.messagesCard}`}>
       <div className={messagesStyles.messagesContent} ref={messagesRef}>
@@ -82,7 +62,7 @@ export default function Messages() {
                     })}
                   </span>
                 </div>
-                <div className={messagesStyles.messageText}>{renderMessageText(msg.text)}</div>
+                <MessageText text={msg.text} />
               </div>
             ))}
           </div>
