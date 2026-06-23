@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../../../stores/useAuthStore';
+import { useNavigate } from 'react-router';
 import styles from './DeleteAccount.module.css';
 
 const CONFIRM_SECONDS = 9;
@@ -8,6 +9,7 @@ type Mode = 'idle' | 'confirming' | 'deleting';
 
 export default function DeleteAccount() {
   const deleteAccount = useAuthStore((state) => state.deleteAccount);
+  const navigate = useNavigate();
 
   const [mode, setMode] = useState<Mode>('idle');
   const [countdown, setCountdown] = useState(CONFIRM_SECONDS);
@@ -31,6 +33,7 @@ export default function DeleteAccount() {
     setMode('deleting');
     try {
       await deleteAccount();
+      navigate('/'); // account gone — leave settings, land on home
     } catch (error) {
       console.error('❌ failed to delete account:', error);
       setMode('confirming');
