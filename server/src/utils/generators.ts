@@ -2,10 +2,8 @@ import crypto from 'crypto';
 import type { RoomId } from '../../../shared/types/core';
 
 export function generateRoomId(): RoomId {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const id = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join(
-    ''
-  );
+  const chars = '0123456789abcdefghjkmnpqrstvwxyz';
+  const id = Array.from({ length: 6 }, () => chars[crypto.randomInt(chars.length)]).join('');
 
   // format: xxx-xxx
   return `${id.slice(0, 3)}-${id.slice(3, 6)}` as RoomId;
