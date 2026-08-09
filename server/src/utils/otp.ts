@@ -1,11 +1,12 @@
 import { Resend } from 'resend';
+import crypto from 'crypto';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
 export function generateOtpCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 1000000).toString();
 }
 
 export async function sendOtpEmail(email: string, code: string): Promise<void> {
