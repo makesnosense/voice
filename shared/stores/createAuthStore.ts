@@ -26,8 +26,11 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
   return create<AuthStore>((set, get) => {
     let renewalPromise: Promise<string> | null = null;
 
-    const renewAccessToken = async (refreshToken: string): Promise<string> => {
+    const renewAccessToken = async (): Promise<string> => {
       try {
+        const refreshToken = await storage.getRefreshToken();
+        if (!refreshToken) throw new Error('no refresh token available');
+
         const { accessToken } = await api.auth.renewAccessToken(refreshToken);
         const user = getUserFromJwt(accessToken);
         if (!user) throw new Error('invalid token payload');
@@ -139,12 +142,9 @@ export function createAuthStore(storage: TokenStorage, api: Api) {
         const { accessToken } = get();
         if (accessToken && !isTokenExpired(accessToken)) return accessToken;
 
-        if (renewalPromise) return renewalPromise;
-
-        const refreshToken = await storage.getRefreshToken();
-        if (!refreshToken) throw new Error('no refresh token available');
-
-        renewalPromise = renewAccessToken(refreshToken);
+        if (!renewalPromise) {
+          renewalPromise = renewAccessToken();
+        }
         return renewalPromise;
       },
 
