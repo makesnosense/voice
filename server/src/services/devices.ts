@@ -3,11 +3,28 @@ import { db } from '../db';
 import { eq, and, desc, inArray, isNotNull } from 'drizzle-orm';
 import { PLATFORM } from '../db/schema';
 import type { Platform } from '../db/schema';
+import type { Device } from '../../../shared/types/devices';
 
 export async function findDeviceByRefreshJti(jti: string) {
   const [device] = await db.select().from(devices).where(eq(devices.jti, jti)).limit(1);
 
   return device;
+}
+
+function mapDeviceRow(row: {
+  jti: string;
+  platform: Platform;
+  deviceName: string | null;
+  lastSeen: Date;
+  createdAt: Date;
+}): Device {
+  return {
+    jti: row.jti,
+    platform: row.platform,
+    deviceName: row.deviceName,
+    lastSeen: row.lastSeen.toISOString(),
+    createdAt: row.createdAt.toISOString(),
+  };
 }
 
 export async function createDevice(
@@ -17,7 +34,7 @@ export async function createDevice(
   deviceName?: string,
   fcmToken?: string,
   voipPushToken?: string
-) {
+): Promise<Device> {
   const [device] = await db
     .insert(devices)
     .values({
@@ -30,7 +47,7 @@ export async function createDevice(
     })
     .returning();
 
-  return device;
+  return mapDeviceRow(device);
 }
 
 export async function updateDevice(
@@ -40,7 +57,7 @@ export async function updateDevice(
   deviceName?: string,
   fcmToken?: string,
   voipPushToken?: string
-) {
+): Promise<Device | null> {
   const updateData: Partial<typeof devices.$inferInsert> = { lastSeen: new Date() };
 
   if (platform !== undefined) updateData.platform = platform;
@@ -52,10 +69,9 @@ export async function updateDevice(
     .update(devices)
     .set(updateData)
     .where(and(eq(devices.jti, jti), eq(devices.userId, userId)))
-
     .returning();
 
-  return updated;
+  return updated ? mapDeviceRow(updated) : null;
 }
 
 const deviceSelect = {
@@ -67,12 +83,14 @@ const deviceSelect = {
   createdAt: devices.createdAt,
 };
 
-export async function getUserDevices(userId: string) {
-  return db
+export async function getUserDevices(userId: string): Promise<Device[]> {
+  const rows = await db
     .select(deviceSelect)
     .from(devices)
     .where(eq(devices.userId, userId))
     .orderBy(desc(devices.lastSeen));
+
+  return rows.map(mapDeviceRow);
 }
 
 export async function getUserMobileDevices(userId: string) {
