@@ -1,4 +1,4 @@
-import { NetworkError, ApiError } from '../errors';
+import { NetworkError, ApiError, type ApiErrorResponse } from '../errors';
 
 export class ApiBase {
   private baseUrl: string;
@@ -22,11 +22,14 @@ export class ApiBase {
     }
 
     if (!response.ok) {
-      type ErrorBody = { error?: string };
-      const body: ErrorBody | null = await (response.json() as Promise<ErrorBody>).catch(
-        () => null
+      const body: Partial<ApiErrorResponse> | null = await (
+        response.json() as Promise<Partial<ApiErrorResponse>>
+      ).catch(() => null);
+      throw new ApiError(
+        response.status,
+        body?.errorMessage ?? `http ${response.status}`,
+        body?.errorCode ?? null
       );
-      throw new ApiError(response.status, body?.error ?? `http ${response.status}`);
     }
 
     const text = await response.text();
