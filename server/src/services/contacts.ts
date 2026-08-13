@@ -1,6 +1,7 @@
 import { db } from '../db';
 import { contacts, users } from '../db/schema';
 import { eq, and, sql } from 'drizzle-orm';
+import type { Contact } from '../../../shared/types/contacts';
 
 const hasMobileDevice = sql<boolean>`EXISTS(
   SELECT 1 FROM devices
@@ -8,8 +9,24 @@ const hasMobileDevice = sql<boolean>`EXISTS(
      AND devices.platform in ('android', 'ios')
 )`;
 
-export async function getContacts(ownerId: string) {
-  return db
+function mapContactRow(row: {
+  id: string;
+  email: string;
+  name: string | null;
+  addedAt: Date;
+  hasMobileDevice: boolean;
+}): Contact {
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    addedAt: row.addedAt.toISOString(),
+    hasMobileDevice: row.hasMobileDevice,
+  };
+}
+
+export async function getContacts(ownerId: string): Promise<Contact[]> {
+  const rows = await db
     .select({
       id: users.id,
       email: users.email,
@@ -20,9 +37,11 @@ export async function getContacts(ownerId: string) {
     .from(contacts)
     .innerJoin(users, eq(contacts.contactId, users.id))
     .where(eq(contacts.ownerId, ownerId));
+
+  return rows.map(mapContactRow);
 }
 
-export async function getContact(ownerId: string, contactId: string) {
+export async function getContact(ownerId: string, contactId: string): Promise<Contact | null> {
   const [row] = await db
     .select({
       id: users.id,
@@ -35,7 +54,7 @@ export async function getContact(ownerId: string, contactId: string) {
     .innerJoin(users, eq(contacts.contactId, users.id))
     .where(and(eq(contacts.ownerId, ownerId), eq(contacts.contactId, contactId)));
 
-  return row ?? null;
+  return row ? mapContactRow(row) : null;
 }
 
 export async function addContact(ownerId: string, contactId: string) {
