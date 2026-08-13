@@ -1,4 +1,10 @@
 import type { CallDirection, CallOutcome } from '../constants/calls';
+import type { RoomId } from './core';
+
+export interface CallInitiationResponse {
+  roomId: RoomId;
+  callId: string;
+}
 
 export interface CallNotificationPayload {
   callerUserId: string;
