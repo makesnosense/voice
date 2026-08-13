@@ -1,8 +1,9 @@
 import { db } from '../db';
-import { users, contacts } from '../db/schema';
-import { sql, eq } from 'drizzle-orm';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
 import { getCallHistory } from './calls';
 import { getContacts } from './contacts';
+import type { DataExport } from '../../../shared/types/core';
 
 export async function findUserByEmail(email: string) {
   const [user] = await db
@@ -28,7 +29,7 @@ export async function deleteUser(userId: string) {
   return deleted ?? null;
 }
 
-export async function exportUserData(userId: string) {
+export async function exportUserData(userId: string): Promise<DataExport | null> {
   const profile = await findUserById(userId);
   if (!profile) return null;
 
@@ -39,7 +40,12 @@ export async function exportUserData(userId: string) {
 
   return {
     exportedAt: new Date().toISOString(),
-    profile: profile,
+    profile: {
+      id: profile.id,
+      email: profile.email,
+      name: profile.name,
+      createdAt: profile.createdAt.toISOString(),
+    },
     contacts: userContacts,
     callHistory,
   };
