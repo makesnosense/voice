@@ -1,5 +1,6 @@
 import { ApiBase } from './base';
-import type { CreateRoomResponse, RoomAliveResponse, RoomId } from '../types/core';
+import type { RoomId } from '../types/core';
+import type { CreateRoomResponse, RoomAliveResponse, RoomInviteResponse } from '../types/rooms';
 
 export class RoomsApi extends ApiBase {
   createRoom(): Promise<CreateRoomResponse> {
@@ -10,8 +11,8 @@ export class RoomsApi extends ApiBase {
     roomId: RoomId,
     target: { targetUserId: string },
     accessToken: string
-  ): Promise<{ callId: string }> {
-    return this.apiFetch<{ callId: string }>(`/rooms/${roomId}/invite`, {
+  ): Promise<RoomInviteResponse> {
+    return this.apiFetch<RoomInviteResponse>(`/rooms/${roomId}/invite`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify(target),
