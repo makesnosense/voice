@@ -1,3 +1,33 @@
 <resources>
     <string name="app_name">Voice</string>
+
+    <!-- notification channels -->
+    <string name="channel_incoming_calls_name">Incoming calls</string>
+    <string name="channel_incoming_calls_description">Incoming voice call alerts</string>
+    <string name="channel_missed_calls_name">Missed calls</string>
+    <string name="channel_missed_calls_description">Missed call alerts</string>
+    <string name="channel_active_call_name">Active call</string>
+    <string name="channel_active_call_description">Keeps call alive while app is backgrounded</string>
+
+    <!-- notifications -->
+    <string name="notification_incoming_call_title">Incoming call</string>
+    <string name="notification_missed_call_title">Missed call</string>
+    <string name="notification_active_call_title">Call in progress</string>
+    <string name="caller_unknown">Unknown</string>
+
+    <!-- shared call actions, reused by notifications and activity_incoming_call.xml -->
+    <string name="action_accept">Accept</string>
+    <string name="action_decline">Decline</string>
+    <string name="incoming_voice_call">Incoming voice call</string>
+
+    <!-- xiaomi / miui permission prompts -->
+    <string name="miui_open_settings">Open settings</string>
+    <string name="miui_skip">Skip</string>
+    <string name="miui_autostart_title">Enable autostart</string>
+    <string name="miui_autostart_message">On Xiaomi devices, autostart must be enabled for Voice to receive incoming calls when the app is closed.</string>
+    <string name="miui_permissions_title">Additional permissions needed</string>
+    <string name="miui_permissions_message">Voice needs the following permissions on Xiaomi devices to show incoming calls:\n\n%1$s</string>
+    <string name="miui_permission_show_on_lock_screen">Show on lock screen</string>
+    <string name="miui_permission_popup_windows">Display pop-up windows while running in the background</string>
+    <string name="miui_permission_permanent_notification">Permanent notification</string>
 </resources>

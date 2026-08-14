@@ -64,7 +64,9 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
         val roomId = intent.getStringExtra("roomId")
         callerUserId = intent.getStringExtra("callerUserId")
         callerEmail = intent.getStringExtra("callerEmail")
-        callerName = intent.getStringExtra("callerName") ?: intent.getStringExtra("callerEmail") ?: "unknown"
+        callerName =
+            intent.getStringExtra("callerName")
+                ?: intent.getStringExtra("callerEmail") ?: getString(R.string.caller_unknown)
         callId = intent.getStringExtra("callId")
 
         when (action) {

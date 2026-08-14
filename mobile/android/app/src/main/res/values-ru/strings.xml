@@ -1,0 +1,27 @@
+<resources>
+    <string name="channel_incoming_calls_name">Входящие звонки</string>
+    <string name="channel_incoming_calls_description">Уведомления о входящих голосовых звонках</string>
+    <string name="channel_missed_calls_name">Пропущенные звонки</string>
+    <string name="channel_missed_calls_description">Уведомления о пропущенных звонках</string>
+    <string name="channel_active_call_name">Активный звонок</string>
+    <string name="channel_active_call_description">Поддерживает звонок активным, пока приложение свёрнуто</string>
+
+    <string name="notification_incoming_call_title">Входящий звонок</string>
+    <string name="notification_missed_call_title">Пропущенный звонок</string>
+    <string name="notification_active_call_title">Идёт звонок</string>
+    <string name="caller_unknown">Неизвестно</string>
+
+    <string name="action_accept">Принять</string>
+    <string name="action_decline">Отклонить</string>
+    <string name="incoming_voice_call">Входящий голосовой звонок</string>
+
+    <string name="miui_open_settings">Открыть настройки</string>
+    <string name="miui_skip">Пропустить</string>
+    <string name="miui_autostart_title">Включить автозапуск</string>
+    <string name="miui_autostart_message">На устройствах Xiaomi необходимо включить автозапуск, чтобы Voice мог получать входящие звонки, когда приложение закрыто.</string>
+    <string name="miui_permissions_title">Требуются дополнительные разрешения</string>
+    <string name="miui_permissions_message">Voice требуются следующие разрешения на устройствах Xiaomi, чтобы показывать входящие звонки:\n\n%1$s</string>
+    <string name="miui_permission_show_on_lock_screen">Отображение на экране блокировки</string>
+    <string name="miui_permission_popup_windows">Показ всплывающих окон в фоновом режиме</string>
+    <string name="miui_permission_permanent_notification">Постоянное уведомление</string>
+</resources>

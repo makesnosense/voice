@@ -133,7 +133,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             val notification =
                 NotificationCompat.Builder(context, MISSED_CALL_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notification_missed_call)
-                    .setContentTitle("Missed call")
+                    .setContentTitle(context.getString(R.string.notification_missed_call_title))
                     .setContentText(callerDisplayName)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(openAppPendingIntent)
@@ -151,13 +151,13 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             val channel =
                 NotificationChannel(
                         MISSED_CALL_CHANNEL_ID,
-                        "missed calls",
+                        context.getString(R.string.channel_missed_calls_name),
                         // high importance = heads-up banner; sound/vibration suppressed below
                         // since the device already rang for the incoming call
                         NotificationManager.IMPORTANCE_HIGH,
                     )
                     .apply {
-                        description = "missed call alerts"
+                        description = context.getString(R.string.channel_missed_calls_description)
                         enableVibration(false)
                         setSound(null, null)
                     }
@@ -179,7 +179,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         // acquire before anything else — wakes screen so full-screen intent fires reliably
         acquireScreenWakeLock()
 
-        val callerEmail = data["callerEmail"] ?: "unknown"
+        val callerEmail = data["callerEmail"] ?: getString(R.string.caller_unknown)
         val callerNameOrNull = data["callerName"]?.takeIf { it.isNotEmpty() }
         val callerDisplayName = callerNameOrNull ?: callerEmail
         val callerUserId = data["callerUserId"] ?: return
@@ -233,12 +233,12 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val channel =
             NotificationChannel(
                     CHANNEL_ID,
-                    "incoming calls",
+                    getString(R.string.channel_incoming_calls_name),
                     // high importance is required for heads-up + full-screen intent
                     NotificationManager.IMPORTANCE_HIGH,
                 )
                 .apply {
-                    description = "incoming voice call alerts"
+                    description = getString(R.string.channel_incoming_calls_description)
                     // channel vibration as fallback for ringer-on mode
                     enableVibration(true)
                     setSound(ringtoneUri, audioAttributes)
@@ -340,15 +340,23 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val notification =
             NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_call)
-                .setContentTitle("incoming call")
+                .setContentTitle(getString(R.string.notification_incoming_call_title))
                 .setContentText(callerName)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setFullScreenIntent(incomingCallFullscreenPendingIntent, true)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .addAction(R.drawable.ic_notification_call, "decline", notificationBarDeclinePendingIntent)
-                .addAction(R.drawable.ic_notification_call, "accept", notificationBarAcceptPendingIntent)
+                .addAction(
+                    R.drawable.ic_notification_call,
+                    getString(R.string.action_decline),
+                    notificationBarDeclinePendingIntent
+                )
+                .addAction(
+                    R.drawable.ic_notification_call,
+                    getString(R.string.action_accept),
+                    notificationBarAcceptPendingIntent
+                )
                 .setTimeoutAfter(CALL_NOTIFICATION_TIMEOUT_MS)
                 .build()
 

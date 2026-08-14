@@ -22,7 +22,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="incoming voice call"
+        android:text="@string/incoming_voice_call"
         android:textSize="16sp"
         android:textColor="#94a3b8"
         android:layout_marginBottom="64dp"/>
@@ -42,21 +42,21 @@
             android:gravity="center"
             android:layout_marginEnd="12dp">
 
-        <ImageButton
-            android:id="@+id/btnDecline"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:padding="12dp"
-            android:background="@drawable/bg_btn_decline"
-            android:src="@drawable/call_end_24px"
-            android:tint="#ef4444"
-            android:scaleType="fitCenter"
-            android:contentDescription="decline"/>
+            <ImageButton
+                android:id="@+id/btnDecline"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_btn_decline"
+                android:src="@drawable/call_end_24px"
+                android:tint="#ef4444"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/action_decline"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="decline"
+                android:text="@string/action_decline"
                 android:textSize="14sp"
                 android:textColor="#94a3b8"
                 android:layout_marginTop="6dp"/>
@@ -70,21 +70,21 @@
             android:gravity="center"
             android:layout_marginStart="12dp">
 
-        <ImageButton
-            android:id="@+id/btnAccept"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:padding="12dp"
-            android:background="@drawable/bg_btn_accept"
-            android:src="@drawable/call_24px"
-            android:tint="#22c55e"
-            android:scaleType="fitCenter"
-            android:contentDescription="accept"/>
+            <ImageButton
+                android:id="@+id/btnAccept"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_btn_accept"
+                android:src="@drawable/call_24px"
+                android:tint="#22c55e"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/action_accept"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="accept"
+                android:text="@string/action_accept"
                 android:textSize="14sp"
                 android:textColor="#94a3b8"
                 android:layout_marginTop="6dp"/>

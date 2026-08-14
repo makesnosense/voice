@@ -38,10 +38,10 @@ class CallForegroundService : Service() {
         val channel =
             NotificationChannel(
                     CHANNEL_ID,
-                    "active call",
+                    getString(R.string.channel_active_call_name),
                     NotificationManager.IMPORTANCE_LOW // low = no sound, no heads-up
                 )
-                .apply { description = "keeps call alive while app is backgrounded" }
+                .apply { description = getString(R.string.channel_active_call_description) }
         manager.createNotificationChannel(channel)
     }
 
@@ -61,7 +61,7 @@ class CallForegroundService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_call)
-            .setContentTitle("call in progress")
+            .setContentTitle(getString(R.string.notification_active_call_title))
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setSilent(true)
