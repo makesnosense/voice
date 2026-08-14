@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { Svg, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Users, Phone, Settings } from 'lucide-react-native';
 import { pressedStyle } from '../styles/common';
 import {
@@ -23,9 +24,9 @@ export const HOME_TAB = {
 export type HomeTab = ObjectValues<typeof HOME_TAB>;
 
 const TABS = [
-  { key: HOME_TAB.CONTACTS, label: 'Contacts', icon: Users },
-  { key: HOME_TAB.CALLS, label: 'Calls', icon: Phone },
-  { key: HOME_TAB.SETTINGS, label: 'Settings', icon: Settings },
+  { key: HOME_TAB.CONTACTS, icon: Users },
+  { key: HOME_TAB.CALLS, icon: Phone },
+  { key: HOME_TAB.SETTINGS, icon: Settings },
 ] as const;
 
 export const SCREEN_PADDING_H = 50;
@@ -39,6 +40,7 @@ interface NavBarProps {
 
 export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const indicatorScales = useRef(
     TABS.map(({ key }) => new Animated.Value(key === activeTab ? 1 : 0)),
@@ -83,8 +85,9 @@ export default function NavigationBar({ activeTab, onTabPress }: NavBarProps) {
           },
         ]}
       >
-        {TABS.map(({ key, label, icon: Icon }, i) => {
+        {TABS.map(({ key, icon: Icon }, i) => {
           const isActive = key === activeTab;
+          const label = t(`navigationBar.${key}`);
           return (
             <Pressable
               key={key}

@@ -19,6 +19,7 @@ import {
 } from '@react-native-firebase/messaging';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { installLogger } from './src/utils/logger';
+import './src/i18n';
 
 installLogger();
 setBackgroundMessageHandler(getMessaging(), async () => {});
