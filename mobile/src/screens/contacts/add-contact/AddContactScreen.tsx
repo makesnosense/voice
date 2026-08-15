@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { View, StyleSheet, Pressable, Keyboard } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAddContactMutation } from '../../../queries/contacts';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
+import { getErrorMessage } from '../../../i18n/get-error-message';
 import { BACKGROUND_PRIMARY } from '../../../styles/colors';
 import { useContentPadding } from '../../../hooks/useContentPadding';
 import InputCard from './InputCard';
@@ -13,6 +15,7 @@ interface AddContactScreenProps {
 }
 
 export default function AddContactScreen({ onBack }: AddContactScreenProps) {
+  const { t } = useTranslation();
   const contentPadding = useContentPadding();
   const addContactMutation = useAddContactMutation();
 
@@ -35,9 +38,8 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
       await addContactMutation.mutateAsync(trimmed);
       onBack();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'failed to add contact';
-      setError(message);
+      console.error('❌ failed to add contact:', err);
+      setError(getErrorMessage(err, t));
     } finally {
       setIsSubmitting(false);
     }
