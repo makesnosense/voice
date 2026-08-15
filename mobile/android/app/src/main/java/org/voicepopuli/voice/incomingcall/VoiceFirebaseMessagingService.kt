@@ -146,8 +146,6 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private fun ensureMissedCallChannel(context: Context) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
             val manager = context.getSystemService(NotificationManager::class.java)
-            if (manager.getNotificationChannel(MISSED_CALL_CHANNEL_ID) != null) return
-
             val channel =
                 NotificationChannel(
                         MISSED_CALL_CHANNEL_ID,

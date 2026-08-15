@@ -33,8 +33,6 @@ class CallForegroundService : Service() {
 
     private fun ensureNotificationChannel() {
         val manager = getSystemService(NotificationManager::class.java)
-        if (manager.getNotificationChannel(CHANNEL_ID) != null) return
-
         val channel =
             NotificationChannel(
                     CHANNEL_ID,
