@@ -184,10 +184,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val callId = data["callId"] ?: return
         val roomId = data["roomId"] ?: return
 
+        // sentAt is kept for call-history/missed-call logging only
         val sentAt = data["sentAt"]?.toLongOrNull() ?: System.currentTimeMillis()
-        val notificationAgeMs = System.currentTimeMillis() - sentAt
-        val remainingNotificationLifeMs = CALL_NOTIFICATION_TIMEOUT_MS - notificationAgeMs
-        if (remainingNotificationLifeMs <= 0) return // call already expired before delivery
 
         pendingCall = PendingCallParams(callId, callerUserId, callerEmail, callerNameOrNull, sentAt)
 
