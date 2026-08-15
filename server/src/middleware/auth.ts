@@ -5,6 +5,8 @@ import { db } from '../db';
 import { refreshTokens } from '../db/schema';
 import { refreshSchema } from '../schemas/auth';
 import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types/auth';
+import type { ApiErrorResponse } from '../../../shared/errors';
+import { ERROR_CODE } from '../../../shared/constants/errors';
 
 declare global {
   namespace Express {
@@ -15,11 +17,18 @@ declare global {
   }
 }
 
-export function requireAccessToken(req: Request, res: Response, next: NextFunction) {
+export function requireAccessToken(
+  req: Request,
+  res: Response<ApiErrorResponse>,
+  next: NextFunction
+) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    return res.status(401).json({
+      errorMessage: 'Missing or invalid authorization header',
+      errorCode: ERROR_CODE.UNAUTHORIZED,
+    });
   }
 
   const token = authHeader.substring(7);
@@ -29,16 +38,24 @@ export function requireAccessToken(req: Request, res: Response, next: NextFuncti
     req.user = { userId: payload.userId, email: payload.email, name: payload.name };
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid or expired access token' });
+    return res.status(401).json({
+      errorMessage: 'Invalid or expired access token',
+      errorCode: ERROR_CODE.UNAUTHORIZED,
+    });
   }
 }
 
-export async function requireRefreshToken(req: Request, res: Response, next: NextFunction) {
+export async function requireRefreshToken(
+  req: Request,
+  res: Response<ApiErrorResponse>,
+  next: NextFunction
+) {
   const result = refreshSchema.safeParse(req.body);
 
   if (!result.success) {
     return res.status(400).json({
-      error: 'Invalid request body',
+      errorMessage: 'Invalid request body',
+      errorCode: ERROR_CODE.INVALID_REQUEST,
       details: result.error.issues,
     });
   }
@@ -55,12 +72,18 @@ export async function requireRefreshToken(req: Request, res: Response, next: Nex
       .limit(1);
 
     if (!tokenRecord) {
-      return res.status(401).json({ error: 'Refresh token revoked' });
+      return res.status(401).json({
+        errorMessage: 'Refresh token revoked',
+        errorCode: ERROR_CODE.REFRESH_TOKEN_REVOKED,
+      });
     }
 
     req.refreshPayload = { userId: payload.userId, jti: payload.jti };
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid refresh token' });
+    return res.status(401).json({
+      errorMessage: 'Invalid refresh token',
+      errorCode: ERROR_CODE.UNAUTHORIZED,
+    });
   }
 }
