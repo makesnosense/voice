@@ -7,7 +7,9 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { getErrorMessage } from '../../i18n/get-error-message';
 import {
   TEXT_PRIMARY,
   BACKGROUND_CARD,
@@ -26,6 +28,7 @@ interface OtpStepProps {
 }
 
 export default function OtpStep({ email }: OtpStepProps) {
+  const { t } = useTranslation();
   const { isLoading, verifyOtp, requestOtp } = useAuthStore();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -58,9 +61,8 @@ export default function OtpStep({ email }: OtpStepProps) {
     try {
       await verifyOtp(email, code.trim());
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('❌ verifyOtp failed:', message);
-      setError(message);
+      console.error('❌ verifyOtp failed:', err);
+      setError(getErrorMessage(err, t));
     }
   };
 
@@ -77,9 +79,8 @@ export default function OtpStep({ email }: OtpStepProps) {
       await requestOtp(email);
       startCooldown();
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('❌ requestOtp failed:', message);
-      setError(message);
+      console.error('❌ requestOtp failed:', err);
+      setError(getErrorMessage(err, t));
     }
   };
 

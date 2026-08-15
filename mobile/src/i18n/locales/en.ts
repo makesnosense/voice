@@ -1,9 +1,32 @@
+import type { ErrorCode } from '../../../../shared/constants/errors';
+
 const en = {
   navigationBar: {
     contacts: 'Contacts',
     calls: 'Calls',
     settings: 'Settings',
   },
+  errors: {
+    INVALID_EMAIL: 'Invalid email address',
+    INVALID_OTP: 'Invalid or expired code',
+    REFRESH_TOKEN_REVOKED: 'Your session has expired — please sign in again',
+    SESSION_NOT_FOUND: 'Session not found',
+    CANNOT_ADD_SELF: "You can't add yourself as a contact",
+    CONTACT_ALREADY_EXISTS: 'This person is already in your contacts',
+    CONTACT_NOT_FOUND: 'Contact not found',
+    CANNOT_CALL_SELF: "You can't call yourself",
+    USER_NOT_REACHABLE: "This person can't be reached right now",
+    ROOM_NOT_FOUND: 'Call not found',
+    CALL_NOT_FOUND: 'Call not found',
+    DEVICE_NOT_FOUND: 'Device not found',
+    USER_NOT_FOUND: 'User not found',
+    INVALID_REQUEST: 'Invalid request',
+    UNAUTHORIZED: 'You need to sign in again',
+    RATE_LIMITED: 'Too many attempts — try again later',
+    INTERNAL_ERROR: 'Something went wrong — please try again',
+  } satisfies Record<ErrorCode, string>,
+  networkError: 'No internet connection',
+  unknownError: 'Something went wrong — please try again',
 } as const;
 
 export default en;
