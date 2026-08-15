@@ -38,11 +38,12 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
   const result = addContactSchema.safeParse(req.body);
   if (!result.success) {
     return res.status(400).json({
-      errorMessage: 'invalid request',
-      errorCode: ERROR_CODE.INVALID_REQUEST,
+      errorMessage: 'invalid email',
+      errorCode: ERROR_CODE.INVALID_EMAIL,
       details: result.error.issues,
     });
   }
+
   const { email } = req.body;
 
   const { userId, email: callerEmail } = req.user;
