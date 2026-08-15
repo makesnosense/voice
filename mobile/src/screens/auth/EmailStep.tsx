@@ -8,9 +8,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { useTranslation } from 'react-i18next';
 
 import { ArrowRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { getErrorMessage } from '../../i18n/get-error-message';
 import { TEXT_PRIMARY, TEXT_SECONDARY } from '../../styles/colors';
 
 interface EmailStepProps {
@@ -24,6 +26,7 @@ export default function EmailStep({
   onEmailChange,
   onSuccess,
 }: EmailStepProps) {
+  const { t } = useTranslation();
   const { isLoading, requestOtp } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
 
@@ -33,10 +36,9 @@ export default function EmailStep({
       const trimmed = email.trim();
       await requestOtp(trimmed);
       onSuccess(trimmed);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      console.error('❌ requestOtp failed:', message);
-      setError(message);
+    } catch (err) {
+      console.error('❌ requestOtp failed:', err);
+      setError(getErrorMessage(err, t));
     }
   };
 
