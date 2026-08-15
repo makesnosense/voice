@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
 
   errorCard: {
     width: '100%',
+    marginTop: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 16,
