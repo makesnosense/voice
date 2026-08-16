@@ -19,8 +19,8 @@ export class ApiError extends Error {
 }
 
 export class NetworkError extends Error {
-  constructor() {
-    super('Network request failed');
+  constructor(cause?: unknown) {
+    super('Network request failed', { cause });
     this.name = 'NetworkError';
   }
 }

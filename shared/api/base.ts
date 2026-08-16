@@ -17,8 +17,8 @@ export class ApiBase {
           ...options.headers,
         },
       });
-    } catch {
-      throw new NetworkError();
+    } catch (error) {
+      throw new NetworkError(error);
     }
 
     if (!response.ok) {
