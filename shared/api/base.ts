@@ -29,6 +29,7 @@ export class ApiBase {
         body?.errorCode ?? null
       );
     }
+
     const text = await response.text();
     return text ? JSON.parse(text) : (undefined as T);
   }
