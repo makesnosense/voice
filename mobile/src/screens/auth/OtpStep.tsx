@@ -94,7 +94,7 @@ export default function OtpStep({ email }: OtpStepProps) {
     >
       <View style={styles.card}>
         <View style={styles.cardInfoBlock}>
-          <Text style={styles.textSecondary}>Code sent to</Text>
+          <Text style={styles.textSecondary}>{t('auth.codeSentTo')}</Text>
           <Text style={[styles.textSecondary, styles.textSecondaryBold]}>
             {email}
           </Text>
@@ -103,7 +103,7 @@ export default function OtpStep({ email }: OtpStepProps) {
         <View style={styles.cardInputWrapper}>
           <TextInput
             style={styles.cardInput}
-            placeholder="Code"
+            placeholder={t('auth.codePlaceholder')}
             placeholderTextColor={TEXT_MUTED}
             keyboardType="number-pad"
             value={otp}
@@ -128,7 +128,9 @@ export default function OtpStep({ email }: OtpStepProps) {
           }
         >
           <Text style={canResend ? styles.textPrimary : styles.textMuted}>
-            {canResend ? 'Resend code' : `Resend code in ${secondsLeft}s`}
+            {canResend
+              ? t('auth.resendCode')
+              : t('auth.resendCodeIn', { seconds: secondsLeft })}
           </Text>
         </Pressable>
       </View>

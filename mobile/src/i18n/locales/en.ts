@@ -6,6 +6,13 @@ const en = {
     calls: 'Calls',
     settings: 'Settings',
   },
+  auth: {
+    emailPlaceholder: 'Enter your email',
+    codeSentTo: 'Code sent to',
+    codePlaceholder: 'Code',
+    resendCode: 'Resend code',
+    resendCodeIn: 'Resend code in {{seconds}}s',
+  },
   errors: {
     INVALID_EMAIL: 'Invalid email address',
     INVALID_OTP: 'Invalid or expired code',

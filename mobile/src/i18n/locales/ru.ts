@@ -7,6 +7,13 @@ const ru: LocaleShape<typeof en> = {
     calls: 'Звонки',
     settings: 'Настройки',
   },
+  auth: {
+    emailPlaceholder: 'Введите email',
+    codeSentTo: 'Код отправлен на',
+    codePlaceholder: 'Код',
+    resendCode: 'Отправить код повторно',
+    resendCodeIn: 'Повторная отправка через {{seconds}} с',
+  },
   errors: {
     INVALID_EMAIL: 'Некорректный email',
     INVALID_OTP: 'Неверный или просроченный код',

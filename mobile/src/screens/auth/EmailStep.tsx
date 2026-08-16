@@ -56,7 +56,7 @@ export default function EmailStep({
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
-          placeholder="Enter your email"
+          placeholder={t('auth.emailPlaceholder')}
           placeholderTextColor={TEXT_SECONDARY}
           keyboardType="email-address"
           autoCapitalize="none"
