@@ -1,4 +1,4 @@
-import type { ErrorCode } from '../../../../shared/constants/errors';
+import type { ErrorCode } from '../../constants/errors';
 
 const en = {
   navigationBar: {
