@@ -1,8 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { getLocales } from 'react-native-localize';
-import en from './locales/en';
-import ru from './locales/ru';
+import en from '../../../shared/i18n/locales/en';
+import ru from '../../../shared/i18n/locales/ru';
 import {
   isSupportedLanguage,
   type SupportedLanguage,

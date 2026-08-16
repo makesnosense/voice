@@ -1,5 +1,5 @@
+import { ApiError, NetworkError } from '../errors';
 import type { TFunction } from 'i18next';
-import { ApiError, NetworkError } from '../../../shared/errors';
 
 export function getErrorMessage(error: unknown, t: TFunction): string {
   if (error instanceof NetworkError) return t('networkError');
