@@ -22,16 +22,13 @@ export class ApiBase {
     }
 
     if (!response.ok) {
-      const body: Partial<ApiErrorResponse> | null = await (
-        response.json() as Promise<Partial<ApiErrorResponse>>
-      ).catch(() => null);
+      const body: ApiErrorResponse | null = await response.json().catch(() => null);
       throw new ApiError(
         response.status,
         body?.errorMessage ?? `http ${response.status}`,
         body?.errorCode ?? null
       );
     }
-
     const text = await response.text();
     return text ? JSON.parse(text) : (undefined as T);
   }
