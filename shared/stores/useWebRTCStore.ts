@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { WebRTCManager } from '../webrtc/WebRTCManager';
 import type { WebRTCConnectionState, DisconnectReason } from '../constants/webrtc';
 import type { TypedClientSocket, SocketId } from '../types/core';
+import { ApiError, type ApiErrorResponse } from '../errors';
 
 export interface TurnCredentials {
   username: string;
@@ -10,8 +11,16 @@ export interface TurnCredentials {
 
 export async function fetchTurnCredentials(credentialsUrl: string): Promise<TurnCredentials> {
   const response = await fetch(credentialsUrl);
-  if (!response.ok)
-    throw new Error('TURN credentials unavailable — cannot establish relay connection');
+
+  if (!response.ok) {
+    const body: ApiErrorResponse | null = await response.json().catch(() => null);
+    throw new ApiError(
+      response.status,
+      body?.errorMessage ?? `http ${response.status}`,
+      body?.errorCode ?? null
+    );
+  }
+
   const credentials = await response.json();
   console.log('✅ [WebRTC] TURN credentials obtained');
   return credentials;
