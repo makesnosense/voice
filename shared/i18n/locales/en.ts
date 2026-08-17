@@ -13,6 +13,13 @@ const en = {
     resendCode: 'Resend code',
     resendCodeIn: 'Resend code in {{seconds}}s',
   },
+  settings: {
+    loggedIn: 'Logged in',
+    logOut: 'Log out',
+    profile: 'Profile',
+    devices: 'Devices',
+    about: 'About',
+  },
   errors: {
     INVALID_EMAIL: 'Invalid email address',
     INVALID_OTP: 'Invalid or expired code',

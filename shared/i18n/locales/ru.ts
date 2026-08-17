@@ -14,6 +14,13 @@ const ru: LocaleShape<typeof en> = {
     resendCode: 'Отправить код повторно',
     resendCodeIn: 'Повторная отправка через {{seconds}} с',
   },
+  settings: {
+    loggedIn: 'Выполнен вход',
+    logOut: 'Выйти',
+    profile: 'Профиль',
+    devices: 'Устройства',
+    about: 'О приложении',
+  },
   errors: {
     INVALID_EMAIL: 'Некорректный email',
     INVALID_OTP: 'Неверный или просроченный код',

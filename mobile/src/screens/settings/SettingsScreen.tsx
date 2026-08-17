@@ -1,5 +1,6 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   LogOut,
   Smartphone,
@@ -36,6 +37,7 @@ const SETTINGS_VIEW = {
 type SettingsView = ObjectValues<typeof SETTINGS_VIEW>;
 
 function SettingsScreen() {
+  const { t } = useTranslation();
   const listPadding = useContentPadding();
   const { user, logout } = useAuthStore();
   const [view, setView] = useState<SettingsView>(SETTINGS_VIEW.MAIN);
@@ -54,14 +56,14 @@ function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Settings" />
+      <Header title={t('navigationBar.settings')} />
       <ScrollView contentContainerStyle={[styles.content, listPadding]}>
         <View style={styles.topGroup}>
           <View style={styles.card}>
             <View style={styles.accountRow}>
               <View style={styles.accountInfo}>
                 <Text style={styles.email}>{user?.email}</Text>
-                <Text style={styles.hint}>Logged in</Text>
+                <Text style={styles.hint}>{t('settings.loggedIn')}</Text>
               </View>
               <Pressable
                 style={({ pressed }) => [
@@ -72,7 +74,7 @@ function SettingsScreen() {
                 hitSlop={8}
               >
                 <LogOut size={16} color={STATUS_RED} strokeWidth={1.75} />
-                <Text style={styles.logoutLabel}>Log out</Text>
+                <Text style={styles.logoutLabel}>{t('settings.logOut')}</Text>
               </Pressable>
             </View>
           </View>
@@ -86,7 +88,7 @@ function SettingsScreen() {
               onPress={() => setView(SETTINGS_VIEW.PROFILE)}
             >
               <User size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-              <Text style={styles.menuLabel}>Profile</Text>
+              <Text style={styles.menuLabel}>{t('settings.profile')}</Text>
               <ChevronRight
                 size={16}
                 color={NEUTRAL_COLOR}
@@ -102,7 +104,7 @@ function SettingsScreen() {
               onPress={() => setView(SETTINGS_VIEW.DEVICES)}
             >
               <Smartphone size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-              <Text style={styles.menuLabel}>Devices</Text>
+              <Text style={styles.menuLabel}>{t('settings.devices')}</Text>
               <ChevronRight
                 size={16}
                 color={NEUTRAL_COLOR}
@@ -120,7 +122,7 @@ function SettingsScreen() {
               onPress={() => setView(SETTINGS_VIEW.ABOUT)}
             >
               <Info size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
-              <Text style={styles.menuLabel}>About</Text>
+              <Text style={styles.menuLabel}>{t('settings.about')}</Text>
               <ChevronRight
                 size={16}
                 color={NEUTRAL_COLOR}
