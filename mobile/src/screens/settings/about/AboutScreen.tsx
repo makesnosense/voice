@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ExternalLink } from 'lucide-react-native';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
@@ -27,6 +28,7 @@ interface AboutScreenProps {
 }
 
 function AboutScreen({ onBack }: AboutScreenProps) {
+  const { t } = useTranslation();
   const contentPadding = useContentPadding();
 
   const handleShareLog = async () => {
@@ -35,7 +37,10 @@ function AboutScreen({ onBack }: AboutScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Header title="About" leftSlot={<HeaderBackButton onPress={onBack} />} />
+      <Header
+        title={t('settings.about')}
+        leftSlot={<HeaderBackButton onPress={onBack} />}
+      />
       <View style={[styles.content, contentPadding]}>
         <View style={styles.brandingBlock}>
           <Text style={styles.appName}>Voice</Text>
@@ -49,7 +54,9 @@ function AboutScreen({ onBack }: AboutScreenProps) {
             ]}
             onPress={handleShareLog}
           >
-            <Text style={styles.shareButtonText}>Share local log</Text>
+            <Text style={styles.shareButtonText}>
+              {t('about.shareLocalLog')}
+            </Text>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
@@ -58,7 +65,9 @@ function AboutScreen({ onBack }: AboutScreenProps) {
             ]}
             onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
           >
-            <Text style={styles.privacyLinkText}>Privacy Policy</Text>
+            <Text style={styles.privacyLinkText}>
+              {t('about.privacyPolicy')}
+            </Text>
             <ExternalLink size={12} color={TEXT_SECONDARY} strokeWidth={1.75} />
           </Pressable>
         </View>
