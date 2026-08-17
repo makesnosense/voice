@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import { pressedStyle } from '../../../styles/common';
 import {
@@ -27,6 +28,7 @@ const DELETE_MODE = {
 type DeleteMode = ObjectValues<typeof DELETE_MODE>;
 
 export default function DeleteAccount() {
+  const { t } = useTranslation();
   const deleteAccount = useAuthStore(state => state.deleteAccount);
 
   const [mode, setMode] = useState<DeleteMode>(DELETE_MODE.IDLE);
@@ -65,16 +67,14 @@ export default function DeleteAccount() {
         style={({ pressed }) => [styles.card, pressed && pressedStyle]}
         onPress={() => setMode(DELETE_MODE.CONFIRMING)}
       >
-        <Text style={styles.deleteText}>Delete account</Text>
+        <Text style={styles.deleteText}>{t('profile.deleteAccount')}</Text>
       </Pressable>
     );
   }
 
   return (
     <View style={styles.card}>
-      <Text style={styles.confirmText}>
-        All your data will be permanently deleted and cannot be recovered.
-      </Text>
+      <Text style={styles.confirmText}>{t('profile.deleteWarning')}</Text>
       <View style={styles.actions}>
         <Pressable
           style={({ pressed }) => [
@@ -86,7 +86,7 @@ export default function DeleteAccount() {
           onPress={() => setMode(DELETE_MODE.IDLE)}
           disabled={mode === DELETE_MODE.DELETING}
         >
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t('common.cancel')}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [
@@ -103,8 +103,8 @@ export default function DeleteAccount() {
           ) : (
             <Text style={styles.confirmButtonText}>
               {countdown > 0
-                ? `Delete account (${countdown}s)`
-                : 'Delete account'}
+                ? t('profile.deleteAccountCountdown', { seconds: countdown })
+                : t('profile.deleteAccount')}
             </Text>
           )}
         </Pressable>

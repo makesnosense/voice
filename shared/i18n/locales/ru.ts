@@ -2,6 +2,20 @@ import type en from './en';
 import type { LocaleShape } from '../locale-shape';
 
 const ru: LocaleShape<typeof en> = {
+  common: {
+    cancel: 'Отмена',
+  },
+  profile: {
+    nameLabel: 'имя',
+    yourDataLabel: 'ваши данные',
+    dangerZoneLabel: 'необратимые действия',
+    namePlaceholder: 'Ваше имя',
+    exportData: 'Экспортировать мои данные',
+    exportSavedTo: 'Сохранено в {{path}}',
+    deleteAccount: 'Удалить аккаунт',
+    deleteAccountCountdown: 'Удалить аккаунт ({{seconds}} с)',
+    deleteWarning: 'Все ваши данные будут безвозвратно удалены.',
+  },
   navigationBar: {
     contacts: 'Контакты',
     calls: 'Звонки',

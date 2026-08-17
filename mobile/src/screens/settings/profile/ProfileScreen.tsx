@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
 import NameRow from './NameRow';
@@ -20,6 +21,7 @@ interface ProfileScreenProps {
 }
 
 function ProfileScreen({ onBack }: ProfileScreenProps) {
+  const { t } = useTranslation();
   const contentPadding = useContentPadding();
   const [isEditing, setIsEditing] = useState(false);
   const cancelEditingRef = useRef<(() => void) | null>(null);
@@ -30,11 +32,11 @@ function ProfileScreen({ onBack }: ProfileScreenProps) {
       onPress={isEditing ? () => cancelEditingRef.current?.() : undefined}
     >
       <Header
-        title="Profile"
+        title={t('settings.profile')}
         leftSlot={<HeaderBackButton onPress={onBack} />}
       />
       <View style={styles.content}>
-        <Text style={styles.sectionLabel}>name</Text>
+        <Text style={styles.sectionLabel}>{t('profile.nameLabel')}</Text>
         <View style={styles.card}>
           <NameRow
             cancelRef={cancelEditingRef}
@@ -44,11 +46,11 @@ function ProfileScreen({ onBack }: ProfileScreenProps) {
 
         <View style={styles.divider} />
 
-        <Text style={styles.sectionLabel}>your data</Text>
+        <Text style={styles.sectionLabel}>{t('profile.yourDataLabel')}</Text>
         <ExportData />
         <View style={styles.divider} />
 
-        <Text style={styles.sectionLabel}>danger zone</Text>
+        <Text style={styles.sectionLabel}>{t('profile.dangerZoneLabel')}</Text>
         <DeleteAccount />
       </View>
     </Pressable>

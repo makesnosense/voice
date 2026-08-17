@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, X, SquarePen } from 'lucide-react-native';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import { pressedStyle } from '../../../styles/common';
@@ -70,6 +71,7 @@ interface NameRowProps {
 }
 
 function NameRow({ cancelRef, onEditingChange }: NameRowProps) {
+  const { t } = useTranslation();
   const { user, updateName } = useAuthStore();
 
   const [mode, setMode] = useState<NameFieldMode>(NAME_FIELD_MODE.IDLE);
@@ -119,7 +121,7 @@ function NameRow({ cancelRef, onEditingChange }: NameRowProps) {
               { color: user?.name ? TEXT_PRIMARY : TEXT_MUTED },
             ]}
           >
-            {user?.name ?? 'Your name'}
+            {user?.name ?? t('profile.namePlaceholder')}
           </Text>
           <SquarePen size={22} color={TEXT_MUTED} strokeWidth={1.75} />
         </Pressable>
@@ -134,7 +136,7 @@ function NameRow({ cancelRef, onEditingChange }: NameRowProps) {
             value={draft}
             onChangeText={setDraft}
             onSubmitEditing={saveName}
-            placeholder="Your name"
+            placeholder={t('profile.namePlaceholder')}
             placeholderTextColor={TEXT_MUTED}
             maxLength={40}
             returnKeyType="done"

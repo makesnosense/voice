@@ -1,6 +1,20 @@
 import type { ErrorCode } from '../../constants/errors';
 
 const en = {
+  common: {
+    cancel: 'Cancel',
+  },
+  profile: {
+    nameLabel: 'name',
+    yourDataLabel: 'your data',
+    dangerZoneLabel: 'danger zone',
+    namePlaceholder: 'Your name',
+    exportData: 'Export my data',
+    exportSavedTo: 'Saved to {{path}}',
+    deleteAccount: 'Delete account',
+    deleteAccountCountdown: 'Delete account ({{seconds}}s)',
+    deleteWarning: 'All your data will be permanently deleted and cannot be recovered.',
+  },
   navigationBar: {
     contacts: 'Contacts',
     calls: 'Calls',

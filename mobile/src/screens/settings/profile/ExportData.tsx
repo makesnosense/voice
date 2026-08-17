@@ -7,6 +7,7 @@ import {
   Platform,
   ToastAndroid,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import RNFS from 'react-native-fs';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { useAuthStore } from '../../../stores/useAuthStore';
@@ -26,6 +27,7 @@ async function requestStoragePermission(): Promise<boolean> {
 }
 
 export default function ExportData() {
+  const { t } = useTranslation();
   const getValidAccessToken = useAuthStore(state => state.getValidAccessToken);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -39,7 +41,10 @@ export default function ExportData() {
       const data = await api.users.exportData(accessToken);
       const path = `${RNFS.DownloadDirectoryPath}/voice-data-export.json`;
       await RNFS.writeFile(path, JSON.stringify(data, null, 2), 'utf8');
-      ToastAndroid.show(`Saved to ${path}`, ToastAndroid.LONG);
+      ToastAndroid.show(
+        t('profile.exportSavedTo', { path }),
+        ToastAndroid.LONG,
+      );
     } catch (error) {
       console.error('❌ failed to export data:', error);
     } finally {
@@ -56,7 +61,7 @@ export default function ExportData() {
       onPress={handleExport}
       disabled={isExporting}
     >
-      <Text style={styles.label}>Export my data</Text>
+      <Text style={styles.label}>{t('profile.exportData')}</Text>
       {isExporting ? (
         <ActivityIndicator size="small" color={TEXT_SECONDARY} />
       ) : (
