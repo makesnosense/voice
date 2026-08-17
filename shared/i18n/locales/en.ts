@@ -34,6 +34,16 @@ const en = {
     devices: 'Devices',
     about: 'About',
   },
+  devices: {
+    edit: 'Edit',
+    done: 'Done',
+    thisDevice: 'this device',
+    otherDevices: 'other devices',
+    activeNow: 'active now',
+    minutesAgo: '{{count}}m ago',
+    hoursAgo: '{{count}}h ago',
+    daysAgo: '{{count}}d ago',
+  },
   errors: {
     INVALID_EMAIL: 'Invalid email address',
     INVALID_OTP: 'Invalid or expired code',

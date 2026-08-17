@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Smartphone, Monitor, Trash2 } from 'lucide-react-native';
 import { pressedStyle } from '../../../styles/common';
 import {
@@ -32,6 +33,7 @@ export default function DeviceRow({
   isRemoving,
   onRemove,
 }: DeviceRowProps) {
+  const { t } = useTranslation();
   const icon =
     device.platform === 'web' ? (
       <Monitor size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />
@@ -47,12 +49,12 @@ export default function DeviceRow({
           {device.deviceName ?? device.platform}
         </Text>
         <Text style={styles.meta}>
-          {device.platform} · {formatLastSeen(device.lastSeen)}
+          {device.platform} · {formatLastSeen(device.lastSeen, t)}
         </Text>
       </View>
       {isCurrentDevice && (
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>this device</Text>
+          <Text style={styles.badgeText}>{t('devices.thisDevice')}</Text>
         </View>
       )}
       {!isCurrentDevice &&

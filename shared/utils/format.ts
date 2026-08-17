@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import type { Message, SocketId } from '../types/core';
 
 const DAYS_IN_A_WEEK = 7;
@@ -28,15 +29,23 @@ export const formatCallTimestamp = (createdAtIso: string): string => {
   return `${month} ${day}`;
 };
 
-export const formatLastSeen = (lastSeen: string): string => {
+export const formatLastSeen = (lastSeen: string, t?: TFunction): string => {
   const diffMs = Date.now() - new Date(lastSeen).getTime();
   const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 2) return 'active now';
-  if (minutes < 60) return `${minutes}m ago`;
+
+  if (minutes < 2) return t ? t('devices.activeNow') : 'active now';
+
+  if (minutes < 60) {
+    return t ? t('devices.minutesAgo', { count: minutes }) : `${minutes}m ago`;
+  }
+
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) {
+    return t ? t('devices.hoursAgo', { count: hours }) : `${hours}h ago`;
+  }
+
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return t ? t('devices.daysAgo', { count: days }) : `${days}d ago`;
 };
 
 export const formatDisplayName = (

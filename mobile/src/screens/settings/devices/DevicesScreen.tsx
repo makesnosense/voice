@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../stores/useAuthStore';
 import { api } from '../../../api';
 import Header from '../../../components/Header';
@@ -30,6 +31,7 @@ interface DevicesScreenProps {
 }
 
 function DevicesScreen({ onBack }: DevicesScreenProps) {
+  const { t } = useTranslation();
   const contentPadding = useContentPadding();
   const { getValidAccessToken, getRefreshToken, currentDeviceJti } =
     useAuthStore();
@@ -79,7 +81,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
   return (
     <View style={[styles.container]}>
       <Header
-        title="Devices"
+        title={t('settings.devices')}
         leftSlot={<HeaderBackButton onPress={onBack} />}
         rightSlot={
           <Pressable
@@ -94,7 +96,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
                 otherDevices.length === 0 && styles.editButtonDisabled,
               ]}
             >
-              {isEditing ? 'Done' : 'Edit'}
+              {isEditing ? t('devices.done') : t('devices.edit')}
             </Text>
           </Pressable>
         }
@@ -106,7 +108,7 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
         <ScrollView contentContainerStyle={[styles.content, contentPadding]}>
           {currentDevice && (
             <>
-              <Text style={styles.sectionLabel}>this device</Text>
+              <Text style={styles.sectionLabel}>{t('devices.thisDevice')}</Text>
               <View style={styles.card}>
                 <DeviceRow
                   device={currentDevice}
@@ -122,7 +124,9 @@ function DevicesScreen({ onBack }: DevicesScreenProps) {
 
           {otherDevices.length > 0 && (
             <>
-              <Text style={styles.sectionLabel}>other devices</Text>
+              <Text style={styles.sectionLabel}>
+                {t('devices.otherDevices')}
+              </Text>
               <View style={styles.card}>
                 {otherDevices.map((device, index) => (
                   <View key={device.jti}>

@@ -35,6 +35,16 @@ const ru: LocaleShape<typeof en> = {
     devices: 'Устройства',
     about: 'О приложении',
   },
+  devices: {
+    edit: 'Изменить',
+    done: 'Готово',
+    thisDevice: 'это устройство',
+    otherDevices: 'другие устройства',
+    activeNow: 'активен сейчас',
+    minutesAgo: '{{count}} мин назад',
+    hoursAgo: '{{count}} ч назад',
+    daysAgo: '{{count}} дн назад',
+  },
   errors: {
     INVALID_EMAIL: 'Некорректный email',
     INVALID_OTP: 'Неверный или просроченный код',
