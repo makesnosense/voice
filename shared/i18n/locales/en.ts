@@ -4,6 +4,11 @@ const en = {
   common: {
     cancel: 'Cancel',
   },
+  contacts: {
+    emptyState: 'No contacts yet',
+    emailPlaceholder: 'Email address',
+    addContact: 'Add contact',
+  },
   profile: {
     nameLabel: 'name',
     yourDataLabel: 'your data',

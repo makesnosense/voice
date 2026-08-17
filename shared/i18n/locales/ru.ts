@@ -5,6 +5,11 @@ const ru: LocaleShape<typeof en> = {
   common: {
     cancel: 'Отмена',
   },
+  contacts: {
+    emptyState: 'Пока нет контактов',
+    emailPlaceholder: 'Email адрес',
+    addContact: 'Добавить контакт',
+  },
   profile: {
     nameLabel: 'имя',
     yourDataLabel: 'ваши данные',

@@ -8,6 +8,7 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { UserPlus, UserMinus } from 'lucide-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -38,6 +39,7 @@ type ContactsView = ObjectValues<typeof CONTACTS_VIEW>;
 const ContactSeparator = () => <View style={styles.separator} />;
 
 function ContactsScreen() {
+  const { t } = useTranslation();
   const listPadding = useContentPadding();
   const queryClient = useQueryClient();
   const [view, setView] = useState<ContactsView>(CONTACTS_VIEW.CONTACTS_LIST);
@@ -69,7 +71,7 @@ function ContactsScreen() {
   return (
     <View style={styles.container}>
       <Header
-        title="Contacts"
+        title={t('navigationBar.contacts')}
         leftSlot={
           <Pressable
             style={({ pressed }) => pressed && pressedStyle}
@@ -110,7 +112,7 @@ function ContactsScreen() {
 
         {contacts.length === 0 && !isPending ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.empty}>No contacts yet</Text>
+            <Text style={styles.empty}>{t('contacts.emptyState')}</Text>
           </View>
         ) : (
           sortedContacts.map((contact, index) => (

@@ -48,7 +48,7 @@ export default function AddContactScreen({ onBack }: AddContactScreenProps) {
   return (
     <Pressable style={styles.container} onPress={Keyboard.dismiss}>
       <Header
-        title="Add contact"
+        title={t('contacts.addContact')}
         leftSlot={<HeaderBackButton onPress={onBack} />}
       />
 

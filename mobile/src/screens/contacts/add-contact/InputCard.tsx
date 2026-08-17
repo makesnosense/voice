@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import {
   TEXT_PRIMARY,
   TEXT_MUTED,
@@ -32,6 +33,7 @@ export default function InputCard({
   onEmailChange,
   onSubmit,
 }: InputCardProps) {
+  const { t } = useTranslation();
   const isSubmitDisabled = !email.trim() || isSubmitting;
 
   return (
@@ -41,7 +43,7 @@ export default function InputCard({
       >
         <TextInput
           style={styles.input}
-          placeholder="Email address"
+          placeholder={t('contacts.emailPlaceholder')}
           placeholderTextColor={TEXT_MUTED}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -77,7 +79,7 @@ export default function InputCard({
                 : styles.buttonTextActive,
             ]}
           >
-            Add contact
+            {t('contacts.addContact')}
           </Text>
         )}
       </Pressable>
