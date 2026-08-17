@@ -8,8 +8,9 @@
     "emitDeclarationOnly": true,
     "outDir": "./dist",
     "paths": {
-      "socket.io": ["../server/node_modules/socket.io"]
+      "socket.io": ["../server/node_modules/socket.io"],
       // "socket.io-client": ["../client/node_modules/socket.io-client"]
+      "i18next": ["../mobile/node_modules/i18next"]
     }
   },
   "include": ["./**/*"],
