@@ -98,6 +98,12 @@ const en = {
     microphoneRationaleMessage: 'Voice needs your microphone for calls',
     allow: 'Allow',
   },
+  connectionStatus: {
+    waitingForOtherPeer: 'waiting',
+    connecting: 'connecting',
+    connected: 'connected',
+    failed: 'failed',
+  },
   errors: {
     INVALID_EMAIL: 'Invalid email address',
     INVALID_OTP: 'Invalid or expired code',

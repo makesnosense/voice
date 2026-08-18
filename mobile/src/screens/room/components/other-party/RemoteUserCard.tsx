@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { MicOff, Mic } from 'lucide-react-native';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
-import { WEBRTC_CONNECTION_STATE } from '../../../../../../shared/constants/webrtc';
+import {
+  WEBRTC_CONNECTION_STATE,
+  type WebRTCConnectionState,
+} from '../../../../../../shared/constants/webrtc';
 import {
   TEXT_PRIMARY,
   TEXT_MUTED,
@@ -33,6 +36,19 @@ export default function RemoteUserCard() {
   const remoteUser = roomUsers.find(user => user.socketId === remoteSocketId);
   const displayName = formatDisplayName(remoteUser?.name, remoteUser?.email, t);
 
+  const getConnectionLabel = (state: WebRTCConnectionState): string => {
+    switch (state) {
+      case WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER:
+        return t('connectionStatus.waitingForOtherPeer');
+      case WEBRTC_CONNECTION_STATE.CONNECTING:
+        return t('connectionStatus.connecting');
+      case WEBRTC_CONNECTION_STATE.CONNECTED:
+        return t('connectionStatus.connected');
+      case WEBRTC_CONNECTION_STATE.FAILED:
+        return t('connectionStatus.failed');
+    }
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.name}>{displayName}</Text>
@@ -51,7 +67,9 @@ export default function RemoteUserCard() {
               { backgroundColor: CONNECTION_DOT_COLOR[webRTCConnectionState] },
             ]}
           />
-          <Text style={styles.connectionLabel}>{webRTCConnectionState}</Text>
+          <Text style={styles.connectionLabel}>
+            {getConnectionLabel(webRTCConnectionState)}
+          </Text>
         </View>
       )}
     </View>

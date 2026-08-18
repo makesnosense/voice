@@ -99,6 +99,12 @@ const ru: LocaleShape<typeof en> = {
     microphoneRationaleMessage: 'Voice нужен доступ к микрофону для звонков',
     allow: 'Разрешить',
   },
+  connectionStatus: {
+    waitingForOtherPeer: 'ожидание',
+    connecting: 'подключение',
+    connected: 'подключено',
+    failed: 'ошибка',
+  },
   errors: {
     INVALID_EMAIL: 'Некорректный email',
     INVALID_OTP: 'Неверный или просроченный код',
