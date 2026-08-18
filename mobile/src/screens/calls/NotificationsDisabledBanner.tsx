@@ -2,11 +2,23 @@ import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { Linking } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { BellOff } from 'lucide-react-native';
-import { PERMISSION_STATUS } from '../../types/permissions';
+import {
+  PERMISSION_STATUS,
+  type PermissionStatus,
+} from '../../types/permissions';
 import { pressedStyle } from '../../styles/common';
 import { AMBER_BG, AMBER_BORDER, AMBER_TEXT } from '../../styles/colors';
 import { ArrowRight } from 'lucide-react-native';
 import { usePermissionsStore } from '../../stores/usePermissionsStore.android';
+
+// any resolved status other than granted means notifications won't
+// actually work — checkNotifications() can't reliably distinguish
+// "denied, can ask again" from "blocked, permanently denied" the way
+// requestNotifications() can, so we treat both the same here
+const NOTIFICATIONS_BROKEN_STATUSES: PermissionStatus[] = [
+  PERMISSION_STATUS.DENIED,
+  PERMISSION_STATUS.BLOCKED,
+];
 
 export default function NotificationsDisabledBanner() {
   const { t } = useTranslation();
@@ -14,7 +26,7 @@ export default function NotificationsDisabledBanner() {
     state => state.notificationsStatus,
   );
 
-  if (notificationsStatus !== PERMISSION_STATUS.DENIED) return null;
+  if (!NOTIFICATIONS_BROKEN_STATUSES.includes(notificationsStatus)) return null;
 
   return (
     <Pressable
