@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { contactsQueryOptions } from '../../../../../../queries/contacts';
@@ -45,6 +46,7 @@ export default function InviteModal({
   onClose,
   onUserInvited,
 }: InviteModalProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: contacts = [], isPending } = useQuery(contactsQueryOptions);
   const [invitedUserId, setInvitedUserId] = useState<string | null>(null);
@@ -126,7 +128,7 @@ export default function InviteModal({
           ]}
         >
           <View style={styles.sheetHeader}>
-            <Text style={styles.sheetTitle}>Add to call</Text>
+            <Text style={styles.sheetTitle}>{t('calls.addToCall')}</Text>
             <Pressable
               style={({ pressed }) => [
                 styles.closeButton,
@@ -142,7 +144,7 @@ export default function InviteModal({
           {isPending ? (
             <ActivityIndicator style={styles.loader} color="#94a3b8" />
           ) : mobileContacts.length === 0 ? (
-            <Text style={styles.empty}>no contacts with the app installed</Text>
+            <Text style={styles.empty}>{t('calls.noMobileContacts')}</Text>
           ) : (
             <ScrollView contentContainerStyle={styles.list}>
               {mobileContacts.map((contact, index) => (

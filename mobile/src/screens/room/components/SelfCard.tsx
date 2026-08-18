@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Mic, MicOff, PhoneOff, VolumeOff, Volume2 } from 'lucide-react-native';
 import { useWebRTCStore } from '../../../../../shared/stores/useWebRTCStore';
 import InCallManager from 'react-native-incall-manager';
@@ -25,6 +26,7 @@ interface SelfCardProps {
 }
 
 export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
+  const { t } = useTranslation();
   const isMicActive = useWebRTCStore(state => state.isMicActive);
   const isMutedLocal = useWebRTCStore(state => state.isMutedLocal);
   const toggleMute = useWebRTCStore(state => state.toggleMute);
@@ -49,7 +51,7 @@ export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.name}>You</Text>
+      <Text style={styles.name}>{t('common.you')}</Text>
 
       <View style={styles.controls}>
         <Pressable

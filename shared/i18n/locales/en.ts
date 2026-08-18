@@ -3,6 +3,7 @@ import type { ErrorCode } from '../../constants/errors';
 const en = {
   common: {
     cancel: 'Cancel',
+    you: 'You',
   },
   contacts: {
     emptyState: 'No contacts yet',
@@ -23,6 +24,10 @@ const en = {
     activeRoomCount: 'Active room: {{count}} inside',
     tapToRejoin: 'Tap to rejoin',
     dismiss: 'Dismiss',
+    addToCall: 'Add to call',
+    noMobileContacts: 'no contacts with the app installed',
+    callDismissedDeclined: 'declined',
+    callDismissedNoAnswer: 'no answer',
   },
   profile: {
     nameLabel: 'name',

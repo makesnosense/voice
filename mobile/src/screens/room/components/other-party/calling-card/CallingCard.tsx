@@ -1,4 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { PhoneOff } from 'lucide-react-native';
 import { pressedStyle } from '../../../../../styles/common';
 import CallingDots from './CallingDots';
@@ -13,11 +14,6 @@ import {
   type CallDismissalReason,
 } from '../../../../../../../shared/constants/calls';
 
-const DISMISSAL_REASON_LABEL: Record<CallDismissalReason, string> = {
-  [CALL_OUTCOME.DECLINED]: 'declined',
-  [CALL_OUTCOME.NO_ANSWER]: 'no answer',
-};
-
 interface CallingCardProps {
   contactName: string | null;
   contactEmail: string;
@@ -31,6 +27,7 @@ export default function CallingCard({
   callDismissalReason,
   onCancel,
 }: CallingCardProps) {
+  const { t } = useTranslation();
   const displayName = contactName ?? contactEmail.split('@')[0];
   const isCallDismissed = callDismissalReason !== null;
 
@@ -42,7 +39,9 @@ export default function CallingCard({
 
       {isCallDismissed ? (
         <Text style={styles.dismissedLabel}>
-          {DISMISSAL_REASON_LABEL[callDismissalReason]}
+          {callDismissalReason === CALL_OUTCOME.DECLINED
+            ? t('calls.callDismissedDeclined')
+            : t('calls.callDismissedNoAnswer')}
         </Text>
       ) : (
         <>

@@ -4,6 +4,7 @@ import type { LocaleShape } from '../locale-shape';
 const ru: LocaleShape<typeof en> = {
   common: {
     cancel: 'Отмена',
+    you: 'Вы',
   },
   contacts: {
     emptyState: 'Пока нет контактов',
@@ -24,6 +25,10 @@ const ru: LocaleShape<typeof en> = {
     activeRoomCount: 'Активная комната: {{count}} внутри',
     tapToRejoin: 'Нажмите, чтобы вернуться',
     dismiss: 'Скрыть',
+    addToCall: 'Добавить в звонок',
+    noMobileContacts: 'нет контактов с установленным приложением',
+    callDismissedDeclined: 'отклонён',
+    callDismissedNoAnswer: 'не отвечает',
   },
   profile: {
     nameLabel: 'имя',
