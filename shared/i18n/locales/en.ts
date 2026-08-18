@@ -29,6 +29,7 @@ const en = {
     noMobileContacts: 'no contacts with the app installed',
     callDismissedDeclined: 'declined',
     callDismissedNoAnswer: 'no answer',
+    roomLink: 'room link',
   },
   chat: {
     emptyState: 'No messages yet',
@@ -49,6 +50,12 @@ const en = {
     contacts: 'Contacts',
     calls: 'Calls',
     settings: 'Settings',
+  },
+  connection: {
+    title: "Can't reach server",
+    subtitle: 'Check your internet connection\nand try restarting the app',
+    retry: 'Retry',
+    serverLabel: 'Server: ',
   },
   auth: {
     emailPlaceholder: 'Enter your email',

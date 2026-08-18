@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Copy, Check } from 'lucide-react-native';
 import { WEB_URL } from '../../../../config';
@@ -10,6 +11,7 @@ interface CopyCardProps {
 }
 
 export default function CopyCard({ roomId }: CopyCardProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const url = `${WEB_URL}/${roomId}`;
@@ -23,7 +25,7 @@ export default function CopyCard({ roomId }: CopyCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.content}>
-        <Text style={styles.label}>room link</Text>
+        <Text style={styles.label}>{t('calls.roomLink')}</Text>
         <Text style={styles.url} numberOfLines={1}>
           {url}
         </Text>

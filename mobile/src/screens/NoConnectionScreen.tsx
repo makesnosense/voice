@@ -6,6 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { WifiOff } from 'lucide-react-native';
 import { pressedStyle } from '../styles/common';
 import { PROD_HOST } from '../config';
@@ -44,6 +45,7 @@ export default function NoConnectionScreen({
   onRetry,
   isRetrying,
 }: NoConnectionScreenProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   return (
@@ -56,10 +58,8 @@ export default function NoConnectionScreen({
       <View style={styles.content}>
         <WifiOff size={52} color={TEXT_MUTED} strokeWidth={1.5} />
         <View style={styles.textGroup}>
-          <Text style={styles.title}>Can't reach server</Text>
-          <Text style={styles.subtitle}>
-            Check your internet connection{'\n'}and try restarting the app
-          </Text>
+          <Text style={styles.title}>{t('connection.title')}</Text>
+          <Text style={styles.subtitle}>{t('connection.subtitle')}</Text>
         </View>
         <Pressable
           style={({ pressed }) => [styles.button, pressed && pressedStyle]}
@@ -69,12 +69,12 @@ export default function NoConnectionScreen({
           {isRetrying ? (
             <ActivityIndicator color={BACKGROUND_PRIMARY} />
           ) : (
-            <Text style={styles.buttonText}>Retry</Text>
+            <Text style={styles.buttonText}>{t('connection.retry')}</Text>
           )}
         </Pressable>
       </View>
       <Text style={styles.serverLabel}>
-        <Text style={styles.serverKey}>Server: </Text>
+        <Text style={styles.serverKey}>{t('connection.serverLabel')}</Text>
         {PROD_HOST}
       </Text>
     </View>

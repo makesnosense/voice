@@ -30,6 +30,7 @@ const ru: LocaleShape<typeof en> = {
     noMobileContacts: 'нет контактов с установленным приложением',
     callDismissedDeclined: 'отклонён',
     callDismissedNoAnswer: 'не отвечает',
+    roomLink: 'ссылка на комнату',
   },
   chat: {
     emptyState: 'Пока нет сообщений',
@@ -50,6 +51,12 @@ const ru: LocaleShape<typeof en> = {
     contacts: 'Контакты',
     calls: 'Звонки',
     settings: 'Настройки',
+  },
+  connection: {
+    title: 'Не удаётся подключиться к серверу',
+    subtitle: 'Проверьте подключение к интернету\nи попробуйте перезапустить приложение',
+    retry: 'Повторить',
+    serverLabel: 'Сервер: ',
   },
   auth: {
     emailPlaceholder: 'Введите email',
