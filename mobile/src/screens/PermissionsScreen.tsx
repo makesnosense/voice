@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Bell, Bluetooth, Mic } from 'lucide-react-native';
 import { PERMISSION_STATUS, type PermissionStatus } from '../types/permissions';
 import { pressedStyle } from '../styles/common';
@@ -24,6 +25,7 @@ const STATUS_DOT_COLOR: Partial<Record<PermissionStatus, string>> = {
 };
 
 export default function PermissionsScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const {
     notificationsStatus,
@@ -46,22 +48,22 @@ export default function PermissionsScreen() {
     {
       key: 'notifications',
       icon: <Bell size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
-      label: 'Notifications',
-      description: 'to receive incoming calls',
+      label: t('permissions.notificationsLabel'),
+      description: t('permissions.notificationsDescription'),
       status: notificationsStatus,
     },
     {
       key: 'microphone',
       icon: <Mic size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
-      label: 'Microphone',
-      description: 'for voice calls',
+      label: t('permissions.microphoneLabel'),
+      description: t('permissions.microphoneDescription'),
       status: microphoneStatus,
     },
     {
       key: 'bluetooth',
       icon: <Bluetooth size={18} color={TEXT_SECONDARY} strokeWidth={1.75} />,
-      label: 'Nearby devices',
-      description: 'to use bluetooth headsets in calls',
+      label: t('permissions.bluetoothLabel'),
+      description: t('permissions.bluetoothDescription'),
       status: bluetoothStatus,
     },
   ];
@@ -73,10 +75,12 @@ export default function PermissionsScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.content}>
-        <Text style={styles.title}>Voice needs access</Text>
+        <Text style={styles.title}>{t('permissions.title')}</Text>
 
         <View>
-          <Text style={styles.sectionLabel}>required permissions</Text>
+          <Text style={styles.sectionLabel}>
+            {t('permissions.requiredSectionLabel')}
+          </Text>
           <View style={styles.card}>
             {items.map(({ key, icon, label, description, status }, index) => (
               <View key={key}>
@@ -107,20 +111,22 @@ export default function PermissionsScreen() {
             style={({ pressed }) => [styles.button, pressed && pressedStyle]}
             onPress={openAppSettings}
           >
-            <Text style={styles.buttonText}>Open settings</Text>
+            <Text style={styles.buttonText}>
+              {t('permissions.openSettings')}
+            </Text>
           </Pressable>
         ) : (
           <Pressable
             style={({ pressed }) => [styles.button, pressed && pressedStyle]}
             onPress={requestPermissions}
           >
-            <Text style={styles.buttonText}>Request permissions</Text>
+            <Text style={styles.buttonText}>
+              {t('permissions.requestPermissions')}
+            </Text>
           </Pressable>
         )}
 
-        <Text style={styles.hint}>
-          if the system dialog doesn't appear, open settings and grant manually
-        </Text>
+        <Text style={styles.hint}>{t('permissions.hint')}</Text>
 
         {canDismiss && (
           <Pressable
@@ -130,7 +136,9 @@ export default function PermissionsScreen() {
             ]}
             onPress={dismiss}
           >
-            <Text style={styles.buttonSecondaryText}>Skip</Text>
+            <Text style={styles.buttonSecondaryText}>
+              {t('permissions.skip')}
+            </Text>
           </Pressable>
         )}
       </View>
