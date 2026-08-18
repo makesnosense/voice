@@ -78,6 +78,9 @@ const ru: LocaleShape<typeof en> = {
     requestPermissions: 'Запросить разрешения',
     hint: 'если системное окно не появилось, откройте настройки и предоставьте разрешения вручную',
     skip: 'Пропустить',
+    microphoneRationaleTitle: 'Доступ к микрофону',
+    microphoneRationaleMessage: 'Voice нужен доступ к микрофону для звонков',
+    allow: 'Разрешить',
   },
   errors: {
     INVALID_EMAIL: 'Некорректный email',

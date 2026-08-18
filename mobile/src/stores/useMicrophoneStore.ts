@@ -4,6 +4,7 @@ import {
   MediaStream as RNMediaStream,
 } from 'react-native-webrtc';
 import { PermissionsAndroid, Platform } from 'react-native';
+import i18n from '../i18n';
 
 import {
   MIC_PERMISSION_STATUS,
@@ -23,9 +24,9 @@ const requestAndroidPermission = async (): Promise<boolean> => {
   const result = await PermissionsAndroid.request(
     PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
     {
-      title: 'microphone permission',
-      message: 'Voice needs your microphone for calls',
-      buttonPositive: 'allow',
+      title: i18n.t('permissions.microphoneRationaleTitle'),
+      message: i18n.t('permissions.microphoneRationaleMessage'),
+      buttonPositive: i18n.t('permissions.allow'),
     },
   );
 

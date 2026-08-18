@@ -77,6 +77,9 @@ const en = {
     requestPermissions: 'Request permissions',
     hint: "if the system dialog doesn't appear, open settings and grant manually",
     skip: 'Skip',
+    microphoneRationaleTitle: 'Microphone permission',
+    microphoneRationaleMessage: 'Voice needs your microphone for calls',
+    allow: 'Allow',
   },
   errors: {
     INVALID_EMAIL: 'Invalid email address',
