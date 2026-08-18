@@ -31,6 +31,7 @@ const ru: LocaleShape<typeof en> = {
     callDismissedDeclined: 'отклонён',
     callDismissedNoAnswer: 'не отвечает',
     roomLink: 'ссылка на комнату',
+    createCall: 'Создать звонок',
   },
   chat: {
     emptyState: 'Пока нет сообщений',

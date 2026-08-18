@@ -1,5 +1,6 @@
 import { Pressable, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createRoom } from '../utils/create-room';
 import { pressedStyle } from '../styles/common';
 import {
@@ -20,6 +21,7 @@ export default function CreateRoomButton({
   mutedColor = false,
   style,
 }: CreateRoomButtonProps) {
+  const { t } = useTranslation();
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
 
   const handleCreateRoom = async () => {
@@ -54,7 +56,7 @@ export default function CreateRoomButton({
             mutedColor ? styles.labelMutedColor : styles.labelNormal,
           ]}
         >
-          Create call
+          {t('calls.createCall')}
         </Text>
       )}
     </Pressable>

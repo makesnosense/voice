@@ -30,6 +30,7 @@ const en = {
     callDismissedDeclined: 'declined',
     callDismissedNoAnswer: 'no answer',
     roomLink: 'room link',
+    createCall: 'Create call',
   },
   chat: {
     emptyState: 'No messages yet',
