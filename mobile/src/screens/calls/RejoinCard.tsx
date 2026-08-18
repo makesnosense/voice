@@ -1,4 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { PhoneCall, X } from 'lucide-react-native';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
@@ -22,6 +23,7 @@ const dismissRejoinCard = () =>
   useRejoinStore.setState({ lastRoomId: null, userCount: null });
 
 export default function RejoinCard() {
+  const { t } = useTranslation();
   const lastRoomId = useRejoinStore(state => state.lastRoomId);
   const userCount = useRejoinStore(state => state.userCount);
 
@@ -37,19 +39,18 @@ export default function RejoinCard() {
       </View>
       <View style={styles.info}>
         <Text style={styles.label}>
-          Active room:{' '}
           {userCount === 0
-            ? 'empty'
-            : `${userCount} ${userCount === 1 ? 'person' : 'people'} inside`}
+            ? t('calls.activeRoomEmpty')
+            : t('calls.activeRoomCount', { count: userCount })}
         </Text>
-        <Text style={styles.sublabel}>Tap to rejoin</Text>
+        <Text style={styles.sublabel}>{t('calls.tapToRejoin')}</Text>
       </View>
       <Pressable
         style={({ pressed }) => [styles.dismissButton, pressed && pressedStyle]}
         onPress={dismissRejoinCard}
       >
         <X size={14} color={RED.TEXT} strokeWidth={1.5} />
-        <Text style={styles.dismissLabel}>Dismiss</Text>
+        <Text style={styles.dismissLabel}>{t('calls.dismiss')}</Text>
       </Pressable>
     </Pressable>
   );

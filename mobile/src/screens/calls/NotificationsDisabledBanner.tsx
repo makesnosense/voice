@@ -1,5 +1,6 @@
 import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { Linking } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { BellOff } from 'lucide-react-native';
 import { PERMISSION_STATUS } from '../../types/permissions';
 import { pressedStyle } from '../../styles/common';
@@ -8,6 +9,7 @@ import { ArrowRight } from 'lucide-react-native';
 import { usePermissionsStore } from '../../stores/usePermissionsStore.android';
 
 export default function NotificationsDisabledBanner() {
+  const { t } = useTranslation();
   const notificationsStatus = usePermissionsStore(
     state => state.notificationsStatus,
   );
@@ -20,11 +22,9 @@ export default function NotificationsDisabledBanner() {
       onPress={() => Linking.openSettings()}
     >
       <BellOff size={14} color={AMBER_TEXT} strokeWidth={1.75} />
-      <Text style={styles.message}>
-        Notifications off — you won't receive calls
-      </Text>
+      <Text style={styles.message}>{t('calls.notificationsDisabled')}</Text>
       <View style={styles.action}>
-        <Text style={styles.actionText}>Settings</Text>
+        <Text style={styles.actionText}>{t('calls.openSystemSettings')}</Text>
         <ArrowRight size={13} color={AMBER_TEXT} strokeWidth={2} />
       </View>
     </Pressable>

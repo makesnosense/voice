@@ -1,4 +1,5 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { BORDER_MUTED, TEXT_MUTED } from '../../styles/colors';
 import { startCall } from '../../utils/start-call';
 import CallRow from './CallRow';
@@ -17,10 +18,12 @@ function CallsList({
   contactIdSet,
   onAddContact,
 }: CallsListProps) {
+  const { t } = useTranslation();
+
   if (isPending)
     return <ActivityIndicator style={styles.loader} color={TEXT_MUTED} />;
   if (history.length === 0)
-    return <Text style={styles.empty}>No past calls</Text>;
+    return <Text style={styles.empty}>{t('calls.noPastCalls')}</Text>;
 
   return history.map(entry => (
     <View key={entry.id}>

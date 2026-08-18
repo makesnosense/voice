@@ -1,5 +1,6 @@
 import { memo, useMemo, useState } from 'react';
 import { View, ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { callHistoryQueryOptions } from '../../queries/call-history';
 import {
@@ -15,6 +16,7 @@ import RejoinCard from './RejoinCard';
 import CallsList from './CallsList';
 
 function CallsScreen() {
+  const { t } = useTranslation();
   const contentPadding = useContentPadding();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -38,7 +40,7 @@ function CallsScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="Calls" />
+      <Header title={t('navigationBar.calls')} />
       <NotificationsDisabledBanner />
       <ScrollView
         contentContainerStyle={[styles.list, contentPadding]}

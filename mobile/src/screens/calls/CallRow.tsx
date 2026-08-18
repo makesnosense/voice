@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { UserPlus, AlertCircle } from 'lucide-react-native';
 import {
   CALL_DIRECTION,
@@ -32,19 +34,23 @@ interface CallRowProps {
   onAddToContacts?: () => Promise<void>;
 }
 
-function getCallLabel(direction: CallDirection, outcome: CallOutcome): string {
+function getCallLabel(
+  direction: CallDirection,
+  outcome: CallOutcome,
+  t: TFunction,
+): string {
   if (direction === CALL_DIRECTION.INCOMING) {
     if (
       outcome === CALL_OUTCOME.CANCELLED ||
       outcome === CALL_OUTCOME.NO_ANSWER
     )
-      return 'Missed';
-    if (outcome === CALL_OUTCOME.DECLINED) return 'Declined';
-    return 'Incoming';
+      return t('calls.missed');
+    if (outcome === CALL_OUTCOME.DECLINED) return t('calls.declined');
+    return t('calls.incoming');
   } else {
-    if (outcome === CALL_OUTCOME.CANCELLED) return 'Cancelled';
-    if (outcome === CALL_OUTCOME.NO_ANSWER) return 'No answer';
-    return 'Outgoing';
+    if (outcome === CALL_OUTCOME.CANCELLED) return t('calls.cancelled');
+    if (outcome === CALL_OUTCOME.NO_ANSWER) return t('calls.noAnswer');
+    return t('calls.outgoing');
   }
 }
 
@@ -53,6 +59,7 @@ export default function CallRow({
   onPress,
   onAddToContacts,
 }: CallRowProps) {
+  const { t } = useTranslation();
   const isIncoming = entry.direction === CALL_DIRECTION.INCOMING;
   const isMissedOrCancelled =
     entry.outcome === CALL_OUTCOME.NO_ANSWER ||
@@ -102,7 +109,7 @@ export default function CallRow({
           {displayName}
         </Text>
         <Text style={[styles.direction, isMissedIncoming && styles.missedCall]}>
-          {getCallLabel(entry.direction, entry.outcome)}
+          {getCallLabel(entry.direction, entry.outcome, t)}
         </Text>
       </View>
 
