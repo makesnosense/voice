@@ -3,8 +3,11 @@ import { useRejoinStore } from '../stores/useRejoinStore';
 import { useAuthStore } from '../stores/useAuthStore';
 import { api } from '../api';
 import { HOME_TAB, type HomeTab } from '../components/NavigationBar';
+import { useActiveRoomStore } from '../stores/useActiveRoomStore';
 
 export function useRejoinStoreRefresh(activeTab: HomeTab) {
+  const activeRoomId = useActiveRoomStore(state => state.activeRoomId);
+
   useEffect(() => {
     if (activeTab !== HOME_TAB.CALLS) return;
     const { lastRoomId } = useRejoinStore.getState();
@@ -20,5 +23,5 @@ export function useRejoinStoreRefresh(activeTab: HomeTab) {
           useRejoinStore.setState({ userCount });
         }
       });
-  }, [activeTab]);
+  }, [activeTab, activeRoomId]);
 }
