@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { MicOff, Mic } from 'lucide-react-native';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import { useWebRTCStore } from '../../../../../../shared/stores/useWebRTCStore';
@@ -22,6 +23,7 @@ const CONNECTION_DOT_COLOR: Record<string, string> = {
 };
 
 export default function RemoteUserCard() {
+  const { t } = useTranslation();
   const roomUsers = useRoomStore(state => state.roomUsers);
   const remoteSocketId = useWebRTCStore(state => state.remoteSocketId);
   const webRTCConnectionState = useWebRTCStore(
@@ -29,7 +31,7 @@ export default function RemoteUserCard() {
   );
 
   const remoteUser = roomUsers.find(user => user.socketId === remoteSocketId);
-  const displayName = formatDisplayName(remoteUser?.name, remoteUser?.email);
+  const displayName = formatDisplayName(remoteUser?.name, remoteUser?.email, t);
 
   return (
     <View style={styles.card}>

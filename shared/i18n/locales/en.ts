@@ -4,6 +4,7 @@ const en = {
   common: {
     cancel: 'Cancel',
     you: 'You',
+    other: 'Other',
   },
   contacts: {
     emptyState: 'No contacts yet',
@@ -28,6 +29,10 @@ const en = {
     noMobileContacts: 'no contacts with the app installed',
     callDismissedDeclined: 'declined',
     callDismissedNoAnswer: 'no answer',
+  },
+  chat: {
+    emptyState: 'No messages yet',
+    inputPlaceholder: 'Message...',
   },
   profile: {
     nameLabel: 'name',

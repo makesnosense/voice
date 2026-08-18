@@ -50,9 +50,10 @@ export const formatLastSeen = (lastSeen: string, t?: TFunction): string => {
 
 export const formatDisplayName = (
   name: string | null | undefined,
-  email: string | null | undefined
+  email: string | null | undefined,
+  t?: TFunction
 ): string => {
-  return name ?? email?.split('@')[0] ?? 'Other';
+  return name ?? email?.split('@')[0] ?? (t ? t('common.other') : 'Other');
 };
 
 export const isFromLocalUser = (
@@ -70,15 +71,22 @@ export const isFromLocalUser = (
 export const getMessageSenderName = (
   message: Message,
   localSocketId: SocketId | null,
-  authenticatedEmail: string | null
+  authenticatedEmail: string | null,
+  t?: TFunction
 ): string => {
   const isAnonymous = message.name === null && message.email === null;
 
   if (isAnonymous) {
-    return isFromLocalUser(message, localSocketId, authenticatedEmail) ? 'You' : 'Other';
+    return isFromLocalUser(message, localSocketId, authenticatedEmail)
+      ? t
+        ? t('common.you')
+        : 'You'
+      : t
+        ? t('common.other')
+        : 'Other';
   }
 
-  return formatDisplayName(message.name, message.email);
+  return formatDisplayName(message.name, message.email, t);
 };
 
 export const formatDeployedAt = (isoString: string): string =>

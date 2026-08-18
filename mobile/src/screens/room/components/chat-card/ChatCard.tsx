@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Send } from 'lucide-react-native';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import {
@@ -22,6 +23,7 @@ import { runOnJS } from 'react-native-worklets';
 import Message from './Message';
 
 export default function ChatCard() {
+  const { t } = useTranslation();
   const messages = useRoomStore(state => state.messages);
   const sendMessage = useRoomStore(state => state.sendMessage);
   const [messageInput, setMessageInput] = useState('');
@@ -68,7 +70,7 @@ export default function ChatCard() {
       >
         {!hasMessages ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No messages yet</Text>
+            <Text style={styles.emptyText}>{t('chat.emptyState')}</Text>
           </View>
         ) : (
           messages.map((msg, index) => <Message key={index} message={msg} />)
@@ -80,7 +82,7 @@ export default function ChatCard() {
           style={styles.input}
           value={messageInput}
           onChangeText={setMessageInput}
-          placeholder="Message..."
+          placeholder={t('chat.inputPlaceholder')}
           placeholderTextColor={TEXT_MUTED}
           onSubmitEditing={handleSend}
           returnKeyType="send"

@@ -5,6 +5,7 @@ const ru: LocaleShape<typeof en> = {
   common: {
     cancel: 'Отмена',
     you: 'Вы',
+    other: 'Гость',
   },
   contacts: {
     emptyState: 'Пока нет контактов',
@@ -29,6 +30,10 @@ const ru: LocaleShape<typeof en> = {
     noMobileContacts: 'нет контактов с установленным приложением',
     callDismissedDeclined: 'отклонён',
     callDismissedNoAnswer: 'не отвечает',
+  },
+  chat: {
+    emptyState: 'Пока нет сообщений',
+    inputPlaceholder: 'Сообщение...',
   },
   profile: {
     nameLabel: 'имя',

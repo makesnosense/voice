@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import { getMessageSenderName } from '../../../../../../shared/utils/format';
@@ -11,6 +12,7 @@ interface MessageProps {
 }
 
 export default function Message({ message }: MessageProps) {
+  const { t } = useTranslation();
   const localUsersEmail = useAuthStore(state => state.user?.email ?? null);
   const localSocketId = useRoomStore(state => state.localSocketId);
 
@@ -18,6 +20,7 @@ export default function Message({ message }: MessageProps) {
     message,
     localSocketId,
     localUsersEmail,
+    t,
   );
 
   return (
