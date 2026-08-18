@@ -73,6 +73,10 @@ const en = {
     devices: 'Devices',
     about: 'About',
   },
+  about: {
+    shareLocalLog: 'Share log',
+    privacyPolicy: 'Privacy Policy',
+  },
   devices: {
     edit: 'Edit',
     done: 'Done',

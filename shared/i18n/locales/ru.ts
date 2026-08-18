@@ -74,6 +74,10 @@ const ru: LocaleShape<typeof en> = {
     devices: 'Устройства',
     about: 'О приложении',
   },
+  about: {
+    shareLocalLog: 'Поделиться логом',
+    privacyPolicy: 'Политика конфиденциальности',
+  },
   devices: {
     edit: 'Изменить',
     done: 'Готово',
