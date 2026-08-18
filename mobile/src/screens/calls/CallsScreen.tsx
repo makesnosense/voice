@@ -41,7 +41,6 @@ function CallsScreen() {
   return (
     <View style={styles.container}>
       <Header title={t('navigationBar.calls')} />
-      <NotificationsDisabledBanner />
       <ScrollView
         contentContainerStyle={[styles.list, contentPadding]}
         refreshControl={
@@ -52,6 +51,7 @@ function CallsScreen() {
           />
         }
       >
+        <NotificationsDisabledBanner />
         <CreateRoomButton style={styles.createRoomButton} />
         <RejoinCard />
         <CallsList
