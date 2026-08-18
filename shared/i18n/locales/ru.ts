@@ -65,6 +65,7 @@ const ru: LocaleShape<typeof en> = {
     codePlaceholder: 'Код',
     resendCode: 'Отправить код повторно',
     resendCodeIn: 'Повторная отправка через {{seconds}} с',
+    changeEmail: 'Другой email',
   },
   settings: {
     loggedIn: 'Выполнен вход',

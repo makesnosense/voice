@@ -64,6 +64,7 @@ const en = {
     codePlaceholder: 'Code',
     resendCode: 'Resend code',
     resendCodeIn: 'Resend code in {{seconds}}s',
+    changeEmail: 'Change email address',
   },
   settings: {
     loggedIn: 'Logged in',

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import WaveformBars from '../../components/WaveformBars';
 import EmailStep from './EmailStep';
 import OtpStep from './OtpStep';
@@ -14,6 +15,7 @@ import {
 type AuthStep = 'email' | 'otp';
 
 export default function AuthScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<AuthStep>('email');
   const [email, setEmail] = useState('');
@@ -55,7 +57,7 @@ export default function AuthScreen() {
               pressed && styles.changeEmailButtonPressed,
             ]}
           >
-            <Text style={styles.textPrimary}>Change email address</Text>
+            <Text style={styles.textPrimary}>{t('auth.changeEmail')}</Text>
           </Pressable>
         </>
       )}
