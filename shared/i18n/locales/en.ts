@@ -100,7 +100,7 @@ const en = {
     requestPermissions: 'Request permissions',
     hint: "if the system dialog doesn't appear, open settings and grant manually",
     skip: 'Skip',
-    microphoneRationaleTitle: 'Microphone permission',
+    microphoneRationaleTitle: 'Microphone access',
     microphoneRationaleMessage: 'Voice needs your microphone for calls',
     allow: 'Allow',
   },
