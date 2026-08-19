@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { getErrorMessage } from '../../../../shared/i18n/get-error-message';
+import { getErrorMessage } from '../../i18n/get-error-message';
 import {
   TEXT_PRIMARY,
   BACKGROUND_CARD,

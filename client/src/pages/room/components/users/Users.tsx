@@ -9,7 +9,7 @@ import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
 import usersStyles from './Users.module.css';
 import useRoomId from '../../useRoomId';
 import CallingCard from './calling-card/CallingCard';
-import { formatDisplayName } from '../../../../../../shared/utils/format';
+import { formatDisplayName } from '../../../../utils/format';
 import type { AudioFrequencyData } from '../../../../../../shared/types/core';
 
 export default function Users() {

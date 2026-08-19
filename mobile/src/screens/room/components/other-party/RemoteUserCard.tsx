@@ -16,7 +16,7 @@ import {
   STATUS_YELLOW,
   STATUS_RED,
 } from '../../../../styles/colors';
-import { formatDisplayName } from '../../../../../../shared/utils/format';
+import { formatDisplayName } from '../../../../i18n/format';
 
 const CONNECTION_DOT_COLOR: Record<string, string> = {
   [WEBRTC_CONNECTION_STATE.WAITING_FOR_OTHER_PEER]: TEXT_MUTED,

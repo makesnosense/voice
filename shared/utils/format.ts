@@ -1,7 +1,9 @@
-import type { TFunction } from 'i18next';
-import type { Message, SocketId } from '../types/core';
+import type { Message, ObjectValues, SocketId } from '../types/core';
 
 const DAYS_IN_A_WEEK = 7;
+const RECENTLY_SEEN_THRESHOLD_MINUTES = 2;
+const MINUTES_IN_AN_HOUR = 60;
+const HOURS_IN_A_DAY = 24;
 
 const startOfDay = (date: Date, daysAgo = 0): Date =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate() - daysAgo);
@@ -29,32 +31,47 @@ export const formatCallTimestamp = (createdAtIso: string): string => {
   return `${month} ${day}`;
 };
 
-export const formatLastSeen = (lastSeen: string, t?: TFunction): string => {
-  const diffMs = Date.now() - new Date(lastSeen).getTime();
+export const LAST_SEEN_UNIT = {
+  NOW: 'now',
+  MINUTES: 'minutes',
+  HOURS: 'hours',
+  DAYS: 'days',
+} as const;
+
+export type LastSeenUnit = ObjectValues<typeof LAST_SEEN_UNIT>;
+
+export interface LastSeen {
+  unit: LastSeenUnit;
+  count: number;
+}
+
+export const getLastSeen = (lastSeenIso: string): LastSeen => {
+  const diffMs = Date.now() - new Date(lastSeenIso).getTime();
   const minutes = Math.floor(diffMs / 60000);
 
-  if (minutes < 2) return t ? t('devices.activeNow') : 'active now';
-
-  if (minutes < 60) {
-    return t ? t('devices.minutesAgo', { count: minutes }) : `${minutes}m ago`;
+  if (minutes < RECENTLY_SEEN_THRESHOLD_MINUTES) {
+    return { unit: LAST_SEEN_UNIT.NOW, count: 0 };
   }
 
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    return t ? t('devices.hoursAgo', { count: hours }) : `${hours}h ago`;
+  if (minutes < MINUTES_IN_AN_HOUR) {
+    return { unit: LAST_SEEN_UNIT.MINUTES, count: minutes };
   }
 
-  const days = Math.floor(hours / 24);
-  return t ? t('devices.daysAgo', { count: days }) : `${days}d ago`;
+  const hours = Math.floor(minutes / MINUTES_IN_AN_HOUR);
+  if (hours < HOURS_IN_A_DAY) {
+    return { unit: LAST_SEEN_UNIT.HOURS, count: hours };
+  }
+
+  const days = Math.floor(hours / HOURS_IN_A_DAY);
+  return { unit: LAST_SEEN_UNIT.DAYS, count: days };
 };
 
-export const formatDisplayName = (
+// display name resolution — null means "nothing to show", callers translate the fallback
+
+export const resolveDisplayName = (
   name: string | null | undefined,
-  email: string | null | undefined,
-  t?: TFunction
-): string => {
-  return name ?? email?.split('@')[0] ?? (t ? t('common.other') : 'Other');
-};
+  email: string | null | undefined
+): string | null => name ?? email?.split('@')[0] ?? null;
 
 export const isFromLocalUser = (
   message: Message,
@@ -68,25 +85,33 @@ export const isFromLocalUser = (
     : message.socketId === localSocketId;
 };
 
-export const getMessageSenderName = (
+export const MESSAGE_SENDER = {
+  YOU: 'you',
+  OTHER: 'other',
+  NAMED: 'named',
+} as const;
+
+export type MessageSender =
+  | { kind: typeof MESSAGE_SENDER.YOU }
+  | { kind: typeof MESSAGE_SENDER.OTHER }
+  | { kind: typeof MESSAGE_SENDER.NAMED; name: string };
+
+export const resolveMessageSender = (
   message: Message,
   localSocketId: SocketId | null,
-  authenticatedEmail: string | null,
-  t?: TFunction
-): string => {
+  authenticatedEmail: string | null
+): MessageSender => {
   const isAnonymous = message.name === null && message.email === null;
 
   if (isAnonymous) {
-    return isFromLocalUser(message, localSocketId, authenticatedEmail)
-      ? t
-        ? t('common.you')
-        : 'You'
-      : t
-        ? t('common.other')
-        : 'Other';
+    const isMine = isFromLocalUser(message, localSocketId, authenticatedEmail);
+    return { kind: isMine ? MESSAGE_SENDER.YOU : MESSAGE_SENDER.OTHER };
   }
 
-  return formatDisplayName(message.name, message.email, t);
+  const displayName = resolveDisplayName(message.name, message.email);
+  return displayName
+    ? { kind: MESSAGE_SENDER.NAMED, name: displayName }
+    : { kind: MESSAGE_SENDER.OTHER };
 };
 
 export const formatDeployedAt = (isoString: string): string =>

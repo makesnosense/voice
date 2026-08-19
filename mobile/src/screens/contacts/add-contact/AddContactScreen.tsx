@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAddContactMutation } from '../../../queries/contacts';
 import Header from '../../../components/Header';
 import HeaderBackButton from '../../../components/HeaderBackButton';
-import { getErrorMessage } from '../../../../../shared/i18n/get-error-message';
+import { getErrorMessage } from '../../../i18n/get-error-message';
 import { BACKGROUND_PRIMARY } from '../../../styles/colors';
 import { useContentPadding } from '../../../hooks/useContentPadding';
 import InputCard from './InputCard';

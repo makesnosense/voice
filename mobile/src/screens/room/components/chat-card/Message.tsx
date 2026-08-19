@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../../stores/useAuthStore';
 import { useRoomStore } from '../../../../../../shared/stores/useRoomStore';
-import { getMessageSenderName } from '../../../../../../shared/utils/format';
+import { getMessageSenderName } from '../../../../i18n/format';
 import { TEXT_MUTED, BACKGROUND_CARD } from '../../../../styles/colors';
 import type { Message } from '../../../../../../shared/types/core';
 import MessageText from './MessageText';

@@ -1,7 +1,8 @@
 import usernameStyles from './Username.module.css';
 import { useAuthStore } from '../../../../../../stores/useAuthStore';
 import { useRoomStore } from '../../../../../../../../shared/stores/useRoomStore';
-import { getMessageSenderName, isFromLocalUser } from '../../../../../../../../shared/utils/format';
+import { isFromLocalUser } from '../../../../../../../../shared/utils/format';
+import { getMessageSenderName } from '../../../../../../utils/format';
 import type { Message } from '../../../../../../../../shared/types/core';
 
 interface UsernameProps {

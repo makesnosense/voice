@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ArrowRight } from 'lucide-react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { getErrorMessage } from '../../../../shared/i18n/get-error-message';
+import { getErrorMessage } from '../../i18n/get-error-message';
 import { TEXT_PRIMARY, TEXT_SECONDARY } from '../../styles/colors';
 
 interface EmailStepProps {

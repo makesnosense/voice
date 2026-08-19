@@ -3,7 +3,7 @@ import baseStyles from '../../../../../styles/BaseCard.module.css';
 import userCardStyles from '../usercard/UserCard.module.css';
 import buttonStyles from '../../../../../styles/Buttons.module.css';
 import callingCardStyles from './CallingCard.module.css';
-import { formatDisplayName } from '../../../../../../../shared/utils/format';
+import { formatDisplayName } from '../../../../../utils/format';
 import {
   CALL_OUTCOME,
   type CallDismissalReason,
