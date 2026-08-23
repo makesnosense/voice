@@ -7,7 +7,7 @@ import {
 global.RTCPeerConnection = RTCPeerConnection;
 global.RTCSessionDescription = RTCSessionDescription;
 global.RTCIceCandidate = RTCIceCandidate;
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { queryClient, queryPersister } from './src/query-client';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -22,7 +22,11 @@ import { installLogger } from './src/utils/logger';
 import './src/i18n';
 
 installLogger();
-setBackgroundMessageHandler(getMessaging(), async () => {});
+
+// android only — iOS call-wake goes through PushKit, not Firebase
+if (Platform.OS === 'android') {
+  setBackgroundMessageHandler(getMessaging(), async () => {});
+}
 
 const Root = () => (
   <PersistQueryClientProvider

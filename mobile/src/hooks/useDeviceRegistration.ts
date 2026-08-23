@@ -45,6 +45,8 @@ export const useDeviceRegistration = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
+    // voip push token registration for iOS not implemented yet
+    if (RNPlatform.OS !== 'android') return;
 
     getFcmToken().then(token => {
       if (token) syncDevice(token);
