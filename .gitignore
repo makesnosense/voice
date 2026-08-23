@@ -67,6 +67,9 @@ mobile/Gemfile.lock
 mobile/ios/.xcode.env.local
 mobile/ios/.xcode.env
 
+# Ruby / bundler
+mobile/vendor/
+
 # Expo
 mobile/.expo/
 mobile/.expo-shared/
