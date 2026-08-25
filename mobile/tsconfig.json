@@ -3,7 +3,8 @@
   "compilerOptions": {
     "lib": ["ES2022"],
     "types": ["jest"],
-    "noEmit": true
+    "noEmit": true,
+    "moduleSuffixes": [".ios", ".android", ""]
   },
   "references": [{ "path": "../shared" }],
   "include": ["**/*.ts", "**/*.tsx"],

@@ -6,7 +6,7 @@ import { useAuthStore } from './stores/useAuthStore';
 import { queryClient } from './query-client';
 import { contactsQueryOptions } from './queries/contacts';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
-import { usePermissionsStore } from './stores/usePermissionsStore.android';
+import { usePermissionsStore } from './stores/usePermissionsStore';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useAnsweredCallDeepLink } from './hooks/useAnsweredCallDeepLink';
 import { useRoomLink } from './hooks/useRoomLink';
