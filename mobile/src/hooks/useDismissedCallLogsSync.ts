@@ -7,6 +7,7 @@ import { drainDismissedCallLogsQueue } from '../native/dismissed-call-logs-queue
 import { CALL_DIRECTION } from '../../../shared/constants/calls';
 import NativeDismissedCallEvents from '../native/specs/NativeDismissedCallEvents';
 import type { Contact } from '../../../shared/types/contacts';
+import { Platform as RNPlatform } from 'react-native';
 
 function prependDismissedCallLogs() {
   const entries = drainDismissedCallLogsQueue();
@@ -42,6 +43,15 @@ export function useDismissedCallLogs() {
   }, [isAuthenticated]);
 
   useEffect(() => {
+    if (!NativeDismissedCallEvents) {
+      if (RNPlatform.OS === 'android') {
+        throw new Error(
+          'NativeDismissedCallEvents native module missing on Android',
+        );
+      }
+      return;
+    }
+
     const subscription = NativeDismissedCallEvents.onCallDismissed(
       prependDismissedCallLogs,
     );
