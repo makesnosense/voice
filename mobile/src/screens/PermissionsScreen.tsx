@@ -16,7 +16,7 @@ import {
   TEXT_PRIMARY,
   TEXT_SECONDARY,
 } from '../styles/colors';
-import { usePermissionsStore } from '../stores/usePermissionsStore.android';
+import { usePermissionsStore } from '../stores/usePermissionsStore';
 
 const STATUS_DOT_COLOR: Partial<Record<PermissionStatus, string>> = {
   [PERMISSION_STATUS.GRANTED]: STATUS_GREEN,
