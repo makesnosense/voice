@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  NativeModules,
+  Platform as RNPlatform,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import InCallManager from 'react-native-incall-manager';
 import { revokeLockScreenBypass } from '../../native/lock-screen-bypass';
@@ -72,9 +78,21 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
     startCallForegroundService();
     InCallManager.start({ media: 'audio' });
     InCallManager.setForceSpeakerphoneOn(false);
+
+    // ios fires a native "Proximity" event unconditionally whenever the
+    // sensor state changes, regardless of whether js is listening — without
+    // this, react native's bridge logs a warning on every state change.
+    // android never emits this event, so the guard just skips a no-op there.
+    if (RNPlatform.OS === 'ios') {
+      NativeModules.InCallManager?.addListener?.('Proximity');
+    }
+
     return () => {
       stopCallForegroundService();
       InCallManager.stop();
+      if (RNPlatform.OS === 'ios') {
+        NativeModules.InCallManager?.removeListeners?.(1);
+      }
     };
   }, []);
 
