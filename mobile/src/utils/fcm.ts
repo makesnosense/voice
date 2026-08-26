@@ -4,10 +4,9 @@ import {
   onTokenRefresh,
 } from '@react-native-firebase/messaging';
 import { getApp } from '@react-native-firebase/app';
+import { sleep } from './sleep';
 
 const RETRY_DELAYS_MS = [1000, 2000, 4000, 8000, 16000];
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function getFcmToken(): Promise<string | null> {
   const messaging = getMessaging(getApp());
