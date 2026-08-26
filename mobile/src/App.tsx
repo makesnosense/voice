@@ -11,7 +11,7 @@ import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useAnsweredCallDeepLink } from './hooks/useAnsweredCallDeepLink';
 import { useRoomLink } from './hooks/useRoomLink';
 import { useServerConnectivity } from './hooks/useServerConnectivity';
-import { runNativePermissions } from './native/runNativePermissions';
+import { runAndroidNativePermissions } from './native/runAndroidNativePermissions';
 import { prependCallHistoryEntry } from './queries/call-history';
 import { CALL_DIRECTION, CALL_OUTCOME } from '../../shared/constants/calls';
 import PermissionsScreen from './screens/PermissionsScreen';
@@ -44,7 +44,7 @@ export default function App() {
 
   useEffect(() => {
     if (bootSplashActive) return;
-    if (allPermissionsGranted || permissionsSkipped) runNativePermissions();
+    if (allPermissionsGranted || permissionsSkipped) runAndroidNativePermissions();
   }, [allPermissionsGranted, permissionsSkipped, bootSplashActive]);
 
   useEffect(() => {
