@@ -68,7 +68,7 @@ class MainActivity : ReactActivity() {
 
     private fun handleCallIntent(intent: Intent?) {
         val data = intent?.data
-        val isCallIntent = intent?.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data?.host == "call"
+        val isCallIntent = intent?.action == Intent.ACTION_VIEW && data?.scheme == "voice" && data.host == "call"
         if (!isCallIntent) return
 
         // show over lock screen when accepting a call
