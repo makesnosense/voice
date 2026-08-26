@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android": "adb reverse tcp:3003 tcp:3003 && react-native run-android --appId org.voicepopuli.voice.dev",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --device",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
