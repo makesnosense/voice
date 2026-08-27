@@ -48,7 +48,7 @@ export default function App() {
   }, [allPermissionsGranted, permissionsSkipped, bootSplashActive]);
 
   useEffect(() => {
-    if (serverConnectivity.isChecking) return;
+    if (serverConnectivity.isChecking || isCheckingPermissions) return;
     if (serverConnectivity.isUnreachable) {
       RNBootSplash.hide({ fade: true }).then(() => setBootSplashActive(false));
       return;
@@ -61,7 +61,11 @@ export default function App() {
           setBootSplashActive(false),
         );
       });
-  }, [serverConnectivity.isChecking, serverConnectivity.isUnreachable]);
+  }, [
+    serverConnectivity.isChecking,
+    serverConnectivity.isUnreachable,
+    isCheckingPermissions,
+  ]);
 
   useDeviceRegistration();
 
