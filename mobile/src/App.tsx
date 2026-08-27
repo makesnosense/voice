@@ -44,7 +44,8 @@ export default function App() {
 
   useEffect(() => {
     if (bootSplashActive) return;
-    if (allPermissionsGranted || permissionsSkipped) runAndroidNativePermissions();
+    if (allPermissionsGranted || permissionsSkipped)
+      runAndroidNativePermissions();
   }, [allPermissionsGranted, permissionsSkipped, bootSplashActive]);
 
   useEffect(() => {
