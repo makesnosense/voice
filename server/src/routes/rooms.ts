@@ -15,6 +15,7 @@ import type {
 import type { ApiErrorResponse } from '../../../shared/errors';
 import { ERROR_CODE } from '../../../shared/constants/errors';
 import type InviteTimeoutManager from '../managers/invite-timeout-manager';
+import type RoomDestructionManager from '../managers/room-destruction-manager';
 import {
   cancelInviteLimiter,
   inviteDeclineLimiter,
@@ -26,12 +27,13 @@ import { INVITE_TIMEOUT_MS } from '../../../shared/constants/calls';
 export default function createRoomsRouter(
   rooms: Map<RoomId, Room>,
   io: TypedServer,
-  inviteTimeoutManager: InviteTimeoutManager
+  inviteTimeoutManager: InviteTimeoutManager,
+  roomDestructionManager: RoomDestructionManager
 ) {
   const router = Router();
 
   router.post('/', roomCreationLimiter, (_req, res: Response<CreateRoomResponse>) => {
-    const { roomId } = createRoom(rooms);
+    const { roomId } = createRoom(rooms, roomDestructionManager);
     res.json({ roomId });
   });
 

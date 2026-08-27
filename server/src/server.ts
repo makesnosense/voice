@@ -25,8 +25,8 @@ const app = createApp();
 const server = createServer(app);
 const io = createSocketIO(server, rooms, roomDestructionManager, inviteTimeoutManager);
 
-app.use('/api/rooms', createRoomsRouter(rooms, io, inviteTimeoutManager));
-app.use('/api/calls', createCallsRouter(rooms, io, inviteTimeoutManager));
+app.use('/api/rooms', createRoomsRouter(rooms, io, inviteTimeoutManager, roomDestructionManager));
+app.use('/api/calls', createCallsRouter(rooms, io, inviteTimeoutManager, roomDestructionManager));
 
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${getProtocol(server)}://${config.host}:${config.port}`);

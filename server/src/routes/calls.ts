@@ -18,13 +18,15 @@ import type { ApiErrorResponse } from '../../../shared/errors';
 import { ERROR_CODE } from '../../../shared/constants/errors';
 import { callInitiationLimiter } from '../middleware/api-rate-limiters';
 import type InviteTimeoutManager from '../managers/invite-timeout-manager';
+import type RoomDestructionManager from '../managers/room-destruction-manager';
 import z from 'zod';
 import { INVITE_TIMEOUT_MS } from '../../../shared/constants/calls';
 
 export default function createCallsRouter(
   rooms: Map<RoomId, Room>,
   io: TypedServer,
-  inviteTimeoutManager: InviteTimeoutManager
+  inviteTimeoutManager: InviteTimeoutManager,
+  roomDestructionManager: RoomDestructionManager
 ) {
   const router = Router();
 
@@ -93,7 +95,7 @@ export default function createCallsRouter(
           device.fcmToken ? [device.fcmToken] : []
         );
 
-        const { roomId, room } = createRoom(rooms);
+        const { roomId, room } = createRoom(rooms, roomDestructionManager);
 
         const callsLogEntry = await createCallsLogEntry(caller.userId, targetUserId);
         await notifyDevicesOfCall(caller, fcmTokens, roomId, callsLogEntry.id);
