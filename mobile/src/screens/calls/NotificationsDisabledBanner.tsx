@@ -9,7 +9,7 @@ import {
 import { pressedStyle } from '../../styles/common';
 import { AMBER_BG, AMBER_BORDER, AMBER_TEXT } from '../../styles/colors';
 import { ArrowRight } from 'lucide-react-native';
-import { usePermissionsStore } from '../../stores/usePermissionsStore.android';
+import { usePermissionsStore } from '../../stores/usePermissionsStore';
 
 // any resolved status other than granted means notifications won't
 // actually work — checkNotifications() can't reliably distinguish
