@@ -17,8 +17,7 @@ shared/dist/
 *tsconfig.tsbuildinfo
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+.vscode/
 .idea
 .cursor/
 .DS_Store
