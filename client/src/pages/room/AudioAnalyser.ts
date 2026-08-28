@@ -45,7 +45,8 @@ export default class AudioAnalyser {
 
     // sample rate is how many pressure numbers arrive per second
     const sampleRate = this.audioContext.sampleRate;
-    const binSize = sampleRate / (this.analyser.fftSize * 2);
+    // binSize ≈ "how many Hz one step in dataArray is" e.g. 48000 / 256 = 187.5
+    const binSize = sampleRate / this.analyser.fftSize;
 
     const frequencyRanges = [
       { min: 80, max: 250 }, // low fundamentals
