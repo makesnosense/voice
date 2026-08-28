@@ -5,7 +5,7 @@ import type { AudioFrequencyData } from '../../../../shared/types/core';
 // | ~48000 samples/s         | stream                                           | live pressure numbers             |
 // | tap into the engine      | source (createMediaStreamSource + connect)       | hose stream → analyser            |
 // | latest 256 samples       | analyser.fftSize                                 | sliding window                    |
-// | 128 pitch-strength bytes | dataArray via getByteFrequencyData               | match strength per ~187.5 Hz bin  |
+// | 128 pitch-strength bytes | matchStrengths via getByteFrequencyData               | match strength per ~187.5 Hz bin  |
 // | 5 bars + overall         | bands, overallLevel (frequencyRanges loop)       | squash those bytes to 0–100       |
 
 export default class AudioAnalyser {
@@ -39,13 +39,13 @@ export default class AudioAnalyser {
 
     // for each of the 128 speeds: build a template wave of that speed, same length 256,
     // and ask "does this sample look like this template?" (sine + cosine so a time-shift
-    // doesn't matter). each answer is squashed to a byte 0–255 in dataArray[i].
-    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-    this.analyser.getByteFrequencyData(dataArray);
+    // doesn't matter). each answer is squashed to a byte 0–255 in matchStrengths[i].
+    const matchStrengths = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(matchStrengths);
 
     // sample rate is how many pressure numbers arrive per second
     const sampleRate = this.audioContext.sampleRate;
-    // binSize ≈ "how many Hz one step in dataArray is" e.g. 48000 / 256 = 187.5
+    // binSize ≈ "how many Hz one step in matchStrengths is" e.g. 48000 / 256 = 187.5
     const binSize = sampleRate / this.analyser.fftSize;
 
     const frequencyRanges = [
@@ -62,17 +62,19 @@ export default class AudioAnalyser {
     const noiseThreshold = 25;
 
     for (const range of frequencyRanges) {
-      // 500–1000 Hz → e.g. indexes 5..9. then those dataArray slots become one bar.
+      // we need to convert 128 matchStrengths into 5 bars. each bar is a Hz range,
+      // so divide by binSize to get which indexes that is.
+      // 500–1000 Hz → e.g. indexes 2..4. then those matchStrengths slots become one bar.
       const startBin = Math.floor(range.min / binSize);
       const endBin = Math.floor(range.max / binSize);
 
       let sum = 0;
       let count = 0;
 
-      for (let i = startBin; i < Math.min(endBin, dataArray.length); i++) {
-        if (dataArray[i] > noiseThreshold) {
+      for (let i = startBin; i < Math.min(endBin, matchStrengths.length); i++) {
+        if (matchStrengths[i] > noiseThreshold) {
           // drop the floor, then a curve so mid values show up more on the bars
-          const adjustedValue = Math.pow(dataArray[i] - noiseThreshold, 1.5);
+          const adjustedValue = Math.pow(matchStrengths[i] - noiseThreshold, 1.5);
           sum += adjustedValue;
           count++;
           totalEnergy += adjustedValue;
