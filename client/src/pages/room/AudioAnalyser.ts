@@ -1,5 +1,13 @@
 import type { AudioFrequencyData } from '../../../../shared/types/core';
 
+// | stage                    | name                                             | what                              |
+// | ------------------------ | ------------------------------------------------ | --------------------------------- |
+// | ~48000 samples/s         | stream                                           | live pressure numbers             |
+// | tap into the engine      | source (createMediaStreamSource + connect)       | hose stream → analyser            |
+// | latest 256 samples       | analyser.fftSize                                 | sliding window                    |
+// | 128 pitch-strength bytes | dataArray via getByteFrequencyData               | match strength per ~187.5 Hz bin  |
+// | 5 bars + overall         | bands, overallLevel (frequencyRanges loop)       | squash those bytes to 0–100       |
+
 export default class AudioAnalyser {
   private audioContext: AudioContext;
   private analyser: AnalyserNode;
@@ -9,14 +17,18 @@ export default class AudioAnalyser {
   constructor(audioContext: AudioContext, stream: MediaStream) {
     this.audioContext = audioContext;
     this.analyser = this.createAnalyser();
+    // adapter: stream is just pressure numbers; this box feeds them into the engine
     this.source = audioContext.createMediaStreamSource(stream);
+    // hose: source → analyser. analyser does not play; it only keeps the latest window
     this.source.connect(this.analyser);
   }
 
   private createAnalyser(): AnalyserNode {
     const analyser = this.audioContext.createAnalyser();
-    analyser.fftSize = 256; // gives us 128 frequency bins
-    analyser.smoothingTimeConstant = 0.8; // smooth out rapid changes
+    // each snapshot uses the latest 256 pressure numbers → 128 frequency bins
+    analyser.fftSize = 256;
+    // mix in the previous snapshot so bars don't jump
+    analyser.smoothingTimeConstant = 0.8;
     return analyser;
   }
 
@@ -25,13 +37,16 @@ export default class AudioAnalyser {
       return { bands: [0, 0, 0, 0, 0], overallLevel: 0 };
     }
 
+    // for each of the 128 speeds: build a template wave of that speed, same length 256,
+    // and ask "does this sample look like this template?" (sine + cosine so a time-shift
+    // doesn't matter). each answer is squashed to a byte 0–255 in dataArray[i].
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.analyser.getByteFrequencyData(dataArray);
 
+    // sample rate is how many pressure numbers arrive per second
     const sampleRate = this.audioContext.sampleRate;
     const binSize = sampleRate / (this.analyser.fftSize * 2);
 
-    // human voice frequency ranges
     const frequencyRanges = [
       { min: 80, max: 250 }, // low fundamentals
       { min: 250, max: 500 }, // vocal fry, low voice
@@ -46,6 +61,7 @@ export default class AudioAnalyser {
     const noiseThreshold = 25;
 
     for (const range of frequencyRanges) {
+      // 500–1000 Hz → e.g. indexes 5..9. then those dataArray slots become one bar.
       const startBin = Math.floor(range.min / binSize);
       const endBin = Math.floor(range.max / binSize);
 
@@ -54,7 +70,7 @@ export default class AudioAnalyser {
 
       for (let i = startBin; i < Math.min(endBin, dataArray.length); i++) {
         if (dataArray[i] > noiseThreshold) {
-          // non-linear scaling to emphasize mid-level sounds
+          // drop the floor, then a curve so mid values show up more on the bars
           const adjustedValue = Math.pow(dataArray[i] - noiseThreshold, 1.5);
           sum += adjustedValue;
           count++;
