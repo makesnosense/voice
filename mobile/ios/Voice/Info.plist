@@ -48,6 +48,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Voice is audio-only and does not use the camera. This description is required because the call library includes unused camera APIs.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Voice needs microphone access for calls</string>
 	<key>RCTNewArchEnabled</key>
