@@ -1,0 +1,8 @@
+# google c++/objc, 100 cols to match prettier
+BasedOnStyle: Google
+ColumnLimit: 100
+DerivePointerAlignment: false
+AllowShortFunctionsOnASingleLine: Empty
+WhitespaceSensitiveMacros:
+  - RCT_EXPORT_METHOD
+  - RCT_EXPORT_MODULE
