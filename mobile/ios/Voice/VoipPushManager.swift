@@ -1,5 +1,11 @@
 import Foundation
+import os
 import PushKit
+
+private let log = Logger(
+  subsystem: Bundle.main.bundleIdentifier ?? "voice",
+  category: "PushKit"
+)
 
 final class VoipPushManager: NSObject, PKPushRegistryDelegate {
   static let shared = VoipPushManager()
@@ -22,11 +28,11 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate {
   ) {
     guard type == .voIP else { return }
     let token = pushCredentials.token.map { String(format: "%02x", $0) }.joined()
-    print("📱 VoIP token: \(token)")
+    log.info("VOICEDEBUG VoIP token: \(token, privacy: .public)")
   }
 
   func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
     guard type == .voIP else { return }
-    print("⚠️ VoIP token invalidated")
+    log.info("VOICEDEBUG VoIP token invalidated")
   }
 }
