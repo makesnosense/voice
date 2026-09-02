@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Platform as RNPlatform } from 'react-native';
+import { getModel } from 'react-native-device-info';
 import { useAuthStore } from '../stores/useAuthStore';
 import { keychainStorage } from '../utils/keychain';
 import { api } from '../api';
@@ -11,6 +12,12 @@ const getNativePlatform = () =>
   RNPlatform.OS === 'ios' ? PLATFORM.IOS : PLATFORM.ANDROID;
 
 const getDeviceName = (): string | undefined => {
+  if (RNPlatform.OS === 'ios') {
+    const model = getModel();
+    if (!model || model === 'unknown') return undefined;
+    return model;
+  }
+
   if (RNPlatform.OS === 'android') {
     const { Brand, Model } = RNPlatform.constants as {
       Brand?: string;
@@ -22,8 +29,7 @@ const getDeviceName = (): string | undefined => {
     }
     return Model ?? Brand;
   }
-  // iOS: Platform.constants doesn't expose model — undefined for now,
-  // will be filled in when iOS support is added via react-native-device-info
+
   return undefined;
 };
 
