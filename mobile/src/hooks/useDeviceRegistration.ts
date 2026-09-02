@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { keychainStorage } from '../utils/keychain';
 import { api } from '../api';
 import { getFcmToken, listenForTokenRefresh } from '../utils/fcm';
+import { getVoipPushToken } from '../native/voip-push';
 import { PLATFORM } from '../../../shared/constants/platform';
 
 const getNativePlatform = () =>
@@ -26,12 +27,15 @@ const getDeviceName = (): string | undefined => {
   return undefined;
 };
 
-const syncDevice = async (token: string) => {
+const syncDevice = async (options: {
+  fcmToken?: string;
+  voipPushToken?: string;
+}) => {
   const refreshToken = await keychainStorage.getRefreshToken();
   if (!refreshToken) return;
   try {
     await api.devices.syncDevice(refreshToken, getNativePlatform(), {
-      fcmToken: token,
+      ...options,
       deviceName: getDeviceName(),
     });
     console.log('✅ Device synced');
@@ -45,13 +49,27 @@ export const useDeviceRegistration = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    // voip push token registration for iOS not implemented yet
+
+    if (RNPlatform.OS === 'ios') {
+      getVoipPushToken().then(token => {
+        if (token) syncDevice({ voipPushToken: token });
+      });
+      return;
+    }
+
     if (RNPlatform.OS !== 'android') return;
 
     getFcmToken().then(token => {
-      if (token) syncDevice(token);
+      if (token) syncDevice({ fcmToken: token });
     });
-    const unsubscribe = listenForTokenRefresh(syncDevice);
+
+    // listenForTokenRefresh wraps firebase onTokenRefresh, which returns a
+    // function that cancels the subscription — so this is "stop listening",
+    // not "listen". useEffect cleanup must call it.
+    const unsubscribe = listenForTokenRefresh(token =>
+      syncDevice({ fcmToken: token }),
+    );
+
     return unsubscribe;
   }, [isAuthenticated]);
 };

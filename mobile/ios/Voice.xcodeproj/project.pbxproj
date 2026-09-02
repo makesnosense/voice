@@ -11,8 +11,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		46565BA86E7340929FC2D3AC /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A90E36A46130455CBF5C62BA /* BootSplash.storyboard */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
-		9A11B2C32CA4567400665502 /* VoipPushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A11B2C32CA4567400665501 /* VoipPushManager.swift */; };
 		958009F30C96454DB788FCF7 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5ABFF95CC7D46C1A7C2969F /* Colors.xcassets */; };
+		9A11B2C32CA4567400665502 /* VoipPushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A11B2C32CA4567400665501 /* VoipPushManager.swift */; };
+		9A33D1B12CA4567400665521 /* VoipPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A33D1B12CA4567400665520 /* VoipPush.m */; };
 		9D9F3CDC2BC9EEAB4846166A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-Voice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Voice.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Voice/AppDelegate.swift; sourceTree = "<group>"; };
 		9A11B2C32CA4567400665501 /* VoipPushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = VoipPushManager.swift; path = Voice/VoipPushManager.swift; sourceTree = "<group>"; };
+		9A33D1B12CA4567400665520 /* VoipPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VoipPush.m; path = Voice/VoipPush.m; sourceTree = "<group>"; };
 		A90E36A46130455CBF5C62BA /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = Voice/BootSplash.storyboard; sourceTree = "<group>"; };
 		D5ABFF95CC7D46C1A7C2969F /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = Voice/Colors.xcassets; sourceTree = "<group>"; };
 		EACF66C23042E4B300F01C07 /* Voice.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Voice.entitlements; path = Voice/Voice.entitlements; sourceTree = "<group>"; };
@@ -51,6 +53,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				9A11B2C32CA4567400665501 /* VoipPushManager.swift */,
+				9A33D1B12CA4567400665520 /* VoipPush.m */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				A90E36A46130455CBF5C62BA /* BootSplash.storyboard */,
@@ -200,13 +203,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Voice/Pods-Voice-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Voice/Pods-Voice-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -243,13 +242,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Voice/Pods-Voice-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Voice/Pods-Voice-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -265,6 +260,7 @@
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 				9A11B2C32CA4567400665502 /* VoipPushManager.swift in Sources */,
+				9A33D1B12CA4567400665521 /* VoipPush.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
