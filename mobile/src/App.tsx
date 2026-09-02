@@ -11,7 +11,7 @@ import { useDeviceRegistration } from './hooks/useDeviceRegistration';
 import { useAnsweredCallDeepLink } from './hooks/useAnsweredCallDeepLink';
 import { useRoomLink } from './hooks/useRoomLink';
 import { useServerConnectivity } from './hooks/useServerConnectivity';
-import { runAndroidNativePermissions } from './native/runAndroidNativePermissions';
+import { runAndroidNativePermissions } from './native/android-native-permissions';
 import { prependCallHistoryEntry } from './queries/call-history';
 import { CALL_DIRECTION, CALL_OUTCOME } from '../../shared/constants/calls';
 import PermissionsScreen from './screens/PermissionsScreen';
