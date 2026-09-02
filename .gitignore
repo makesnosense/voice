@@ -38,6 +38,7 @@ ssl/
 .env
 .env.development
 .env.production
+*.p8
 
 # React Native / Android / iOS
 *.apk
