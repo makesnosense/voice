@@ -5,7 +5,12 @@ type FcmConfig =
   | { enabled: true; projectId: string; privateKey: string; clientEmail: string }
   | { enabled: false; projectId: undefined; privateKey: undefined; clientEmail: undefined };
 
+type ApnsConfig =
+  | { enabled: true; keyId: string; teamId: string; privateKey: string; bundleId: string }
+  | { enabled: false; keyId: undefined; teamId: undefined; privateKey: undefined; bundleId: undefined };
+
 const { FCM_PROJECT_ID, FCM_PRIVATE_KEY, FCM_CLIENT_EMAIL } = process.env;
+const { APNS_KEY_ID, APNS_TEAM_ID, APNS_PRIVATE_KEY, APNS_BUNDLE_ID } = process.env;
 
 const fcmConfig: FcmConfig =
   FCM_PROJECT_ID && FCM_PRIVATE_KEY && FCM_CLIENT_EMAIL
@@ -16,6 +21,23 @@ const fcmConfig: FcmConfig =
         clientEmail: FCM_CLIENT_EMAIL,
       }
     : { enabled: false, projectId: undefined, privateKey: undefined, clientEmail: undefined };
+
+const apnsConfig: ApnsConfig =
+  APNS_KEY_ID && APNS_TEAM_ID && APNS_PRIVATE_KEY && APNS_BUNDLE_ID
+    ? {
+        enabled: true,
+        keyId: APNS_KEY_ID,
+        teamId: APNS_TEAM_ID,
+        privateKey: APNS_PRIVATE_KEY,
+        bundleId: APNS_BUNDLE_ID,
+      }
+    : {
+        enabled: false,
+        keyId: undefined,
+        teamId: undefined,
+        privateKey: undefined,
+        bundleId: undefined,
+      };
 
 const getRequiredEnv = (key: string): string => {
   const value = process.env[key];
@@ -64,6 +86,7 @@ const config = {
     trustProxy: isProduction, // trust proxy headers in production
   },
   fcm: fcmConfig,
+  apns: apnsConfig,
   playStoreReview: {
     email: process.env.REVIEW_EMAIL,
     otpCode: process.env.REVIEW_OTP_CODE,
@@ -86,7 +109,8 @@ if (!config.isProduction && config.ssl) {
 }
 console.log(`   CORS Origins: ${config.corsOrigins.join(', ')}`);
 console.log(`   Rate Limiting: ${config.rateLimiting.enabled ? 'enabled' : 'disabled'}`);
-console.log(`   Push notifications: ${config.fcm.enabled ? 'enabled' : 'disabled'}`);
+console.log(`   FCM: ${config.fcm.enabled ? 'enabled' : 'disabled'}`);
+console.log(`   APNs: ${config.apns.enabled ? 'enabled' : 'disabled'}`);
 console.log(
   `   Play Store review bypass: ${config.playStoreReview.email ? 'enabled' : 'disabled'}`
 );

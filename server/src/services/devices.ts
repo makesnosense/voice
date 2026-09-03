@@ -1,6 +1,6 @@
 import { devices, refreshTokens } from '../db/schema';
 import { db } from '../db';
-import { eq, and, desc, inArray, isNotNull } from 'drizzle-orm';
+import { eq, and, desc, inArray, isNotNull, or } from 'drizzle-orm';
 import { PLATFORM } from '../db/schema';
 import type { Platform } from '../db/schema';
 import type { Device } from '../../../shared/types/devices';
@@ -74,18 +74,15 @@ export async function updateDevice(
   return updated ? mapDeviceRow(updated) : null;
 }
 
-const deviceSelect = {
-  jti: devices.jti,
-  platform: devices.platform,
-  deviceName: devices.deviceName,
-  fcmToken: devices.fcmToken,
-  lastSeen: devices.lastSeen,
-  createdAt: devices.createdAt,
-};
-
 export async function getUserDevices(userId: string): Promise<Device[]> {
   const rows = await db
-    .select(deviceSelect)
+    .select({
+      jti: devices.jti,
+      platform: devices.platform,
+      deviceName: devices.deviceName,
+      lastSeen: devices.lastSeen,
+      createdAt: devices.createdAt,
+    })
     .from(devices)
     .where(eq(devices.userId, userId))
     .orderBy(desc(devices.lastSeen));
@@ -93,16 +90,29 @@ export async function getUserDevices(userId: string): Promise<Device[]> {
   return rows.map(mapDeviceRow);
 }
 
-export async function getUserMobileDevices(userId: string) {
-  return db
-    .select(deviceSelect)
+export async function getUserMobileDevicesPushTokens(userId: string) {
+  const rows = await db
+    .select({
+      fcmToken: devices.fcmToken,
+      voipPushToken: devices.voipPushToken,
+    })
     .from(devices)
     .where(
       and(
         eq(devices.userId, userId),
         inArray(devices.platform, [PLATFORM.ANDROID, PLATFORM.IOS]),
-        isNotNull(devices.fcmToken)
+        or(isNotNull(devices.fcmToken), isNotNull(devices.voipPushToken))
       )
     )
     .orderBy(desc(devices.lastSeen));
+
+  const fcmTokens: string[] = [];
+  const voipPushTokens: string[] = [];
+
+  for (const { fcmToken, voipPushToken } of rows) {
+    if (fcmToken !== null) fcmTokens.push(fcmToken);
+    if (voipPushToken !== null) voipPushTokens.push(voipPushToken);
+  }
+
+  return { fcmTokens, voipPushTokens };
 }

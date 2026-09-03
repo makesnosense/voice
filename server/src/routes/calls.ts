@@ -7,7 +7,7 @@ import {
   markCallAnswered,
   markCallCancelled,
 } from '../services/calls';
-import { getUserMobileDevices } from '../services/devices';
+import { getUserMobileDevicesPushTokens } from '../services/devices';
 import { findUserById } from '../services/users';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/calls';
@@ -84,21 +84,18 @@ export default function createCallsRouter(
       }
 
       try {
-        const mobileDevices = await getUserMobileDevices(targetUserId);
-        if (mobileDevices.length === 0) {
+        const pushTokens = await getUserMobileDevicesPushTokens(targetUserId);
+        if (pushTokens.fcmTokens.length === 0 && pushTokens.voipPushTokens.length === 0) {
           return res.status(404).json({
             errorMessage: 'User not reachable',
             errorCode: ERROR_CODE.USER_NOT_REACHABLE,
           });
         }
-        const fcmTokens = mobileDevices.flatMap((device) =>
-          device.fcmToken ? [device.fcmToken] : []
-        );
 
         const { roomId, room } = createRoom(rooms, roomDestructionManager);
 
         const callsLogEntry = await createCallsLogEntry(caller.userId, targetUserId);
-        await notifyDevicesOfCall(caller, fcmTokens, roomId, callsLogEntry.id);
+        await notifyDevicesOfCall(caller, pushTokens, roomId, callsLogEntry.id);
 
         const targetUser = await findUserById(targetUserId);
         if (targetUser) {
@@ -107,7 +104,7 @@ export default function createCallsRouter(
             email: targetUser.email,
             name: targetUser.name,
             callId: callsLogEntry.id,
-            fcmTokens,
+            fcmTokens: pushTokens.fcmTokens,
           };
 
           inviteTimeoutManager.scheduleTimeout(roomId, INVITE_TIMEOUT_MS, () => {

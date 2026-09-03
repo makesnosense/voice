@@ -1,4 +1,5 @@
 import { sendCallNotification } from '../utils/fcm';
+import { sendVoipCallNotification } from '../utils/apns';
 import { db } from '../db';
 import { calls } from '../db/schema';
 import { and, eq, SQL, sql } from 'drizzle-orm';
@@ -9,23 +10,31 @@ import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
   caller: { userId: string; email: string; name: string | null },
-  fcmTokens: string[],
+  pushTokens: { fcmTokens: string[]; voipPushTokens: string[] },
   roomId: RoomId,
   callId: string
 ): Promise<void> {
   const sentAt = Date.now();
-  await Promise.allSettled(
-    fcmTokens.map((token) =>
-      sendCallNotification(token, {
-        callerUserId: caller.userId,
-        callerEmail: caller.email,
-        callerName: caller.name,
-        roomId,
-        callId,
-        sentAt,
-      })
-    )
+  const payload = {
+    callerUserId: caller.userId,
+    callerEmail: caller.email,
+    callerName: caller.name,
+    roomId,
+    callId,
+    sentAt,
+  };
+
+  const fcmSends = pushTokens.fcmTokens.map((token) => sendCallNotification(token, payload));
+  const apnsSends = pushTokens.voipPushTokens.map((token) =>
+    sendVoipCallNotification(token, payload)
   );
+
+  const results = await Promise.allSettled([...fcmSends, ...apnsSends]);
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      console.error('Failed to send call push:', result.reason);
+    }
+  }
 }
 
 export async function createCallsLogEntry(fromUserId: string, toUserId: string) {
