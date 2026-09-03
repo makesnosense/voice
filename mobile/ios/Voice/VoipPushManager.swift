@@ -8,6 +8,20 @@ private let log = Logger(
   category: "PushKit"
 )
 
+private struct IncomingCallInfo {
+  let uuid: UUID
+  let roomId: String
+  let callId: String
+  let callerUserId: String
+  let callerEmail: String
+  let callerName: String?
+
+  var callerDisplayName: String {
+    if let callerName { return callerName }
+    return callerEmail
+  }
+}
+
 // @objc is only so the React Native iOS module (Objective-C++) can read shared and currentToken
 @objc(VoipPushManager)
 final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
@@ -16,6 +30,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   private var voipRegistry: PKPushRegistry?
   @objc private(set) var currentToken: String?
   private let telephonyProvider: CXProvider
+  private var pendingCalls: [UUID: IncomingCallInfo] = [:]
 
   private override init() {
     let configuration = CXProviderConfiguration()
@@ -70,18 +85,32 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     log.info("VOICEDEBUG VoIP push received")
 
+    let dictionary = payload.dictionaryPayload
+    let incomingCallInfo = parseIncomingCall(from: dictionary)
+    let callUUID = incomingCallInfo?.uuid ?? UUID()
+
+    if let incomingCallInfo {
+      pendingCalls[incomingCallInfo.uuid] = incomingCallInfo
+      log.info(
+        "VOICEDEBUG parsed call uuid=\(incomingCallInfo.uuid.uuidString, privacy: .public) roomId=\(incomingCallInfo.roomId, privacy: .public) callId=\(incomingCallInfo.callId, privacy: .public)"
+      )
+    } else {
+      log.error("VOICEDEBUG VoIP payload missing required fields, reporting fallback call")
+    }
+
     let update = CXCallUpdate()
-    let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Incoming call"
-    update.remoteHandle = CXHandle(type: .generic, value: callerName)
-    update.localizedCallerName = callerName
+    let callerDisplayName = incomingCallInfo?.callerDisplayName ?? "Incoming call"
+    update.remoteHandle = CXHandle(type: .generic, value: callerDisplayName)
+    update.localizedCallerName = callerDisplayName
     update.hasVideo = false
     update.supportsHolding = false
     update.supportsGrouping = false
     update.supportsUngrouping = false
     update.supportsDTMF = false
 
-    func onCallReported(error: Error?) {
+    func onIncomingCallReportFinished(error: Error?) {
       if let error {
+        self.pendingCalls.removeValue(forKey: callUUID)
         log.error("VOICEDEBUG CallKit report failed: \(error.localizedDescription, privacy: .public)")
         completion()
         return
@@ -92,13 +121,14 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     }
 
     telephonyProvider.reportNewIncomingCall(
-      with: UUID(),
+      with: callUUID,
       update: update,
-      completion: onCallReported
+      completion: onIncomingCallReportFinished
     )
   }
 
   func providerDidReset(_ provider: CXProvider) {
+    pendingCalls.removeAll()
     log.info("VOICEDEBUG CallKit provider reset")
   }
 
@@ -108,7 +138,34 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   }
 
   func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+    pendingCalls.removeValue(forKey: action.callUUID)
     log.info("VOICEDEBUG CallKit end (stub)")
     action.fulfill()
+  }
+
+  private func parseIncomingCall(from payload: [AnyHashable: Any]) -> IncomingCallInfo? {
+    guard
+      let uuidString = trimmedString(payload["uuid"]) ?? trimmedString(payload["callId"]),
+      let uuid = UUID(uuidString: uuidString),
+      let roomId = trimmedString(payload["roomId"]),
+      let callId = trimmedString(payload["callId"]),
+      let callerUserId = trimmedString(payload["callerUserId"]),
+      let callerEmail = trimmedString(payload["callerEmail"])
+    else { return nil }
+
+    return IncomingCallInfo(
+      uuid: uuid,
+      roomId: roomId,
+      callId: callId,
+      callerUserId: callerUserId,
+      callerEmail: callerEmail,
+      callerName: trimmedString(payload["callerName"])
+    )
+  }
+
+  private func trimmedString(_ value: Any?) -> String? {
+    guard let value = value as? String else { return nil }
+    let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.isEmpty ? nil : trimmed
   }
 }
