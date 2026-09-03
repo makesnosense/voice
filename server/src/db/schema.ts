@@ -53,7 +53,7 @@ export const devices = pgTable('devices', {
   platform: platformEnum('platform').notNull(),
   deviceName: varchar('device_name', { length: 100 }),
   fcmToken: varchar('fcm_token', { length: 255 }),
-  voipPushToken: varchar('voip_push_token', { length: 255 }),
+  voipPushToken: varchar('voip_token', { length: 255 }),
   lastSeen: timestamp('last_seen', { withTimezone: true }).notNull().defaultNow(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

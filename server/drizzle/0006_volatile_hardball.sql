@@ -1,0 +1,1 @@
+ALTER TABLE "devices" RENAME COLUMN "voip_push_token" TO "voip_token";

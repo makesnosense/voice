@@ -43,6 +43,13 @@
       "when": 1782009022485,
       "tag": "0005_ordinary_prism",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788406865664,
+      "tag": "0006_volatile_hardball",
+      "breakpoints": true
     }
   ]
 }
