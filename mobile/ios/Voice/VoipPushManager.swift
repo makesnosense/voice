@@ -36,6 +36,8 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   private let telephonyProvider: CXProvider
   private var pendingCalls: [UUID: IncomingCallInfo] = [:]
   private var acceptedCall: IncomingCallInfo?
+  // held until we fulfill or fail — not fulfilling tells callkit the call is still connecting
+  private var pendingAnswerAction: CXAnswerCallAction?
 
   override private init() {
     let configuration = CXProviderConfiguration()
@@ -137,6 +139,8 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   /// callkit discarded every call it knew about (out of sync, leftover state).
   /// not a voIP token change — that is didInvalidatePushTokenFor.
   func providerDidReset(_: CXProvider) {
+    pendingAnswerAction?.fail()
+    pendingAnswerAction = nil
     acceptedCall = nil
     pendingCalls.removeAll()
     log.info("VOICEDEBUG CallKit provider reset")
@@ -145,15 +149,21 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   func provider(_: CXProvider, perform action: CXAnswerCallAction) {
     acceptedCall = pendingCalls[action.callUUID]
     pendingCalls.removeValue(forKey: action.callUUID)
-    if let acceptedCall {
-      log.info("VOICEDEBUG CallKit answer stashed callId=\(acceptedCall.callId, privacy: .public)")
-    } else {
+    guard let acceptedCall else {
       log.error("VOICEDEBUG CallKit answer missing pending call")
+      action.fail()
+      return
     }
-    action.fulfill()
+
+    pendingAnswerAction = action
+    log.info("VOICEDEBUG CallKit answer held callId=\(acceptedCall.callId, privacy: .public)")
   }
 
   func provider(_: CXProvider, perform action: CXEndCallAction) {
+    if pendingAnswerAction?.callUUID == action.callUUID {
+      pendingAnswerAction?.fail()
+      pendingAnswerAction = nil
+    }
     if acceptedCall?.uuid == action.callUUID {
       acceptedCall = nil
     }
