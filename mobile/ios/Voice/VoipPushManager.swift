@@ -17,22 +17,27 @@ private struct IncomingCallInfo {
   let callerName: String?
 
   var callerDisplayName: String {
-    if let callerName { return callerName }
+    if let callerName {
+      return callerName
+    }
     return callerEmail
   }
 }
 
-// @objc is only so the React Native iOS module (Objective-C++) can read shared and currentToken
+/// @objc is only so the React Native iOS module (Objective-C++) can read shared and currentToken
 @objc(VoipPushManager)
 final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
   @objc static let shared = VoipPushManager()
 
   private var voipRegistry: PKPushRegistry?
   @objc private(set) var currentToken: String?
+  // callkit's handle to the system incoming-call ui. we report calls on it;
+  // it calls us back (answer, end, reset) via CXProviderDelegate.
   private let telephonyProvider: CXProvider
   private var pendingCalls: [UUID: IncomingCallInfo] = [:]
+  private var acceptedCall: IncomingCallInfo?
 
-  private override init() {
+  override private init() {
     let configuration = CXProviderConfiguration()
     configuration.supportsVideo = false
     configuration.maximumCallGroups = 1
@@ -45,7 +50,9 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   }
 
   func registerForVoIPPushes() {
-    if voipRegistry != nil { return }
+    if voipRegistry != nil {
+      return
+    }
 
     voipRegistry = PKPushRegistry(queue: .main)
     guard let voipRegistry else { return }
@@ -54,7 +61,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   }
 
   func pushRegistry(
-    _ registry: PKPushRegistry,
+    _: PKPushRegistry,
     didUpdate pushCredentials: PKPushCredentials,
     for type: PKPushType
   ) {
@@ -64,16 +71,16 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     log.info("VOICEDEBUG VoIP token: \(token, privacy: .public)")
   }
 
-  func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+  func pushRegistry(_: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
     guard type == .voIP else { return }
     currentToken = nil
     log.info("VOICEDEBUG VoIP token invalidated")
   }
 
-  // apple requires reportNewIncomingCall before this method returns. skip that and
-  // ios kills the app; repeat it and voip pushes stop until the app is reinstalled.
+  /// apple requires reportNewIncomingCall before this method returns. skip that and
+  /// ios kills the app; repeat it and voip pushes stop until the app is reinstalled.
   func pushRegistry(
-    _ registry: PKPushRegistry,
+    _: PKPushRegistry,
     didReceiveIncomingPushWith payload: PKPushPayload,
     for type: PKPushType,
     completion: @escaping () -> Void
@@ -110,7 +117,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     func onIncomingCallReportFinished(error: Error?) {
       if let error {
-        self.pendingCalls.removeValue(forKey: callUUID)
+        pendingCalls.removeValue(forKey: callUUID)
         log.error("VOICEDEBUG CallKit report failed: \(error.localizedDescription, privacy: .public)")
         completion()
         return
@@ -127,17 +134,29 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     )
   }
 
-  func providerDidReset(_ provider: CXProvider) {
+  /// callkit discarded every call it knew about (out of sync, leftover state).
+  /// not a voIP token change — that is didInvalidatePushTokenFor.
+  func providerDidReset(_: CXProvider) {
+    acceptedCall = nil
     pendingCalls.removeAll()
     log.info("VOICEDEBUG CallKit provider reset")
   }
 
-  func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-    log.info("VOICEDEBUG CallKit answer (stub)")
+  func provider(_: CXProvider, perform action: CXAnswerCallAction) {
+    acceptedCall = pendingCalls[action.callUUID]
+    pendingCalls.removeValue(forKey: action.callUUID)
+    if let acceptedCall {
+      log.info("VOICEDEBUG CallKit answer stashed callId=\(acceptedCall.callId, privacy: .public)")
+    } else {
+      log.error("VOICEDEBUG CallKit answer missing pending call")
+    }
     action.fulfill()
   }
 
-  func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+  func provider(_: CXProvider, perform action: CXEndCallAction) {
+    if acceptedCall?.uuid == action.callUUID {
+      acceptedCall = nil
+    }
     pendingCalls.removeValue(forKey: action.callUUID)
     log.info("VOICEDEBUG CallKit end (stub)")
     action.fulfill()
