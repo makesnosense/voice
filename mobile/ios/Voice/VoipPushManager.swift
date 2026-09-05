@@ -22,9 +22,24 @@ private struct IncomingCallInfo {
     }
     return callerEmail
   }
+
+  var asDictionary: [String: Any] {
+    var dictionary: [String: Any] = [
+      "roomId": roomId,
+      "callId": callId,
+      "callerUserId": callerUserId,
+      "callerEmail": callerEmail,
+    ]
+    if let callerName {
+      dictionary["callerName"] = callerName
+    }
+    return dictionary
+  }
 }
 
-/// @objc is only so the React Native iOS module (Objective-C++) can read shared and currentToken
+/// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
+/// the swift compiler creates Voice-Swift.h at compile time and writes those @objc declarations into it
+/// VoipPush.m imports that header.
 @objc(VoipPushManager)
 final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
   @objc static let shared = VoipPushManager()
@@ -35,7 +50,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   // it calls us back (answer, end, reset) via CXProviderDelegate.
   private let telephonyProvider: CXProvider
   private var pendingCalls: [UUID: IncomingCallInfo] = [:]
-  private var acceptedCall: IncomingCallInfo?
+  private var acceptedCallInfo: IncomingCallInfo?
   // held until we fulfill or fail — not fulfilling tells callkit the call is still connecting
   private var pendingAnswerAction: CXAnswerCallAction?
 
@@ -141,22 +156,22 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   func providerDidReset(_: CXProvider) {
     pendingAnswerAction?.fail()
     pendingAnswerAction = nil
-    acceptedCall = nil
+    acceptedCallInfo = nil
     pendingCalls.removeAll()
     log.info("VOICEDEBUG CallKit provider reset")
   }
 
   func provider(_: CXProvider, perform action: CXAnswerCallAction) {
-    acceptedCall = pendingCalls[action.callUUID]
+    acceptedCallInfo = pendingCalls[action.callUUID]
     pendingCalls.removeValue(forKey: action.callUUID)
-    guard let acceptedCall else {
+    guard let acceptedCallInfo else {
       log.error("VOICEDEBUG CallKit answer missing pending call")
       action.fail()
       return
     }
 
     pendingAnswerAction = action
-    log.info("VOICEDEBUG CallKit answer held callId=\(acceptedCall.callId, privacy: .public)")
+    log.info("VOICEDEBUG CallKit answer held callId=\(acceptedCallInfo.callId, privacy: .public)")
   }
 
   func provider(_: CXProvider, perform action: CXEndCallAction) {
@@ -164,12 +179,28 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       pendingAnswerAction?.fail()
       pendingAnswerAction = nil
     }
-    if acceptedCall?.uuid == action.callUUID {
-      acceptedCall = nil
+    if acceptedCallInfo?.uuid == action.callUUID {
+      acceptedCallInfo = nil
     }
     pendingCalls.removeValue(forKey: action.callUUID)
     log.info("VOICEDEBUG CallKit end (stub)")
     action.fulfill()
+  }
+
+  /// this is the way for js to reach for acceptedCallInfo
+  /// (if RN was down when we stroke an event an it missed it)
+  @objc func takeAcceptedCallInfo() -> [String: Any]? {
+    guard let acceptedCallInfo else { return nil }
+    self.acceptedCallInfo = nil
+    return acceptedCallInfo.asDictionary
+  }
+
+  /// this is the way to fulfill when we want it (also from js)
+  @objc func fulfillPendingAnswerAction() {
+    guard let pendingAnswerAction else { return }
+    log.info("VOICEDEBUG CallKit answer fulfilled")
+    pendingAnswerAction.fulfill()
+    self.pendingAnswerAction = nil
   }
 
   private func parseIncomingCall(from payload: [AnyHashable: Any]) -> IncomingCallInfo? {
