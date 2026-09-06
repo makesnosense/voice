@@ -46,7 +46,7 @@ extension Notification.Name {
 
 /// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
 /// the swift compiler creates Voice-Swift.h at compile time and writes those @objc declarations into it
-/// VoipPush.m imports that header.
+/// VoipPushToken.m imports that header.
 @objc(VoipPushManager)
 final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
   @objc static let shared = VoipPushManager()
@@ -160,6 +160,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
   /// callkit discarded every call it knew about (out of sync, leftover state).
   /// not a voIP token change — that is didInvalidatePushTokenFor.
+  /// first argument is telephonyProvider. iOS calls this on it automatically (setDelegate queue: nil → main).
   func providerDidReset(_: CXProvider) {
     pendingAnswerAction?.fail()
     pendingAnswerAction = nil
@@ -168,6 +169,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     log.info("VOICEDEBUG CallKit provider reset")
   }
 
+  /// first argument is telephonyProvider. iOS calls this on it automatically.
   func provider(_: CXProvider, perform action: CXAnswerCallAction) {
     acceptedCallInfo = pendingCalls[action.callUUID]
     pendingCalls.removeValue(forKey: action.callUUID)
@@ -189,6 +191,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     )
   }
 
+  /// first argument is telephonyProvider. iOS calls this on it automatically.
   func provider(_: CXProvider, perform action: CXEndCallAction) {
     if pendingAnswerAction?.callUUID == action.callUUID {
       pendingAnswerAction?.fail()
