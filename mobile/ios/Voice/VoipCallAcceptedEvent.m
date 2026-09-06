@@ -1,7 +1,7 @@
 #import <React/RCTEventEmitter.h>
+#import "Voice-Swift.h"
 
 // translates apple's in-process VoipCallAccepted notification into an RN event.
-// does not talk to CallKit or VoipPushManager — js still cannot hear NotificationCenter directly.
 
 @interface VoipCallAcceptedEvent : RCTEventEmitter
 @end
@@ -48,6 +48,12 @@ RCT_EXPORT_MODULE();
 
 - (void)handleCallAccepted:(NSNotification*)notification {
   [self sendEventWithName:@"callAccepted" body:notification.userInfo];
+}
+
+// lets js get acceptedCallInfo if the notification fired when RN was down
+RCT_EXPORT_METHOD(takeAcceptedCallInfo:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  resolve([[VoipPushManager shared] takeAcceptedCallInfo]);
 }
 
 @end
