@@ -37,6 +37,13 @@ private struct IncomingCallInfo {
   }
 }
 
+/// Nofication.name is typical way to create a channel in NotificationCenter
+/// NotificationCenter is in-process Pub/Sub
+extension Notification.Name {
+  /// in-process only — not a user/push notification. objc will observe this string later.
+  static let voipCallAccepted = Notification.Name("VoipCallAccepted")
+}
+
 /// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
 /// the swift compiler creates Voice-Swift.h at compile time and writes those @objc declarations into it
 /// VoipPush.m imports that header.
@@ -172,6 +179,14 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     pendingAnswerAction = action
     log.info("VOICEDEBUG CallKit answer held callId=\(acceptedCallInfo.callId, privacy: .public)")
+
+    // NotificationCenter is Apple’s in-process pub/sub. Same app, same process.
+    // It is NOT push notifications, NOT CallKit, NOT UNUserNotificationCenter (banners).
+    NotificationCenter.default.post(
+      name: Notification.Name.voipCallAccepted,
+      object: nil,
+      userInfo: acceptedCallInfo.asDictionary
+    )
   }
 
   func provider(_: CXProvider, perform action: CXEndCallAction) {
