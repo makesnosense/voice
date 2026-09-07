@@ -24,16 +24,13 @@ private struct IncomingCallInfo {
   }
 
   var asDictionary: [String: Any] {
-    var dictionary: [String: Any] = [
+    [
       "roomId": roomId,
       "callId": callId,
       "callerUserId": callerUserId,
       "callerEmail": callerEmail,
+      "callerName": callerName ?? NSNull(),
     ]
-    if let callerName {
-      dictionary["callerName"] = callerName
-    }
-    return dictionary
   }
 }
 
