@@ -6,14 +6,17 @@ export interface CallInitiationResponse {
   callId: string;
 }
 
-export interface CallNotificationPayload {
+export interface IncomingCallInfo {
   callerUserId: string;
   callerEmail: string;
   callerName: string | null;
   roomId: string;
   callId: string;
-  sentAt: number;
 }
+
+export type CallNotificationPayload = IncomingCallInfo & {
+  sentAt: number;
+};
 
 // always relative to "us" – the authenticated user
 // outgoing = authenticated user originated the call

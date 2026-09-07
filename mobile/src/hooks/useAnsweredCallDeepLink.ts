@@ -1,15 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Linking } from 'react-native';
+import type { IncomingCallInfo } from '../../../shared/types/calls';
 
-export interface AnsweredCallDeepLinkParams {
-  roomId: string;
-  callerUserId: string;
-  callerEmail: string;
-  callerName: string | null;
-  callId: string;
-}
-
-function extractCallParams(url: string): AnsweredCallDeepLinkParams | null {
+function extractCallParams(url: string): IncomingCallInfo | null {
   const [, query] = url.split('?');
   if (!query) return null;
   const params = new URLSearchParams(query);
@@ -30,7 +23,7 @@ function extractCallParams(url: string): AnsweredCallDeepLinkParams | null {
 }
 
 export function useAnsweredCallDeepLink(
-  onAnswered: (params: AnsweredCallDeepLinkParams) => void,
+  onAnswered: (params: IncomingCallInfo) => void,
 ) {
   const onAnsweredRef = useRef(onAnswered);
   onAnsweredRef.current = onAnswered;
