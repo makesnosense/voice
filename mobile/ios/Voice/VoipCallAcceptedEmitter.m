@@ -3,17 +3,17 @@
 
 // translates apple's in-process VoipCallAccepted notification into an RN event.
 
-@interface VoipCallAcceptedEvent : RCTEventEmitter
+@interface VoipCallAcceptedEmitter : RCTEventEmitter
 @end
 
-@implementation VoipCallAcceptedEvent
+@implementation VoipCallAcceptedEmitter
 
 RCT_EXPORT_MODULE();
 
 // We put all readers/writers on one queue (main, because CallKit already chose it) so they never
 // overlap.
 
-// Init this object (VoipCallAcceptedEvent — the ObjC module RN constructs) on the main thread
+// Init this object (VoipCallAcceptedEmitter — the ObjC module RN constructs) on the main thread
 + (BOOL)requiresMainQueueSetup {
   return YES;
 }
