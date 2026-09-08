@@ -56,4 +56,8 @@ RCT_EXPORT_METHOD(takeAcceptedCallInfo:(RCTPromiseResolveBlock)resolve
   resolve([[VoipPushManager shared] takeAcceptedCallInfo]);
 }
 
+RCT_EXPORT_METHOD(fulfillPendingAnswerAction) {
+  [[VoipPushManager shared] fulfillPendingAnswerAction];
+}
+
 @end

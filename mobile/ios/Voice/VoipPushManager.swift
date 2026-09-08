@@ -211,6 +211,9 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   }
 
   /// this is the way to fulfill when we want it (also from js)
+  /// until we send it, iOS keeps the banner on Connecting.
+  /// after we send it, iOS shows the in-call UI,
+  /// CallKit treats the call as connected and activates AVAudioSession and calls didActivate
   @objc func fulfillPendingAnswerAction() {
     guard let pendingAnswerAction else { return }
     log.info("VOICEDEBUG CallKit answer fulfilled")
