@@ -75,7 +75,7 @@ export async function takeStoredAcceptedCallInfo(): Promise<IncomingCallInfo | n
 }
 
 export function subscribeCallAccepted(
-  onAccepted: (params: IncomingCallInfo) => void,
+  onAccepted: (incomingCallInfo: IncomingCallInfo) => void,
 ) {
   if (Platform.OS !== 'ios') return { remove: () => {} };
 
@@ -87,8 +87,8 @@ export function subscribeCallAccepted(
   return voipCallAcceptedJsEmitter.addListener(
     'callAccepted',
     callAcceptedPayload => {
-      const params = parseAcceptedCall(callAcceptedPayload);
-      if (params) onAccepted(params);
+      const incomingCallInfo = parseAcceptedCall(callAcceptedPayload);
+      if (incomingCallInfo) onAccepted(incomingCallInfo);
     },
   );
 }
