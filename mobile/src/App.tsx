@@ -8,7 +8,7 @@ import { contactsQueryOptions } from './queries/contacts';
 import { useActiveRoomStore } from './stores/useActiveRoomStore';
 import { usePermissionsStore } from './stores/usePermissionsStore';
 import { useDeviceRegistration } from './hooks/useDeviceRegistration';
-import { useAnsweredCallDeepLink } from './hooks/useAnsweredCallDeepLink';
+import { useIncomingCall } from './hooks/useIncomingCall';
 import { useRoomLink } from './hooks/useRoomLink';
 import { useServerConnectivity } from './hooks/useServerConnectivity';
 import { runAndroidNativePermissions } from './native/android-native-permissions';
@@ -70,8 +70,7 @@ export default function App() {
   ]);
 
   useDeviceRegistration();
-
-  useAnsweredCallDeepLink(incomingCallInfo => joinCall(incomingCallInfo));
+  useIncomingCall(joinCall);
 
   useDismissedCallLogs();
 

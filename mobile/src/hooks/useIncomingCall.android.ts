@@ -22,7 +22,7 @@ function extractCallParams(url: string): IncomingCallInfo | null {
   };
 }
 
-export function useAnsweredCallDeepLink(
+export function useIncomingCall(
   onAnswered: (incomingCallInfo: IncomingCallInfo) => void,
 ) {
   const onAnsweredRef = useRef(onAnswered);
