@@ -50,10 +50,10 @@ RCT_EXPORT_MODULE();
   [self sendEventWithName:@"callAccepted" body:notification.userInfo];
 }
 
-// lets js get acceptedCallInfo if the notification fired when RN was down
-RCT_EXPORT_METHOD(takeAcceptedCallInfo:(RCTPromiseResolveBlock)resolve
+// lets js drain storedAcceptedCallInfo if the notification fired when RN was down
+RCT_EXPORT_METHOD(takeStoredAcceptedCallInfo:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-  resolve([[VoipPushManager shared] takeAcceptedCallInfo]);
+  resolve([[VoipPushManager shared] takeStoredAcceptedCallInfo]);
 }
 
 RCT_EXPORT_METHOD(fulfillPendingAnswerAction) {

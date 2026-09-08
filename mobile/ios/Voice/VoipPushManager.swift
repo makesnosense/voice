@@ -54,7 +54,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   // it calls us back (answer, end, reset) via CXProviderDelegate.
   private let telephonyProvider: CXProvider
   private var pendingCalls: [UUID: IncomingCallInfo] = [:]
-  private var acceptedCallInfo: IncomingCallInfo?
+  private var storedAcceptedCallInfo: IncomingCallInfo?
   // held until we fulfill or fail — not fulfilling tells callkit the call is still connecting
   private var pendingAnswerAction: CXAnswerCallAction?
 
@@ -161,30 +161,30 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   func providerDidReset(_: CXProvider) {
     pendingAnswerAction?.fail()
     pendingAnswerAction = nil
-    acceptedCallInfo = nil
+    storedAcceptedCallInfo = nil
     pendingCalls.removeAll()
     log.info("VOICEDEBUG CallKit provider reset")
   }
 
   /// first argument is telephonyProvider. iOS calls this on it automatically.
   func provider(_: CXProvider, perform action: CXAnswerCallAction) {
-    acceptedCallInfo = pendingCalls[action.callUUID]
+    storedAcceptedCallInfo = pendingCalls[action.callUUID]
     pendingCalls.removeValue(forKey: action.callUUID)
-    guard let acceptedCallInfo else {
+    guard let storedAcceptedCallInfo else {
       log.error("VOICEDEBUG CallKit answer missing pending call")
       action.fail()
       return
     }
 
     pendingAnswerAction = action
-    log.info("VOICEDEBUG CallKit answer held callId=\(acceptedCallInfo.callId, privacy: .public)")
+    log.info("VOICEDEBUG CallKit answer held callId=\(storedAcceptedCallInfo.callId, privacy: .public)")
 
     // NotificationCenter is Apple’s in-process pub/sub. Same app, same process.
     // It is NOT push notifications, NOT CallKit, NOT UNUserNotificationCenter (banners).
     NotificationCenter.default.post(
       name: Notification.Name.voipCallAccepted,
       object: nil,
-      userInfo: acceptedCallInfo.asDictionary
+      userInfo: storedAcceptedCallInfo.asDictionary
     )
   }
 
@@ -194,20 +194,20 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       pendingAnswerAction?.fail()
       pendingAnswerAction = nil
     }
-    if acceptedCallInfo?.uuid == action.callUUID {
-      acceptedCallInfo = nil
+    if storedAcceptedCallInfo?.uuid == action.callUUID {
+      storedAcceptedCallInfo = nil
     }
     pendingCalls.removeValue(forKey: action.callUUID)
     log.info("VOICEDEBUG CallKit end (stub)")
     action.fulfill()
   }
 
-  /// this is the way for js to reach for acceptedCallInfo
+  /// this is the way for js to reach for storedAcceptedCallInfo
   /// (if RN was down when we stroke an event an it missed it)
-  @objc func takeAcceptedCallInfo() -> [String: Any]? {
-    guard let acceptedCallInfo else { return nil }
-    self.acceptedCallInfo = nil
-    return acceptedCallInfo.asDictionary
+  @objc func takeStoredAcceptedCallInfo() -> [String: Any]? {
+    guard let storedAcceptedCallInfo else { return nil }
+    self.storedAcceptedCallInfo = nil
+    return storedAcceptedCallInfo.asDictionary
   }
 
   /// this is the way to fulfill when we want it (also from js)
