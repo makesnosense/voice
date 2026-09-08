@@ -5,33 +5,33 @@ import type { IncomingCallInfo } from '../../../shared/types/calls';
 function extractCallParams(url: string): IncomingCallInfo | null {
   const [, query] = url.split('?');
   if (!query) return null;
-  const params = new URLSearchParams(query);
+  const incomingCallInfo = new URLSearchParams(query);
 
-  const roomId = params.get('roomId');
-  const callerUserId = params.get('callerUserId');
-  const callerEmail = params.get('callerEmail');
-  const callId = params.get('callId');
+  const roomId = incomingCallInfo.get('roomId');
+  const callerUserId = incomingCallInfo.get('callerUserId');
+  const callerEmail = incomingCallInfo.get('callerEmail');
+  const callId = incomingCallInfo.get('callId');
   if (!roomId || !callerUserId || !callerEmail || !callId) return null;
 
   return {
     roomId,
     callerUserId,
     callerEmail,
-    callerName: params.get('callerName'),
+    callerName: incomingCallInfo.get('callerName'),
     callId,
   };
 }
 
 export function useAnsweredCallDeepLink(
-  onAnswered: (params: IncomingCallInfo) => void,
+  onAnswered: (incomingCallInfo: IncomingCallInfo) => void,
 ) {
   const onAnsweredRef = useRef(onAnswered);
   onAnsweredRef.current = onAnswered;
 
   useEffect(() => {
     const handleUrl = (url: string) => {
-      const params = extractCallParams(url);
-      if (params) onAnsweredRef.current(params);
+      const incomingCallInfo = extractCallParams(url);
+      if (incomingCallInfo) onAnsweredRef.current(incomingCallInfo);
     };
 
     Linking.getInitialURL().then(url => {
