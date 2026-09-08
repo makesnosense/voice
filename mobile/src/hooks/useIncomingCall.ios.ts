@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { subscribeCallAccepted } from '../native/voip-call-accepted-ios';
+import {
+  fulfillPendingAnswerAction,
+  subscribeCallAccepted,
+} from '../native/voip-call-accepted-ios';
 import type { IncomingCallInfo } from '../../../shared/types/calls';
 
 export function useIncomingCall(
@@ -11,6 +14,7 @@ export function useIncomingCall(
   useEffect(() => {
     const subscription = subscribeCallAccepted(params => {
       onAnsweredRef.current(params);
+      fulfillPendingAnswerAction();
     });
     return () => subscription.remove();
   }, []);
