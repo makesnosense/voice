@@ -22,6 +22,7 @@ import type { Contact } from '../../shared/types/contacts';
 import { api } from './api';
 import { useDismissedCallLogs } from './hooks/useDismissedCallLogsSync';
 import AuthOrHome from './AuthOrHome';
+import type { IncomingCallInfo } from '../../shared/types/calls';
 
 export default function App() {
   const [bootSplashActive, setBootSplashActive] = useState(true);
@@ -70,36 +71,7 @@ export default function App() {
 
   useDeviceRegistration();
 
-  useAnsweredCallDeepLink(params => {
-    const cachedContacts =
-      queryClient.getQueryData<Contact[]>(contactsQueryOptions.queryKey) ?? [];
-    const contactInStore = cachedContacts.find(
-      contact => contact.id === params.callerUserId,
-    );
-
-    useAuthStore
-      .getState()
-      .getValidAccessToken()
-      .then(token => api.calls.markAnswered(params.callId, token))
-      .catch(err =>
-        console.error('❌ Failed to record answered outcome:', err),
-      );
-
-    prependCallHistoryEntry({
-      id: params.callId,
-      createdAt: new Date().toISOString(),
-      direction: CALL_DIRECTION.INCOMING,
-      outcome: CALL_OUTCOME.ANSWERED,
-      contactId: params.callerUserId,
-      contactEmail: params.callerEmail,
-      contactName: params.callerName,
-      contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
-    });
-
-    useActiveRoomStore.setState({
-      activeRoomId: params.roomId as RoomId,
-    });
-  });
+  useAnsweredCallDeepLink(incomingCallInfo => joinCall(incomingCallInfo));
 
   useDismissedCallLogs();
 
@@ -138,6 +110,35 @@ export default function App() {
       </View>
     </>
   );
+}
+
+function joinCall(incomingCallInfo: IncomingCallInfo) {
+  const cachedContacts =
+    queryClient.getQueryData<Contact[]>(contactsQueryOptions.queryKey) ?? [];
+  const contactInStore = cachedContacts.find(
+    contact => contact.id === incomingCallInfo.callerUserId,
+  );
+
+  useAuthStore
+    .getState()
+    .getValidAccessToken()
+    .then(token => api.calls.markAnswered(incomingCallInfo.callId, token))
+    .catch(err => console.error('❌ Failed to record answered outcome:', err));
+
+  prependCallHistoryEntry({
+    id: incomingCallInfo.callId,
+    createdAt: new Date().toISOString(),
+    direction: CALL_DIRECTION.INCOMING,
+    outcome: CALL_OUTCOME.ANSWERED,
+    contactId: incomingCallInfo.callerUserId,
+    contactEmail: incomingCallInfo.callerEmail,
+    contactName: incomingCallInfo.callerName,
+    contactHasMobileDevice: contactInStore?.hasMobileDevice ?? true,
+  });
+
+  useActiveRoomStore.setState({
+    activeRoomId: incomingCallInfo.roomId as RoomId,
+  });
 }
 
 const styles = StyleSheet.create({
