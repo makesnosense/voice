@@ -7,10 +7,11 @@ import {
 import type { IncomingCallInfo } from '../../../shared/types/calls';
 
 // NativeModule is RN's event-emitter shape: addListener / removeListeners only
-// the same object also has the method fulfillPendingAnswerAction we export from ObjC
+// the same object also has the methods we export from ObjC
 // NativeModules — a dictionary of every RCT_EXPORT_MODULE() RN loaded
 type VoipCallAcceptedNativeModule = NativeModule & {
   fulfillPendingAnswerAction(): void;
+  takeStoredAcceptedCallInfo(): Promise<unknown>;
 };
 
 const { VoipCallAcceptedEmitter: voipCallAcceptedNativeModule } =
@@ -58,6 +59,19 @@ export function fulfillPendingAnswerAction() {
   }
 
   voipCallAcceptedNativeModule.fulfillPendingAnswerAction();
+}
+
+export async function takeStoredAcceptedCallInfo(): Promise<IncomingCallInfo | null> {
+  if (Platform.OS !== 'ios') return null;
+
+  if (!voipCallAcceptedNativeModule?.takeStoredAcceptedCallInfo) {
+    console.error('❌ VoipCallAcceptedEmitter native module missing on iOS');
+    return null;
+  }
+
+  const unvalidatedAcceptedCallInfo =
+    await voipCallAcceptedNativeModule.takeStoredAcceptedCallInfo();
+  return parseAcceptedCall(unvalidatedAcceptedCallInfo);
 }
 
 export function subscribeCallAccepted(
