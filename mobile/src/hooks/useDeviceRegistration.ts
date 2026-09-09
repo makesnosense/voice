@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { keychainStorage } from '../utils/keychain';
 import { api } from '../api';
 import { getFcmToken, listenForTokenRefresh } from '../utils/fcm';
-import { getVoipPushToken } from '../native/voip-push';
+import { getVoipPushToken } from '../native/get-voip-push-token-ios';
 import { PLATFORM } from '../../../shared/constants/platform';
 
 const getNativePlatform = () =>
