@@ -47,9 +47,9 @@ extension Notification.Name {
 /// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
 /// the swift compiler creates Voice-Swift.h at compile time and writes those @objc declarations into it
 /// VoipPushToken.m imports that header.
-@objc(VoipPushManager)
-final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
-  @objc static let shared = VoipPushManager()
+@objc(VoipCallManager)
+final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
+  @objc static let shared = VoipCallManager()
 
   private var voipRegistry: PKPushRegistry?
   @objc private(set) var currentToken: String?

@@ -1,5 +1,5 @@
 #import <React/RCTBridgeModule.h>
-// generated Swift→ObjC header. this is how VoipPushManager and currentToken exist in this .m file.
+// generated Swift→ObjC header. this is how VoipCallManager and currentToken exist in this .m file.
 #import "Voice-Swift.h"
 
 @interface VoipPushToken : NSObject <RCTBridgeModule>
@@ -11,7 +11,7 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(getToken:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-  resolve([VoipPushManager shared].currentToken);
+  resolve([VoipCallManager shared].currentToken);
 }
 
 @end

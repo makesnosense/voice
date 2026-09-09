@@ -62,15 +62,15 @@ RCT_EXPORT_MODULE();
 // lets js drain storedAcceptedCallInfo if the notification fired when RN was down
 RCT_EXPORT_METHOD(takeStoredAcceptedCallInfo:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-  resolve([[VoipPushManager shared] takeStoredAcceptedCallInfo]);
+  resolve([[VoipCallManager shared] takeStoredAcceptedCallInfo]);
 }
 
 RCT_EXPORT_METHOD(fulfillPendingAnswerAction) {
-  [[VoipPushManager shared] fulfillPendingAnswerAction];
+  [[VoipCallManager shared] fulfillPendingAnswerAction];
 }
 
 RCT_EXPORT_METHOD(requestIosEndCallKitCall) {
-  [[VoipPushManager shared] requestIosEndCallKitCall];
+  [[VoipCallManager shared] requestIosEndCallKitCall];
 }
 
 @end
