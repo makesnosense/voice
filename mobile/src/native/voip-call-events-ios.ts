@@ -9,17 +9,17 @@ import type { IncomingCallInfo } from '../../../shared/types/calls';
 // NativeModule is RN's event-emitter shape: addListener / removeListeners only
 // the same object also has the methods we export from ObjC
 // NativeModules — a dictionary of every RCT_EXPORT_MODULE() RN loaded
-type VoipCallAcceptedNativeModule = NativeModule & {
+type VoipCallEventsNativeModule = NativeModule & {
   fulfillPendingAnswerAction(): void;
   takeStoredAcceptedCallInfo(): Promise<unknown>;
 };
 
-const { VoipCallAcceptedEmitter: voipCallAcceptedNativeModule } =
-  NativeModules as { VoipCallAcceptedEmitter?: VoipCallAcceptedNativeModule };
+const { VoipCallEventsEmitter: voipCallEventsNativeModule } =
+  NativeModules as { VoipCallEventsEmitter?: VoipCallEventsNativeModule };
 
-const voipCallAcceptedJsEmitter =
-  Platform.OS === 'ios' && voipCallAcceptedNativeModule
-    ? new NativeEventEmitter(voipCallAcceptedNativeModule)
+const voipCallEventsJsEmitter =
+  Platform.OS === 'ios' && voipCallEventsNativeModule
+    ? new NativeEventEmitter(voipCallEventsNativeModule)
     : null;
 
 function isValidIncomingCallInfo(
@@ -53,24 +53,24 @@ function parseAcceptedCall(
 export function fulfillPendingAnswerAction() {
   if (Platform.OS !== 'ios') return;
 
-  if (!voipCallAcceptedNativeModule?.fulfillPendingAnswerAction) {
-    console.error('❌ VoipCallAcceptedEmitter native module missing on iOS');
+  if (!voipCallEventsNativeModule?.fulfillPendingAnswerAction) {
+    console.error('❌ VoipCallEventsEmitter native module missing on iOS');
     return;
   }
 
-  voipCallAcceptedNativeModule.fulfillPendingAnswerAction();
+  voipCallEventsNativeModule.fulfillPendingAnswerAction();
 }
 
 export async function takeStoredAcceptedCallInfo(): Promise<IncomingCallInfo | null> {
   if (Platform.OS !== 'ios') return null;
 
-  if (!voipCallAcceptedNativeModule?.takeStoredAcceptedCallInfo) {
-    console.error('❌ VoipCallAcceptedEmitter native module missing on iOS');
+  if (!voipCallEventsNativeModule?.takeStoredAcceptedCallInfo) {
+    console.error('❌ VoipCallEventsEmitter native module missing on iOS');
     return null;
   }
 
   const unvalidatedAcceptedCallInfo =
-    await voipCallAcceptedNativeModule.takeStoredAcceptedCallInfo();
+    await voipCallEventsNativeModule.takeStoredAcceptedCallInfo();
   return parseAcceptedCall(unvalidatedAcceptedCallInfo);
 }
 
@@ -79,12 +79,12 @@ export function subscribeCallAccepted(
 ) {
   if (Platform.OS !== 'ios') return { remove: () => {} };
 
-  if (!voipCallAcceptedJsEmitter) {
-    console.error('❌ VoipCallAcceptedEmitter native module missing on iOS');
+  if (!voipCallEventsJsEmitter) {
+    console.error('❌ VoipCallEventsEmitter native module missing on iOS');
     return { remove: () => {} };
   }
 
-  return voipCallAcceptedJsEmitter.addListener(
+  return voipCallEventsJsEmitter.addListener(
     'callAccepted',
     callAcceptedPayload => {
       const incomingCallInfo = parseAcceptedCall(callAcceptedPayload);
@@ -96,10 +96,10 @@ export function subscribeCallAccepted(
 export function subscribeCallEnded(onEnded: () => void) {
   if (Platform.OS !== 'ios') return { remove: () => {} };
 
-  if (!voipCallAcceptedJsEmitter) {
-    console.error('❌ VoipCallAcceptedEmitter native module missing on iOS');
+  if (!voipCallEventsJsEmitter) {
+    console.error('❌ VoipCallEventsEmitter native module missing on iOS');
     return { remove: () => {} };
   }
 
-  return voipCallAcceptedJsEmitter.addListener('callEnded', onEnded);
+  return voipCallEventsJsEmitter.addListener('callEnded', onEnded);
 }
