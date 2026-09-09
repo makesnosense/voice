@@ -92,3 +92,14 @@ export function subscribeCallAccepted(
     },
   );
 }
+
+export function subscribeCallEnded(onEnded: () => void) {
+  if (Platform.OS !== 'ios') return { remove: () => {} };
+
+  if (!voipCallAcceptedJsEmitter) {
+    console.error('❌ VoipCallAcceptedEmitter native module missing on iOS');
+    return { remove: () => {} };
+  }
+
+  return voipCallAcceptedJsEmitter.addListener('callEnded', onEnded);
+}

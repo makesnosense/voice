@@ -41,6 +41,7 @@ private struct IncomingCallInfo {
 extension Notification.Name {
   /// in-process only — not a user/push notification. objc will observe this string later.
   static let voipCallAccepted = Notification.Name("VoipCallAccepted")
+  static let voipCallEnded = Notification.Name("VoipCallEnded")
 }
 
 /// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
@@ -221,7 +222,8 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       storedAcceptedCallInfo = nil
     }
     pendingCalls.removeValue(forKey: action.callUUID)
-    log.info("VOICEDEBUG CallKit end (stub)")
+    NotificationCenter.default.post(name: Notification.Name.voipCallEnded, object: nil)
+    log.info("VOICEDEBUG CallKit end")
     action.fulfill()
   }
 

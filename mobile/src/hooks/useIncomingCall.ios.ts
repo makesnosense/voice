@@ -2,8 +2,10 @@ import { useEffect, useRef } from 'react';
 import {
   fulfillPendingAnswerAction,
   subscribeCallAccepted,
+  subscribeCallEnded,
   takeStoredAcceptedCallInfo,
 } from '../native/voip-call-accepted-ios';
+import { useActiveRoomStore } from '../stores/useActiveRoomStore';
 import type { IncomingCallInfo } from '../../../shared/types/calls';
 
 export function useIncomingCall(
@@ -21,8 +23,14 @@ export function useIncomingCall(
   };
 
   useEffect(() => {
-    const subscription = subscribeCallAccepted(joinAndFulfill);
-    return () => subscription.remove();
+    const accepted = subscribeCallAccepted(joinAndFulfill);
+    const ended = subscribeCallEnded(() => {
+      useActiveRoomStore.setState({ activeRoomId: null });
+    });
+    return () => {
+      accepted.remove();
+      ended.remove();
+    };
   }, []);
 
   // cold start: accept happened before js subscribed; native kept it in storedAcceptedCallInfo

@@ -1,7 +1,7 @@
 #import <React/RCTEventEmitter.h>
 #import "Voice-Swift.h"
 
-// translates apple's in-process VoipCallAccepted notification into an RN event.
+// translates apple's in-process VoipCallAccepted / VoipCallEnded notifications into RN events.
 
 @interface VoipCallAcceptedEmitter : RCTEventEmitter
 @end
@@ -25,13 +25,17 @@ RCT_EXPORT_MODULE();
 }
 
 - (NSArray<NSString*>*)supportedEvents {
-  return @[ @"callAccepted" ];
+  return @[ @"callAccepted", @"callEnded" ];
 }
 
 - (void)startObserving {
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(handleCallAccepted:)
                                                name:@"VoipCallAccepted"
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(handleCallEnded:)
+                                               name:@"VoipCallEnded"
                                              object:nil];
 }
 
@@ -48,6 +52,10 @@ RCT_EXPORT_MODULE();
 
 - (void)handleCallAccepted:(NSNotification*)notification {
   [self sendEventWithName:@"callAccepted" body:notification.userInfo];
+}
+
+- (void)handleCallEnded:(__unused NSNotification*)notification {
+  [self sendEventWithName:@"callEnded" body:nil];
 }
 
 // lets js drain storedAcceptedCallInfo if the notification fired when RN was down
