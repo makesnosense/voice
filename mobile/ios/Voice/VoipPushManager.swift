@@ -57,6 +57,9 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   // it calls us back (answer, end, reset) via CXProviderDelegate.
   private let telephonyProvider: CXProvider
   private var pendingCalls: [UUID: IncomingCallInfo] = [:]
+  // our callId (if callInfo parse doesn't fail), held as UUID because callkit wants that type.
+  // pendingCalls / storedAcceptedCallInfo go away on answer; this stays until end/reset.
+  private var activeCallUUID: UUID?
   private var storedAcceptedCallInfo: IncomingCallInfo?
   // held until we fulfill or fail — not fulfilling tells callkit the call is still connecting
   private var pendingAnswerAction: CXAnswerCallAction?
@@ -147,7 +150,10 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
         return
       }
 
-      log.info("VOICEDEBUG CallKit incoming call reported")
+      activeCallUUID = callUUID
+      log.info(
+        "VOICEDEBUG CallKit incoming call reported uuid=\(callUUID.uuidString, privacy: .public)"
+      )
       completion()
     }
 
@@ -166,6 +172,7 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     pendingAnswerAction = nil
     storedAcceptedCallInfo = nil
     pendingCalls.removeAll()
+    activeCallUUID = nil
     log.info("VOICEDEBUG CallKit provider reset")
   }
 
@@ -222,6 +229,9 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       storedAcceptedCallInfo = nil
     }
     pendingCalls.removeValue(forKey: action.callUUID)
+    if activeCallUUID == action.callUUID {
+      activeCallUUID = nil
+    }
     NotificationCenter.default.post(name: Notification.Name.voipCallEnded, object: nil)
     log.info("VOICEDEBUG CallKit end")
     action.fulfill()
