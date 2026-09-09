@@ -1,7 +1,9 @@
+import AVFoundation
 import CallKit
 import Foundation
 import os
 import PushKit
+import WebRTC
 
 private let log = Logger(
   subsystem: Bundle.main.bundleIdentifier ?? "voice",
@@ -176,6 +178,27 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       return
     }
 
+    // WebRTC’s singleton wrapper around system audio session.
+    // One process-wide instance.
+    let rtcAudioSession = RTCAudioSession.sharedInstance()
+
+    // by default webrtc starts its audio unit as soon as a track is ready
+    // (getUserMedia) — before callkit has handed over the session. this flag
+    // defers that: the unit only starts once isAudioEnabled is also true,
+    // which we set in didActivate.
+    rtcAudioSession.useManualAudio = true
+    do {
+      try AVAudioSession.sharedInstance().setCategory(
+        AVAudioSession.Category.playAndRecord,
+        mode: AVAudioSession.Mode.voiceChat,
+        options: [AVAudioSession.CategoryOptions.allowBluetooth]
+      )
+    } catch {
+      log.error(
+        "VOICEDEBUG audio session category failed: \(error.localizedDescription, privacy: .public)"
+      )
+    }
+
     pendingAnswerAction = action
     log.info("VOICEDEBUG CallKit answer held callId=\(storedAcceptedCallInfo.callId, privacy: .public)")
 
@@ -200,6 +223,24 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     pendingCalls.removeValue(forKey: action.callUUID)
     log.info("VOICEDEBUG CallKit end (stub)")
     action.fulfill()
+  }
+
+  /// callkit calls this after it activates avaudiosession (after fulfill).
+  /// we hand that session to webrtc.
+  func provider(_: CXProvider, didActivate audioSession: AVAudioSession) {
+    let rtcAudioSession = RTCAudioSession.sharedInstance()
+    rtcAudioSession.audioSessionDidActivate(audioSession)
+    rtcAudioSession.isAudioEnabled = true
+    log.info("VOICEDEBUG CallKit audio session activated")
+  }
+
+  /// callkit calls this after it deactivates the session (end, fail, or interruption). we stop webrtc's audio unit.
+  func provider(_: CXProvider, didDeactivate audioSession: AVAudioSession) {
+    let rtcAudioSession = RTCAudioSession.sharedInstance()
+    rtcAudioSession.audioSessionDidDeactivate(audioSession)
+    rtcAudioSession.isAudioEnabled = false
+    rtcAudioSession.useManualAudio = false
+    log.info("VOICEDEBUG CallKit audio session deactivated")
   }
 
   /// this is the way for js to reach for storedAcceptedCallInfo

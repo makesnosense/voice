@@ -76,8 +76,14 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
 
   useEffect(() => {
     startCallForegroundService();
-    InCallManager.start({ media: 'audio' });
-    InCallManager.setForceSpeakerphoneOn(false);
+
+    // ios incoming call uses callkit's audio session.
+    // InCallManager.start() would setActive and fight didActivate.
+    // android has no callkit, so it still needs this.
+    if (RNPlatform.OS !== 'ios') {
+      InCallManager.start({ media: 'audio' });
+      InCallManager.setForceSpeakerphoneOn(false);
+    }
 
     // ios fires a native "Proximity" event unconditionally whenever the
     // sensor state changes, regardless of whether js is listening — without
@@ -89,7 +95,9 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
 
     return () => {
       stopCallForegroundService();
-      InCallManager.stop();
+      if (RNPlatform.OS !== 'ios') {
+        InCallManager.stop();
+      }
       if (RNPlatform.OS === 'ios') {
         NativeModules.InCallManager?.removeListeners?.(1);
       }
