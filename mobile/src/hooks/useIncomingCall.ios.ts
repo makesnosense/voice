@@ -4,7 +4,7 @@ import {
   subscribeCallAccepted,
   subscribeCallEnded,
   takeStoredAcceptedCallInfo,
-} from '../native/voip-call-events-ios';
+} from '../native/voip-callkit-ios';
 import { useActiveRoomStore } from '../stores/useActiveRoomStore';
 import type { IncomingCallInfo } from '../../../shared/types/calls';
 

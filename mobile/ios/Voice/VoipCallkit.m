@@ -2,18 +2,19 @@
 #import "Voice-Swift.h"
 
 // translates apple's in-process VoipCallAccepted / VoipCallEnded notifications into RN events.
+// also exports js → native callkit commands (fulfill, take stored accept, end).
 
-@interface VoipCallEventsEmitter : RCTEventEmitter
+@interface VoipCallkit : RCTEventEmitter
 @end
 
-@implementation VoipCallEventsEmitter
+@implementation VoipCallkit
 
 RCT_EXPORT_MODULE();
 
 // We put all readers/writers on one queue (main, because CallKit already chose it) so they never
 // overlap.
 
-// Init this object (VoipCallEventsEmitter — the ObjC module RN constructs) on the main thread
+// Init this object (VoipCallkit — the ObjC module RN constructs) on the main thread
 + (BOOL)requiresMainQueueSetup {
   return YES;
 }
