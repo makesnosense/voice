@@ -68,4 +68,8 @@ RCT_EXPORT_METHOD(fulfillPendingAnswerAction) {
   [[VoipPushManager shared] fulfillPendingAnswerAction];
 }
 
+RCT_EXPORT_METHOD(requestIosEndCallKitCall) {
+  [[VoipPushManager shared] requestIosEndCallKitCall];
+}
+
 @end

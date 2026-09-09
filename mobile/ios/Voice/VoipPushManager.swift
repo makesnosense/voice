@@ -53,9 +53,11 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
   private var voipRegistry: PKPushRegistry?
   @objc private(set) var currentToken: String?
-  // callkit's handle to the system incoming-call ui. we report calls on it;
-  // it calls us back (answer, end, reset) via CXProviderDelegate.
+  /// callkit's handle to the system incoming-call ui. we report calls on it;
+  /// it calls us back (answer, end, reset) via CXProviderDelegate.
   private let telephonyProvider: CXProvider
+  // we request actions on this (js hangup → CXEndCallAction). provider only receives.
+  private let callController = CXCallController()
   private var pendingCalls: [UUID: IncomingCallInfo] = [:]
   // our callId (if callInfo parse doesn't fail), held as UUID because callkit wants that type.
   // pendingCalls / storedAcceptedCallInfo go away on answer; this stays until end/reset.
@@ -272,6 +274,21 @@ final class VoipPushManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     log.info("VOICEDEBUG CallKit answer fulfilled")
     pendingAnswerAction.fulfill()
     self.pendingAnswerAction = nil
+  }
+
+  /// js requests a CXEndCallAction through CXCallController
+  /// (same path as the system End button). no-op if there is no active callkit call.
+  @objc func requestIosEndCallKitCall() {
+    guard let activeCallUUID else { return }
+    let endAction = CXEndCallAction(call: activeCallUUID)
+    let endActionTransaction = CXTransaction(action: endAction)
+    callController.request(endActionTransaction) { error in
+      if let error {
+        log.error(
+          "VOICEDEBUG CallKit end request failed: \(error.localizedDescription, privacy: .public)"
+        )
+      }
+    }
   }
 
   private func parseIncomingCall(from payload: [AnyHashable: Any]) -> IncomingCallInfo? {

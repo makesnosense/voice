@@ -12,10 +12,12 @@ import type { IncomingCallInfo } from '../../../shared/types/calls';
 type VoipCallEventsNativeModule = NativeModule & {
   fulfillPendingAnswerAction(): void;
   takeStoredAcceptedCallInfo(): Promise<unknown>;
+  requestIosEndCallKitCall(): void;
 };
 
-const { VoipCallEventsEmitter: voipCallEventsNativeModule } =
-  NativeModules as { VoipCallEventsEmitter?: VoipCallEventsNativeModule };
+const { VoipCallEventsEmitter: voipCallEventsNativeModule } = NativeModules as {
+  VoipCallEventsEmitter?: VoipCallEventsNativeModule;
+};
 
 const voipCallEventsJsEmitter =
   Platform.OS === 'ios' && voipCallEventsNativeModule
@@ -91,6 +93,17 @@ export function subscribeCallAccepted(
       if (incomingCallInfo) onAccepted(incomingCallInfo);
     },
   );
+}
+
+export function requestIosEndCallKitCall() {
+  if (Platform.OS !== 'ios') return;
+
+  if (!voipCallEventsNativeModule?.requestIosEndCallKitCall) {
+    console.error('❌ VoipCallEventsEmitter native module missing on iOS');
+    return;
+  }
+
+  voipCallEventsNativeModule.requestIosEndCallKitCall();
 }
 
 export function subscribeCallEnded(onEnded: () => void) {

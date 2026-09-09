@@ -26,6 +26,7 @@ import { BACKGROUND_SECONDARY, TEXT_MUTED } from '../../styles/colors';
 import type { RoomId } from '../../../../shared/types/core';
 import RoomTop from './RoomTop';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
+import { requestIosEndCallKitCall } from '../../native/voip-call-events-ios';
 
 interface RoomScreenProps {
   roomId: RoomId;
@@ -46,6 +47,7 @@ const handleJoinSuccess = (roomId: RoomId) => {
 
 const handleLeave = () => {
   useActiveRoomStore.setState({ activeRoomId: null });
+  requestIosEndCallKitCall();
 };
 
 export default function RoomScreen({ roomId }: RoomScreenProps) {
