@@ -89,11 +89,11 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
       InCallManager.setForceSpeakerphoneOn(false);
     }
 
-    // ios fires a native "Proximity" event unconditionally whenever the
-    // sensor state changes, regardless of whether js is listening — without
-    // this, react native's bridge logs a warning on every state change.
-    // android never emits this event, so the guard just skips a no-op there.
     if (RNPlatform.OS === 'ios') {
+      // sometimes we're here NOT from callkit accept of incoming call
+      // so we need InCallManager proximity sensor
+      InCallManager.startProximitySensor();
+      // this is just to silence "Sending 'Proximity' with no listeners registered"
       NativeModules.InCallManager?.addListener?.('Proximity');
     }
 
@@ -103,6 +103,7 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
         InCallManager.stop();
       }
       if (RNPlatform.OS === 'ios') {
+        InCallManager.stopProximitySensor();
         NativeModules.InCallManager?.removeListeners?.(1);
       }
     };

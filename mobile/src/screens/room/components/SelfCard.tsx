@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Mic, MicOff, PhoneOff, VolumeOff, Volume2 } from 'lucide-react-native';
@@ -37,6 +38,11 @@ export default function SelfCard({ onLeave, isLoading }: SelfCardProps) {
   const toggleSpeaker = () => {
     const next = !isSpeakerOn;
     InCallManager.setForceSpeakerphoneOn(next);
+    // earpiece uses proximity; speaker should not black the screen
+    if (Platform.OS === 'ios') {
+      if (next) InCallManager.stopProximitySensor();
+      else InCallManager.startProximitySensor();
+    }
     setIsSpeakerOn(next);
   };
 
