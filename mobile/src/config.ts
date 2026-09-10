@@ -1,14 +1,16 @@
 import { Platform as RNPlatform } from 'react-native';
+import { getServerConfigIos } from './native/server-config-ios';
 
 // android reaches the dev server via `adb reverse tcp:3003 tcp:3003` (see
 // package.json), so `localhost` on-device correctly tunnels to the mac.
 // ios has no equivalent automatic forward for a physical device, so it
 // needs the mac's actual lan ip — same one metro already uses for this phone.
+// those hosts live in ServerConfigIos.swift; js reads the native constants.
 export const DEV_HOST =
-  RNPlatform.OS === 'ios' ? 'admins-MacBook-Pro.local' : 'localhost';
+  RNPlatform.OS === 'ios' ? getServerConfigIos().devHost : 'localhost';
 
-// export const DEV_HOST = 'localhost';
-export const PROD_HOST = 'voice.k.vu';
+export const PROD_HOST =
+  RNPlatform.OS === 'ios' ? getServerConfigIos().prodHost : 'voice.k.vu';
 
 export const BASE_URL = __DEV__
   ? `https://${DEV_HOST}:3003`
