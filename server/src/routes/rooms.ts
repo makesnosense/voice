@@ -143,7 +143,7 @@ export default function createRoomsRouter(
       inviteTimeoutManager.cancelTimeout(roomId);
 
       if (room.invitedUser) {
-        const { fcmTokens } = room.invitedUser;
+        const { fcmTokens, voipTokens } = room.invitedUser;
 
         const result = declineCallSchema.safeParse(req.body);
         if (!result.success) {
@@ -152,13 +152,17 @@ export default function createRoomsRouter(
             .json({ errorMessage: 'invalid request', errorCode: ERROR_CODE.INVALID_REQUEST });
         }
 
-        const { callId, declinerFcmToken } = result.data;
+        const { callId, declinerFcmToken, declinerVoipToken } = result.data;
 
-        const tokensToNotify = fcmTokens.filter((token) => token !== declinerFcmToken);
+        const fcmTokensToNotify = fcmTokens.filter((token) => token !== declinerFcmToken);
+        const voipTokensToNotify = voipTokens.filter((token) => token !== declinerVoipToken);
 
-        await Promise.allSettled(
-          tokensToNotify.map((token) => sendCallDeclinedNotification(token))
-        );
+        await Promise.allSettled([
+          ...fcmTokensToNotify.map((token) => sendCallDeclinedNotification(token)),
+          ...voipTokensToNotify.map((token) =>
+            sendVoipPush(token, VOIP_PUSH_TYPE.CALL_DECLINED, { callId })
+          ),
+        ]);
 
         room.invitedUser = null;
 

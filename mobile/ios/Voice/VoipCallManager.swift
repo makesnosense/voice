@@ -3,6 +3,7 @@ import CallKit
 import Foundation
 import os
 import PushKit
+import UIKit
 import WebRTC
 
 private let log = Logger(
@@ -86,7 +87,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     voipRegistry = PKPushRegistry(queue: .main)
     guard let voipRegistry else { return }
     voipRegistry.delegate = self
-    voipRegistry.desiredPushTypes = [.voIP]
+    voipRegistry.desiredPushTypes = [PKPushType.voIP]
   }
 
   func pushRegistry(
@@ -94,14 +95,14 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     didUpdate pushCredentials: PKPushCredentials,
     for type: PKPushType
   ) {
-    guard type == .voIP else { return }
-    let token = pushCredentials.token.map { String(format: "%02x", $0) }.joined()
+    guard type == PKPushType.voIP else { return }
+    let token = hexString(from: pushCredentials.token)
     currentToken = token
     log.info("VOICEDEBUG VoIP token: \(token, privacy: .public)")
   }
 
   func pushRegistry(_: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
-    guard type == .voIP else { return }
+    guard type == PKPushType.voIP else { return }
     currentToken = nil
     log.info("VOICEDEBUG VoIP token invalidated")
   }
@@ -114,7 +115,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     for type: PKPushType,
     completion: @escaping () -> Void
   ) {
-    guard type == .voIP else {
+    guard type == PKPushType.voIP else {
       completion()
       return
     }
@@ -228,18 +229,14 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   }
 
   /// first argument is telephonyProvider. iOS calls this on it automatically.
+  /// decline of a still-ringing call and hangup of an answered call both arrive here.
+  /// only the ringing case POSTs /decline — same as android DeclineCallReceiver.
   func provider(_: CXProvider, perform action: CXEndCallAction) {
-    if pendingAnswerAction?.callUUID == action.callUUID {
-      pendingAnswerAction?.fail()
-      pendingAnswerAction = nil
+    if isRinging(uuid: action.callUUID), let ringingCall = pendingCalls[action.callUUID] {
+      postCallDeclined(roomId: ringingCall.roomId, callId: ringingCall.callId)
     }
-    if storedAcceptedCallInfo?.uuid == action.callUUID {
-      storedAcceptedCallInfo = nil
-    }
-    pendingCalls.removeValue(forKey: action.callUUID)
-    if activeCallUUID == action.callUUID {
-      activeCallUUID = nil
-    }
+
+    clearCallState(action.callUUID)
     NotificationCenter.default.post(name: Notification.Name.voipCallEnded, object: nil)
     log.info("VOICEDEBUG CallKit end")
     action.fulfill()
@@ -378,6 +375,19 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     pendingCalls[uuid] != nil
   }
 
+  /// binary push token as hex so json can carry it.
+  private func hexString(from tokenData: Data) -> String {
+    tokenData.map { String(format: "%02x", $0) }.joined()
+  }
+
+  private func hexEncodedVoipToken() -> String? {
+    if let currentToken {
+      return currentToken
+    }
+    guard let tokenData = voipRegistry?.pushToken(for: PKPushType.voIP) else { return nil }
+    return hexString(from: tokenData)
+  }
+
   private func uuidFromPushPayload(_ voipPayloadDictionary: [AnyHashable: Any]) -> UUID {
     let uuidString = trimmedString(voipPayloadDictionary["uuid"]) ?? trimmedString(voipPayloadDictionary["callId"])
     return uuidString.flatMap { UUID(uuidString: $0) } ?? UUID()
@@ -395,6 +405,69 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     if activeCallUUID == uuid {
       activeCallUUID = nil
     }
+  }
+
+  /// unauthenticated, same as android PostCallDeclined. callkit already woke us;
+  /// beginBackgroundTask is the analog of DeclineCallReceiver.goAsync so we are
+  /// not suspended before the POST finishes.
+  private func postCallDeclined(roomId: String, callId: String) {
+    guard let voipPushToken = hexEncodedVoipToken() else {
+      log.error("VOICEDEBUG decline POST skipped: no VoIP token")
+      return
+    }
+
+    guard let url = URL(string: "\(ServerConfigIos.baseURL)/api/rooms/\(roomId)/decline") else {
+      log.error("VOICEDEBUG decline POST skipped: bad URL")
+      return
+    }
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.timeoutInterval = 5
+    request.httpBody = Data(
+      "{\"callId\":\"\(callId)\",\"declinerVoipToken\":\"\(voipPushToken)\"}".utf8
+    )
+
+    // this function returns before the POST finishes. callkit then fulfill()s
+    // and ios may suspend us. beginBackgroundTask asks ios to keep the process
+    // alive until we endBackgroundTask (android DeclineCallReceiver.goAsync).
+    // UIBackgroundTaskIdentifier.invalid = no task / already ended.
+    // var so both callbacks can share the id.
+    var backgroundTask = UIBackgroundTaskIdentifier.invalid
+
+    func onDeclinePostRequestBackgroundTimeExpired() {
+      UIApplication.shared.endBackgroundTask(backgroundTask)
+      backgroundTask = UIBackgroundTaskIdentifier.invalid
+    }
+
+    backgroundTask = UIApplication.shared.beginBackgroundTask(
+      withName: "postCallDeclined",
+      expirationHandler: onDeclinePostRequestBackgroundTimeExpired
+    )
+
+    log.info("VOICEDEBUG decline POST callId=\(callId, privacy: .public)")
+
+    /// URLSession.dataTask(...) only creates a task. .resume() starts it
+    /// onDeclinePostRequestFinished runs later when the response arrives (or fails).
+    func onDeclinePostRequestFinished(_: Data?, response: URLResponse?, error: Error?) {
+      if let error {
+        log.error(
+          "VOICEDEBUG decline POST failed: \(error.localizedDescription, privacy: .public)"
+        )
+      } else if let httpResponse = response as? HTTPURLResponse {
+        log.info("VOICEDEBUG decline POST status=\(httpResponse.statusCode, privacy: .public)")
+      }
+      // tell ios we no longer need background time. if we never call this,
+      // ios still thinks the task is running and can kill the app.
+      // skip if the expiration handler already ended it.
+      if backgroundTask != UIBackgroundTaskIdentifier.invalid {
+        UIApplication.shared.endBackgroundTask(backgroundTask)
+        backgroundTask = UIBackgroundTaskIdentifier.invalid
+      }
+    }
+
+    URLSession.shared.dataTask(with: request, completionHandler: onDeclinePostRequestFinished).resume()
   }
 
   private func parseIncomingCall(from payload: [AnyHashable: Any]) -> IncomingCallInfo? {
