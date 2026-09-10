@@ -18,7 +18,8 @@ export function useRoomSocket(
   onCleanup: () => void,
   accessToken?: string,
   onJoinSuccess?: (roomId: RoomId) => void, // mobile-only for rejoin
-  url?: string
+  url?: string,
+  getJoiningDeviceVoipToken?: () => Promise<string | null>
 ) {
   const socketRef = useRef<TypedClientSocket | null>(null);
 
@@ -27,9 +28,11 @@ export function useRoomSocket(
     const socket: TypedClientSocket = url ? io(url, options) : io(options);
     socketRef.current = socket;
 
-    socket.on('connect', () => {
+    socket.on('connect', async () => {
       console.log('✅ Connected to server:', socket.id);
-      socket.emit('join-room', roomId);
+      const joiningDeviceVoipToken = await getJoiningDeviceVoipToken?.();
+
+      socket.emit('join-room', roomId, joiningDeviceVoipToken ?? undefined);
 
       useRoomStore.setState({
         localSocketId: socket.id as SocketId,

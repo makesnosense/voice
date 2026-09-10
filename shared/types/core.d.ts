@@ -82,7 +82,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  'join-room': (roomId: RoomId) => void;
+  'join-room': (roomId: RoomId, joiningDeviceVoipToken?: string) => void;
   message: (data: { text: string }) => void;
   'webrtc-ready': () => void;
   'mute-status-changed': (data: { isMuted: boolean }) => void;

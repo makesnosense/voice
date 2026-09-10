@@ -6,6 +6,7 @@ import { requireAccessToken } from '../middleware/auth';
 import { callSchema, declineCallSchema } from '../schemas/calls';
 import { createCallsLogEntry, notifyDevicesOfCall, markCallDeclined } from '../services/calls';
 import { sendCallCancelledNotification, sendCallDeclinedNotification } from '../utils/fcm';
+import { sendVoipPush, VOIP_PUSH_TYPE } from '../utils/apns';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import type {
   CreateRoomResponse,
@@ -105,9 +106,12 @@ export default function createRoomsRouter(
           inviteTimeoutManager.scheduleTimeout(roomId, INVITE_TIMEOUT_MS, () => {
             const currentRoom = rooms.get(roomId);
             if (!currentRoom?.invitedUser) return;
-            const { fcmTokens: tokens } = currentRoom.invitedUser;
+            const { fcmTokens, voipTokens, callId } = currentRoom.invitedUser;
             currentRoom.invitedUser = null;
-            tokens.forEach((token) => sendCallCancelledNotification(token).catch(() => {}));
+            fcmTokens.forEach((token) => sendCallCancelledNotification(token).catch(() => {}));
+            voipTokens.forEach((token) =>
+              sendVoipPush(token, VOIP_PUSH_TYPE.CALL_CANCELLED, { callId }).catch(() => {})
+            );
             io.to(roomId).emit('invite-expired');
             console.log(`⏰ [Invite] timed out for room ${roomId}`);
           });
@@ -191,9 +195,13 @@ export default function createRoomsRouter(
       inviteTimeoutManager.cancelTimeout(roomId);
 
       if (room.invitedUser) {
-        await Promise.allSettled(
-          room.invitedUser.fcmTokens.map((token) => sendCallCancelledNotification(token))
-        );
+        const { fcmTokens, voipTokens, callId } = room.invitedUser;
+        await Promise.allSettled([
+          ...fcmTokens.map((token) => sendCallCancelledNotification(token)),
+          ...voipTokens.map((token) =>
+            sendVoipPush(token, VOIP_PUSH_TYPE.CALL_CANCELLED, { callId })
+          ),
+        ]);
         room.invitedUser = null;
       }
 

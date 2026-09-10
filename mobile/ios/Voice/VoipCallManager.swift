@@ -121,8 +121,14 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     log.info("VOICEDEBUG VoIP push received")
 
-    let dictionary = payload.dictionaryPayload
-    let incomingCallInfo = parseIncomingCall(from: dictionary)
+    let voipPayloadDictionary = payload.dictionaryPayload
+    let pushType = trimmedString(voipPayloadDictionary["type"])
+    if pushType == "call_declined" || pushType == "call_cancelled" {
+      handleCallDeclinedOrCancelledFromRemotePush(voipPayloadDictionary, completion: completion)
+      return
+    }
+
+    let incomingCallInfo = parseIncomingCall(from: voipPayloadDictionary)
     let callUUID = incomingCallInfo?.uuid ?? UUID()
 
     if let incomingCallInfo {
@@ -288,6 +294,106 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
           "VOICEDEBUG CallKit end request failed: \(error.localizedDescription, privacy: .public)"
         )
       }
+    }
+  }
+
+  private func handleCallDeclinedOrCancelledFromRemotePush(
+    _ voipPayloadDictionary: [AnyHashable: Any],
+    completion: @escaping () -> Void
+  ) {
+    let callUUID = uuidFromPushPayload(voipPayloadDictionary)
+    if !isRinging(uuid: callUUID) {
+      handleUnexpectedRemoteEndWhileNotRinging(uuid: callUUID, completion: completion)
+      return
+    }
+
+    log.info("VOICEDEBUG VoIP remote end uuid=\(callUUID.uuidString, privacy: .public)")
+
+    // drop ringing state first so CXEndCallAction from this end does not POST /decline
+    pendingCalls.removeValue(forKey: callUUID)
+
+    /// apple still requires reportNewIncomingCall for this voip. if the uuid is
+    /// already ringing, that report fails (duplicate) and we just end the existing call.
+    func onCallDeclinedOrCancelledFromRemoteReportFinished(error: Error?) {
+      telephonyProvider.reportCall(
+        with: callUUID,
+        endedAt: Date(),
+        reason: CXCallEndedReason.remoteEnded
+      )
+      clearCallState(callUUID)
+      if let error {
+        log.info(
+          "VOICEDEBUG CallKit remote-end report: \(error.localizedDescription, privacy: .public)"
+        )
+      }
+      completion()
+    }
+
+    reportDummyIncomingCallToSatisfyPushKit(
+      uuid: callUUID,
+      completion: onCallDeclinedOrCancelledFromRemoteReportFinished
+    )
+  }
+
+  /// room join excludes this device's voip token, so this push should not arrive while
+  /// we are not ringing. still must reportNewIncomingCall or apple kills voip.
+  /// duplicate = already in callkit (answered) — do not end.
+  /// success = ghost incoming we just created → end it.
+  private func handleUnexpectedRemoteEndWhileNotRinging(
+    uuid: UUID,
+    completion: @escaping () -> Void
+  ) {
+    log.error(
+      "VOICEDEBUG unexpected remote-end voip while not ringing uuid=\(uuid.uuidString, privacy: .public)"
+    )
+
+    func onUnexpectedRemoteEndReportFinished(error: Error?) {
+      if error == nil {
+        telephonyProvider.reportCall(
+          with: uuid,
+          endedAt: Date(),
+          reason: CXCallEndedReason.remoteEnded
+        )
+      }
+      completion()
+    }
+
+    reportDummyIncomingCallToSatisfyPushKit(
+      uuid: uuid,
+      completion: onUnexpectedRemoteEndReportFinished
+    )
+  }
+
+  private func reportDummyIncomingCallToSatisfyPushKit(uuid: UUID, completion: @escaping (Error?) -> Void) {
+    let update = CXCallUpdate()
+    update.hasVideo = false
+    update.supportsHolding = false
+    update.supportsGrouping = false
+    update.supportsUngrouping = false
+    update.supportsDTMF = false
+    telephonyProvider.reportNewIncomingCall(with: uuid, update: update, completion: completion)
+  }
+
+  private func isRinging(uuid: UUID) -> Bool {
+    pendingCalls[uuid] != nil
+  }
+
+  private func uuidFromPushPayload(_ voipPayloadDictionary: [AnyHashable: Any]) -> UUID {
+    let uuidString = trimmedString(voipPayloadDictionary["uuid"]) ?? trimmedString(voipPayloadDictionary["callId"])
+    return uuidString.flatMap { UUID(uuidString: $0) } ?? UUID()
+  }
+
+  private func clearCallState(_ uuid: UUID) {
+    pendingCalls.removeValue(forKey: uuid)
+    if pendingAnswerAction?.callUUID == uuid {
+      pendingAnswerAction?.fail()
+      pendingAnswerAction = nil
+    }
+    if storedAcceptedCallInfo?.uuid == uuid {
+      storedAcceptedCallInfo = nil
+    }
+    if activeCallUUID == uuid {
+      activeCallUUID = nil
     }
   }
 

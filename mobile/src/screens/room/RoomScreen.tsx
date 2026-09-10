@@ -27,6 +27,7 @@ import type { RoomId } from '../../../../shared/types/core';
 import RoomTop from './RoomTop';
 import { useActiveRoomStore } from '../../stores/useActiveRoomStore';
 import { requestIosEndCallKitCall } from '../../native/voip-callkit-ios';
+import { getVoipPushToken } from '../../native/get-voip-push-token-ios';
 
 interface RoomScreenProps {
   roomId: RoomId;
@@ -73,6 +74,7 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
     accessToken ?? undefined,
     handleJoinSuccess,
     BASE_URL,
+    getVoipPushToken,
   );
   useWebRTCInit(socketRef);
 

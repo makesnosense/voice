@@ -17,6 +17,7 @@ import type {
 } from '../../shared/types/core';
 import type RoomDestructionManager from './managers/room-destruction-manager';
 import { sendCallCancelledNotification } from './utils/fcm';
+import { sendVoipPush, VOIP_PUSH_TYPE } from './utils/apns';
 import { MAX_ROOM_MESSAGES } from '../../shared/constants/room';
 
 export default function createConnectionHandler(
@@ -35,10 +36,18 @@ export default function createConnectionHandler(
       console.log(`🔄 [Socket] ${socket.id} upgraded to ${transport.name}`);
     });
 
-    socket.on('join-room', (roomId: RoomId) => {
+    socket.on('join-room', (roomId: RoomId, joiningDeviceVoipToken?: string) => {
       if (!checkRateLimit(socket, 'join-room')) return;
       const room = rooms.get(roomId);
-      handleRoomJoin(io, room, roomId, socket, roomDestructionManager, inviteTimeoutManager);
+      handleRoomJoin(
+        io,
+        room,
+        roomId,
+        socket,
+        roomDestructionManager,
+        inviteTimeoutManager,
+        joiningDeviceVoipToken
+      );
     });
 
     socket.on('message', (data: { text: string }) => {
@@ -176,7 +185,8 @@ const handleRoomJoin = (
   roomId: RoomId,
   socket: ExtendedConnectedSocket,
   roomDestructionManager: RoomDestructionManager,
-  inviteTimeoutManager: InviteTimeoutManager
+  inviteTimeoutManager: InviteTimeoutManager,
+  joiningDeviceVoipToken?: string
 ): void => {
   if (!room) {
     console.warn(`❌ [Socket] room ${roomId} not found`);
@@ -223,11 +233,15 @@ const handleRoomJoin = (
   const invitedUserJoined =
     room.invitedUser !== null && joiningEmail !== null && joiningEmail === room.invitedUser.email;
 
+  // “answered on one device, stop ringing everywhere else” path
   if (invitedUserJoined && room.invitedUser) {
+    const { fcmTokens, voipTokens, callId } = room.invitedUser;
     inviteTimeoutManager.cancelTimeout(roomId);
-    room.invitedUser.fcmTokens.forEach((token) =>
-      sendCallCancelledNotification(token).catch(() => {})
-    );
+    fcmTokens.forEach((token) => sendCallCancelledNotification(token).catch(() => {}));
+    voipTokens.forEach((token) => {
+      if (token !== joiningDeviceVoipToken)
+        sendVoipPush(token, VOIP_PUSH_TYPE.CALL_CANCELLED, { callId }).catch(() => {});
+    });
     room.invitedUser = null;
   }
 
