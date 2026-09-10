@@ -39,6 +39,7 @@ export interface InvitedUserClientState {
 export interface InvitedUserServerState extends InvitedUserClientState {
   userId: string;
   fcmTokens: string[];
+  voipTokens: string[];
 }
 
 export interface Room {

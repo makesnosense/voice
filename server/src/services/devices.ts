@@ -107,12 +107,12 @@ export async function getUserMobileDevicesPushTokens(userId: string) {
     .orderBy(desc(devices.lastSeen));
 
   const fcmTokens: string[] = [];
-  const voipPushTokens: string[] = [];
+  const voipTokens: string[] = [];
 
   for (const { fcmToken, voipPushToken } of rows) {
     if (fcmToken !== null) fcmTokens.push(fcmToken);
-    if (voipPushToken !== null) voipPushTokens.push(voipPushToken);
+    if (voipPushToken !== null) voipTokens.push(voipPushToken);
   }
 
-  return { fcmTokens, voipPushTokens };
+  return { fcmTokens, voipTokens };
 }

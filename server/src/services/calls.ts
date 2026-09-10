@@ -10,7 +10,7 @@ import type { CallHistoryEntry } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
   caller: { userId: string; email: string; name: string | null },
-  pushTokens: { fcmTokens: string[]; voipPushTokens: string[] },
+  pushTokens: { fcmTokens: string[]; voipTokens: string[] },
   roomId: RoomId,
   callId: string
 ): Promise<void> {
@@ -25,11 +25,9 @@ export async function notifyDevicesOfCall(
   };
 
   const fcmSends = pushTokens.fcmTokens.map((token) => sendCallNotification(token, payload));
-  const apnsSends = pushTokens.voipPushTokens.map((token) =>
-    sendVoipCallNotification(token, payload)
-  );
+  const voipSends = pushTokens.voipTokens.map((token) => sendVoipCallNotification(token, payload));
 
-  const results = await Promise.allSettled([...fcmSends, ...apnsSends]);
+  const results = await Promise.allSettled([...fcmSends, ...voipSends]);
   for (const result of results) {
     if (result.status === 'rejected') {
       console.error('Failed to send call push:', result.reason);

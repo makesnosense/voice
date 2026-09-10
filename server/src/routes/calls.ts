@@ -85,7 +85,7 @@ export default function createCallsRouter(
 
       try {
         const pushTokens = await getUserMobileDevicesPushTokens(targetUserId);
-        if (pushTokens.fcmTokens.length === 0 && pushTokens.voipPushTokens.length === 0) {
+        if (pushTokens.fcmTokens.length === 0 && pushTokens.voipTokens.length === 0) {
           return res.status(404).json({
             errorMessage: 'User not reachable',
             errorCode: ERROR_CODE.USER_NOT_REACHABLE,
@@ -105,6 +105,7 @@ export default function createCallsRouter(
             name: targetUser.name,
             callId: callsLogEntry.id,
             fcmTokens: pushTokens.fcmTokens,
+            voipTokens: pushTokens.voipTokens,
           };
 
           inviteTimeoutManager.scheduleTimeout(roomId, INVITE_TIMEOUT_MS, () => {
