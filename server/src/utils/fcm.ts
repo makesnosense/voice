@@ -23,12 +23,7 @@ export async function sendCallNotification(
     token: fcmToken,
     data: {
       type: 'incoming_call',
-      callerUserId: payload.callerUserId,
-      callerEmail: payload.callerEmail,
-      callerName: payload.callerName ?? '',
-      roomId: payload.roomId,
-      callId: payload.callId,
-      sentAt: payload.sentAt.toString(),
+      ...payload,
     },
     android: {
       priority: 'high',

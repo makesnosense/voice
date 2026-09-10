@@ -15,7 +15,8 @@ export interface IncomingCallInfo {
 }
 
 export type CallNotificationPayload = IncomingCallInfo & {
-  sentAt: number;
+  callerName: string;
+  sentAt: string;
 };
 
 // always relative to "us" – the authenticated user

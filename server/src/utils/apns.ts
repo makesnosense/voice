@@ -2,6 +2,15 @@ import { connect } from 'node:http2';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import type { CallNotificationPayload } from '../../../shared/types/calls';
+import type { ObjectValues } from '../../../shared/types/core';
+
+export const VOIP_PUSH_TYPE = {
+  INCOMING_CALL: 'incoming_call',
+  CALL_DECLINED: 'call_declined',
+  CALL_CANCELLED: 'call_cancelled',
+} as const;
+
+export type VoipPushType = ObjectValues<typeof VOIP_PUSH_TYPE>;
 
 const APNS_JWT_TTL_MS = 50 * 60 * 1000;
 const APNS_HOST = config.isProduction ? 'api.push.apple.com' : 'api.sandbox.push.apple.com';
@@ -26,13 +35,16 @@ function getApnsJwt(): string {
   return token;
 }
 
-function postVoipPush(deviceToken: string, body: string): Promise<void> {
-  if (!config.apns.enabled) {
-    throw new Error('APNs is disabled');
-  }
+export function sendVoipPush(
+  voipToken: string,
+  type: VoipPushType,
+  payload: CallNotificationPayload | { callId: string }
+): Promise<void> {
+  if (!config.apns.enabled) return Promise.resolve();
 
   const topic = `${config.apns.bundleId}.voip`;
   const authorization = `bearer ${getApnsJwt()}`;
+  const body = JSON.stringify({ type, ...payload });
 
   return new Promise((resolve, reject) => {
     const client = connect(`https://${APNS_HOST}`);
@@ -56,7 +68,7 @@ function postVoipPush(deviceToken: string, body: string): Promise<void> {
 
     const request = client.request({
       ':method': 'POST',
-      ':path': `/3/device/${deviceToken}`,
+      ':path': `/3/device/${voipToken}`,
       authorization,
       'apns-topic': topic,
       'apns-push-type': 'voip',
@@ -86,25 +98,4 @@ function postVoipPush(deviceToken: string, body: string): Promise<void> {
 
     request.end(body);
   });
-}
-
-export async function sendVoipCallNotification(
-  voipPushToken: string,
-  payload: CallNotificationPayload
-): Promise<void> {
-  if (!config.apns.enabled) return;
-
-  await postVoipPush(
-    voipPushToken,
-    JSON.stringify({
-      type: 'incoming_call',
-      callerUserId: payload.callerUserId,
-      callerEmail: payload.callerEmail,
-      callerName: payload.callerName ?? '',
-      roomId: payload.roomId,
-      callId: payload.callId,
-      uuid: payload.callId,
-      sentAt: payload.sentAt.toString(),
-    })
-  );
 }

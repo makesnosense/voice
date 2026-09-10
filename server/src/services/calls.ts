@@ -1,12 +1,12 @@
 import { sendCallNotification } from '../utils/fcm';
-import { sendVoipCallNotification } from '../utils/apns';
+import { sendVoipPush, VOIP_PUSH_TYPE } from '../utils/apns';
 import { db } from '../db';
 import { calls } from '../db/schema';
 import { and, eq, SQL, sql } from 'drizzle-orm';
 
 import type { RoomId } from '../../../shared/types/core';
 import { CALL_OUTCOME, CallOutcome, type CallDirection } from '../../../shared/constants/calls';
-import type { CallHistoryEntry } from '../../../shared/types/calls';
+import type { CallHistoryEntry, CallNotificationPayload } from '../../../shared/types/calls';
 
 export async function notifyDevicesOfCall(
   caller: { userId: string; email: string; name: string | null },
@@ -14,18 +14,19 @@ export async function notifyDevicesOfCall(
   roomId: RoomId,
   callId: string
 ): Promise<void> {
-  const sentAt = Date.now();
-  const payload = {
+  const payload: CallNotificationPayload = {
     callerUserId: caller.userId,
     callerEmail: caller.email,
-    callerName: caller.name,
+    callerName: caller.name ?? '',
     roomId,
     callId,
-    sentAt,
+    sentAt: Date.now().toString(),
   };
 
   const fcmSends = pushTokens.fcmTokens.map((token) => sendCallNotification(token, payload));
-  const voipSends = pushTokens.voipTokens.map((token) => sendVoipCallNotification(token, payload));
+  const voipSends = pushTokens.voipTokens.map((token) =>
+    sendVoipPush(token, VOIP_PUSH_TYPE.INCOMING_CALL, payload)
+  );
 
   const results = await Promise.allSettled([...fcmSends, ...voipSends]);
   for (const result of results) {
