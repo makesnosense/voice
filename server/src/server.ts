@@ -1,6 +1,7 @@
 import { createApp } from './create-app';
 import { createServer } from './create-server';
 import { createSocketIO } from './create-socketio';
+import createConnectionHandler from './socket-handlers';
 import createRoomsRouter from './routes/rooms';
 import { runMigrations } from './db';
 import RoomDestructionManager from './managers/room-destruction-manager';
@@ -15,7 +16,6 @@ console.log('🗄️  DB schema up to date');
 
 const rooms = new Map<RoomId, Room>();
 const roomDestructionManager = new RoomDestructionManager(rooms);
-const inviteTimeoutManager = new InviteTimeoutManager();
 const cleanupManager = new CleanupManager();
 
 roomDestructionManager.start();
@@ -23,7 +23,12 @@ cleanupManager.start();
 
 const app = createApp();
 const server = createServer(app);
-const io = createSocketIO(server, rooms, roomDestructionManager, inviteTimeoutManager);
+const io = createSocketIO(server);
+const inviteTimeoutManager = new InviteTimeoutManager(rooms, io);
+io.on(
+  'connection',
+  createConnectionHandler(io, rooms, roomDestructionManager, inviteTimeoutManager)
+);
 
 app.use('/api/rooms', createRoomsRouter(rooms, io, inviteTimeoutManager, roomDestructionManager));
 app.use('/api/calls', createCallsRouter(rooms, io, inviteTimeoutManager, roomDestructionManager));

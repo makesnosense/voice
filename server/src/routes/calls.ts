@@ -11,8 +11,6 @@ import { getUserMobileDevicesPushTokens } from '../services/devices';
 import { findUserById } from '../services/users';
 import { createRoom } from '../services/rooms';
 import { callSchema } from '../schemas/calls';
-import { sendCallCancelledNotification } from '../utils/fcm';
-import { sendVoipPush, VOIP_PUSH_TYPE } from '../utils/apns';
 import type { Room, RoomId, TypedServer } from '../../../shared/types/core';
 import type { CallHistoryEntry, CallInitiationResponse } from '../../../shared/types/calls';
 import type { ApiErrorResponse } from '../../../shared/errors';
@@ -21,7 +19,6 @@ import { callInitiationLimiter } from '../middleware/api-rate-limiters';
 import type InviteTimeoutManager from '../managers/invite-timeout-manager';
 import type RoomDestructionManager from '../managers/room-destruction-manager';
 import z from 'zod';
-import { INVITE_TIMEOUT_MS } from '../../../shared/constants/calls';
 
 export default function createCallsRouter(
   rooms: Map<RoomId, Room>,
@@ -109,18 +106,7 @@ export default function createCallsRouter(
             voipTokens: pushTokens.voipTokens,
           };
 
-          inviteTimeoutManager.scheduleTimeout(roomId, INVITE_TIMEOUT_MS, () => {
-            const currentRoom = rooms.get(roomId);
-            if (!currentRoom?.invitedUser) return;
-            const { fcmTokens, voipTokens, callId } = currentRoom.invitedUser;
-            currentRoom.invitedUser = null;
-            fcmTokens.forEach((token) => sendCallCancelledNotification(token).catch(() => {}));
-            voipTokens.forEach((token) =>
-              sendVoipPush(token, VOIP_PUSH_TYPE.CALL_CANCELLED, { callId }).catch(() => {})
-            );
-            io.to(roomId).emit('invite-expired');
-            console.log(`⏰ [Invite] timed out for room ${roomId}`);
-          });
+          inviteTimeoutManager.scheduleInviteTimeout(roomId);
         }
 
         res.json({ roomId, callId: callsLogEntry.id });

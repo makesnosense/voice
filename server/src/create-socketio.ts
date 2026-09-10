@@ -1,18 +1,13 @@
 import { Server } from 'socket.io';
-import createConnectionHandler from './socket-handlers';
 import config from './config';
 import { socketRateLimiter, SOCKET_CONNECTION_RATE_LIMIT } from './middleware/socket-rate-limiter';
 import type { Server as HttpServer } from 'http';
 import type {
-  Room,
-  RoomId,
   ClientToServerEvents,
   ServerToClientEvents,
   ExtendedConnectedSocket,
 } from '../../shared/types/core';
-import type RoomDestructionManager from './managers/room-destruction-manager';
 import { verifyAccessToken } from './utils/jwt';
-import InviteTimeoutManager from './managers/invite-timeout-manager';
 
 const getClientIp = (socket: ExtendedConnectedSocket): string => {
   if (config.rateLimiting.trustProxy) {
@@ -25,12 +20,7 @@ const getClientIp = (socket: ExtendedConnectedSocket): string => {
   return socket.handshake.address;
 };
 
-export function createSocketIO(
-  server: HttpServer,
-  rooms: Map<RoomId, Room>,
-  roomDestructionManager: RoomDestructionManager,
-  inviteTimeoutManager: InviteTimeoutManager
-) {
+export function createSocketIO(server: HttpServer) {
   const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
     cors: {
       origin: config.corsOrigins,
@@ -71,14 +61,6 @@ export function createSocketIO(
     }
     next();
   });
-
-  const handleConnection = createConnectionHandler(
-    io,
-    rooms,
-    roomDestructionManager,
-    inviteTimeoutManager
-  );
-  io.on('connection', handleConnection);
 
   return io;
 }
