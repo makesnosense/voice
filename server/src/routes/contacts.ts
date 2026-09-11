@@ -1,5 +1,5 @@
 import { Router, type Response } from 'express';
-import { requireAccessToken } from '../middleware/auth';
+import { assertAuthed, requireAccessToken } from '../middleware/auth';
 import { findUserByEmail } from '../services/users';
 import { getContacts, getContact, addContact, removeContact } from '../services/contacts';
 import { addContactSchema, contactIdSchema } from '../schemas/contacts';
@@ -10,15 +10,10 @@ import type { ApiErrorResponse } from '../../../shared/errors';
 const router = Router();
 
 router.get('/', requireAccessToken, async (req, res: Response<Contact[] | ApiErrorResponse>) => {
-  if (!req.user) {
-    return res
-      .status(401)
-      .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-  }
-  const { userId } = req.user;
+  assertAuthed(req);
 
   try {
-    const userContacts = await getContacts(userId);
+    const userContacts = await getContacts(req.user.userId);
     res.json(userContacts);
   } catch (error) {
     console.error('failed to fetch contacts:', error);
@@ -29,11 +24,7 @@ router.get('/', requireAccessToken, async (req, res: Response<Contact[] | ApiErr
 });
 
 router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErrorResponse>) => {
-  if (!req.user) {
-    return res
-      .status(401)
-      .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-  }
+  assertAuthed(req);
 
   const result = addContactSchema.safeParse(req.body);
   if (!result.success) {
@@ -46,9 +37,7 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
 
   const { email } = req.body;
 
-  const { userId, email: callerEmail } = req.user;
-
-  if (email === callerEmail) {
+  if (email === req.user.email) {
     return res
       .status(400)
       .json({ errorMessage: 'cannot add yourself', errorCode: ERROR_CODE.CANNOT_ADD_SELF });
@@ -62,7 +51,7 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
         .json({ errorMessage: 'user not found', errorCode: ERROR_CODE.USER_NOT_FOUND });
     }
 
-    const contact = await addContact(userId, target.id);
+    const contact = await addContact(req.user.userId, target.id);
     if (!contact) {
       return res.status(409).json({
         errorMessage: 'already a contact',
@@ -70,9 +59,12 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
       });
     }
 
-    const contactWithDetails = await getContact(userId, target.id);
+    const contactWithDetails = await getContact(req.user.userId, target.id);
     if (!contactWithDetails) {
-      console.error('contact added but could not be refetched:', { userId, targetId: target.id });
+      console.error('contact added but could not be refetched:', {
+        userId: req.user.userId,
+        targetId: target.id,
+      });
       return res
         .status(500)
         .json({ errorMessage: 'failed to add contact', errorCode: ERROR_CODE.INTERNAL_ERROR });
@@ -87,12 +79,7 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
 });
 
 router.delete('/:contactId', requireAccessToken, async (req, res: Response<ApiErrorResponse>) => {
-  if (!req.user) {
-    return res
-      .status(401)
-      .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-  }
-  const { userId } = req.user;
+  assertAuthed(req);
 
   const paramResult = contactIdSchema.safeParse(req.params);
   if (!paramResult.success) {
@@ -103,7 +90,7 @@ router.delete('/:contactId', requireAccessToken, async (req, res: Response<ApiEr
   const { contactId } = paramResult.data;
 
   try {
-    const removed = await removeContact(userId, contactId);
+    const removed = await removeContact(req.user.userId, contactId);
     if (!removed) {
       return res
         .status(404)

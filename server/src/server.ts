@@ -10,6 +10,7 @@ import type { Room, RoomId } from '../../shared/types/core';
 import CleanupManager from './managers/cleanup-manager';
 import InviteTimeoutManager from './managers/invite-timeout-manager';
 import createCallsRouter from './routes/calls';
+import { errorHandler } from './middleware/error-handler';
 
 await runMigrations();
 console.log('🗄️  DB schema up to date');
@@ -32,6 +33,7 @@ io.on(
 
 app.use('/api/rooms', createRoomsRouter(rooms, io, inviteTimeoutManager, roomDestructionManager));
 app.use('/api/calls', createCallsRouter(rooms, io, inviteTimeoutManager, roomDestructionManager));
+app.use(errorHandler);
 
 server.listen(config.port, config.host, () => {
   console.log(`🚀 Server running on ${getProtocol(server)}://${config.host}:${config.port}`);

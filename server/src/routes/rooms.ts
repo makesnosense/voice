@@ -2,7 +2,7 @@ import { Router, type Response } from 'express';
 import { createRoom } from '../services/rooms';
 import { getUserMobileDevicesPushTokens } from '../services/devices';
 import { findUserById } from '../services/users';
-import { requireAccessToken } from '../middleware/auth';
+import { assertAuthed, requireAccessToken } from '../middleware/auth';
 import { callSchema, declineCallSchema } from '../schemas/calls';
 import { createCallsLogEntry, notifyDevicesOfCall, markCallDeclined } from '../services/calls';
 import { sendCallCancelledNotification, sendCallDeclinedNotification } from '../utils/fcm';
@@ -42,11 +42,7 @@ export default function createRoomsRouter(
     requireAccessToken,
     inviteLimiter,
     async (req, res: Response<RoomInviteResponse | ApiErrorResponse>) => {
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-      }
+      assertAuthed(req);
 
       const roomId = req.params.roomId as RoomId;
 
@@ -67,9 +63,8 @@ export default function createRoomsRouter(
       }
 
       const { targetUserId } = result.data;
-      const caller = req.user;
 
-      if (targetUserId === caller.userId) {
+      if (targetUserId === req.user.userId) {
         return res.status(400).json({
           errorMessage: 'Cannot call yourself',
           errorCode: ERROR_CODE.CANNOT_CALL_SELF,
@@ -85,8 +80,8 @@ export default function createRoomsRouter(
           });
         }
 
-        const entry = await createCallsLogEntry(caller.userId, targetUserId);
-        await notifyDevicesOfCall(caller, pushTokens, roomId, entry.id);
+        const entry = await createCallsLogEntry(req.user.userId, targetUserId);
+        await notifyDevicesOfCall(req.user, pushTokens, roomId, entry.id);
 
         const targetUser = await findUserById(targetUserId);
         if (targetUser) {

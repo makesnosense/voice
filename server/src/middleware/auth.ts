@@ -4,16 +4,22 @@ import { verifyAccessToken, verifyRefreshToken } from '../utils/jwt';
 import { db } from '../db';
 import { refreshTokens } from '../db/schema';
 import { refreshSchema } from '../schemas/auth';
-import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types/auth';
-import type { ApiErrorResponse } from '../../../shared/errors';
+import type { RefreshTokenPayload, User } from '../../../shared/types/auth';
+import { ApiError, type ApiErrorResponse } from '../../../shared/errors';
 import { ERROR_CODE } from '../../../shared/constants/errors';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: Omit<AccessTokenPayload, 'exp' | 'iat'>;
+      user?: User;
       refreshPayload?: Omit<RefreshTokenPayload, 'iat'>;
     }
+  }
+}
+
+export function assertAuthed(req: Request): asserts req is Request & { user: User } {
+  if (!req.user) {
+    throw new ApiError(401, 'Unauthorized', ERROR_CODE.UNAUTHORIZED);
   }
 }
 

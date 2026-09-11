@@ -1,5 +1,5 @@
 import { Router, type Response } from 'express';
-import { requireAccessToken } from '../middleware/auth';
+import { assertAuthed, requireAccessToken } from '../middleware/auth';
 import {
   createCallsLogEntry,
   notifyDevicesOfCall,
@@ -32,11 +32,7 @@ export default function createCallsRouter(
     '/',
     requireAccessToken,
     async (req, res: Response<CallHistoryEntry[] | ApiErrorResponse>) => {
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-      }
+      assertAuthed(req);
 
       try {
         const history = await getCallHistory(req.user.userId);
@@ -56,11 +52,7 @@ export default function createCallsRouter(
     requireAccessToken,
     callInitiationLimiter,
     async (req, res: Response<CallInitiationResponse | ApiErrorResponse>) => {
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-      }
+      assertAuthed(req);
 
       const result = callSchema.safeParse(req.body);
       if (!result.success) {
@@ -72,9 +64,8 @@ export default function createCallsRouter(
       }
 
       const { targetUserId } = result.data;
-      const caller = req.user;
 
-      if (targetUserId === caller.userId) {
+      if (targetUserId === req.user.userId) {
         return res.status(400).json({
           errorMessage: 'Cannot call yourself',
           errorCode: ERROR_CODE.CANNOT_CALL_SELF,
@@ -92,8 +83,8 @@ export default function createCallsRouter(
 
         const { roomId, room } = createRoom(rooms, roomDestructionManager);
 
-        const callsLogEntry = await createCallsLogEntry(caller.userId, targetUserId);
-        await notifyDevicesOfCall(caller, pushTokens, roomId, callsLogEntry.id);
+        const callsLogEntry = await createCallsLogEntry(req.user.userId, targetUserId);
+        await notifyDevicesOfCall(req.user, pushTokens, roomId, callsLogEntry.id);
 
         const targetUser = await findUserById(targetUserId);
         if (targetUser) {
@@ -124,11 +115,7 @@ export default function createCallsRouter(
     '/:callId/mark-answered',
     requireAccessToken,
     async (req, res: Response<ApiErrorResponse>) => {
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-      }
+      assertAuthed(req);
 
       const callIdResult = z.uuid().safeParse(req.params.callId);
       if (!callIdResult.success) {
@@ -154,11 +141,7 @@ export default function createCallsRouter(
     '/:callId/mark-cancelled',
     requireAccessToken,
     async (req, res: Response<ApiErrorResponse>) => {
-      if (!req.user) {
-        return res
-          .status(401)
-          .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-      }
+      assertAuthed(req);
 
       const callIdResult = z.uuid().safeParse(req.params.callId);
       if (!callIdResult.success) {

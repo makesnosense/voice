@@ -1,5 +1,5 @@
 import { Router, type Response } from 'express';
-import { requireAccessToken, requireRefreshToken } from '../middleware/auth';
+import { assertAuthed, requireAccessToken, requireRefreshToken } from '../middleware/auth';
 import { findUserByEmail, deleteUser } from '../services/users';
 import { byEmailSchema, updateNameSchema } from '../schemas/users';
 import { updateUserName, exportUserData } from '../services/users';
@@ -13,7 +13,7 @@ import { reissueAccessTokenWithUpdatedName } from '../utils/jwt';
 import type { PublicUser } from '../../../shared/types/users';
 import type { RenewAccessTokenResponse } from '../../../shared/types/auth';
 import type { DataExport } from '../../../shared/types/core';
-import type { ApiErrorResponse } from '../../../shared/errors';
+import { ApiError, type ApiErrorResponse } from '../../../shared/errors';
 import { ERROR_CODE } from '../../../shared/constants/errors';
 
 const router = Router();
@@ -64,18 +64,16 @@ router.patch(
       });
     }
 
-    const user = req.user;
+    assertAuthed(req);
     const authHeader = req.headers.authorization;
-    if (!user || !authHeader) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
+    if (!authHeader) {
+      throw new ApiError(401, 'Unauthorized', ERROR_CODE.UNAUTHORIZED);
     }
 
     const rawToken = authHeader.substring(7);
 
     try {
-      const updated = await updateUserName(user.userId, result.data.name);
+      const updated = await updateUserName(req.user.userId, result.data.name);
       if (!updated) {
         return res
           .status(404)
@@ -130,15 +128,10 @@ router.get(
   requireAccessToken,
   dataExportLimiter,
   async (req, res: Response<DataExport | ApiErrorResponse>) => {
-    if (!req.user) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-    }
-    const { userId } = req.user;
+    assertAuthed(req);
 
     try {
-      const data = await exportUserData(userId);
+      const data = await exportUserData(req.user.userId);
       if (!data) {
         return res
           .status(404)

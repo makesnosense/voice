@@ -1,5 +1,5 @@
 import { Router, type Response } from 'express';
-import { requireAccessToken, requireRefreshToken } from '../middleware/auth';
+import { assertAuthed, requireAccessToken, requireRefreshToken } from '../middleware/auth';
 import { registerDeviceSchema } from '../schemas/devices';
 import {
   findDeviceByRefreshJti,
@@ -71,15 +71,10 @@ router.post('/', requireRefreshToken, async (req, res: Response<Device | ApiErro
 });
 
 router.get('/', requireAccessToken, async (req, res: Response<Device[] | ApiErrorResponse>) => {
-  if (!req.user) {
-    return res
-      .status(401)
-      .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-  }
-  const { userId } = req.user;
+  assertAuthed(req);
 
   try {
-    const userDevices = await getUserDevices(userId);
+    const userDevices = await getUserDevices(req.user.userId);
     res.json(userDevices);
   } catch (error) {
     console.error('failed to fetch devices:', error);
