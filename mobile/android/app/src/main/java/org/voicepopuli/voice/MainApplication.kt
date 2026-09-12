@@ -8,8 +8,8 @@ import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.tencent.mmkv.MMKV
 import org.voicepopuli.voice.activityready.ActivityReadyPackage
+import org.voicepopuli.voice.calldismissedeventemitter.CallDismissedEventEmitterPackage
 import org.voicepopuli.voice.callforegroundservice.CallForegroundServicePackage
-import org.voicepopuli.voice.dismissedcallevents.DismissedCallEventsPackage
 import org.voicepopuli.voice.lockscreenbypass.LockScreenBypassPackage
 import org.voicepopuli.voice.runnativepermissions.RunNativePermissionsPackage
 
@@ -27,7 +27,7 @@ class MainApplication : Application(), ReactApplication {
               add(ActivityReadyPackage())
               add(CallForegroundServicePackage())
               add(RunNativePermissionsPackage())
-              add(DismissedCallEventsPackage())
+              add(CallDismissedEventEmitterPackage())
             },
     )
   }

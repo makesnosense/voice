@@ -23,7 +23,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.voicepopuli.voice.MainActivity
 import org.voicepopuli.voice.R
-import org.voicepopuli.voice.dismissedcallevents.DismissedCallEventsModule
+import org.voicepopuli.voice.calldismissedeventemitter.CallDismissedEventEmitter
 
 class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -63,7 +63,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 appContext?.let { context -> showMissedCallNotification(context, callerDisplayName) }
                 pendingCall = null
             }
-            DismissedCallEventsModule.emitDismissed()
+            CallDismissedEventEmitter.emitDismissed()
         }
 
         fun cancelVibration() {
@@ -112,7 +112,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 enqueueDismissedCallLog(params, OUTCOME_DECLINED)
                 pendingCall = null
             }
-            DismissedCallEventsModule.emitDismissed()
+            CallDismissedEventEmitter.emitDismissed()
         }
 
         private fun showMissedCallNotification(context: Context, callerDisplayName: String) {
@@ -212,7 +212,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         }
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
         sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
-        DismissedCallEventsModule.emitDismissed()
+        CallDismissedEventEmitter.emitDismissed()
     }
 
     private fun ensureNotificationChannel() {

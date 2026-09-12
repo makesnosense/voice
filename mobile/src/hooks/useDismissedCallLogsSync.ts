@@ -5,7 +5,7 @@ import { contactsQueryOptions } from '../queries/contacts';
 import { prependCallHistoryEntry } from '../queries/call-history';
 import { drainDismissedCallLogsQueue } from '../native/dismissed-call-logs-queue';
 import { CALL_DIRECTION } from '../../../shared/constants/calls';
-import NativeDismissedCallEvents from '../native/specs/NativeDismissedCallEvents';
+import NativeCallDismissedEventEmitterAndroid from '../native/specs/NativeCallDismissedEventEmitterAndroid';
 import type { Contact } from '../../../shared/types/contacts';
 import { Platform as RNPlatform } from 'react-native';
 
@@ -43,16 +43,16 @@ export function useDismissedCallLogs() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (!NativeDismissedCallEvents) {
+    if (!NativeCallDismissedEventEmitterAndroid) {
       if (RNPlatform.OS === 'android') {
         throw new Error(
-          'NativeDismissedCallEvents native module missing on Android',
+          'NativeCallDismissedEventEmitterAndroid native module missing on Android',
         );
       }
       return;
     }
 
-    const subscription = NativeDismissedCallEvents.onCallDismissed(
+    const subscription = NativeCallDismissedEventEmitterAndroid.onCallDismissed(
       prependDismissedCallLogs,
     );
     return () => subscription.remove();
