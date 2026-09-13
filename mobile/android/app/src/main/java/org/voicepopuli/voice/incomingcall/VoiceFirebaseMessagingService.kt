@@ -32,7 +32,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val callerUserId: String,
         val callerEmail: String,
         val callerName: String?,
-        val sentAt: Long,
+        val createdAt: String,
     )
 
     companion object {
@@ -98,7 +98,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                     put("callerUserId", params.callerUserId)
                     put("callerEmail", params.callerEmail)
                     put("callerName", params.callerName ?: JSONObject.NULL)
-                    put("createdAt", params.sentAt)
+                    put("createdAt", params.createdAt)
                     put("outcome", outcome)
                 }
             )
@@ -183,11 +183,16 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val callerUserId = data["callerUserId"] ?: return
         val callId = data["callId"] ?: return
         val roomId = data["roomId"] ?: return
+        val createdAt = data["createdAt"]?.takeIf { it.isNotEmpty() } ?: return
 
-        // sentAt is kept for call-history/missed-call logging only
-        val sentAt = data["sentAt"]?.toLongOrNull() ?: System.currentTimeMillis()
-
-        pendingCall = PendingCallParams(callId, callerUserId, callerEmail, callerNameOrNull, sentAt)
+        pendingCall =
+            PendingCallParams(
+                callId,
+                callerUserId,
+                callerEmail,
+                callerNameOrNull,
+                createdAt,
+            )
 
         ensureNotificationChannel()
         scheduleTimeout()
@@ -197,6 +202,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             callerEmail,
             roomId,
             callId,
+            createdAt,
         )
         startVibration()
     }
@@ -286,6 +292,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         callerEmail: String,
         roomId: String,
         callId: String,
+        createdAt: String,
     ) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
@@ -296,6 +303,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 putExtra("callerEmail", callerEmail)
                 putExtra("roomId", roomId)
                 putExtra("callId", callId)
+                putExtra("createdAt", createdAt)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
         val incomingCallFullscreenPendingIntent =
@@ -320,7 +328,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             )
 
         val notificationBarAcceptIntent =
-            Intent(Intent.ACTION_VIEW, buildCallUri(roomId, callerUserId, callerEmail, callerName, callId)).apply {
+            Intent(Intent.ACTION_VIEW, buildCallUri(roomId, callerUserId, callerEmail, callerName, callId, createdAt)).apply {
                 setClass(this@VoiceFirebaseMessagingService, MainActivity::class.java)
                 flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_ANIMATION

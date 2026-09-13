@@ -81,7 +81,7 @@ export default function createRoomsRouter(
         }
 
         const entry = await createCallsLogEntry(req.user.userId, targetUserId);
-        await notifyDevicesOfCall(req.user, pushTokens, roomId, entry.id);
+        await notifyDevicesOfCall(req.user, pushTokens, roomId, entry.id, entry.createdAt);
 
         const targetUser = await findUserById(targetUserId);
         if (targetUser) {

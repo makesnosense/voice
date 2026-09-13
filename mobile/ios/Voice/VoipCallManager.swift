@@ -18,6 +18,7 @@ private struct IncomingCallInfo {
   let callerUserId: String
   let callerEmail: String
   let callerName: String?
+  let createdAt: String
 
   var callerDisplayName: String {
     if let callerName {
@@ -33,6 +34,7 @@ private struct IncomingCallInfo {
       "callerUserId": callerUserId,
       "callerEmail": callerEmail,
       "callerName": callerName ?? NSNull(),
+      "createdAt": createdAt,
     ]
   }
 }
@@ -484,7 +486,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       let roomId = trimmedString(payload["roomId"]),
       let callId = trimmedString(payload["callId"]),
       let callerUserId = trimmedString(payload["callerUserId"]),
-      let callerEmail = trimmedString(payload["callerEmail"])
+      let callerEmail = trimmedString(payload["callerEmail"]),
+      let createdAt = trimmedString(payload["createdAt"])
     else { return nil }
 
     return IncomingCallInfo(
@@ -493,7 +496,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       callId: callId,
       callerUserId: callerUserId,
       callerEmail: callerEmail,
-      callerName: trimmedString(payload["callerName"])
+      callerName: trimmedString(payload["callerName"]),
+      createdAt: createdAt
     )
   }
 

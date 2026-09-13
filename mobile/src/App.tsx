@@ -126,7 +126,7 @@ function joinCall(incomingCallInfo: IncomingCallInfo) {
 
   prependCallHistoryEntry({
     id: incomingCallInfo.callId,
-    createdAt: new Date().toISOString(),
+    createdAt: incomingCallInfo.createdAt,
     direction: CALL_DIRECTION.INCOMING,
     outcome: CALL_OUTCOME.ANSWERED,
     contactId: incomingCallInfo.callerUserId,

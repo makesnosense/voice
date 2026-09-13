@@ -9,6 +9,7 @@ fun buildCallUri(
     callerEmail: String?,
     callerName: String?,
     callId: String?,
+    createdAt: String?,
 ): Uri {
     var url =
         "voice://call" +
@@ -17,5 +18,6 @@ fun buildCallUri(
             "&callerEmail=${URLEncoder.encode(callerEmail, "UTF-8")}" +
             "&callId=$callId"
     if (callerName != null) url += "&callerName=${URLEncoder.encode(callerName, "UTF-8")}"
+    if (createdAt != null) url += "&createdAt=${URLEncoder.encode(createdAt, "UTF-8")}"
     return Uri.parse(url)
 }

@@ -1,10 +1,9 @@
 import { ApiBase } from './base';
-import type { RoomId } from '../types/core';
-import type { CallHistoryEntry } from '../types/calls';
+import type { CallHistoryEntry, CallInitiationResponse } from '../types/calls';
 
 export class CallsApi extends ApiBase {
-  create(targetUserId: string, accessToken: string): Promise<{ roomId: RoomId; callId: string }> {
-    return this.apiFetch<{ roomId: RoomId; callId: string }>('/calls', {
+  create(targetUserId: string, accessToken: string): Promise<CallInitiationResponse> {
+    return this.apiFetch<CallInitiationResponse>('/calls', {
       method: 'POST',
       headers: { Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ targetUserId }),

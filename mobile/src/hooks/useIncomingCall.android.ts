@@ -11,7 +11,10 @@ function extractCallParams(url: string): IncomingCallInfo | null {
   const callerUserId = incomingCallInfo.get('callerUserId');
   const callerEmail = incomingCallInfo.get('callerEmail');
   const callId = incomingCallInfo.get('callId');
-  if (!roomId || !callerUserId || !callerEmail || !callId) return null;
+  const createdAt = incomingCallInfo.get('createdAt');
+  if (!roomId || !callerUserId || !callerEmail || !callId || !createdAt) {
+    return null;
+  }
 
   return {
     roomId,
@@ -19,6 +22,7 @@ function extractCallParams(url: string): IncomingCallInfo | null {
     callerEmail,
     callerName: incomingCallInfo.get('callerName'),
     callId,
+    createdAt,
   };
 }
 

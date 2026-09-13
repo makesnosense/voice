@@ -84,7 +84,13 @@ export default function createCallsRouter(
         const { roomId, room } = createRoom(rooms, roomDestructionManager);
 
         const callsLogEntry = await createCallsLogEntry(req.user.userId, targetUserId);
-        await notifyDevicesOfCall(req.user, pushTokens, roomId, callsLogEntry.id);
+        await notifyDevicesOfCall(
+          req.user,
+          pushTokens,
+          roomId,
+          callsLogEntry.id,
+          callsLogEntry.createdAt
+        );
 
         const targetUser = await findUserById(targetUserId);
         if (targetUser) {
@@ -100,7 +106,11 @@ export default function createCallsRouter(
           inviteTimeoutManager.scheduleInviteTimeout(roomId);
         }
 
-        res.json({ roomId, callId: callsLogEntry.id });
+        res.json({
+          roomId,
+          callId: callsLogEntry.id,
+          createdAt: callsLogEntry.createdAt.toISOString(),
+        });
       } catch (error) {
         console.error('Failed to initiate call:', error);
         res.status(500).json({

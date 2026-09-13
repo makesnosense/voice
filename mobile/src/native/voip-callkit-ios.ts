@@ -31,14 +31,15 @@ function isValidIncomingCallInfo(
     return false;
   }
 
-  const { roomId, callerUserId, callerEmail, callerName, callId } =
+  const { roomId, callerUserId, callerEmail, callerName, callId, createdAt } =
     callAcceptedPayload as Record<string, unknown>;
 
   const hasRequiredStrings =
     typeof roomId === 'string' &&
     typeof callerUserId === 'string' &&
     typeof callerEmail === 'string' &&
-    typeof callId === 'string';
+    typeof callId === 'string' &&
+    typeof createdAt === 'string';
 
   const nameOk = callerName === null || typeof callerName === 'string';
 

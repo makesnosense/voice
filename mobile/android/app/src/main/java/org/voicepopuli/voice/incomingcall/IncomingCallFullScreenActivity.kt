@@ -22,6 +22,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private var callerEmail: String? = null
     private var callerName: String? = null
     private var callId: String? = null
+    private var createdAt: String? = null
 
     private val callCancelledReceiver =
         object : BroadcastReceiver() {
@@ -68,6 +69,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
             intent.getStringExtra("callerName")
                 ?: intent.getStringExtra("callerEmail") ?: getString(R.string.caller_unknown)
         callId = intent.getStringExtra("callId")
+        createdAt = intent.getStringExtra("createdAt")
 
         when (action) {
             "accept" -> {
@@ -100,7 +102,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun acceptCall(roomId: String?) {
         cancelNotification()
-        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName, callId)
+        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName, callId, createdAt)
         val intent =
             Intent(this, MainActivity::class.java).apply {
                 action = Intent.ACTION_VIEW

@@ -4,6 +4,7 @@ import type { RoomId } from './core';
 export interface CallInitiationResponse {
   roomId: RoomId;
   callId: string;
+  createdAt: string;
 }
 
 export interface IncomingCallInfo {
@@ -12,11 +13,11 @@ export interface IncomingCallInfo {
   callerName: string | null;
   roomId: string;
   callId: string;
+  createdAt: string;
 }
 
 export type CallNotificationPayload = IncomingCallInfo & {
   callerName: string;
-  sentAt: string;
 };
 
 // always relative to "us" – the authenticated user

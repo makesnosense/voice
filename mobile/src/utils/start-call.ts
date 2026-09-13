@@ -15,11 +15,14 @@ interface CallTarget {
 export async function startCall(target: CallTarget) {
   try {
     const token = await useAuthStore.getState().getValidAccessToken();
-    const { roomId, callId } = await api.calls.create(target.contactId, token);
+    const { roomId, callId, createdAt } = await api.calls.create(
+      target.contactId,
+      token,
+    );
 
     prependCallHistoryEntry({
       id: callId,
-      createdAt: new Date().toISOString(),
+      createdAt,
       direction: CALL_DIRECTION.OUTGOING,
       outcome: CALL_OUTCOME.NO_ANSWER,
       contactId: target.contactId,

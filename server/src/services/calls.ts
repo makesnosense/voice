@@ -12,7 +12,8 @@ export async function notifyDevicesOfCall(
   caller: { userId: string; email: string; name: string | null },
   pushTokens: { fcmTokens: string[]; voipTokens: string[] },
   roomId: RoomId,
-  callId: string
+  callId: string,
+  createdAt: Date
 ): Promise<void> {
   const payload: CallNotificationPayload = {
     callerUserId: caller.userId,
@@ -20,7 +21,7 @@ export async function notifyDevicesOfCall(
     callerName: caller.name ?? '',
     roomId,
     callId,
-    sentAt: Date.now().toString(),
+    createdAt: createdAt.toISOString(),
   };
 
   const fcmSends = pushTokens.fcmTokens.map((token) => sendCallNotification(token, payload));

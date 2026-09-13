@@ -9,7 +9,7 @@ interface DismissedCallEntry {
   callerUserId: string;
   callerEmail: string;
   callerName: string | null;
-  createdAt: number;
+  createdAt: string;
   outcome: CallOutcome;
 }
 

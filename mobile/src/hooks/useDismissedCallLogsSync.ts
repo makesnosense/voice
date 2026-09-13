@@ -21,7 +21,7 @@ function prependDismissedCallLogs() {
     const contact = cachedContacts.find(c => c.id === entry.callerUserId);
     prependCallHistoryEntry({
       id: entry.callId,
-      createdAt: new Date(entry.createdAt).toISOString(),
+      createdAt: entry.createdAt,
       direction: CALL_DIRECTION.INCOMING,
       outcome: entry.outcome,
       contactId: entry.callerUserId,
