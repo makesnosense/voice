@@ -11,7 +11,7 @@ private let log = Logger(
   category: "PushKit"
 )
 
-private struct IncomingCallInfo {
+struct IncomingCallInfo {
   let uuid: UUID
   let roomId: String
   let callId: String
@@ -47,6 +47,12 @@ extension Notification.Name {
   static let voipCallEnded = Notification.Name("VoipCallEnded")
   /// still-ringing call ended without answer — js drains call-history mmkv. not hangup.
   static let voipCallDismissed = Notification.Name("VoipCallDismissed")
+}
+
+private enum VoipPushType: String {
+  case incomingCall = "incoming_call"
+  case callDeclined = "call_declined"
+  case callCancelled = "call_cancelled"
 }
 
 /// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
@@ -127,9 +133,15 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     log.info("VOICEDEBUG VoIP push received")
 
     let voipPayloadDictionary = payload.dictionaryPayload
-    let pushType = trimmedString(voipPayloadDictionary["type"])
-    if pushType == "call_declined" || pushType == "call_cancelled" {
-      handleCallDeclinedOrCancelledFromRemotePush(voipPayloadDictionary, completion: completion)
+    if let typeString = trimmedString(voipPayloadDictionary["type"]),
+       let pushType = VoipPushType(rawValue: typeString),
+       pushType == VoipPushType.callDeclined || pushType == VoipPushType.callCancelled
+    {
+      handleCallDeclinedOrCancelledFromRemotePush(
+        voipPayloadDictionary,
+        pushType: pushType,
+        completion: completion
+      )
       return
     }
 
@@ -238,7 +250,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   func provider(_: CXProvider, perform action: CXEndCallAction) {
     if isRinging(uuid: action.callUUID), let ringingCall = pendingCalls[action.callUUID] {
       postCallDeclined(roomId: ringingCall.roomId, callId: ringingCall.callId)
-      // TODO: enqueue dismissed-call-logs mmkv (outcome: declined), then poke
+      DismissedCallLogsQueue.enqueue(ringingCall, outcome: CallOutcome.declined)
       NotificationCenter.default.post(name: Notification.Name.voipCallDismissed, object: nil)
     }
 
@@ -302,6 +314,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
   private func handleCallDeclinedOrCancelledFromRemotePush(
     _ voipPayloadDictionary: [AnyHashable: Any],
+    pushType: VoipPushType,
     completion: @escaping () -> Void
   ) {
     let callUUID = uuidFromPushPayload(voipPayloadDictionary)
@@ -312,8 +325,11 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     log.info("VOICEDEBUG VoIP remote end uuid=\(callUUID.uuidString, privacy: .public)")
 
-    // TODO: enqueue dismissed-call-logs mmkv from pendingCalls[callUUID]
-    // (outcome: cancelled or declined from push type), then poke — before we drop ringing state
+    let callOutcome: CallOutcome =
+      pushType == VoipPushType.callDeclined ? CallOutcome.declined : CallOutcome.cancelled
+    if let ringingCall = pendingCalls[callUUID] {
+      DismissedCallLogsQueue.enqueue(ringingCall, outcome: callOutcome)
+    }
     // drop ringing state first so CXEndCallAction from this end does not POST /decline
     pendingCalls.removeValue(forKey: callUUID)
     NotificationCenter.default.post(name: Notification.Name.voipCallDismissed, object: nil)

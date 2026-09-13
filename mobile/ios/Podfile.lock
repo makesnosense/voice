@@ -9,6 +9,8 @@ PODS:
     - hermes-engine/Pre-built (= 0.14.0)
   - hermes-engine/Pre-built (0.14.0)
   - JitsiWebRTC (124.0.2)
+  - MMKV (2.4.0):
+    - MMKVCore (~> 2.4.0)
   - MMKVCore (2.4.0)
   - NitroMmkv (4.3.2):
     - boost
@@ -3053,6 +3055,7 @@ DEPENDENCIES:
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - MMKV (= 2.4.0)
   - NitroMmkv (from `../node_modules/react-native-mmkv`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -3145,6 +3148,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - JitsiWebRTC
+    - MMKV
     - MMKVCore
     - SocketRocket
 
@@ -3346,6 +3350,7 @@ SPEC CHECKSUMS:
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
   hermes-engine: eb3b00d11068a5caff5e7804498cd39af28908db
   JitsiWebRTC: b47805ab5668be38e7ee60e2258f49badfe8e1d0
+  MMKV: 86859fdfa2b0b21db1fd6e48788474a6416a2c77
   MMKVCore: 3d16ce9f7d411e135020915fde98a056859a1efa
   NitroMmkv: 975be1948fd74280e6febcda06671d7bf604a4cd
   NitroModules: b5c5baefa71a65c40e129876a8b7943a9aef6aa5
@@ -3419,7 +3424,7 @@ SPEC CHECKSUMS:
   React-utils: 8ab26781c2f5c2f7fafb2022c8ab39d39f231b80
   React-webperformancenativemodule: 7953b7fe519f76fa595111fe18ff3d5de131bfe9
   ReactAppDependencyProvider: 0eb286cc274abb059ee601b862ebddac2e681d01
-  ReactCodegen: 62d3e70415e1b198e1ed838c93c0100f3059748a
+  ReactCodegen: 3f385b56ee4ed96fe400b660416696d4c09b4d9b
   ReactCommon: ac934cb340aee91282ecd6f273a26d24d4c55cae
   ReactNativeIncallManager: c6e08cc005da0f73d5a1ecbd58ad33bc61d5d79f
   RNBootSplash: 83bc1fef5ff2e9fd3ed0f20a472dd87d8a9ef898
@@ -3435,6 +3440,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 5456bb010373068fc92221140921b09d126b116e
 
-PODFILE CHECKSUM: 290503be07a1194c031d984352a0fae3ca5f447c
+PODFILE CHECKSUM: 45408cd524e1a14b52681099a5f828adba185126
 
 COCOAPODS: 1.16.2

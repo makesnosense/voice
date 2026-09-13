@@ -35,6 +35,8 @@ use_react_native!(
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'MMKV', '2.4.0'
+
   post_install do |installer|
 react_native_post_install(
       installer,

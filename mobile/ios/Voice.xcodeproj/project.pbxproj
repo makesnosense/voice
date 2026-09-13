@@ -16,6 +16,7 @@
 		9A33D1B12CA4567400665521 /* VoipPushToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A33D1B12CA4567400665520 /* VoipPushToken.m */; };
 		9A55F1C12CA4567400665601 /* VoipCallkit.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A55F1C12CA4567400665600 /* VoipCallkit.m */; };
 		9A77C0F12CA4567400665702 /* ServerConfigIos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A77C0F12CA4567400665701 /* ServerConfigIos.swift */; };
+		9A99E0B12CA4567400665902 /* DismissedCallLogsQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A99E0B12CA4567400665901 /* DismissedCallLogsQueue.swift */; };
 		9A88D0F12CA4567400665711 /* ServerConfigIos.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A88D0F12CA4567400665710 /* ServerConfigIos.m */; };
 		9D9F3CDC2BC9EEAB4846166A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
@@ -33,6 +34,7 @@
 		9A33D1B12CA4567400665520 /* VoipPushToken.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VoipPushToken.m; path = Voice/VoipPushToken.m; sourceTree = "<group>"; };
 		9A55F1C12CA4567400665600 /* VoipCallkit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VoipCallkit.m; path = Voice/VoipCallkit.m; sourceTree = "<group>"; };
 		9A77C0F12CA4567400665701 /* ServerConfigIos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ServerConfigIos.swift; path = Voice/ServerConfigIos.swift; sourceTree = "<group>"; };
+		9A99E0B12CA4567400665901 /* DismissedCallLogsQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DismissedCallLogsQueue.swift; path = Voice/DismissedCallLogsQueue.swift; sourceTree = "<group>"; };
 		9A88D0F12CA4567400665710 /* ServerConfigIos.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ServerConfigIos.m; path = Voice/ServerConfigIos.m; sourceTree = "<group>"; };
 		A90E36A46130455CBF5C62BA /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = Voice/BootSplash.storyboard; sourceTree = "<group>"; };
 		D5ABFF95CC7D46C1A7C2969F /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = Voice/Colors.xcassets; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 				EACF66C23042E4B300F01C07 /* Voice.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
+				9A99E0B12CA4567400665901 /* DismissedCallLogsQueue.swift */,
 				9A11B2C32CA4567400665501 /* VoipCallManager.swift */,
 				9A33D1B12CA4567400665520 /* VoipPushToken.m */,
 				9A55F1C12CA4567400665600 /* VoipCallkit.m */,
@@ -268,6 +271,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				9A99E0B12CA4567400665902 /* DismissedCallLogsQueue.swift in Sources */,
 				9A11B2C32CA4567400665502 /* VoipCallManager.swift in Sources */,
 				9A33D1B12CA4567400665521 /* VoipPushToken.m in Sources */,
 				9A55F1C12CA4567400665601 /* VoipCallkit.m in Sources */,
