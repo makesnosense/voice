@@ -43,6 +43,8 @@ extension Notification.Name {
   /// in-process only — not a user/push notification. objc will observe this string later.
   static let voipCallAccepted = Notification.Name("VoipCallAccepted")
   static let voipCallEnded = Notification.Name("VoipCallEnded")
+  /// still-ringing call ended without answer — js drains call-history mmkv. not hangup.
+  static let voipCallDismissed = Notification.Name("VoipCallDismissed")
 }
 
 /// @objc is so the React Native iOS module can read shared, currentToken, and accepted-call methods.
@@ -234,6 +236,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   func provider(_: CXProvider, perform action: CXEndCallAction) {
     if isRinging(uuid: action.callUUID), let ringingCall = pendingCalls[action.callUUID] {
       postCallDeclined(roomId: ringingCall.roomId, callId: ringingCall.callId)
+      // TODO: enqueue dismissed-call-logs mmkv (outcome: declined), then poke
+      NotificationCenter.default.post(name: Notification.Name.voipCallDismissed, object: nil)
     }
 
     clearCallState(action.callUUID)
@@ -306,8 +310,11 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     log.info("VOICEDEBUG VoIP remote end uuid=\(callUUID.uuidString, privacy: .public)")
 
+    // TODO: enqueue dismissed-call-logs mmkv from pendingCalls[callUUID]
+    // (outcome: cancelled or declined from push type), then poke — before we drop ringing state
     // drop ringing state first so CXEndCallAction from this end does not POST /decline
     pendingCalls.removeValue(forKey: callUUID)
+    NotificationCenter.default.post(name: Notification.Name.voipCallDismissed, object: nil)
 
     /// apple still requires reportNewIncomingCall for this voip. if the uuid is
     /// already ringing, that report fails (duplicate) and we just end the existing call.

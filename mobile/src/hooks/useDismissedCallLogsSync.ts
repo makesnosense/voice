@@ -6,6 +6,7 @@ import { prependCallHistoryEntry } from '../queries/call-history';
 import { drainDismissedCallLogsQueue } from '../native/dismissed-call-logs-queue';
 import { CALL_DIRECTION } from '../../../shared/constants/calls';
 import NativeCallDismissedEventEmitterAndroid from '../native/specs/NativeCallDismissedEventEmitterAndroid';
+import { subscribeCallDismissedIos } from '../native/voip-callkit-ios';
 import type { Contact } from '../../../shared/types/contacts';
 import { Platform as RNPlatform } from 'react-native';
 
@@ -43,18 +44,23 @@ export function useDismissedCallLogs() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (!NativeCallDismissedEventEmitterAndroid) {
-      if (RNPlatform.OS === 'android') {
+    if (RNPlatform.OS === 'ios') {
+      const subscription = subscribeCallDismissedIos(prependDismissedCallLogs);
+      return () => subscription.remove();
+    }
+
+    if (RNPlatform.OS === 'android') {
+      if (!NativeCallDismissedEventEmitterAndroid) {
         throw new Error(
           'NativeCallDismissedEventEmitterAndroid native module missing on Android',
         );
       }
-      return;
-    }
 
-    const subscription = NativeCallDismissedEventEmitterAndroid.onCallDismissed(
-      prependDismissedCallLogs,
-    );
-    return () => subscription.remove();
+      const subscription =
+        NativeCallDismissedEventEmitterAndroid.onCallDismissed(
+          prependDismissedCallLogs,
+        );
+      return () => subscription.remove();
+    }
   }, []);
 }

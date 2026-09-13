@@ -76,6 +76,17 @@ export async function takeStoredAcceptedCallInfo(): Promise<IncomingCallInfo | n
   return parseAcceptedCall(unvalidatedAcceptedCallInfo);
 }
 
+export function requestIosEndCallKitCall() {
+  if (Platform.OS !== 'ios') return;
+
+  if (!voipCallkitNativeModule?.requestIosEndCallKitCall) {
+    console.error('❌ VoipCallkit native module missing on iOS');
+    return;
+  }
+
+  voipCallkitNativeModule.requestIosEndCallKitCall();
+}
+
 export function subscribeCallAccepted(
   onAccepted: (incomingCallInfo: IncomingCallInfo) => void,
 ) {
@@ -95,17 +106,6 @@ export function subscribeCallAccepted(
   );
 }
 
-export function requestIosEndCallKitCall() {
-  if (Platform.OS !== 'ios') return;
-
-  if (!voipCallkitNativeModule?.requestIosEndCallKitCall) {
-    console.error('❌ VoipCallkit native module missing on iOS');
-    return;
-  }
-
-  voipCallkitNativeModule.requestIosEndCallKitCall();
-}
-
 export function subscribeCallEnded(onEnded: () => void) {
   if (Platform.OS !== 'ios') return { remove: () => {} };
 
@@ -115,4 +115,15 @@ export function subscribeCallEnded(onEnded: () => void) {
   }
 
   return voipCallkitJsEmitter.addListener('callEnded', onEnded);
+}
+
+export function subscribeCallDismissedIos(onDismissed: () => void) {
+  if (Platform.OS !== 'ios') return { remove: () => {} };
+
+  if (!voipCallkitJsEmitter) {
+    console.error('❌ VoipCallkit native module missing on iOS');
+    return { remove: () => {} };
+  }
+
+  return voipCallkitJsEmitter.addListener('callDismissed', onDismissed);
 }
