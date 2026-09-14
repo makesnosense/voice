@@ -72,7 +72,9 @@ export function createPermissionsStore(waitForActivity?: () => Promise<void>) {
   }
 
   async function requestNativePermissions(): Promise<PermissionsResult> {
-    const { status: notificationsStatus } = await requestNotifications([]);
+    const { status: notificationsStatus } = await requestNotifications([
+      'alert',
+    ]);
     const statuses = await requestMultiple(nativePermissions);
     return toResult(notificationsStatus, statuses);
   }

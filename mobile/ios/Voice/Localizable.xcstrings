@@ -1,0 +1,24 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "notification_missed_call_title": {
+      "comment": "shade notification after an unanswered incoming call",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Missed call"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пропущенный вызов"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

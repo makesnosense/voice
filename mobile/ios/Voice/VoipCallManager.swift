@@ -4,6 +4,7 @@ import Foundation
 import os
 import PushKit
 import UIKit
+import UserNotifications
 import WebRTC
 
 private let log = Logger(
@@ -327,8 +328,12 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     let callOutcome: CallOutcome =
       pushType == VoipPushType.callDeclined ? CallOutcome.declined : CallOutcome.cancelled
+    let shouldShowMissedCallNotification = pushType == VoipPushType.callCancelled
     if let ringingCall = pendingCalls[callUUID] {
       DismissedCallLogsQueue.enqueue(ringingCall, outcome: callOutcome)
+      if shouldShowMissedCallNotification {
+        showMissedCallNotification(callerDisplayName: ringingCall.callerDisplayName)
+      }
     }
     // drop ringing state first so CXEndCallAction from this end does not POST /decline
     pendingCalls.removeValue(forKey: callUUID)
@@ -398,6 +403,26 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
   private func isRinging(uuid: UUID) -> Bool {
     pendingCalls[uuid] != nil
+  }
+
+  /// local notification after a remote cancel. same as android showMissedCallNotification.
+  /// apple default: locked/background shows it; foreground-active does not.
+  private func showMissedCallNotification(callerDisplayName: String) {
+    let content = UNMutableNotificationContent()
+    content.title = String(
+      localized: "notification_missed_call_title",
+      defaultValue: "Missed call"
+    )
+    content.body = callerDisplayName
+    content.sound = nil
+
+    let request = UNNotificationRequest(
+      identifier: "missed-call",
+      content: content,
+      trigger: nil
+    )
+
+    UNUserNotificationCenter.current().add(request)
   }
 
   /// binary push token as hex so json can carry it.
