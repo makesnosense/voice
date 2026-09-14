@@ -5,7 +5,10 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { keychainStorage } from '../utils/keychain';
 import { api } from '../api';
 import { getFcmToken, listenForTokenRefresh } from '../utils/fcm';
-import { getVoipPushToken } from '../native/get-voip-push-token-ios';
+import {
+  getVoipPushToken,
+  listenForVoipTokenRefreshIos,
+} from '../native/get-voip-push-token-ios';
 import { PLATFORM } from '../../../shared/constants/platform';
 
 const getNativePlatform = () =>
@@ -57,10 +60,14 @@ export const useDeviceRegistration = () => {
     if (!isAuthenticated) return;
 
     if (RNPlatform.OS === 'ios') {
+      // subscribe first so a didUpdate that races getToken posts updated token in any case
+      const unsubscribe = listenForVoipTokenRefreshIos(token =>
+        syncDevice({ voipPushToken: token ?? '' }),
+      );
       getVoipPushToken().then(token => {
         if (token) syncDevice({ voipPushToken: token });
       });
-      return;
+      return unsubscribe;
     }
 
     if (RNPlatform.OS !== 'android') return;

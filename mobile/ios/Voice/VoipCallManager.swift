@@ -48,6 +48,9 @@ extension Notification.Name {
   static let voipCallEnded = Notification.Name("VoipCallEnded")
   /// still-ringing call ended without answer — js drains call-history mmkv. not hangup.
   static let voipCallDismissed = Notification.Name("VoipCallDismissed")
+  /// apple rotated or invalidated the voip token. js POSTs /devices upon event receipt;
+  /// currentToken is the drain if rn was down.
+  static let voipTokenUpdated = Notification.Name("VoipTokenUpdated")
 }
 
 private enum VoipPushType: String {
@@ -110,12 +113,14 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     let token = hexString(from: pushCredentials.token)
     currentToken = token
     log.info("VOICEDEBUG VoIP token: \(token, privacy: .public)")
+    notifyVoipTokenUpdated()
   }
 
   func pushRegistry(_: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
     guard type == PKPushType.voIP else { return }
     currentToken = nil
     log.info("VOICEDEBUG VoIP token invalidated")
+    notifyVoipTokenUpdated()
   }
 
   /// apple requires reportNewIncomingCall before this method returns. skip that and
@@ -428,6 +433,16 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   /// binary push token as hex so json can carry it.
   private func hexString(from tokenData: Data) -> String {
     tokenData.map { String(format: "%02x", $0) }.joined()
+  }
+
+  /// nsnull → js null (didInvalidate). hex string → didUpdate.
+  private func notifyVoipTokenUpdated() {
+    let tokenValue: Any = currentToken ?? NSNull()
+    NotificationCenter.default.post(
+      name: .voipTokenUpdated,
+      object: nil,
+      userInfo: ["token": tokenValue]
+    )
   }
 
   private func hexEncodedVoipToken() -> String? {
