@@ -49,7 +49,7 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Voice is audio-only and does not use the camera. This description is required because the call library includes unused camera APIs.</string>
+	<string>Voice is audio-only and never accesses the camera. This key exists because the WebRTC library bundled for calls includes camera APIs the app doesn't invoke.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Voice needs microphone access for calls</string>
 	<key>RCTNewArchEnabled</key>
