@@ -43,7 +43,7 @@ export function createPermissionsStore(waitForActivity?: () => Promise<void>) {
 
   // notifications are not in this list —
   // they use a dedicated react-native-permissions API
-  const nativePermissions: Permission[] = isAndroid
+  const runtimePermissions: Permission[] = isAndroid
     ? [microphonePermission, bluetoothPermission]
     : [microphonePermission];
 
@@ -66,16 +66,8 @@ export function createPermissionsStore(waitForActivity?: () => Promise<void>) {
   async function checkPermissions(): Promise<PermissionsResult> {
     const [notificationsStatus, statuses] = await Promise.all([
       checkNotifications().then(({ status }) => status),
-      checkMultiple(nativePermissions),
+      checkMultiple(runtimePermissions),
     ]);
-    return toResult(notificationsStatus, statuses);
-  }
-
-  async function requestNativePermissions(): Promise<PermissionsResult> {
-    const { status: notificationsStatus } = await requestNotifications([
-      'alert',
-    ]);
-    const statuses = await requestMultiple(nativePermissions);
     return toResult(notificationsStatus, statuses);
   }
 
@@ -131,8 +123,11 @@ export function createPermissionsStore(waitForActivity?: () => Promise<void>) {
       requestPermissions: async () => {
         await waitForActivity?.();
 
-        const result = await requestNativePermissions();
-        applyPermissionsResults(result);
+        const { status: notificationsStatus } = await requestNotifications([
+          'alert',
+        ]);
+        const statuses = await requestMultiple(runtimePermissions);
+        applyPermissionsResults(toResult(notificationsStatus, statuses));
         set({ permissionsRequested: true });
       },
 
