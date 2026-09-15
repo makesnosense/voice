@@ -184,7 +184,6 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
         return
       }
 
-      activeCallUUID = callUUID
       log.info(
         "VOICEDEBUG CallKit incoming call reported uuid=\(callUUID.uuidString, privacy: .public)"
       )
@@ -219,6 +218,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       action.fail()
       return
     }
+    activeCallUUID = action.callUUID
 
     // WebRTC’s singleton wrapper around system audio session.
     // One process-wide instance.
@@ -263,8 +263,14 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       NotificationCenter.default.post(name: Notification.Name.voipCallDismissed, object: nil)
     }
 
+    // we send call ended event to JS to act upon (exit room), only if it was currently active call which is declined
+    // as opposed to declining a second incoming call while being in a call already
+    if action.callUUID == activeCallUUID {
+      NotificationCenter.default.post(name: Notification.Name.voipCallEnded, object: nil)
+    }
+
     clearCallState(action.callUUID)
-    NotificationCenter.default.post(name: Notification.Name.voipCallEnded, object: nil)
+
     log.info("VOICEDEBUG CallKit end")
     action.fulfill()
   }
