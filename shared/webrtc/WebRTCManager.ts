@@ -364,15 +364,16 @@ export class WebRTCManager {
     return !this.inputAudioEnabled;
   }
 
-  toggleMute() {
-    if (this.localStream) {
-      this.localStream.getAudioTracks().forEach((track) => {
-        track.enabled = !track.enabled;
-      });
+  setMuted(isMuted: boolean) {
+    if (!this.localStream) return;
+    if (this.isMuted === isMuted) return;
 
-      console.log(`🔇 [WebRTC] mute status changed: ${this.isMuted ? 'muted' : 'unmuted'}`);
-      this.socket.emit('mute-status-changed', { isMuted: this.isMuted });
-    }
+    this.localStream.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
+    });
+
+    console.log(`🔇 [WebRTC] mute status changed: ${this.isMuted ? 'muted' : 'unmuted'}`);
+    this.socket.emit('mute-status-changed', { isMuted: this.isMuted });
   }
 
   private async handleConnectionFailed(reason: DisconnectReason) {

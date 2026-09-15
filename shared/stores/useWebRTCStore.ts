@@ -48,6 +48,7 @@ interface WebRTCStore {
     }
   ) => Promise<void>;
   toggleMute: () => void;
+  setMuted: (isMuted: boolean) => void;
   cleanup: () => void;
   setRemoteStream: (socketId: SocketId, stream: MediaStream) => void;
   clearRemoteStream: (reason: DisconnectReason) => void;
@@ -97,9 +98,15 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
   toggleMute: () => {
     const { manager } = get();
     if (manager) {
-      manager.toggleMute();
-      const actualMutedState = manager.isMuted;
-      set({ isMutedLocal: actualMutedState });
+      get().setMuted(!manager.isMuted);
+    }
+  },
+
+  setMuted: (isMuted: boolean) => {
+    const { manager } = get();
+    if (manager) {
+      manager.setMuted(isMuted);
+      set({ isMutedLocal: manager.isMuted });
     }
   },
 
