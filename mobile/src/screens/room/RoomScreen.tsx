@@ -16,6 +16,7 @@ import { useMicrophoneStore } from '../../stores/useMicrophoneStore';
 import { useRejoinStore } from '../../stores/useRejoinStore';
 import { useAuthStore } from '../../stores/useAuthStore';
 import useWebRTCInit from '../../hooks/useWebRTCInit';
+import { useIosCallKitMuteSync } from '../../hooks/useIosCallKitMuteSync';
 import { BASE_URL } from '../../config';
 import {
   startCallForegroundService,
@@ -77,6 +78,7 @@ export default function RoomScreen({ roomId }: RoomScreenProps) {
     getVoipPushToken,
   );
   useWebRTCInit(socketRef);
+  useIosCallKitMuteSync();
 
   useEffect(() => {
     startCallForegroundService();
