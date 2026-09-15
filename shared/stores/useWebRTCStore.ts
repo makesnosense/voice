@@ -84,10 +84,12 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       analyserCallbacks
     );
 
+    // after construction, align the new manager mute state with the store mute state
+    newManager.setMuted(get().isMutedLocal);
+
     set({
       manager: newManager,
       isMicActive: true,
-      isMutedLocal: newManager.isMuted,
     });
 
     console.log('✅ [Store] emitting webrtc-ready to server');
@@ -107,7 +109,11 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
     if (manager) {
       manager.setMuted(isMuted);
       set({ isMutedLocal: manager.isMuted });
+      return;
     }
+
+    // we align isMuted with local store isMutedLocal state, even when manager does not exist yet
+    set({ isMutedLocal: isMuted });
   },
 
   setRemoteStream: (socketId, stream) => {
@@ -133,6 +139,7 @@ export const useWebRTCStore = create<WebRTCStore>((set, get) => ({
       remoteStream: null,
       remoteSocketId: null,
       isMicActive: false,
+      isMutedLocal: false,
     });
   },
 }));
