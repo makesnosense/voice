@@ -1,9 +1,9 @@
 #import <React/RCTEventEmitter.h>
 #import "Voice-Swift.h"
 
-// translates apple's in-process VoipCallAccepted / VoipCallEnded / VoipCallDismissed
-// notifications into RN events.
-// also exports js → native callkit commands (fulfill, take stored accept, end).
+// translates apple's in-process VoipCallAccepted / VoipCallEnded / VoipCallDismissed /
+// VoipCallMuteChanged notifications into RN events.
+// also exports js → native callkit commands (fulfill, take stored accept, end, mute).
 
 @interface VoipCallkit : RCTEventEmitter
 @end
@@ -27,7 +27,7 @@ RCT_EXPORT_MODULE();
 }
 
 - (NSArray<NSString*>*)supportedEvents {
-  return @[ @"callAccepted", @"callEnded", @"callDismissed" ];
+  return @[ @"callAccepted", @"callEnded", @"callDismissed", @"muteChanged" ];
 }
 
 - (void)startObserving {
@@ -42,6 +42,10 @@ RCT_EXPORT_MODULE();
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(handleCallDismissed:)
                                                name:@"VoipCallDismissed"
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(handleCallMuteChanged:)
+                                               name:@"VoipCallMuteChanged"
                                              object:nil];
 }
 
@@ -68,6 +72,10 @@ RCT_EXPORT_MODULE();
   [self sendEventWithName:@"callDismissed" body:nil];
 }
 
+- (void)handleCallMuteChanged:(NSNotification*)notification {
+  [self sendEventWithName:@"muteChanged" body:notification.userInfo];
+}
+
 // lets js drain storedAcceptedCallInfo if the notification fired when RN was down
 RCT_EXPORT_METHOD(takeStoredAcceptedCallInfo:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
@@ -80,6 +88,10 @@ RCT_EXPORT_METHOD(fulfillPendingAnswerAction) {
 
 RCT_EXPORT_METHOD(requestIosEndCallKitCall) {
   [[VoipCallManager shared] requestIosEndCallKitCall];
+}
+
+RCT_EXPORT_METHOD(requestIosSetMutedCallKitState:(BOOL)isMuted) {
+  [[VoipCallManager shared] requestIosSetMutedCallKitState:isMuted];
 }
 
 @end
