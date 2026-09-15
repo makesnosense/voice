@@ -51,6 +51,9 @@ extension Notification.Name {
   /// apple rotated or invalidated the voip token. js POSTs /devices upon event receipt;
   /// currentToken is the drain if rn was down.
   static let voipTokenUpdated = Notification.Name("VoipTokenUpdated")
+  /// system mute surface (callkit ui, carplay, bluetooth, siri) toggled mute.
+  /// js is the source of truth for the actual webrtc track — this just forwards intent.
+  static let voipCallMuteChanged = Notification.Name("VoipCallMuteChanged")
 }
 
 private enum VoipPushType: String {
@@ -266,6 +269,19 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     action.fulfill()
   }
 
+  /// this method is CallKit → app
+  /// first argument is telephonyProvider. iOS calls this on it automatically.
+  /// fires for system mute surfaces: callkit in-call ui, carplay, bluetooth, siri.
+  func provider(_: CXProvider, perform action: CXSetMutedCallAction) {
+    action.fulfill()
+    NotificationCenter.default.post(
+      name: Notification.Name.voipCallMuteChanged,
+      object: nil,
+      userInfo: ["isMuted": action.isMuted]
+    )
+    log.info("VOICEDEBUG CallKit mute changed isMuted=\(action.isMuted, privacy: .public)")
+  }
+
   /// callkit calls this after it activates avaudiosession (after fulfill).
   /// we hand that session to webrtc.
   func provider(_: CXProvider, didActivate audioSession: AVAudioSession) {
@@ -316,6 +332,26 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
         )
       }
     }
+  }
+
+  /// this method is app → CallKit
+  /// js requests a CXSetMutedCallAction through CXCallController so callkit's system ui
+  /// reflects an app-side mute toggle.
+  /// no-op if there is no active callkit call
+  @objc func requestIosSetMutedCallKitState(_ isMuted: Bool) {
+    guard let activeCallUUID else { return }
+    let muteAction = CXSetMutedCallAction(call: activeCallUUID, muted: isMuted)
+    let muteActionTransaction = CXTransaction(action: muteAction)
+
+    func onMuteRequestFinished(error: Error?) {
+      if let error {
+        log.error(
+          "VOICEDEBUG CallKit mute request failed: \(error.localizedDescription, privacy: .public)"
+        )
+      }
+    }
+
+    callController.request(muteActionTransaction, completion: onMuteRequestFinished)
   }
 
   private func handleCallDeclinedOrCancelledFromRemotePush(
