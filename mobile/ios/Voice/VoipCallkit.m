@@ -90,8 +90,8 @@ RCT_EXPORT_METHOD(requestIosEndCallKitCall) {
   [[VoipCallManager shared] requestIosEndCallKitCall];
 }
 
-RCT_EXPORT_METHOD(requestIosSetMutedCallKitState:(BOOL)isMuted) {
-  [[VoipCallManager shared] requestIosSetMutedCallKitState:isMuted];
+RCT_EXPORT_METHOD(requestIosSetMuteStateInCallKit:(BOOL)isMuted) {
+  [[VoipCallManager shared] requestIosSetMuteStateInCallKit:isMuted];
 }
 
 @end

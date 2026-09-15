@@ -338,7 +338,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   /// js requests a CXSetMutedCallAction through CXCallController so callkit's system ui
   /// reflects an app-side mute toggle.
   /// no-op if there is no active callkit call
-  @objc func requestIosSetMutedCallKitState(_ isMuted: Bool) {
+  @objc func requestIosSetMuteStateInCallKit(_ isMuted: Bool) {
     guard let activeCallUUID else { return }
     let muteAction = CXSetMutedCallAction(call: activeCallUUID, muted: isMuted)
     let muteActionTransaction = CXTransaction(action: muteAction)

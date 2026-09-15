@@ -13,6 +13,7 @@ type VoipCallkitNativeModule = NativeModule & {
   fulfillPendingAnswerAction(): void;
   takeStoredAcceptedCallInfo(): Promise<unknown>;
   requestIosEndCallKitCall(): void;
+  requestIosSetMuteStateInCallKit(isMuted: boolean): void;
 };
 
 const { VoipCallkit: voipCallkitNativeModule } = NativeModules as {
@@ -53,6 +54,20 @@ function parseAcceptedCall(
   return callAcceptedPayload;
 }
 
+function parseMuteStateChangePayload(
+  muteStateChangePayload: unknown,
+): boolean | null {
+  if (
+    typeof muteStateChangePayload !== 'object' ||
+    muteStateChangePayload === null
+  ) {
+    return null;
+  }
+
+  const { isMuted } = muteStateChangePayload as Record<string, unknown>;
+  return typeof isMuted === 'boolean' ? isMuted : null;
+}
+
 export function fulfillPendingAnswerAction() {
   if (Platform.OS !== 'ios') return;
 
@@ -86,6 +101,17 @@ export function requestIosEndCallKitCall() {
   }
 
   voipCallkitNativeModule.requestIosEndCallKitCall();
+}
+
+export function requestIosSetMuteStateInCallKit(isMuted: boolean) {
+  if (Platform.OS !== 'ios') return;
+
+  if (!voipCallkitNativeModule?.requestIosSetMuteStateInCallKit) {
+    console.error('❌ VoipCallkit native module missing on iOS');
+    return;
+  }
+
+  voipCallkitNativeModule.requestIosSetMuteStateInCallKit(isMuted);
 }
 
 export function subscribeCallAccepted(
@@ -127,4 +153,23 @@ export function subscribeCallDismissedIos(onDismissed: () => void) {
   }
 
   return voipCallkitJsEmitter.addListener('callDismissed', onDismissed);
+}
+
+export function subscribeMuteStateChanged(
+  onMuteChanged: (isMuted: boolean) => void,
+) {
+  if (Platform.OS !== 'ios') return { remove: () => {} };
+
+  if (!voipCallkitJsEmitter) {
+    console.error('❌ VoipCallkit native module missing on iOS');
+    return { remove: () => {} };
+  }
+
+  return voipCallkitJsEmitter.addListener(
+    'muteChanged',
+    muteStateChangePayload => {
+      const isMuted = parseMuteStateChangePayload(muteStateChangePayload);
+      if (isMuted !== null) onMuteChanged(isMuted);
+    },
+  );
 }
