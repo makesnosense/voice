@@ -29,15 +29,6 @@ import org.voicepopuli.voice.calldismissedeventemitter.CallDismissedEventEmitter
 
 class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
-    data class PendingCallParams(
-        val callId: String,
-        val callerUserId: String,
-        val callerEmail: String,
-        val callerName: String?,
-        val createdAt: String,
-        val roomId: String,
-    )
-
     companion object {
         const val CHANNEL_ID = "incoming_calls"
         const val NOTIFICATION_ID = 3333
@@ -53,19 +44,25 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         private const val OUTCOME_DECLINED = "declined"
 
         private var vibrator: Vibrator? = null
-        var pendingCall: PendingCallParams? = null
+        var incomingCallInfo: IncomingCallInfo? = null
 
         private var appContext: Context? = null
 
         private val timeoutHandler = Handler(Looper.getMainLooper())
         private val timeoutRunnable = Runnable {
             cancelVibration()
-            pendingCall?.let { params ->
-                val callerDisplayName = params.callerName ?: params.callerEmail
-                enqueueDismissedCallLog(params, OUTCOME_NO_ANSWER)
-                appContext?.let { context -> showMissedCallNotification(context, callerDisplayName) }
-                pendingCall = null
+
+            // we need local variables because  Kotlin is smart about locals, strict about members
+            val timedOutCallInfo = incomingCallInfo
+            if (timedOutCallInfo != null) {
+                enqueueDismissedCallLog(timedOutCallInfo, OUTCOME_NO_ANSWER)
+                val context = appContext
+                if (context != null) {
+                    showMissedCallNotification(context, timedOutCallInfo.callerDisplayName)
+                }
+                incomingCallInfo = null
             }
+
             CallDismissedEventEmitter.emitDismissed()
         }
 
@@ -82,11 +79,11 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             timeoutHandler.removeCallbacks(timeoutRunnable)
         }
 
-        fun clearPendingCall() {
-            pendingCall = null
+        fun clearIncomingCallInfo() {
+            incomingCallInfo = null
         }
 
-        fun enqueueDismissedCallLog(params: PendingCallParams, outcome: String) {
+        fun enqueueDismissedCallLog(callInfo: IncomingCallInfo, outcome: String) {
             val mmkv = MMKV.mmkvWithID(DISMISSED_CALL_LOGS_MMKV_ID)
             val existing = mmkv.decodeString(QUEUE_KEY) ?: "[]"
             val queue =
@@ -97,11 +94,11 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 }
             queue.put(
                 JSONObject().apply {
-                    put("callId", params.callId)
-                    put("callerUserId", params.callerUserId)
-                    put("callerEmail", params.callerEmail)
-                    put("callerName", params.callerName ?: JSONObject.NULL)
-                    put("createdAt", params.createdAt)
+                    put("callId", callInfo.callId)
+                    put("callerUserId", callInfo.callerUserId)
+                    put("callerEmail", callInfo.callerEmail)
+                    put("callerName", callInfo.callerName ?: JSONObject.NULL)
+                    put("createdAt", callInfo.createdAt)
                     put("outcome", outcome)
                 }
             )
@@ -111,9 +108,10 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         fun handleCallDeclined() {
             cancelVibration()
             cancelTimeout()
-            pendingCall?.let { params ->
-                enqueueDismissedCallLog(params, OUTCOME_DECLINED)
-                pendingCall = null
+            val declinedCallInfo = incomingCallInfo
+            if (declinedCallInfo != null) {
+                enqueueDismissedCallLog(declinedCallInfo, OUTCOME_DECLINED)
+                incomingCallInfo = null
             }
             CallDismissedEventEmitter.emitDismissed()
         }
@@ -122,14 +120,14 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         // that's a reused full-screen activity, in foreground it's just a swapped notification.
         // either way the previous caller never otherwise gets an explicit decline, so they'd
         // just ring out to the 60s timeout.
-        private fun declinePreviousPendingCall() {
-            val previousCall = pendingCall ?: return
+        private fun declinePreviousIncomingCall() {
+            val previousCallInfo = incomingCallInfo ?: return
             cancelVibration()
             cancelTimeout()
-            enqueueDismissedCallLog(previousCall, OUTCOME_DECLINED)
+            enqueueDismissedCallLog(previousCallInfo, OUTCOME_DECLINED)
             thread {
                 try {
-                    postCallDeclined(previousCall.roomId, previousCall.callId)
+                    postCallDeclined(previousCallInfo.roomId, previousCallInfo.callId)
                 } catch (exception: Exception) {
                     Log.e("VoiceFirebaseMessagingService", "failed to notify server of preempted decline", exception)
                 }
@@ -200,16 +198,15 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
 
         val callerEmail = data["callerEmail"] ?: getString(R.string.caller_unknown)
         val callerNameOrNull = data["callerName"]?.takeIf { it.isNotEmpty() }
-        val callerDisplayName = callerNameOrNull ?: callerEmail
         val callerUserId = data["callerUserId"] ?: return
         val callId = data["callId"] ?: return
         val roomId = data["roomId"] ?: return
         val createdAt = data["createdAt"]?.takeIf { it.isNotEmpty() } ?: return
 
-        declinePreviousPendingCall()
+        declinePreviousIncomingCall()
 
-        pendingCall =
-            PendingCallParams(
+        val callInfo =
+            IncomingCallInfo(
                 callId,
                 callerUserId,
                 callerEmail,
@@ -217,28 +214,22 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 createdAt,
                 roomId,
             )
+        incomingCallInfo = callInfo
 
         ensureNotificationChannel()
         scheduleTimeout()
-        showIncomingCallNotification(
-            callerDisplayName,
-            callerUserId,
-            callerEmail,
-            roomId,
-            callId,
-            createdAt,
-        )
+        showIncomingCallNotification(callInfo)
         startVibration()
     }
 
     private fun handleCallCancelled() {
         cancelVibration()
         cancelTimeout()
-        pendingCall?.let { params ->
-            val callerDisplayName = params.callerName ?: params.callerEmail
-            enqueueDismissedCallLog(params, OUTCOME_CANCELLED)
-            showMissedCallNotification(applicationContext, callerDisplayName)
-            pendingCall = null
+        val cancelledCallInfo = incomingCallInfo
+        if (cancelledCallInfo != null) {
+            enqueueDismissedCallLog(cancelledCallInfo, OUTCOME_CANCELLED)
+            showMissedCallNotification(applicationContext, cancelledCallInfo.callerDisplayName)
+            incomingCallInfo = null
         }
         getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
         sendBroadcast(Intent(ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
@@ -310,24 +301,12 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         wakeLock.acquire(30_000L)
     }
 
-    private fun showIncomingCallNotification(
-        callerName: String,
-        callerUserId: String,
-        callerEmail: String,
-        roomId: String,
-        callId: String,
-        createdAt: String,
-    ) {
+    private fun showIncomingCallNotification(incomingCallInfo: IncomingCallInfo) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
         val incomingCallFullscreenIntent =
             Intent(this, IncomingCallFullScreenActivity::class.java).apply {
-                putExtra("callerName", callerName)
-                putExtra("callerUserId", callerUserId)
-                putExtra("callerEmail", callerEmail)
-                putExtra("roomId", roomId)
-                putExtra("callId", callId)
-                putExtra("createdAt", createdAt)
+                incomingCallInfo.putExtraOn(this)
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
         val incomingCallFullscreenPendingIntent =
@@ -339,10 +318,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             )
 
         val notificationBarDeclineIntent =
-            Intent(this, DeclineCallReceiver::class.java).apply {
-                putExtra("roomId", roomId)
-                putExtra("callId", callId)
-            }
+            Intent(this, DeclineCallReceiver::class.java).apply { incomingCallInfo.putExtraOn(this) }
         val notificationBarDeclinePendingIntent =
             PendingIntent.getBroadcast(
                 this,
@@ -352,7 +328,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             )
 
         val notificationBarAcceptIntent =
-            Intent(Intent.ACTION_VIEW, buildCallUri(roomId, callerUserId, callerEmail, callerName, callId, createdAt)).apply {
+            Intent(Intent.ACTION_VIEW, buildCallUri(incomingCallInfo)).apply {
                 setClass(this@VoiceFirebaseMessagingService, MainActivity::class.java)
                 flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_ANIMATION
@@ -369,7 +345,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_call)
                 .setContentTitle(getString(R.string.notification_incoming_call_title))
-                .setContentText(callerName)
+                .setContentText(incomingCallInfo.callerDisplayName)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setFullScreenIntent(incomingCallFullscreenPendingIntent, true)

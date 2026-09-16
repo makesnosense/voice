@@ -15,15 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
 import org.voicepopuli.voice.MainActivity
-import org.voicepopuli.voice.R // R is Android’s generated resource index for this app
+import org.voicepopuli.voice.R
 
 class IncomingCallFullScreenActivity : AppCompatActivity() {
-    private var roomId: String? = null
-    private var callerUserId: String? = null
-    private var callerEmail: String? = null
-    private var callerName: String? = null
-    private var callId: String? = null
-    private var createdAt: String? = null
+    private var incomingCallInfo: IncomingCallInfo? = null
 
     private val callCancelledReceiver =
         object : BroadcastReceiver() {
@@ -63,7 +58,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
         // handle action extras (from notification action buttons)
         val action = intent.getStringExtra("action")
-        populateCallFieldsFromIntent(intent)
+        incomingCallInfo = incomingCallInfoFrom(intent)
 
         when (action) {
             "accept" -> {
@@ -86,29 +81,20 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        populateCallFieldsFromIntent(intent)
+        incomingCallInfo = incomingCallInfoFrom(intent)
         renderCallerName()
         getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 
-    private fun populateCallFieldsFromIntent(intent: Intent) {
-        roomId = intent.getStringExtra("roomId")
-        callerUserId = intent.getStringExtra("callerUserId")
-        callerEmail = intent.getStringExtra("callerEmail")
-        callerName =
-            intent.getStringExtra("callerName")
-                ?: intent.getStringExtra("callerEmail") ?: getString(R.string.caller_unknown)
-        callId = intent.getStringExtra("callId")
-        createdAt = intent.getStringExtra("createdAt")
-    }
-
     private fun renderCallerName() {
-        findViewById<TextView>(R.id.callerName)?.text = callerName
+        findViewById<TextView>(R.id.callerName)?.text =
+            incomingCallInfo?.callerDisplayName ?: getString(R.string.caller_unknown)
     }
 
     private fun acceptCall() {
+        val callInfo = incomingCallInfo ?: return finish()
         cancelNotification()
-        val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName, callId, createdAt)
+        val uri = buildCallUri(callInfo)
         val intent =
             Intent(this, MainActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
@@ -130,13 +116,12 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     }
 
     private fun declineCall() {
+        val callInfo = incomingCallInfo ?: return finish()
         VoiceFirebaseMessagingService.handleCallDeclined()
         cancelNotification()
-        val declinedRoomId = roomId ?: return finish()
-        val declinedCallId = callId ?: return finish()
         thread {
             try {
-                postCallDeclined(declinedRoomId, declinedCallId)
+                postCallDeclined(callInfo.roomId, callInfo.callId)
             } catch (exception: Exception) {
                 Log.e("IncomingCallFullScreenActivity", "Failed to notify server of decline", exception)
             }
@@ -147,7 +132,7 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private fun cancelNotification() {
         VoiceFirebaseMessagingService.cancelTimeout()
         VoiceFirebaseMessagingService.cancelVibration()
-        VoiceFirebaseMessagingService.clearPendingCall()
+        VoiceFirebaseMessagingService.clearIncomingCallInfo()
         getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 }

@@ -88,7 +88,7 @@ class MainActivity : ReactActivity() {
         getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
         VoiceFirebaseMessagingService.cancelVibration()
         VoiceFirebaseMessagingService.cancelTimeout()
-        VoiceFirebaseMessagingService.clearPendingCall()
+        VoiceFirebaseMessagingService.clearIncomingCallInfo()
         sendBroadcast(Intent(VoiceFirebaseMessagingService.ACTION_INCOMING_CALL_DISMISSED).setPackage(packageName))
     }
 }
