@@ -15,10 +15,12 @@ import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.tencent.mmkv.MMKV
+import kotlin.concurrent.thread
 import org.json.JSONArray
 import org.json.JSONObject
 import org.voicepopuli.voice.MainActivity
@@ -33,6 +35,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val callerEmail: String,
         val callerName: String?,
         val createdAt: String,
+        val roomId: String,
     )
 
     companion object {
@@ -115,6 +118,24 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
             CallDismissedEventEmitter.emitDismissed()
         }
 
+        // a newer incoming call replaces whichever one is still ringing — on the lock screen
+        // that's a reused full-screen activity, in foreground it's just a swapped notification.
+        // either way the previous caller never otherwise gets an explicit decline, so they'd
+        // just ring out to the 60s timeout.
+        private fun declinePreviousPendingCall() {
+            val previousCall = pendingCall ?: return
+            cancelVibration()
+            cancelTimeout()
+            enqueueDismissedCallLog(previousCall, OUTCOME_DECLINED)
+            thread {
+                try {
+                    postCallDeclined(previousCall.roomId, previousCall.callId)
+                } catch (exception: Exception) {
+                    Log.e("VoiceFirebaseMessagingService", "failed to notify server of preempted decline", exception)
+                }
+            }
+        }
+
         private fun showMissedCallNotification(context: Context, callerDisplayName: String) {
             ensureMissedCallChannel(context)
 
@@ -185,6 +206,8 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
         val roomId = data["roomId"] ?: return
         val createdAt = data["createdAt"]?.takeIf { it.isNotEmpty() } ?: return
 
+        declinePreviousPendingCall()
+
         pendingCall =
             PendingCallParams(
                 callId,
@@ -192,6 +215,7 @@ class VoiceFirebaseMessagingService : FirebaseMessagingService() {
                 callerEmail,
                 callerNameOrNull,
                 createdAt,
+                roomId,
             )
 
         ensureNotificationChannel()

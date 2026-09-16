@@ -85,12 +85,6 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-
-        // a second call preempts whichever one is on screen. that call never otherwise gets
-        // an explicit decline, so its caller would just ring out to the 60s timeout — decline
-        // it now, using the fields as they stood before this intent overwrites them.
-        declinePreemptedCall()
-
         setIntent(intent)
         populateCallFieldsFromIntent(intent)
         renderCallerName()
@@ -110,37 +104,6 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
     private fun renderCallerName() {
         findViewById<TextView>(R.id.callerName)?.text = callerName
-    }
-
-    // the call this screen was showing before a newer one just overwrote its fields
-    private fun declinePreemptedCall() {
-        val preemptedRoomId = roomId
-        val preemptedCallId = callId
-        if (preemptedRoomId == null || preemptedCallId == null) return
-
-        thread {
-            try {
-                postCallDeclined(preemptedRoomId, preemptedCallId)
-            } catch (exception: Exception) {
-                Log.e("IncomingCallFullScreenActivity", "failed to notify server of preempted decline", exception)
-            }
-        }
-
-        val preemptedCallerUserId = callerUserId
-        val preemptedCallerEmail = callerEmail
-        val preemptedCreatedAt = createdAt
-        if (preemptedCallerUserId != null && preemptedCallerEmail != null && preemptedCreatedAt != null) {
-            VoiceFirebaseMessagingService.enqueueDismissedCallLog(
-                VoiceFirebaseMessagingService.PendingCallParams(
-                    preemptedCallId,
-                    preemptedCallerUserId,
-                    preemptedCallerEmail,
-                    callerName,
-                    preemptedCreatedAt,
-                ),
-                "declined", // matches private OUTCOME_DECLINED in VoiceFirebaseMessagingService
-            )
-        }
     }
 
     private fun acceptCall() {
