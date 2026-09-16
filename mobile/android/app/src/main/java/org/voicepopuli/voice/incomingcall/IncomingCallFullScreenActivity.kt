@@ -15,9 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
 import org.voicepopuli.voice.MainActivity
-import org.voicepopuli.voice.R
+import org.voicepopuli.voice.R // R is Android’s generated resource index for this app
 
 class IncomingCallFullScreenActivity : AppCompatActivity() {
+    private var roomId: String? = null
     private var callerUserId: String? = null
     private var callerEmail: String? = null
     private var callerName: String? = null
@@ -62,18 +63,11 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
         // handle action extras (from notification action buttons)
         val action = intent.getStringExtra("action")
-        val roomId = intent.getStringExtra("roomId")
-        callerUserId = intent.getStringExtra("callerUserId")
-        callerEmail = intent.getStringExtra("callerEmail")
-        callerName =
-            intent.getStringExtra("callerName")
-                ?: intent.getStringExtra("callerEmail") ?: getString(R.string.caller_unknown)
-        callId = intent.getStringExtra("callId")
-        createdAt = intent.getStringExtra("createdAt")
+        populateCallFieldsFromIntent(intent)
 
         when (action) {
             "accept" -> {
-                acceptCall(roomId)
+                acceptCall()
                 return
             }
             "decline" -> {
@@ -84,23 +78,72 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
 
         // no action = full-screen intent triggered, show the UI
         setContentView(R.layout.activity_incoming_call)
-
-        findViewById<TextView>(R.id.callerName).text = callerName
-
-        findViewById<ImageButton>(R.id.btnAccept).setOnClickListener { acceptCall(roomId) }
-
+        renderCallerName()
+        findViewById<ImageButton>(R.id.btnAccept).setOnClickListener { acceptCall() }
         findViewById<ImageButton>(R.id.btnDecline).setOnClickListener { declineCall() }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+
+        // a second call preempts whichever one is on screen. that call never otherwise gets
+        // an explicit decline, so its caller would just ring out to the 60s timeout — decline
+        // it now, using the fields as they stood before this intent overwrites them.
+        declinePreemptedCall()
+
         setIntent(intent)
-        // reached only if a second call arrives while this screen is showing
-        // TODO: remove once server-side busy detection is implemented
+        populateCallFieldsFromIntent(intent)
+        renderCallerName()
         getSystemService(NotificationManager::class.java).cancel(VoiceFirebaseMessagingService.NOTIFICATION_ID)
     }
 
-    private fun acceptCall(roomId: String?) {
+    private fun populateCallFieldsFromIntent(intent: Intent) {
+        roomId = intent.getStringExtra("roomId")
+        callerUserId = intent.getStringExtra("callerUserId")
+        callerEmail = intent.getStringExtra("callerEmail")
+        callerName =
+            intent.getStringExtra("callerName")
+                ?: intent.getStringExtra("callerEmail") ?: getString(R.string.caller_unknown)
+        callId = intent.getStringExtra("callId")
+        createdAt = intent.getStringExtra("createdAt")
+    }
+
+    private fun renderCallerName() {
+        findViewById<TextView>(R.id.callerName)?.text = callerName
+    }
+
+    // the call this screen was showing before a newer one just overwrote its fields
+    private fun declinePreemptedCall() {
+        val preemptedRoomId = roomId
+        val preemptedCallId = callId
+        if (preemptedRoomId == null || preemptedCallId == null) return
+
+        thread {
+            try {
+                postCallDeclined(preemptedRoomId, preemptedCallId)
+            } catch (exception: Exception) {
+                Log.e("IncomingCallFullScreenActivity", "failed to notify server of preempted decline", exception)
+            }
+        }
+
+        val preemptedCallerUserId = callerUserId
+        val preemptedCallerEmail = callerEmail
+        val preemptedCreatedAt = createdAt
+        if (preemptedCallerUserId != null && preemptedCallerEmail != null && preemptedCreatedAt != null) {
+            VoiceFirebaseMessagingService.enqueueDismissedCallLog(
+                VoiceFirebaseMessagingService.PendingCallParams(
+                    preemptedCallId,
+                    preemptedCallerUserId,
+                    preemptedCallerEmail,
+                    callerName,
+                    preemptedCreatedAt,
+                ),
+                "declined", // matches private OUTCOME_DECLINED in VoiceFirebaseMessagingService
+            )
+        }
+    }
+
+    private fun acceptCall() {
         cancelNotification()
         val uri = buildCallUri(roomId, callerUserId, callerEmail, callerName, callId, createdAt)
         val intent =
@@ -126,10 +169,11 @@ class IncomingCallFullScreenActivity : AppCompatActivity() {
     private fun declineCall() {
         VoiceFirebaseMessagingService.handleCallDeclined()
         cancelNotification()
-        val roomId = intent.getStringExtra("roomId") ?: return finish()
+        val declinedRoomId = roomId ?: return finish()
+        val declinedCallId = callId ?: return finish()
         thread {
             try {
-                postCallDeclined(roomId, callId ?: return@thread)
+                postCallDeclined(declinedRoomId, declinedCallId)
             } catch (exception: Exception) {
                 Log.e("IncomingCallFullScreenActivity", "Failed to notify server of decline", exception)
             }
