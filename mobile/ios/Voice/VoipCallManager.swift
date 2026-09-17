@@ -1,16 +1,30 @@
 import AVFoundation
 import CallKit
 import Foundation
-import os
 import PushKit
 import UIKit
 import UserNotifications
 import WebRTC
 
-private let log = Logger(
-  subsystem: Bundle.main.bundleIdentifier ?? "voice",
-  category: "PushKit"
-)
+#if DEBUG
+  import os
+
+  private let log = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "voice",
+    category: "PushKit"
+  )
+
+  private func debugLog(_ message: String) {
+    log.info("VOICEDEBUG \(message, privacy: .public)")
+  }
+
+  private func debugError(_ message: String) {
+    log.error("VOICEDEBUG \(message, privacy: .public)")
+  }
+#else
+  private func debugLog(_: @autoclosure () -> String) {}
+  private func debugError(_: @autoclosure () -> String) {}
+#endif
 
 struct IncomingCallInfo {
   let uuid: UUID
@@ -115,14 +129,14 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     guard type == PKPushType.voIP else { return }
     let token = hexString(from: pushCredentials.token)
     currentToken = token
-    log.info("VOICEDEBUG VoIP token: \(token, privacy: .public)")
+    debugLog("VoIP token: \(token)")
     notifyVoipTokenUpdated()
   }
 
   func pushRegistry(_: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
     guard type == PKPushType.voIP else { return }
     currentToken = nil
-    log.info("VOICEDEBUG VoIP token invalidated")
+    debugLog("VoIP token invalidated")
     notifyVoipTokenUpdated()
   }
 
@@ -139,7 +153,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       return
     }
 
-    log.info("VOICEDEBUG VoIP push received")
+    debugLog("VoIP push received")
 
     let voipPayloadDictionary = payload.dictionaryPayload
     if let typeString = trimmedString(voipPayloadDictionary["type"]),
@@ -159,11 +173,11 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     if let incomingCallInfo {
       pendingCalls[incomingCallInfo.uuid] = incomingCallInfo
-      log.info(
-        "VOICEDEBUG parsed call uuid=\(incomingCallInfo.uuid.uuidString, privacy: .public) roomId=\(incomingCallInfo.roomId, privacy: .public) callId=\(incomingCallInfo.callId, privacy: .public)"
+      debugLog(
+        "parsed call uuid=\(incomingCallInfo.uuid.uuidString) roomId=\(incomingCallInfo.roomId) callId=\(incomingCallInfo.callId)"
       )
     } else {
-      log.error("VOICEDEBUG VoIP payload missing required fields, reporting fallback call")
+      debugError("VoIP payload missing required fields, reporting fallback call")
     }
 
     let update = CXCallUpdate()
@@ -179,13 +193,13 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     func onIncomingCallReportFinished(error: Error?) {
       if let error {
         pendingCalls.removeValue(forKey: callUUID)
-        log.error("VOICEDEBUG CallKit report failed: \(error.localizedDescription, privacy: .public)")
+        debugError("CallKit report failed: \(error.localizedDescription)")
         completion()
         return
       }
 
-      log.info(
-        "VOICEDEBUG CallKit incoming call reported uuid=\(callUUID.uuidString, privacy: .public)"
+      debugLog(
+        "CallKit incoming call reported uuid=\(callUUID.uuidString)"
       )
       completion()
     }
@@ -206,7 +220,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     storedAcceptedCallInfo = nil
     pendingCalls.removeAll()
     activeCallUUID = nil
-    log.info("VOICEDEBUG CallKit provider reset")
+    debugLog("CallKit provider reset")
   }
 
   /// first argument is telephonyProvider. iOS calls this on it automatically.
@@ -214,7 +228,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     storedAcceptedCallInfo = pendingCalls[action.callUUID]
     pendingCalls.removeValue(forKey: action.callUUID)
     guard let storedAcceptedCallInfo else {
-      log.error("VOICEDEBUG CallKit answer missing pending call")
+      debugError("CallKit answer missing pending call")
       action.fail()
       return
     }
@@ -236,13 +250,13 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
         options: [AVAudioSession.CategoryOptions.allowBluetooth]
       )
     } catch {
-      log.error(
-        "VOICEDEBUG audio session category failed: \(error.localizedDescription, privacy: .public)"
+      debugError(
+        "audio session category failed: \(error.localizedDescription)"
       )
     }
 
     pendingAnswerAction = action
-    log.info("VOICEDEBUG CallKit answer held callId=\(storedAcceptedCallInfo.callId, privacy: .public)")
+    debugLog("CallKit answer held callId=\(storedAcceptedCallInfo.callId)")
 
     // NotificationCenter is Apple’s in-process pub/sub. Same app, same process.
     // It is NOT push notifications, NOT CallKit, NOT UNUserNotificationCenter (banners).
@@ -271,7 +285,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     clearCallState(action.callUUID)
 
-    log.info("VOICEDEBUG CallKit end")
+    debugLog("CallKit end")
     action.fulfill()
   }
 
@@ -285,7 +299,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       object: nil,
       userInfo: ["isMuted": action.isMuted]
     )
-    log.info("VOICEDEBUG CallKit mute changed isMuted=\(action.isMuted, privacy: .public)")
+    debugLog("CallKit mute changed isMuted=\(action.isMuted)")
   }
 
   /// callkit calls this after it activates avaudiosession (after fulfill).
@@ -294,7 +308,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     let rtcAudioSession = RTCAudioSession.sharedInstance()
     rtcAudioSession.audioSessionDidActivate(audioSession)
     rtcAudioSession.isAudioEnabled = true
-    log.info("VOICEDEBUG CallKit audio session activated")
+    debugLog("CallKit audio session activated")
   }
 
   /// callkit calls this after it deactivates the session (end, fail, or interruption). we stop webrtc's audio unit.
@@ -303,7 +317,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     rtcAudioSession.audioSessionDidDeactivate(audioSession)
     rtcAudioSession.isAudioEnabled = false
     rtcAudioSession.useManualAudio = false
-    log.info("VOICEDEBUG CallKit audio session deactivated")
+    debugLog("CallKit audio session deactivated")
   }
 
   /// this is the way for js to reach for storedAcceptedCallInfo
@@ -320,7 +334,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   /// CallKit treats the call as connected and activates AVAudioSession and calls didActivate
   @objc func fulfillPendingAnswerAction() {
     guard let pendingAnswerAction else { return }
-    log.info("VOICEDEBUG CallKit answer fulfilled")
+    debugLog("CallKit answer fulfilled")
     pendingAnswerAction.fulfill()
     self.pendingAnswerAction = nil
   }
@@ -333,8 +347,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     let endActionTransaction = CXTransaction(action: endAction)
     callController.request(endActionTransaction) { error in
       if let error {
-        log.error(
-          "VOICEDEBUG CallKit end request failed: \(error.localizedDescription, privacy: .public)"
+        debugError(
+          "CallKit end request failed: \(error.localizedDescription)"
         )
       }
     }
@@ -351,8 +365,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
 
     func onMuteRequestFinished(error: Error?) {
       if let error {
-        log.error(
-          "VOICEDEBUG CallKit mute request failed: \(error.localizedDescription, privacy: .public)"
+        debugError(
+          "CallKit mute request failed: \(error.localizedDescription)"
         )
       }
     }
@@ -371,7 +385,7 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       return
     }
 
-    log.info("VOICEDEBUG VoIP remote end uuid=\(callUUID.uuidString, privacy: .public)")
+    debugLog("VoIP remote end uuid=\(callUUID.uuidString)")
 
     let callOutcome: CallOutcome =
       pushType == VoipPushType.callDeclined ? CallOutcome.declined : CallOutcome.cancelled
@@ -396,8 +410,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       )
       clearCallState(callUUID)
       if let error {
-        log.info(
-          "VOICEDEBUG CallKit remote-end report: \(error.localizedDescription, privacy: .public)"
+        debugLog(
+          "CallKit remote-end report: \(error.localizedDescription)"
         )
       }
       completion()
@@ -417,8 +431,8 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     uuid: UUID,
     completion: @escaping () -> Void
   ) {
-    log.error(
-      "VOICEDEBUG unexpected remote-end voip while not ringing uuid=\(uuid.uuidString, privacy: .public)"
+    debugError(
+      "unexpected remote-end voip while not ringing uuid=\(uuid.uuidString)"
     )
 
     func onUnexpectedRemoteEndReportFinished(error: Error?) {
@@ -519,12 +533,12 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
   /// not suspended before the POST finishes.
   private func postCallDeclined(roomId: String, callId: String) {
     guard let voipPushToken = hexEncodedVoipToken() else {
-      log.error("VOICEDEBUG decline POST skipped: no VoIP token")
+      debugError("decline POST skipped: no VoIP token")
       return
     }
 
     guard let url = URL(string: "\(ServerConfigIos.baseURL)/api/rooms/\(roomId)/decline") else {
-      log.error("VOICEDEBUG decline POST skipped: bad URL")
+      debugError("decline POST skipped: bad URL")
       return
     }
 
@@ -553,17 +567,17 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
       expirationHandler: onDeclinePostRequestBackgroundTimeExpired
     )
 
-    log.info("VOICEDEBUG decline POST callId=\(callId, privacy: .public)")
+    debugLog("decline POST callId=\(callId)")
 
     /// URLSession.dataTask(...) only creates a task. .resume() starts it
     /// onDeclinePostRequestFinished runs later when the response arrives (or fails).
     func onDeclinePostRequestFinished(_: Data?, response: URLResponse?, error: Error?) {
       if let error {
-        log.error(
-          "VOICEDEBUG decline POST failed: \(error.localizedDescription, privacy: .public)"
+        debugError(
+          "decline POST failed: \(error.localizedDescription)"
         )
       } else if let httpResponse = response as? HTTPURLResponse {
-        log.info("VOICEDEBUG decline POST status=\(httpResponse.statusCode, privacy: .public)")
+        debugLog("decline POST status=\(httpResponse.statusCode)")
       }
       // tell ios we no longer need background time. if we never call this,
       // ios still thinks the task is running and can kill the app.
