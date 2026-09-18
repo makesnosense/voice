@@ -5,6 +5,8 @@ import { BACK_BUTTON_VARIANT } from '../../components/header/back-button/BackBut
 import layoutStyles from '../../styles/Layout.module.css';
 import styles from './PrivacyPage.module.css';
 
+export const HOSTED_HOST = 'voice.k.vu';
+
 const backButton = <BackButton label="" variant={BACK_BUTTON_VARIANT.NEUTRAL} />;
 
 export default function PrivacyPage() {
@@ -28,8 +30,8 @@ export default function PrivacyPage() {
           <h2 className={styles.heading}>Hosted version</h2>
           <p className={styles.paragraph}>
             This policy applies to the hosted version of Voice at{' '}
-            <a className={styles.link} href={window.location.origin}>
-              {window.location.host}
+            <a className={styles.link} href={`https://${HOSTED_HOST}`}>
+              {HOSTED_HOST}
             </a>
             , operated from the Netherlands. Users in the EU may exercise their rights under GDPR —
             including access, erasure, and portability — by deleting their account in-app.
