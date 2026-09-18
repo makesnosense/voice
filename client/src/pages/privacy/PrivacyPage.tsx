@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       <Header leftSlot={backButton} />
       <main className={styles.content}>
         <h1 className={styles.title}>Privacy Policy</h1>
-        <p className={styles.meta}>Effective May 1, 2026</p>
+        <p className={styles.meta}>Effective September 18, 2026</p>
 
         <p className={`${styles.intro} ${styles.paragraph}`}>
           Voice is a voice calling app. This policy describes what data is stored, why, and how it
@@ -54,10 +54,11 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>Device information</strong> — device name (e.g. "Samsung Galaxy S22" or
-              "Chrome on macOS"), platform, last active timestamp, and FCM token are stored on
-              Voice's server per signed-in session. This is used to identify active sessions and
-              deliver incoming call notifications. Device records are removed on logout or when
-              manually removed from the active sessions list in Settings.
+              "Chrome on macOS"), platform, last active timestamp, and a push token are stored on
+              Voice's server per signed-in session — a Firebase Cloud Messaging token on Android, a
+              VoIP push token on iOS. This is used to identify active sessions and deliver incoming
+              call notifications. Device records are removed on logout or when manually removed from
+              the active sessions list in Settings.
             </li>
             <li>
               <strong>Contacts</strong> — the list of users you have added as contacts is stored on
@@ -65,8 +66,8 @@ export default function PrivacyPage() {
             </li>
             <li>
               <strong>Session tokens</strong> — authentication tokens are stored in{' '}
-              <code>localStorage</code> on the browser, or in the system keychain on Android, to
-              keep you signed in.
+              <code>localStorage</code> on the browser, or in the system keychain on Android and
+              iOS, to keep you signed in.
             </li>
             <li>
               <strong>IP addresses</strong> — processed transiently for rate limiting and call
@@ -89,12 +90,12 @@ export default function PrivacyPage() {
         </section>
 
         <section className={styles.section}>
-          <h2 className={styles.heading}>Android app local logs</h2>
+          <h2 className={styles.heading}>Mobile app local logs</h2>
           <p className={styles.paragraph}>
-            The Android app keeps a rolling diagnostic log on your device capturing application
-            events — call state transitions, WebRTC connection status, errors — which may
-            incidentally include room IDs or contact display names. The log is stored in the app's
-            private storage, never transmitted to any server, and capped at 1,000 entries.
+            The Android and iOS apps keep a rolling diagnostic log on your device capturing
+            application events — call state transitions, WebRTC connection status, errors — which
+            may incidentally include room IDs or contact display names. The log is stored in the
+            app's private storage, never transmitted to any server, and capped at 1,000 entries.
           </p>
           <p className={styles.paragraph}>
             The log can leave your device only if you share it using the{' '}
@@ -108,7 +109,7 @@ export default function PrivacyPage() {
           <ul className={styles.list}>
             <li>
               <strong>Firebase Cloud Messaging (Google)</strong> — used to deliver push
-              notifications. Subject to{' '}
+              notifications on Android. Subject to{' '}
               <a
                 className={styles.link}
                 href="https://policies.google.com/privacy"
@@ -116,6 +117,19 @@ export default function PrivacyPage() {
                 rel="noopener noreferrer"
               >
                 Google's Privacy Policy
+              </a>
+              .
+            </li>
+            <li>
+              <strong>Apple Push Notification service</strong> — used to deliver push notifications
+              on iOS. Subject to{' '}
+              <a
+                className={styles.link}
+                href="https://www.apple.com/legal/privacy/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Apple's Privacy Policy
               </a>
               .
             </li>
