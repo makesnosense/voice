@@ -4,7 +4,11 @@ import {
   splitTextWithLinks,
   TEXT_SEGMENT_TYPE,
 } from '../../../../../../shared/utils/linkify';
-import { TEXT_PRIMARY, BACKGROUND_PRIMARY } from '../../../../styles/colors';
+import {
+  TEXT_PRIMARY,
+  BACKGROUND_PRIMARY,
+  TEXT_LINK,
+} from '../../../../styles/colors';
 
 interface MessageTextProps {
   text: string;
@@ -45,6 +49,6 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
   link: {
-    textDecorationLine: 'underline',
+    color: TEXT_LINK,
   },
 });
