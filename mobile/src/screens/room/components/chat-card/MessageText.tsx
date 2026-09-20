@@ -1,34 +1,26 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Text, Linking, StyleSheet } from 'react-native';
 import {
   splitTextWithLinks,
   TEXT_SEGMENT_TYPE,
 } from '../../../../../../shared/utils/linkify';
-import {
-  TEXT_PRIMARY,
-  TEXT_SECONDARY,
-  TEXT_MUTED,
-} from '../../../../styles/colors';
+import { TEXT_PRIMARY, BACKGROUND_PRIMARY } from '../../../../styles/colors';
 
 interface MessageTextProps {
   text: string;
+  isFromMe: boolean;
 }
 
-export default function MessageText({ text }: MessageTextProps) {
-  const [pressedLinkIndex, setPressedLinkIndex] = useState<number | null>(null);
+export default function MessageText({ text, isFromMe }: MessageTextProps) {
   const segments = useMemo(() => splitTextWithLinks(text), [text]);
 
   return (
-    <Text style={styles.text}>
+    <Text style={isFromMe ? styles.textFromMe : styles.text}>
       {segments.map((segment, index) =>
         segment.type === TEXT_SEGMENT_TYPE.LINK ? (
           <Text
             key={index}
-            style={
-              pressedLinkIndex === index ? styles.linkPressed : styles.link
-            }
-            onPressIn={() => setPressedLinkIndex(index)}
-            onPressOut={() => setPressedLinkIndex(null)}
+            style={styles.link}
             onPress={() => Linking.openURL(segment.value)}
           >
             {segment.value}
@@ -47,12 +39,12 @@ const styles = StyleSheet.create({
     color: TEXT_PRIMARY,
     lineHeight: 19,
   },
-  link: {
-    color: TEXT_SECONDARY,
-    textDecorationLine: 'underline',
+  textFromMe: {
+    fontSize: 13,
+    color: BACKGROUND_PRIMARY,
+    lineHeight: 19,
   },
-  linkPressed: {
-    color: TEXT_MUTED,
+  link: {
     textDecorationLine: 'underline',
   },
 });
