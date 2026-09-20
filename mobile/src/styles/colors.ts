@@ -2,7 +2,9 @@ export const TEXT_PRIMARY = '#18181b'; // zinc-900
 export const TEXT_SECONDARY = '#71717a'; // zinc-500, secondary text and icons
 export const TEXT_MUTED = '#a1a1aa'; // zinc-400
 export const TEXT_DANGER = '#ef4444';
-export const TEXT_LINK = '#0a84ff'; // ios system blue
+
+export const TEXT_LINK = '#0a84ff'; // ios system blue, hsl(210, 100%, 52%)
+export const TEXT_LINK_FROM_ME = 'hsl(210, 100%, 88%)'; // same hue; last number is lightness
 
 export const BORDER_PRIMARY = '#71717a'; // zinc-500
 export const BORDER_MUTED = '#e4e4e7'; // zinc-200

@@ -8,6 +8,7 @@ import {
   TEXT_PRIMARY,
   BACKGROUND_PRIMARY,
   TEXT_LINK,
+  TEXT_LINK_FROM_ME,
 } from '../../../../styles/colors';
 
 interface MessageTextProps {
@@ -24,7 +25,7 @@ export default function MessageText({ text, isFromMe }: MessageTextProps) {
         segment.type === TEXT_SEGMENT_TYPE.LINK ? (
           <Text
             key={index}
-            style={styles.link}
+            style={isFromMe ? styles.linkFromMe : styles.link}
             onPress={() => Linking.openURL(segment.value)}
           >
             {segment.value}
@@ -50,5 +51,8 @@ const styles = StyleSheet.create({
   },
   link: {
     color: TEXT_LINK,
+  },
+  linkFromMe: {
+    color: TEXT_LINK_FROM_ME,
   },
 });
