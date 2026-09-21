@@ -295,7 +295,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Voice/Voice.entitlements;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2UALFVP763;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Voice/Info.plist;
@@ -313,6 +313,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.voicepopuli.voice.ios.debug;
 				PRODUCT_NAME = Voice;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -328,7 +329,7 @@
 				CODE_SIGN_ENTITLEMENTS = Voice/Voice.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2UALFVP763;
 				INFOPLIST_FILE = Voice/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -345,6 +346,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.voicepopuli.voice.ios;
 				PRODUCT_NAME = Voice;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				TARGETED_DEVICE_FAMILY = 1;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
