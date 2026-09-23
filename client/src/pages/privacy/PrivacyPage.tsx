@@ -15,7 +15,7 @@ export default function PrivacyPage() {
   }, []);
 
   return (
-    <div className={`${layoutStyles.page} ${styles.page}`}>
+    <div className={`${layoutStyles.page}`}>
       <Header leftSlot={backButton} />
       <main className={styles.content}>
         <h1 className={styles.title}>Privacy Policy</h1>
