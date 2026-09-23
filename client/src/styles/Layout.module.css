@@ -8,12 +8,6 @@
   margin: 0 auto;
 }
 
-@media (max-width: 390px) {
-  .page {
-    padding: 10px 5px;
-  }
-}
-
 .landingContent {
   display: grid;
   place-items: center;
