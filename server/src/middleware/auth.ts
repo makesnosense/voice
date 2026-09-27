@@ -68,28 +68,29 @@ export async function requireRefreshToken(
 
   const { refreshToken } = result.data;
 
+  let payload: RefreshTokenPayload;
   try {
-    const payload = verifyRefreshToken(refreshToken);
-
-    const [tokenRecord] = await db
-      .select()
-      .from(refreshTokens)
-      .where(eq(refreshTokens.jti, payload.jti))
-      .limit(1);
-
-    if (!tokenRecord) {
-      return res.status(401).json({
-        errorMessage: 'Refresh token revoked',
-        errorCode: ERROR_CODE.REFRESH_TOKEN_REVOKED,
-      });
-    }
-
-    req.refreshPayload = { userId: payload.userId, jti: payload.jti };
-    next();
-  } catch (error) {
+    payload = verifyRefreshToken(refreshToken);
+  } catch {
     return res.status(401).json({
-      errorMessage: 'Invalid refresh token',
+      errorMessage: 'Invalid or expired refresh token',
       errorCode: ERROR_CODE.UNAUTHORIZED,
     });
   }
+
+  const [tokenRecord] = await db
+    .select()
+    .from(refreshTokens)
+    .where(eq(refreshTokens.jti, payload.jti))
+    .limit(1);
+
+  if (!tokenRecord) {
+    return res.status(401).json({
+      errorMessage: 'Refresh token revoked',
+      errorCode: ERROR_CODE.REFRESH_TOKEN_REVOKED,
+    });
+  }
+
+  req.refreshPayload = { userId: payload.userId, jti: payload.jti };
+  next();
 }
