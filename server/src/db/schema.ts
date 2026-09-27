@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import {
   pgTable,
   pgEnum,
@@ -6,16 +7,21 @@ import {
   timestamp,
   boolean,
   primaryKey,
+  check,
 } from 'drizzle-orm/pg-core';
 import { CALL_OUTCOME } from '../../../shared/constants/calls';
 import type { ObjectValues } from '../../../shared/types/core';
 
-export const users = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  name: varchar('name', { length: 255 }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const users = pgTable(
+  'users',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
+    name: varchar('name', { length: 255 }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [check('users_email_lowercase', sql`${table.email} = lower(${table.email})`)]
+);
 
 export const refreshTokens = pgTable('refresh_tokens', {
   jti: uuid('jti').defaultRandom().primaryKey(),
@@ -25,13 +31,17 @@ export const refreshTokens = pgTable('refresh_tokens', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const otpCodes = pgTable('otp_codes', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  email: varchar('email', { length: 255 }).notNull(),
-  code: varchar('code', { length: 6 }).notNull(),
-  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const otpCodes = pgTable(
+  'otp_codes',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    email: varchar('email', { length: 255 }).notNull(),
+    code: varchar('code', { length: 6 }).notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [check('otp_codes_email_lowercase', sql`${table.email} = lower(${table.email})`)]
+);
 
 export const PLATFORM = {
   WEB: 'web',

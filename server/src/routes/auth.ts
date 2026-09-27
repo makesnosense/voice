@@ -33,11 +33,10 @@ router.post(
     }
 
     const { email } = result.data;
+    const reviewEmail = config.playStoreReview.email?.toLowerCase();
 
     const isReviewAccount =
-      config.playStoreReview.email &&
-      config.playStoreReview.otpCode &&
-      email === config.playStoreReview.email;
+      !!reviewEmail && !!config.playStoreReview.otpCode && email === reviewEmail;
 
     if (isReviewAccount) {
       return res.json({ success: true });
@@ -66,11 +65,12 @@ router.post(
     }
 
     const { email, code } = result.data;
+    const reviewEmail = config.playStoreReview.email?.toLowerCase();
 
     const isReviewBypass =
-      config.playStoreReview.email &&
-      config.playStoreReview.otpCode &&
-      email === config.playStoreReview.email &&
+      !!reviewEmail &&
+      !!config.playStoreReview.otpCode &&
+      email === reviewEmail &&
       code === config.playStoreReview.otpCode;
 
     const otpValidated = await validateAndDeleteOtp(email, code);

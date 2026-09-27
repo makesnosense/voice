@@ -6,6 +6,7 @@ import { getContacts } from './contacts';
 import type { DataExport } from '../../../shared/types/core';
 
 export async function findUserByEmail(email: string) {
+  email = email.toLowerCase();
   const [user] = await db
     .select({ id: users.id, email: users.email, name: users.name })
     .from(users)

@@ -35,7 +35,7 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
     });
   }
 
-  const { email } = req.body;
+  const { email } = result.data;
 
   if (email === req.user.email) {
     return res
@@ -49,6 +49,12 @@ router.post('/', requireAccessToken, async (req, res: Response<Contact | ApiErro
       return res
         .status(404)
         .json({ errorMessage: 'user not found', errorCode: ERROR_CODE.USER_NOT_FOUND });
+    }
+
+    if (target.id === req.user.userId) {
+      return res
+        .status(400)
+        .json({ errorMessage: 'cannot add yourself', errorCode: ERROR_CODE.CANNOT_ADD_SELF });
     }
 
     const contact = await addContact(req.user.userId, target.id);

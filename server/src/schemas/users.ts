@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import { db } from '../db';
-import { users } from '../db/schema';
-import { eq } from 'drizzle-orm';
 
-export const byEmailSchema = z.object({ email: z.email() });
+export const byEmailSchema = z.object({
+  email: z.email().transform((email) => email.toLowerCase()),
+});
 
 export const updateNameSchema = z.object({
   name: z

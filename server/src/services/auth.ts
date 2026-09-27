@@ -3,6 +3,7 @@ import { otpCodes, users } from '../db/schema';
 import { eq, and, gt } from 'drizzle-orm';
 
 export async function findValidOtp(email: string, code: string) {
+  email = email.toLowerCase();
   const [otpRecord] = await db
     .select()
     .from(otpCodes)
@@ -19,6 +20,7 @@ export async function deleteOtpById(id: string) {
 }
 
 export async function findOrCreateUserForEmail(email: string) {
+  email = email.toLowerCase();
   const [existingUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   if (existingUser) return existingUser;
 

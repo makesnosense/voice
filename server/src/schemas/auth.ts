@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 export const requestOtpSchema = z.object({
-  email: z.email(),
+  email: z.email().transform((email) => email.toLowerCase()),
 });
 
 export const verifyOtpSchema = z.object({
-  email: z.email(),
+  email: z.email().transform((email) => email.toLowerCase()),
   code: z
     .string()
     .length(6)

@@ -50,6 +50,13 @@
       "when": 1788406865664,
       "tag": "0006_volatile_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790490222376,
+      "tag": "0007_sticky_deathbird",
+      "breakpoints": true
     }
   ]
 }
