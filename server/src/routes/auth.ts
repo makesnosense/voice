@@ -9,7 +9,7 @@ import { OTP_EXPIRY_MS } from '../utils/otp';
 import type { OtpVerificationResponse, RenewAccessTokenResponse } from '../../../shared/types/auth';
 import type { ApiErrorResponse } from '../../../shared/errors';
 import { ERROR_CODE } from '../../../shared/constants/errors';
-import { requireRefreshToken } from '../middleware/auth';
+import { assertRefreshAuthed, requireRefreshToken } from '../middleware/auth';
 import {
   otpRequestLimiter,
   otpVerificationLimiter,
@@ -109,11 +109,7 @@ router.post(
   refreshLimiter,
   requireRefreshToken,
   async (req, res: Response<RenewAccessTokenResponse | ApiErrorResponse>) => {
-    if (!req.refreshPayload) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-    }
+    assertRefreshAuthed(req);
 
     // check if jti exists in database (not revoked)
     const [tokenRecord] = await db
@@ -157,11 +153,7 @@ router.delete(
   '/sessions/current',
   requireRefreshToken,
   async (req, res: Response<{ success: true } | ApiErrorResponse>) => {
-    if (!req.refreshPayload) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-    }
+    assertRefreshAuthed(req);
 
     const { jti, userId } = req.refreshPayload;
 
@@ -180,11 +172,7 @@ router.delete(
   '/sessions/:jti',
   requireRefreshToken,
   async (req, res: Response<{ success: true } | ApiErrorResponse>) => {
-    if (!req.refreshPayload) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-    }
+    assertRefreshAuthed(req);
     const { userId } = req.refreshPayload;
 
     const jtiResult = z.uuid().safeParse(req.params.jti);
@@ -217,11 +205,7 @@ router.delete(
   '/sessions',
   requireRefreshToken,
   async (req, res: Response<{ success: true; count: number } | ApiErrorResponse>) => {
-    if (!req.refreshPayload) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-    }
+    assertRefreshAuthed(req);
     const { userId, jti: currentJti } = req.refreshPayload;
 
     const deleted = await db

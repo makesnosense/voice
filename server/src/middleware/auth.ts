@@ -23,6 +23,16 @@ export function assertAuthed(req: Request): asserts req is Request & { user: Use
   }
 }
 
+type RefreshPayload = NonNullable<Request['refreshPayload']>;
+
+export function assertRefreshAuthed(
+  req: Request
+): asserts req is Request & { refreshPayload: RefreshPayload } {
+  if (!req.refreshPayload) {
+    throw new ApiError(401, 'Unauthorized', ERROR_CODE.UNAUTHORIZED);
+  }
+}
+
 export function requireAccessToken(
   req: Request,
   res: Response<ApiErrorResponse>,

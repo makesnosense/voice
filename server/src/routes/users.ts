@@ -1,5 +1,10 @@
 import { Router, type Response } from 'express';
-import { assertAuthed, requireAccessToken, requireRefreshToken } from '../middleware/auth';
+import {
+  assertAuthed,
+  assertRefreshAuthed,
+  requireAccessToken,
+  requireRefreshToken,
+} from '../middleware/auth';
 import { findUserByEmail, deleteUser } from '../services/users';
 import { byEmailSchema, updateNameSchema } from '../schemas/users';
 import { updateUserName, exportUserData } from '../services/users';
@@ -96,11 +101,7 @@ router.delete(
   requireRefreshToken,
   deleteAccountLimiter,
   async (req, res: Response<ApiErrorResponse>) => {
-    if (!req.refreshPayload) {
-      return res
-        .status(401)
-        .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-    }
+    assertRefreshAuthed(req);
     const { userId } = req.refreshPayload;
 
     try {

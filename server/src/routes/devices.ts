@@ -1,5 +1,10 @@
 import { Router, type Response } from 'express';
-import { assertAuthed, requireAccessToken, requireRefreshToken } from '../middleware/auth';
+import {
+  assertAuthed,
+  assertRefreshAuthed,
+  requireAccessToken,
+  requireRefreshToken,
+} from '../middleware/auth';
 import { registerDeviceSchema } from '../schemas/devices';
 import {
   findDeviceByRefreshJti,
@@ -14,11 +19,7 @@ import { ERROR_CODE } from '../../../shared/constants/errors';
 const router = Router();
 
 router.post('/', requireRefreshToken, async (req, res: Response<Device | ApiErrorResponse>) => {
-  if (!req.refreshPayload) {
-    return res
-      .status(401)
-      .json({ errorMessage: 'Unauthorized', errorCode: ERROR_CODE.UNAUTHORIZED });
-  }
+  assertRefreshAuthed(req);
 
   const result = registerDeviceSchema.safeParse(req.body);
   if (!result.success) {
