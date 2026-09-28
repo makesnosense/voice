@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types/auth';
 
 const ACCESS_TOKEN_EXPIRY = '120m';
+const JWT_ALGORITHM = 'HS256';
 
 const TOKEN_TYPE = {
   ACCESS: 'access',
@@ -22,13 +23,16 @@ export function generateAccessToken(
   payload: Omit<AccessTokenPayload, 'exp' | 'iat' | 'type'>
 ): string {
   return jwt.sign({ ...payload, type: TOKEN_TYPE.ACCESS }, JWT_SECRET, {
+    algorithm: JWT_ALGORITHM,
     expiresIn: ACCESS_TOKEN_EXPIRY,
   });
 }
 
 export function generateRefreshToken(userId: string): { token: string; jti: string } {
   const jti = randomUUID();
-  const token = jwt.sign({ userId, jti, type: TOKEN_TYPE.REFRESH }, JWT_SECRET);
+  const token = jwt.sign({ userId, jti, type: TOKEN_TYPE.REFRESH }, JWT_SECRET, {
+    algorithm: JWT_ALGORITHM,
+  });
   return { token, jti };
 }
 
@@ -47,12 +51,13 @@ export function reissueAccessTokenWithUpdatedName(
       name: newName,
       exp: original.exp,
     },
-    JWT_SECRET
+    JWT_SECRET,
+    { algorithm: JWT_ALGORITHM }
   );
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {
-  const payload = jwt.verify(token, JWT_SECRET);
+  const payload = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] });
 
   if (typeof payload === 'string' || payload.type !== TOKEN_TYPE.ACCESS) {
     throw new Error('invalid token type');
@@ -62,7 +67,7 @@ export function verifyAccessToken(token: string): AccessTokenPayload {
 }
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
-  const payload = jwt.verify(token, JWT_SECRET);
+  const payload = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] });
 
   if (typeof payload === 'string' || payload.type !== TOKEN_TYPE.REFRESH) {
     throw new Error('invalid token type');
