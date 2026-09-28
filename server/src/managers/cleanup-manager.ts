@@ -46,6 +46,7 @@ export default class CleanupManager {
   }
 
   private async cleanOldRefreshTokens(): Promise<void> {
+    // last_seen is bumped by device sync. a token with no device row yet falls back to created_at.
     const deletedJtis = await db.execute(sql`
         WITH users_with_excess AS (
       SELECT user_id
@@ -53,19 +54,22 @@ export default class CleanupManager {
     GROUP BY user_id
       HAVING COUNT(*) > 10
     ),
-             tokens_by_age AS (
-      SELECT jti,
+             tokens_by_last_seen AS (
+      SELECT refresh_tokens.jti,
              ROW_NUMBER() OVER (
-               PARTITION BY user_id 
-               ORDER BY created_at DESC
+               PARTITION BY refresh_tokens.user_id
+                   ORDER BY COALESCE(devices.last_seen, refresh_tokens.created_at) DESC,
+                            refresh_tokens.created_at DESC
              ) as row_num
         FROM refresh_tokens
-       WHERE user_id IN (SELECT user_id FROM users_with_excess)
+   LEFT JOIN devices
+          ON devices.jti = refresh_tokens.jti
+       WHERE refresh_tokens.user_id IN (SELECT user_id FROM users_with_excess)
     )
-       
+
  DELETE FROM refresh_tokens
        WHERE jti IN (
-      SELECT jti FROM tokens_by_age WHERE row_num > 10
+      SELECT jti FROM tokens_by_last_seen WHERE row_num > 10
     )
    RETURNING jti
   `);
