@@ -47,26 +47,27 @@ export default class CleanupManager {
 
   private async cleanOldRefreshTokens(): Promise<void> {
     const deletedJtis = await db.execute(sql`
-    WITH users_with_excess AS (
+        WITH users_with_excess AS (
       SELECT user_id
-      FROM refresh_tokens
-      GROUP BY user_id
+        FROM refresh_tokens
+    GROUP BY user_id
       HAVING COUNT(*) > 10
     ),
-    ranked_tokens AS (
+             tokens_by_age AS (
       SELECT jti,
              ROW_NUMBER() OVER (
                PARTITION BY user_id 
                ORDER BY created_at DESC
              ) as row_num
-      FROM refresh_tokens
-      WHERE user_id IN (SELECT user_id FROM users_with_excess)
+        FROM refresh_tokens
+       WHERE user_id IN (SELECT user_id FROM users_with_excess)
     )
-    DELETE FROM refresh_tokens
-    WHERE jti IN (
-      SELECT jti FROM ranked_tokens WHERE row_num > 10
+       
+ DELETE FROM refresh_tokens
+       WHERE jti IN (
+      SELECT jti FROM tokens_by_age WHERE row_num > 10
     )
-    RETURNING jti
+   RETURNING jti
   `);
 
     if (deletedJtis.length > 0) {
@@ -82,7 +83,7 @@ export default class CleanupManager {
            GROUP BY from_user_id
              HAVING COUNT(*) > 20
             ),
-                    ranked_calls AS (
+                    calls_by_age AS (
              SELECT id,
                     ROW_NUMBER() OVER (PARTITION BY from_user_id
                                            ORDER BY created_at DESC) 
@@ -94,7 +95,7 @@ export default class CleanupManager {
         DELETE FROM calls
               WHERE id 
                  IN (SELECT id
-                       FROM ranked_calls
+                       FROM calls_by_age
                       WHERE row_num > 20
                 )
       RETURNING id
