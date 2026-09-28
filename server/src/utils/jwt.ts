@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import type { AccessTokenPayload, RefreshTokenPayload } from '../../../shared/types/auth';
 
-const ACCESS_TOKEN_EXPIRY = '120m';
+const ACCESS_TOKEN_EXPIRY = '20m';
 const JWT_ALGORITHM = 'HS256';
 
 const TOKEN_TYPE = {
