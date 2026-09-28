@@ -12,6 +12,7 @@ export interface User {
 }
 
 export interface AccessTokenPayload {
+  type: 'access';
   userId: string;
   email: string;
   name: string | null;
@@ -20,6 +21,7 @@ export interface AccessTokenPayload {
 }
 
 export interface RefreshTokenPayload {
+  type: 'refresh';
   userId: string;
   jti: string;
   iat: number;

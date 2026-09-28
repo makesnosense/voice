@@ -12,7 +12,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: User;
-      refreshPayload?: Omit<RefreshTokenPayload, 'iat'>;
+      refreshPayload?: Omit<RefreshTokenPayload, 'iat' | 'type'>;
     }
   }
 }
