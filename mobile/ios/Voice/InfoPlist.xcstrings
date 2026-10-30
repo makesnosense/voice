@@ -1,0 +1,40 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NSCameraUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice is audio-only and never accesses the camera. This key exists because the WebRTC library bundled for calls includes camera APIs the app doesn't invoke."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice поддерживает только аудиозвонки и никогда не обращается к камере. Этот ключ добавлен, потому что библиотека WebRTC, используемая для звонков, содержит API камеры, которые приложение не вызывает."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice uses your microphone so the other person can hear you during calls."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice использует микрофон, чтобы собеседник слышал вас во время звонков."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

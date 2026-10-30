@@ -181,7 +181,10 @@ final class VoipCallManager: NSObject, PKPushRegistryDelegate, CXProviderDelegat
     }
 
     let update = CXCallUpdate()
-    let callerDisplayName = incomingCallInfo?.callerDisplayName ?? "Incoming call"
+    let callerDisplayName = incomingCallInfo?.callerDisplayName ?? String(
+      localized: "incoming_call_fallback_name",
+      defaultValue: "Incoming call"
+    )
     update.remoteHandle = CXHandle(type: .generic, value: callerDisplayName)
     update.localizedCallerName = callerDisplayName
     update.hasVideo = false

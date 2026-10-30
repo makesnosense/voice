@@ -1,6 +1,24 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "incoming_call_fallback_name": {
+      "comment": "fallback caller label when an incoming voip push lacks valid call information",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incoming call"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Входящий звонок"
+          }
+        }
+      }
+    },
     "notification_missed_call_title": {
       "comment": "shade notification after an unanswered incoming call",
       "extractionState": "manual",
