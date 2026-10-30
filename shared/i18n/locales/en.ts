@@ -97,7 +97,7 @@ const en = {
     bluetoothLabel: 'Nearby devices',
     bluetoothDescription: 'to use bluetooth headsets in calls',
     openSettings: 'Open settings',
-    requestPermissions: 'Request permissions',
+    continue: 'Continue',
     hint: "if the system dialog doesn't appear, open settings and grant manually",
     skip: 'Skip',
     microphoneRationaleTitle: 'Microphone access',

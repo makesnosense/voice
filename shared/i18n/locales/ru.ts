@@ -98,7 +98,7 @@ const ru: LocaleShape<typeof en> = {
     bluetoothLabel: 'Устройства поблизости',
     bluetoothDescription: 'для использования Bluetooth-гарнитур в звонках',
     openSettings: 'Открыть настройки',
-    requestPermissions: 'Запросить разрешения',
+    continue: 'Продолжить',
     hint: 'если системное окно не появилось, откройте настройки и предоставьте разрешения вручную',
     skip: 'Пропустить',
     microphoneRationaleTitle: 'Доступ к микрофону',
