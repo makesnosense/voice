@@ -51,7 +51,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Voice is audio-only and never accesses the camera. This key exists because the WebRTC library bundled for calls includes camera APIs the app doesn't invoke.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Voice needs microphone access for calls</string>
+	<string>Voice uses your microphone so the other person can hear you during calls.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIBackgroundModes</key>
