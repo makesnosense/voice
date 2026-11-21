@@ -13,8 +13,10 @@ const getClientIp = (socket: ExtendedConnectedSocket): string => {
   if (config.rateLimiting.trustProxy) {
     const forwardedHeader = socket.handshake.headers['x-forwarded-for'];
     if (forwardedHeader) {
-      const firstIp = String(forwardedHeader).split(',')[0].trim();
-      return firstIp;
+      // nginx appends the real client address, so the last entry is the only one a client cannot choose
+      const forwardedIps = String(forwardedHeader).split(',');
+      const lastIp = forwardedIps[forwardedIps.length - 1].trim();
+      return lastIp;
     }
   }
   return socket.handshake.address;
